@@ -76,7 +76,7 @@
 			<section class="pages_draft_author"><?=$draft_author["name"]?></section>
 			<section class="pages_publish"><a class="icon_publish" href="#"></a></section>
 			<section class="pages_edit"><a class="icon_edit" href="<?=$aroot?>pages/edit/<?=$pdata["id"]?>/"></a></section>
-			<section class="pages_delete"><a class="icon_delete" href="<?=$aroot?>ajax/pages/delete-draft/?id=<?=$pdata["id"]?>"></a></section>
+			<section class="pages_delete"><a class="icon_delete" href="<?=$aroot?>pages/revisions/delete-draft/<?=$pdata["id"]?>/"></a></section>
 		</li>
 		<?
 			}
@@ -117,7 +117,7 @@
 		<span class="pages_last_edited">Saved</span>
 		<span class="pages_draft_description">Description</span>
 		<span class="pages_publish">New Draft</span>
-		<span class="pages_edit">Edit</span>
+		<span class="pages_edit">Delete</span>
 	</header>
 	<ul>
 		<? foreach ($saved as $r) { ?>
@@ -137,8 +137,8 @@
 	
 	$(".icon_save").click(function() {
 		new BigTreeDialog("Save Revision",'<fieldset><label>Short Description <small>(quick reminder of what\'s special about this revision)</small></label><input type="text" name="description" /></fieldset>',$.proxy(function(d) {
-			$.ajax("<?=$aroot?>ajax/pages/revisions/save/" + BigTree.CleanHref($(this).attr("href")) + "/", { type: "POST", data: { description: d.description }, complete: function() {
-				//window.location.reload();
+			$.ajax("<?=$aroot?>pages/revisions/save/" + BigTree.CleanHref($(this).attr("href")) + "/", { type: "POST", data: { description: d.description }, complete: function() {
+				window.location.reload();
 			}});
 		},this));
 		
@@ -149,7 +149,7 @@
 		href = $(this).attr("href");
 		if (href.substr(1) == "#") {
 			new BigTreeDialog("Delete Revision",'<p class="confirm">Are you sure you want to delete this revision?</p>',$.proxy(function() {
-				$.ajax("<?=$aroot?>ajax/pages/revisions/delete/?id=" + BigTree.CleanHref($(this).attr("href")));
+				$.ajax("<?=$aroot?>pages/revisions/delete/?id=" + BigTree.CleanHref($(this).attr("href")));
 				$(this).parents("li").remove();
 			},this),"delete",false,"OK");
 		} else {
