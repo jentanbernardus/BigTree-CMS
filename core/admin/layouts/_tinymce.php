@@ -1,0 +1,1 @@
+<script type="text/javascript" src="<?=$aroot?>js/tiny_mce/tiny_mce.js"></script>

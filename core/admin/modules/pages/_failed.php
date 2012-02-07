@@ -1,0 +1,20 @@
+<h1>Errors Occurred</h1>
+<div class="table">
+	<summary>
+		<p>Your submission had <?=count($fails)?> error<? if (count($fails) != 1) { ?>s<? } ?>.</p>
+	</summary>
+	<header>
+		<span class="view_column" style="padding: 0 0 0 20px; width: 250px;">Field</span>
+		<span class="view_column" style="width: 688px;">Error</span>
+	</header>
+	<ul>
+		<? foreach ($fails as $fail) { ?>
+		<li>
+			<section class="view_column" style="padding: 0 0 0 20px; width: 250px;"><?=$fail["field"]?></section>
+			<section class="view_column" style="width: 688px;"><?=$fail["error"]?></section>
+		</li>
+		<? } ?>
+	</ul>
+</div>
+<a href="<?=$aroot?>pages/edit/<?=$page?>/" class="button blue">Go Back</a>
+<a href="<?=$aroot?>pages/view-tree/<?=$_POST["parent"]?>/" class="button white">Ignore</a>

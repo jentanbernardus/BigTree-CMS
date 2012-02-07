@@ -1,0 +1,2334 @@
+<?
+	// BigTree Admin Class
+
+	class BigTreeAdmin {
+
+		var $PerPage = 15;
+
+		// !Constructor
+		function __construct() {
+			if (isset($_SESSION["bigtree"]["email"])) {
+				$this->ID = $_SESSION["bigtree"]["id"];
+				$this->User = $_SESSION["bigtree"]["email"];
+				$this->Level = $_SESSION["bigtree"]["level"];
+				$this->Name = $_SESSION["bigtree"]["name"];
+				$this->Permissions = $_SESSION["bigtree"]["permissions"];
+			}
+			if (isset($_COOKIE["bigtree"]["email"])) {
+				$user = mysql_escape_string($_COOKIE["bigtree"]["email"]);
+				$pass = mysql_escape_string($_COOKIE["bigtree"]["password"]);
+				$f = sqlfetch(sqlquery("SELECT * FROM bigtree_users WHERE email = '$user' AND password = '$pass'"));
+				if ($f) {
+					$this->ID = $f["id"];
+					$this->User = $user;
+					$this->Level = $f["level"];
+					$this->Name = $f["name"];
+					$this->Permissions = json_decode($f["permissions"],true);
+					$_SESSION["bigtree"]["id"] = $f["id"];
+					$_SESSION["bigtree"]["email"] = $f["email"];
+					$_SESSION["bigtree"]["level"] = $f["level"];
+					$_SESSION["bigtree"]["name"] = $f["name"];
+					$_SESSION["bigtree"]["permissions"] = $this->Permissions;
+				}
+			}
+			
+			// Used cached values if available, otherwise query the DB
+			if (file_exists($GLOBALS["server_root"]."cache/form-field-types.btc")) {
+				$types = json_decode(file_get_contents($GLOBALS["server_root"]."cache/form-field-types.btc"),true);
+			} else {
+				$types["module"] = array(
+					"text" => "Text",
+					"textarea" => "Text Area",
+					"html" => "HTML Area",
+					"upload" => "Upload",
+					"list" => "List",
+					"checkbox" => "Checkbox",
+					"date" => "Date Picker",
+					"time" => "Time Picker",
+					"photo-gallery" => "Photo Gallery",
+					"array" => "Array of Items",
+					"route" => "Generated Route",
+					"custom" => "Custom Function"
+				);
+				$types["template"] = $types["module"];
+				$types["callout"] = array(
+					"text" => "Text",
+					"textarea" => "Text Area",
+					"html" => "HTML Area",
+					"upload" => "Upload",
+					"list" => "List",
+					"checkbox" => "Checkbox",
+					"date" => "Date Picker",
+					"time" => "Time Picker",
+					"array" => "Array of Items",
+					"custom" => "Custom Function"
+				);
+				
+				$q = sqlquery("SELECT * FROM bigtree_field_types ORDER BY name");
+				while ($f = sqlfetch($q)) {
+					if ($f["pages"]) {
+						$types["template"][$f["id"]] = $f["name"];
+					}
+					if ($f["modules"]) {
+						$types["module"][$f["id"]] = $f["name"];
+					}
+					if ($f["callouts"]) {
+						$types["callout"][$f["id"]] = $f["name"];
+					}
+				}
+				file_put_contents($GLOBALS["server_root"]."cache/form-field-types.btc",json_encode($types));
+			}
+			
+			// Set the field types up
+			$this->ModuleFieldTypes = $types["module"];
+			$this->TemplateFieldTypes = $types["template"];
+			$this->CalloutFieldTypes = $types["callout"];
+		}
+
+		// !View Types
+		var $ViewTypes = array(
+			"searchable" => "Searchable List",
+			"draggable" => "Draggable List",
+			"images" => "Image List",
+			"grouped" => "Grouped List",
+			"images-grouped" => "Grouped Image List"
+		);
+
+		// !Reserved Column Names
+		var $ReservedColumns = array(
+			"id",
+			"position",
+			"archived",
+			"approved"
+		);
+
+		// !View Actions
+		var $ViewActions = array(
+			"approve" => array(
+				"key" => "approved",
+				"name" => "Approve",
+				"class" => "icon_approve icon_approve_on"
+			),
+			"archive" => array(
+				"key" => "archived",
+				"name" => "Archive",
+				"class" => "icon_archive"
+			),
+			"feature" => array(
+				"key" => "featured",
+				"name" => "Feature",
+				"class" => "icon_feature icon_feature_on"
+			),
+			"delete" => array(
+				"key" => "id",
+				"name" => "Delete",
+				"class" => "icon_delete"
+			),
+			"edit" => array(
+				"key" => "id",
+				"name" => "Edit",
+				"class" => "icon_edit"
+			)
+		);
+
+		// !Utility Functions
+
+		function autoIPL($html) {
+			global $cms;
+
+			$html = preg_replace_callback('^href="([a-zA-Z0-9\:\/\.\?\=\-]*)"^','bigtree_regex_set_ipl',$html);
+			$html = str_replace($GLOBALS["resource_root"],"{wwwroot}",$html);
+			$html = str_replace($GLOBALS["www_root"],"{wwwroot}",$html);
+
+			return $html;
+		}
+
+		function checkHTML($dpath,$html,$external = false) {
+			if (!$html)
+				return array();
+			$errors = array();
+			$doc = new DOMDocument();
+			$doc->loadHTML($html);
+			// Check A tags.
+			$links = $doc->getElementsByTagName("a");
+			foreach ($links as $link) {
+				$href = $link->getAttribute("href");
+				$href = str_replace(array("{wwwroot}","%7Bwwwroot%7D"),$GLOBALS["www_root"],$href);
+				if (substr($href,0,4) == "http" && strpos($href,$GLOBALS["www_root"]) === false) {
+					// External link, not much we can do but alert that it's dead
+					if ($external) {
+						if (strpos($href,"#") !== false)
+							$href = substr($href,0,strpos($href,"#")-1);
+						if (!$this->urlExists($href)) {
+							$errors["a"][] = $href;
+						}
+					}
+				} elseif (substr($href,0,6) == "ipl://") {
+					$ipl = explode("//",$href);
+					if (!$this->iplExists($ipl)) {
+						$errors["a"][] = $href;
+					}
+				} elseif (substr($href,0,7) == "mailto:" || substr($href,0,1) == "#") {
+					// Don't do anything, it's a page mark or email address
+				} elseif (substr($href,0,4) == "http") {
+					// It's a local hard link
+					if (!$this->urlExists($href)) {
+						$errors["a"][] = $href;
+					}
+				} else {
+					// Local file.
+					$local = $dpath."/".$href;
+					if (!$this->urlExists($local)) {
+						$errors["a"][] = $local;
+					}
+				}
+			}
+			// Check IMG tags.
+			$images = $doc->getElementsByTagName("img");
+			foreach ($images as $image) {
+				$href = $image->getAttribute("src");
+				$href = str_replace(array("{wwwroot}","%7Bwwwroot%7D"),$GLOBALS["www_root"],$href);
+				if (substr($href,0,4) == "http" && strpos($href,$GLOBALS["www_root"]) === false) {
+					// External link, not much we can do but alert that it's dead
+					if ($external) {
+						if (!$this->urlExists($href)) {
+							$errors["img"][] = $href;
+						}
+					}
+				} elseif (substr($href,0,6) == "ipl://") {
+					$ipl = explode("//",$href);
+					if (!$this->iplExists($ipl)) {
+						$errors["a"][] = $href;
+					}
+				} elseif (substr($href,0,4) == "http") {
+					// It's a local hard link
+					if (!$this->urlExists($href)) {
+						$errors["img"][] = $href;
+					}
+				} else {
+					// Local file.
+					$local = $dpath."/".$href;
+					if (!$this->urlExists($local)) {
+						$errors["img"][] = $local;
+					}
+				}
+			}
+			return array($errors);
+		}
+
+		function growl($module,$message,$type = "success") {
+			$_SESSION["bigtree"]["flash"] = array("message" => $message, "title" => $module, "type" => $type);
+		}
+		
+		function ungrowl() {
+			unset($_SESSION["bigtree"]["flash"]);
+		}
+
+		function htmlClean($html) {
+			return str_replace("<br></br>","<br />",strip_tags($html,"<a><abbr><address><area><article><aside><audio><b><base><bdo><blockquote><body><br><button><canvas><caption><cite><code><col><colgroup><command><datalist><dd><del><details><dfn><div><dl><dt><em><emded><fieldset><figcaption><figure><footer><form><h1><h2><h3><h4><h5><h6><header><hgroup><hr><i><iframe><img><input><ins><keygen><kbd><label><legend><li><link><map><mark><menu><meter><nav><noscript><object><ol><optgroup><option><output><p><param><pre><progress><q><rp><rt><ruby><s><samp><script><section><select><small><source><span><strong><style><sub><summary><sup><table><tbody><td><textarea><tfoot><th><thead><time><title><tr><ul><var><video><wbr>"));
+		}
+
+		function iplExists($ipl) {
+			global $cms;
+			$nav_id = $ipl[1];
+			if (!sqlrows(sqlquery("SELECT id FROM bigtree_pages WHERE id = '$nav_id'"))) {
+				return false;
+			}
+			$commands = json_decode(base64_decode($ipl[2]),true);
+			if (!isset($commands[0]) || !$commands[0]) {
+				return true;
+			}
+			if (substr($commands[0],0,1) == "#") {
+				return true;
+			}
+			// Get template for the navigation id to see if it's a routed template
+			$t = sqlfetch(sqlquery("SELECT bigtree_templates.routed FROM bigtree_templates JOIN bigtree_pages ON bigtree_templates.id = bigtree_pages.template WHERE bigtree_pages.id = '$nav_id'"));
+			if ($t["routed"]) {
+				return true;
+			}
+			if (count($commands) > 1) {
+				return false;
+			}
+			$file = $nav_id."_".$commands[0];
+			if (file_exists($GLOBALS["server_root"]."site/files/resources/".$file)) {
+				return true;
+			}
+			return false;
+		}
+
+		function makeIPL($href) {
+			global $cms;
+			$command = explode("/",rtrim(str_replace($GLOBALS["www_root"],"",$href),"/"));
+			list($navid,$commands) = $cms->getNavId($command);
+			if (!$navid) {
+				return str_replace(array($GLOBALS["www_root"],$GLOBALS["resource_root"]),"{wwwroot}",$href);
+			}
+			return "ipl://".$navid."//".base64_encode(json_encode($commands));
+		}
+
+		function stop($message = "") {
+			global $cms,$admin,$www_root,$aroot,$site,$breadcrumb;
+			echo $message;
+			$content = ob_get_clean();
+			include bigtree_path("admin/layouts/default.php");
+			die();
+		}
+		
+		function track($table,$entry,$type) {
+			$table = mysql_real_escape_string($table);
+			$entry = mysql_real_escape_string($entry);
+			$type = mysql_real_escape_string($type);
+			sqlquery("INSERT INTO bigtree_audit_trail VALUES (`table`,`user`,`entry`,`date`,`type`) VALUES ('$table','".$admin->ID."','$entry',NOW(),'$type')");
+		}
+
+		function urlExists($url) {
+			$handle = curl_init($url);
+			if (false === $handle)
+				return false;
+			curl_setopt($handle, CURLOPT_HEADER, false);
+			curl_setopt($handle, CURLOPT_FAILONERROR, true);
+			curl_setopt($handle, CURLOPT_NOBODY, true);
+			curl_setopt($handle, CURLOPT_RETURNTRANSFER, false);
+			$connectable = curl_exec($handle);
+			curl_close($handle);
+			return $connectable;
+		}
+
+		function urlify($title) {
+			$accent_match = array('Â', 'Ã', 'Ä', 'À', 'Á', 'Å', 'Æ', 'Ç', 'È', 'É', 'Ê', 'Ë', 'Ì', 'Í', 'Î', 'Ï', 'Ð', 'Ñ', 'Ò', 'Ó', 'Ô', 'Õ', 'Ö', 'Ø', 'Ù', 'Ú', 'Û', 'Ü', 'Ý', 'ß', 'à', 'á', 'â', 'ã', 'ä', 'å', 'æ', 'ç', 'è', 'é', 'ê', 'ë', 'ì', 'í', 'î', 'ï', 'ð', 'ñ', 'ò', 'ó', 'ô', 'õ', 'ö', 'ø', 'ù', 'ú', 'û', 'ü', 'ý', 'ÿ');
+			$accent_replace = array('A', 'A', 'A', 'A', 'A', 'A', 'AE', 'C', 'E', 'E', 'E', 'E', 'I', 'I', 'I', 'I', 'D', 'N', 'O', 'O', 'O', 'O', 'O', 'O', 'U', 'U', 'U', 'U', 'Y', 'B', 'a', 'a', 'a', 'a', 'a', 'a', 'ae', 'c', 'e', 'e', 'e', 'e', 'i', 'i', 'i', 'i', 'o', 'n', 'o', 'o', 'o', 'o', 'o', 'o', 'u', 'u', 'u', 'u', 'y', 'y');
+
+			$title = str_replace($accent_match, $accent_replace, $title);
+			
+			return strtolower(preg_replace('/\s/', '-',preg_replace('/[^a-zA-Z0-9\s\-\_]+/', '',trim($title))));
+		}
+
+		// !Developer Functions
+
+		function getActionClass($action,$item) {
+			$class = "";
+			if ($item["bigtree_pending"] && $action != "edit" && $action != "delete") {
+				return "icon_disabled";
+			}
+			if ($action == "feature") {
+				$class = "icon_feature";
+				if ($item["featured"]) {
+					$class .= " icon_feature_on";
+				}
+			}
+			if ($action == "edit") {
+				$class = "icon_edit";
+			}
+			if ($action == "delete") {
+				$class = "icon_delete";
+			}
+			if ($action == "approve") {
+				$class = "icon_approve";
+				if ($item["approved"]) {
+					$class .= " icon_approve_on";
+				}
+			}
+			if ($action == "archive") {
+				$class = "icon_archive";
+				if ($item["archived"]) {
+					$class .= " icon_archive_on";
+				}
+			}
+			if ($action == "preview") {
+				$class = "icon_preview";
+			}
+			return $class;
+		}
+
+		function getAvailableModuleRoute($route) {
+			$existing = array();
+			$d = opendir($GLOBALS["server_root"]."core/admin/modules/");
+			while ($f = readdir($d)) {
+				if ($f != "." && $f != "..") {
+					$existing[] = $f;
+				}
+			}
+			$d = opendir($GLOBALS["server_root"]."core/admin/");
+			while ($f = readdir($d)) {
+				if ($f != "." && $f != "..") {
+					$existing[] = $f;
+				}
+			}
+			$q = sqlquery("SELECT * FROM bigtree_modules");
+			while ($f = sqlfetch($q)) {
+				$existing[] = $f["route"];
+			}
+
+			$x = 2;
+			$oroute = $route;
+			while (in_array($route,$existing)) {
+				$route = $oroute."-".$x;
+				$x++;
+			}
+			return $route;
+		}
+
+		// !Cache Functions
+
+		function clearCache() {
+			$d = opendir($GLOBALS["server_root"]."cache/");
+			while ($f = readdir($d)) {
+				if ($f != "." && $f != ".." && !is_dir($GLOBALS["server_root"]."cache/".$f)) {
+					unlink($GLOBALS["server_root"]."cache/".$f);
+				}
+			}
+		}
+
+		function unCache($page) {
+			global $cms;
+			$file = $GLOBALS["server_root"]."cache/".base64_encode(str_replace($GLOBALS["www_root"],"",$cms->getLinkById($page)));
+			if (file_exists($file)) {
+				unlink($file);
+			}
+		}
+
+		// !Navigation Functions
+
+		function getArchivedNavigationByParent($parent) {
+			$nav = array();
+			$q = sqlquery("SELECT id,nav_title as title,parent,external,new_window,template,publish_at FROM bigtree_pages WHERE parent = '$parent' AND archived = 'on' ORDER BY nav_title asc");
+			while ($nav_item = sqlfetch($q)) {
+				$nav_item["external"] = str_replace("{wwwroot}",$GLOBALS["www_root"],$nav_item["external"]);
+				$nav[] = $nav_item;
+			}
+			return $nav;
+		}
+
+		function getHiddenNavigationByParent($parent) {
+			$nav = array();
+			$q = sqlquery("SELECT id,nav_title as title,parent,external,new_window,template,publish_at FROM bigtree_pages WHERE parent = '$parent' AND in_nav = '' AND archived != 'on' ORDER BY nav_title asc");
+			while ($nav_item = sqlfetch($q)) {
+				$nav_item["external"] = str_replace("{wwwroot}",$GLOBALS["www_root"],$nav_item["external"]);
+				$nav[] = $nav_item;
+			}
+			return $nav;
+		}
+
+		function getNaturalNavigationByParent($parent,$levels = 1) {
+			$nav = array();
+			$q = sqlquery("SELECT id,nav_title as title,parent,external,new_window,template,publish_at FROM bigtree_pages WHERE parent = '$parent' AND in_nav = 'on' AND archived != 'on' ORDER BY position DESC, id ASC");
+			while ($nav_item = sqlfetch($q)) {
+				$nav_item["external"] = str_replace("{wwwroot}",$GLOBALS["www_root"],$nav_item["external"]);
+				if ($levels > 1) {
+					$nav_item["children"] = $this->getNaturalNavigationByParent($f["id"],$levels - 1);
+				}
+				$nav[] = $nav_item;
+			}
+			return $nav;
+		}
+		
+		function getPendingNavigationByParent($parent,$in_nav = "on") {
+			$nav = array();
+			$titles = array();
+			$q = sqlquery("SELECT * FROM bigtree_pending_changes WHERE pending_page_parent = '$parent' AND `table` = 'bigtree_pages' AND type = 'NEW'");
+			while ($f = sqlfetch($q)) {
+				$page = json_decode($f["changes"],true);
+				if ($page["in_nav"] == $in_nav) {
+					$titles[] = $page["nav_title"];
+					$page["bigtree_pending"] = true;
+					$page["title"] = $page["nav_title"];
+					$page["id"] = "p".$f["id"];
+					$nav[] = $page;
+				}
+			}
+			array_multisort($titles,$nav);
+			return $nav;
+		}
+
+		// !Template Functions
+		
+		function getBasicTemplates() {
+			$q = sqlquery("SELECT * FROM bigtree_templates WHERE level <= '".$this->Level."' ORDER BY position desc");
+			$items = array();
+			while ($f = sqlfetch($q)) {
+				if (!$f["routed"]) {
+					$items[] = $f;
+				}
+			}
+			return $items;
+		}
+		
+		function getPageTemplates() { return $this->getBasicTemplates(); }
+		
+		function getModuleTemplates() { return $this->getRoutedTemplates(); }
+
+		function getRoutedTemplates() {
+			$q = sqlquery("SELECT * FROM bigtree_templates WHERE level <= '".$this->Level."' ORDER BY position desc");
+			$items = array();
+			while ($f = sqlfetch($q)) {
+				if ($f["routed"]) {
+					$items[] = $f;
+				}
+			}
+			return $items;
+		}
+		
+		function getTemplates() {
+			$items = array();
+			$q = sqlquery("SELECT * FROM bigtree_templates ORDER BY position DESC, id ASC");
+			while ($f = sqlfetch($q)) {
+				$items[] = $f;
+			}
+			return $items;
+		}
+
+		// !Page Functions
+		
+		function archivePage($page) {
+			$page = mysql_real_escape_string($page);
+
+			$access = $this->getPageAccessLevel($page);
+			if ($access == "p") {
+				sqlquery("UPDATE bigtree_pages SET archived = 'on' WHERE id = '$page'");
+				$this->archivePageChildren($page);
+				$this->growl("Pages","Archived Page");
+				$this->track("bigtree_pages",$page,"archived");
+				return true;
+			}
+			return false;
+		}
+		
+		function archivePageChildren($id) {
+			$q = sqlquery("SELECT * FROM bigtree_pages WHERE parent = '$id'");
+			while ($f = sqlfetch($q)) {
+				if (!$f["archived"]) {
+					sqlquery("UPDATE bigtree_pages SET archived = 'on', archived_inherited = 'on' WHERE id = '".$f["id"]."'");
+					$this->track("bigtree_pages",$f["id"],"archived");
+					$this->archivePageChildren($f["id"]);
+				}
+			}
+		}
+
+		function createPage($d) {
+			global $cms;
+			
+			foreach ($d as $key => $val) {
+				if (substr($key,0,1) != "_") {
+					if (is_array($val)) {
+						$$key = mysql_real_escape_string(json_encode($val));
+					} else {
+						$$key = mysql_real_escape_string($val);
+					}
+				}
+			}
+
+			if ($external)
+				$external = $this->makeIPL($external);
+
+			$resources = mysql_real_escape_string(json_encode($d["resources"]));
+			$callouts = mysql_real_escape_string(json_encode($d["callouts"]));
+
+			$route = $d["route"];
+			if (!$route) {
+				$route = $this->urlify($d["nav_title"]);
+			} else {
+				$route = $this->urlify($route);
+			}
+
+			$oroute = $route;
+			$x = 2;
+			// Reserved paths.
+			if ($parent == 0) {
+				while (file_exists($GLOBALS["server_root"]."core/".$route."/") || file_exists($GLOBALS["server_root"]."site/".$route."/")) {
+					$route = $oroute."-".$x;
+					$x++;
+				}
+			}
+
+			$f = sqlfetch(sqlquery("SELECT * FROM bigtree_pages WHERE `route` = '$route' AND parent = '$parent'"));
+			while ($f) {
+				$route = $oroute."-".$x;
+				$f = sqlfetch(sqlquery("SELECT * FROM bigtree_pages WHERE `route` = '$route' AND parent = '$parent'"));
+				$x++;
+			}
+			
+			if ($parent) {
+				$path = $cms->getFullNavigationPath($parent)."/".$route;
+			} else {
+				$path = $route;
+			}
+			
+			if ($publish_at) {
+				$publish_at = "'".date("Y-m-d",strtotime($publish_at))."'";
+			} else {
+				$publish_at = "NULL";
+			}
+			
+			$title = htmlspecialchars($title);
+			$nav_title = htmlspecialchars($nav_title);
+			$meta_description = htmlspecialchars($meta_description);
+			$meta_keywords = htmlspecialchars($meta_keywords);
+			$external = htmlspecialchars($external);
+
+			sqlquery("INSERT INTO bigtree_pages (`parent`,`nav_title`,`route`,`path`,`in_nav`,`title`,`template`,`external`,`new_window`,`resources`,`callouts`,`meta_keywords`,`meta_description`,`last_edited_by`,`created_at`,`publish_at`) VALUES ('$parent','$nav_title','$route','$path','$in_nav','$title','$template','$external','$new_window','$resources','$callouts','$meta_keywords','$meta_description','".$this->ID."',NOW(),$publish_at)");
+
+			$id = sqlid();
+			
+			// Handle tags
+			if (is_array($d["_tags"])) {
+				foreach ($d["_tags"] as $tag) {
+					sqlquery("INSERT INTO bigtree_tags_rel (`module`,`entry`,`tag`) VALUES ('0','$id','$tag')");
+				}
+			}
+
+			
+			// Handle resources
+			if (is_array($d["_resources"])) {
+				foreach ($d["_resources"] as $rid) {
+					sqlquery("UPDATE bigtree_resources SET `table` = 'bigtree_pages', entry = '$id' WHERE id = '$rid'");
+				}
+			}
+
+			$newpath = $cms->getFullNavigationPath($id);
+			sqlquery("DELETE FROM bigtree_route_history WHERE old_route = '$newpath'");
+
+			$this->clearCache();
+			$this->pingSearchEngines();
+			$this->track("bigtree_pages",$id,"created");
+
+			return $id;
+		}
+
+		function createPendingPage($data) {
+			global $cms;
+			
+			if ($d["external"]) {
+				$d["external"] = $this->makeIPL($d["external"]);
+			}
+			
+			$tags = mysql_real_escape_string(json_encode($data["_tags"]));
+			$resources = mysql_real_escape_string(json_encode($data["_resources"]));
+			unset($data["_tags"]);
+			unset($data["_resources"]);
+			
+			$data["nav_title"] = htmlspecialchars($data["nav_title"]);
+			$data["title"] = htmlspecialchars($data["title"]);
+			$data["external"] = htmlspecialchars($data["external"]);
+			$data["meta_keywords"] = htmlspecialchars($data["meta_keywords"]);
+			$data["meta_description"] = htmlspecialchars($data["meta_description"]);
+
+			$data = mysql_real_escape_string(json_encode($data));
+			sqlquery("INSERT INTO bigtree_pending_changes (`user`,`date`,`title`,`table`,`changes`,`tags_changes`,`resources_changes`,`type`,`module`,`pending_page_parent`) VALUES ('".$this->ID."',NOW(),'New Page Created','bigtree_pages','$data','$tags','$resources','NEW','','".$data["parent"]."')");
+			$id = sqlid();
+			
+			$this->track("bigtree_pages","p$id","created-pending");
+			
+			return $id;
+		}
+		
+		function deletePage($page) {
+			global $cms;
+			
+			$page = mysql_real_escape_string($page);
+			
+			$r = $this->getPageAccessLevelByUserId($page,$this->ID);
+			if ($r == "p") {
+				if (!is_numeric($page)) {
+					sqlquery("DELETE FROM bigtree_pending_changes WHERE id = '".mysql_real_escape_string(substr($page,1))."'");
+					$this->growl("Pages","Deleted Page");
+					$this->track("bigtree_pages","p$page","deleted-pending");
+				} else {
+					sqlquery("DELETE FROM bigtree_pages WHERE id = '$page'");
+					$this->deletePageChildren($page);
+					$this->growl("Pages","Deleted Page");
+					$this->track("bigtree_pages",$page,"deleted");
+				}
+				
+				return true;
+			}
+			$this->stop("You do not have permission to delete this page.");
+		}
+		
+		function deletePageChildren($id) {
+			$q = sqlquery("SELECT * FROM bigtree_pages WHERE parent = '$id'");
+			while ($f = sqlfetch($q)) {
+				$this->deletePageChildren($f["id"]);
+			}
+			sqlquery("DELETE FROM bigtree_pages WHERE parent = '$id'");
+			$this->track("bigtree_pages",$id,"deleted");
+		}
+		
+		function getPageVersion($id) {
+			$id = mysql_real_escape_string($id);
+			$item = sqlfetch(sqlquery("SELECT * FROM bigtree_page_versions WHERE id = '$id'"));
+			return $item;
+		}
+		
+		function getPendingChange($id) {
+			$id = mysql_real_escape_string($id);
+			$item = sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE id = '$id'"));
+			if (!$item) {
+				return false;
+			}
+			$item["changes"] = json_decode($item["changes"],true);
+			return $item;
+		}
+
+		function getPendingPageById($id) {
+			global $cms;
+			$page = $cms->getPageById($id);
+			$page["tags"] = $this->getTagsForPage($id);
+			
+			$f = sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE `table` = 'bigtree_pages' AND item_id = '$id'"));
+			if ($f) {
+				$changes = json_decode($f["changes"],true);
+				foreach ($changes as $key => $val) {
+					if ($key == "external") {
+						$val = $cms->getInternalPageLink($val);
+					}
+					$page[$key] = $val;
+				}
+				$tags = array();
+				$temp_tags = json_decode($f["tags_changes"],true);
+				if (is_array($temp_tags)) {
+					foreach ($temp_tags as $tag) {
+						$tags[] = sqlfetch(sqlquery("SELECT * FROM bigtree_tags WHERE id = '$tag'"));
+					}
+				}
+				$page["tags"] = $tags;
+			}
+			return $page;
+		}
+
+		function getTagsForPage($page) {
+			$tags = array();
+			$q = sqlquery("SELECT bigtree_tags.* FROM bigtree_tags JOIN bigtree_tags_rel WHERE bigtree_tags_rel.tag = bigtree_tags.id AND bigtree_tags_rel.entry = '$page' AND bigtree_tags_rel.module = '0' ORDER BY bigtree_tags.tag");
+			while ($f = sqlfetch($q)) {
+				$tags[] = $f;
+			}
+			return $tags;
+		}
+
+		function pingSearchEngines() {
+			global $cms;
+			if ($cms->getSetting("ping-search-engines") == "on") {
+				$google = file_get_contents("http://www.google.com/webmasters/tools/ping?sitemap=".urlencode($GLOBALS["www_root"]."sitemap.xml"));
+				$ask = file_get_contents("http://submissions.ask.com/ping?sitemap=".urlencode($GLOBALS["www_root"]."sitemap.xml"));
+				$yahoo = file_get_contents("http://search.yahooapis.com/SiteExplorerService/V1/ping?sitemap=".urlencode($GLOBALS["www_root"]."sitemap.xml"));
+				$bing = file_get_contents("http://www.bing.com/webmaster/ping.aspx?siteMap=".urlencode($GLOBALS["www_root"]."sitemap.xml"));
+			}
+		}
+
+		function submitPageChange($page,$changes,$type = "EDIT") {
+			global $cms;
+			if ($page[0] == "p") {
+				// It's still pending...
+				$pdata = array();
+				$pending = true;
+				$type = "NEW";
+			} else {
+				$pending = false;
+				$pdata = $cms->getPageById($page);
+			}
+
+			$template = $pdata["template"];
+			if (!$pending) {
+				$f = sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE `table` = 'bigtree_pages' AND item_id = '$page'"));
+			} else {
+				$f = sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE id = '".substr($page,1)."'"));
+			}
+			
+			$tags = mysql_real_escape_string(json_encode($changes["_tags"]));
+			unset($changes["_tags"]);
+
+			// If there's already a change in the queue, update it with this latest info.
+			if ($f) {
+				$comments = json_decode($f["comments"],true);
+				if ($f["user"] == $this->ID) {
+					$comments[] = array(
+						"user" => "BigTree",
+						"date" => date("F j, Y @ g:ia"),
+						"comment" => "A new revision has been made."
+					);
+				} else {
+					$user = $this->getUserById($this->ID);
+					$comments[] = array(
+						"user" => "BigTree",
+						"date" => date("F j, Y @ g:ia"),
+						"comment" => "A new revision has been made.  Owner switched to ".$user["name"]."."
+					);
+				}
+
+				if ($pending) {
+					$changes = mysql_real_escape_string(json_encode($changes));
+				} else {
+					$ochanges = json_decode($f["changes"],true);
+					if (isset($ochanges["template"])) {
+						$template = $ochanges["template"];
+					}
+					if (isset($changes["external"])) {
+						$changes["external"] = $this->makeIPL($changes["external"]);
+					}
+
+					foreach ($changes as $key => $val) {
+						if ($val != $pdata[$key] && isset($pdata[$key])) {
+							$ochanges[$key] = $val;
+						}
+					}
+
+					$changes = mysql_real_escape_string(json_encode($ochanges));
+				}
+
+				$comments = mysql_real_escape_string(json_encode($comments));
+				if ($type == "DELETE") {
+					sqlquery("UPDATE bigtree_pending_changes SET comments = '$comments', title = 'Page Deletion Pending', date = NOW(), user = '".$this->ID."', type = 'DELETE' WHERE id = '".$f["id"]."'");
+				} else {
+					sqlquery("UPDATE bigtree_pending_changes SET comments = '$comments', changes = '$changes', tags_changes = '$tags', date = NOW(), user = '".$this->ID."', type = '$type' WHERE id = '".$f["id"]."'");
+				}
+				
+				$this->track("bigtree_pages",$page,"updated-draft");
+			
+			// We're submitting a change to a presently published page with no pending changes.
+			} else {
+				$ochanges = array();
+
+				foreach ($changes as $key => $val) {
+					if ($key == "external") {
+						$val = $this->makeIPL($val);
+					}
+					
+					if (isset($pdata[$key]) && $val != $pdata[$key]) {
+						$ochanges[$key] = $val;
+					}
+				}
+				
+				$changes = mysql_real_escape_string(json_encode($ochanges));
+				if ($type == "DELETE") {
+					sqlquery("INSERT INTO bigtree_pending_changes (`user`,`date`,`table`,`item_id`,`changes`,`type`,`title`) VALUES ('".$this->ID."',NOW(),'bigtree_pages','$page','$changes','DELETE','Page Deletion Pending')");
+				} else {
+					sqlquery("INSERT INTO bigtree_pending_changes (`user`,`date`,`table`,`item_id`,`changes`,`tags_changes`,`type`,`title`) VALUES ('".$this->ID."',NOW(),'bigtree_pages','$page','$changes','$tags','EDIT','Page Change Pending')");
+				}
+				
+				$this->track("bigtree_pages",$page,"saved-draft");
+			}
+			
+			return sqlid();
+		}
+		
+		function unarchivePage($page) {
+			$page = mysql_real_escape_string($page);
+			$access = $this->getPageAccessLevel($page);
+			if ($access == "p") {
+				sqlquery("UPDATE bigtree_pages SET archived = '' WHERE id = '$page'");
+				$this->track("bigtree_pages",$page,"unarchived");
+				$this->unarchivePageChildren($page);
+				return true;
+			}
+			return false;
+		}
+		
+		function unarchivePageChildren($id) {
+			$q = sqlquery("SELECT * FROM bigtree_pages WHERE parent = '$id'");
+			while ($f = sqlfetch($q)) {
+				if ($f["archived_inherited"]) {
+					sqlquery("UPDATE bigtree_pages SET archived = '', archived_inherited = '' WHERE id = '".$f["id"]."'");
+					$this->track("bigtree_pages",$f["id"],"unarchived");
+					$this->archivePageChildren($f["id"]);
+				}
+			}
+		}
+		
+		function updateChildPageRoutes($page) {
+			global $cms;
+			$q = sqlquery("SELECT * FROM bigtree_pages WHERE parent = '$page'");
+			while ($f = sqlfetch($q)) {
+				$oldpath = $f["path"];
+				$path = $cms->getFullNavigationPath($f["id"]);
+				if ($oldpath != $path) {
+					sqlquery("DELETE FROM bigtree_route_history WHERE old_route = '$path' OR old_route = '$oldpath'");
+					sqlquery("INSERT INTO bigtree_route_history (`old_route`,`new_route`) VALUES ('$oldpath','$path')");
+					sqlquery("UPDATE bigtree_pages SET path = '$path' WHERE id = '".$f["id"]."'");
+					$this->updateChildPageRoutes($f["id"]);
+				}
+			}
+		}
+
+		function updatePage($page,$data) {
+			global $cms;
+			
+			$page = mysql_real_escape_string($page);
+			
+			// Save the existing copy as a draft, remove drafts for this page that are one month old or older.
+			sqlquery("DELETE FROM bigtree_page_versions WHERE page = '$page' AND updated_at < '".date("Y-m-d",strtotime("-31 days"))."' AND saved != 'on'");
+			// Get the current copy
+			$current = sqlfetch(sqlquery("SELECT * FROM bigtree_pages WHERE id = '$page'"));
+			foreach ($current as $key => $val) {
+				$$key = mysql_real_escape_string($val);
+			}
+			// Copy it to the saved versions
+			sqlquery("INSERT INTO bigtree_page_versions (`page`,`title`,`meta_keywords`,`meta_description`,`template`,`external`,`new_window`,`resources`,`callouts`,`author`,`updated_at`) VALUES ('$page','$title','$meta_keywords','$meta_description','$template','$external','$new_window','$resources','$callouts','$last_edited_by','$updated_at')");
+			
+			// Remove this page from the cache
+			$this->unCache($page);
+			
+			// Set local variables in a clean fashion that prevents _SESSION exploitation.  Also, don't let them somehow overwrite $page and $current.
+			foreach ($data as $key => $val) {
+				if (substr($key,0,1) != "_" && $key != "current" && $key != "page") {
+					if (is_array($val)) {
+						$$key = mysql_real_escape_string(json_encode($val));
+					} else {
+						$$key = mysql_real_escape_string($val);
+					}
+				}
+			}
+			
+			// Make an ipl:// or {wwwroot}'d version of the URL
+			if ($external) {
+				$external = $this->makeIPL($external);
+			}
+			
+			// If somehow we didn't provide a parent page (like, say, the user didn't have the right to change it) then pull the one from before.  Actually, this might be exploitable… look into it later.
+			if (!isset($data["parent"])) {
+				$parent = $current["parent"];
+			}
+			
+			// Create a route if we don't have one, otherwise, make sure the one they provided doesn't suck.
+			$route = $data["route"];
+			if (!$route) {
+				$route = $this->urlify($data["nav_title"]);
+			} else {
+				$route = $this->urlify($route);
+			}
+			
+			// Get a unique route
+			$oroute = $route;
+			$x = 2;
+			// Reserved paths.
+			if ($parent == 0) {
+				while (file_exists($GLOBALS["server_root"]."core/".$route."/") || file_exists($GLOBALS["server_root"]."site/".$route."/")) {
+					$route = $oroute."-".$x;
+					$x++;
+				}
+			}
+			// Existing pages.
+			$f = sqlfetch(sqlquery("SELECT id FROM bigtree_pages WHERE `route` = '$route' AND parent = '$parent' AND id != '$page'"));
+			while ($f) {
+				$route = $oroute."-".$x;
+				$f = sqlfetch(sqlquery("SELECT id FROM bigtree_pages WHERE `route` = '$route' AND parent = '$parent' AND id != '$page'"));
+				$x++;
+			}
+			
+			// We have no idea how this affects the nav, just wipe it all.
+			if ($current["nav_title"] != $nav_title || $current["route"] != $route || $current["in_nav"] != $in_nav || $current["parent"] != $parent) {
+				$this->clearCache();
+			}
+			
+			// Make sure we set the publish date to NULL if it wasn't provided or we'll have a page that got published at 0000-00-00
+			if ($publish_at) {
+				$publish_at = "'".date("Y-m-d",strtotime($publish_at))."'";
+			} else {
+				$publish_at = "NULL";
+			}
+			
+			// Set the full path, saves DB access time on the front end.
+			if ($parent) {
+				$path = $cms->getFullNavigationPath($parent)."/".$route;
+			} else {
+				$path = $route;
+			}
+			
+			// htmlspecialchars stuff so that it doesn't need to be re-encoded when echo'd on the front end.
+			$title = htmlspecialchars($title);
+			$nav_title = htmlspecialchars($nav_title);
+			$meta_description = htmlspecialchars($meta_description);
+			$meta_keywords = htmlspecialchars($meta_keywords);
+			$external = htmlspecialchars($external);
+
+			// Update the database
+			sqlquery("UPDATE bigtree_pages SET `parent` = '$parent', `nav_title` = '$nav_title',`route` = '$route', `path` = '$path', `in_nav` = '$in_nav',`title` = '$title',`template` = '$template',`external` = '$external',`new_window` = '$new_window',`resources` = '$resources',`callouts` = '$callouts',`meta_keywords` = '$meta_keywords',`meta_description` = '$meta_description', `last_edited_by` = '".$this->ID."', publish_at = $publish_at WHERE id = '$page'");
+			
+			// Remove any pending drafts
+			sqlquery("DELETE FROM bigtree_pending_changes WHERE `table` = 'bigtree_pages' AND item_id = '$page'");
+			
+			// Remove old paths from the redirect list
+			sqlquery("DELETE FROM bigtree_route_history WHERE old_route = '$path' OR old_route = '".$current["path"]."'");
+
+			// Create an automatic redirect from the old path to the new one.
+			if ($current["path"] != $path) {
+				sqlquery("INSERT INTO bigtree_route_history (`old_route`,`new_route`) VALUES ('$oldpath','$newpath')");
+				
+				// Update all child page routes, ping those engines, clean those caches
+				$this->updateChildPageRoutes($page);
+				$this->pingSearchEngines();
+				$this->clearCache();
+			}
+			
+			// Handle tags
+			sqlquery("DELETE FROM bigtree_tags_rel WHERE module = '0' AND entry = '$page'");
+			if (is_array($data["_tags"])) {
+				foreach ($data["_tags"] as $tag) {
+					sqlquery("INSERT INTO bigtree_tags_rel (`module`,`entry`,`tag`) VALUES ('0','$page','$tag')");
+				}
+			}
+			
+			$this->track("bigtree_pages",$page,"updated");
+
+			return $page;
+		}
+
+		// !Editor/Publisher Functions
+
+		function getChangeById($id) {
+			return sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE id = '$id'"));
+		}
+
+		function getChangeEditLink($change) {
+			$f = sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE id = '$change'"));
+			
+			if ($f["table"] == "bigtree_pages" && $f["item_id"]) {
+				return $GLOBALS["www_root"]."admin/pages/edit/".$f["item_id"]."/";
+			}
+			
+			if ($f["table"] == "bigtree_pages") {
+				return $GLOBALS["www_root"]."admin/pages/edit/p".$f["id"]."/";
+			}
+
+			$modid = $f["module"];
+			$module = sqlfetch(sqlquery("SELECT * FROM bigtree_modules WHERE id = '$modid'"));
+			$form = sqlfetch(sqlquery("SELECT * FROM bigtree_module_forms WHERE `table` = '".$f["table"]."'"));
+			$action = sqlfetch(sqlquery("SELECT * FROM bigtree_module_actions WHERE `form` = '".$form["id"]."' AND in_nav = ''"));
+
+			if (!$f["item_id"]) {
+				$f["item_id"] = "p".$f["id"];
+			}
+
+			if ($action) {
+				return $GLOBALS["www_root"]."admin/".$module["route"]."/".$action["route"]."/".$f["item_id"]."/";
+			} else {
+				return $GLOBALS["www_root"]."admin/".$module["route"]."/edit/".$f["item_id"]."/";
+			}
+		}
+
+		// !Module Functions
+
+		function getActionId($module,$action) {
+			$f = sqlfetch(sqlquery("SELECT id FROM bigtree_module_actions WHERE route = '$action' AND module = '$module'"));
+			if (!$f) {
+				return false;
+			}
+			return $f["id"];
+		}
+		
+		function getAutoModuleActions($module) {
+			$am = new BigTreeAutoModule;
+			$items = array();
+			$id = mysql_real_escape_string($module);
+			$q = sqlquery("SELECT * FROM bigtree_module_actions WHERE module = '$id' AND (form != 0 OR view != 0) AND in_nav = 'on' ORDER BY position DESC, id ASC");
+			while ($f = sqlfetch($q)) {
+				if ($f["form"]) {
+					$f["form"] = $am->getForm($f["form"]);
+					$f["type"] = "form";
+				} elseif ($f["view"]) {
+					$f["view"] = $am->getView($f["view"]);
+					$f["type"] = "view";
+				}
+				$items[] = $f;
+			}
+			return $items;
+		}
+		
+		function getModule($id) {
+			$id = mysql_real_escape_string($id);
+			$module = sqlfetch(sqlquery("SELECT * FROM bigtree_modules WHERE id = '$id'"));
+			if (!$module) {
+				return false;
+			}
+			
+			$module["gbp"] = json_decode($module["gbp"],true);
+			return $module;
+		}
+		
+		function getModuleAction($id) {
+			$id = mysql_real_escape_string($id);
+			return sqlfetch(sqlquery("SELECT * FROM bigtree_module_actions WHERE id = '$id'"));
+		}
+		
+		function getModuleActionForForm($id) {
+			$id = mysql_real_escape_string($id);
+			return sqlfetch(sqlquery("SELECT * FROM bigtree_module_actions WHERE form = '$id'"));
+		}
+		
+		function getModuleActionForView($id) {
+			$id = mysql_real_escape_string($id);
+			return sqlfetch(sqlquery("SELECT * FROM bigtree_module_actions WHERE view = '$id'"));
+		}
+
+		function getModuleActions($module) {
+			$items = array();
+			$id = mysql_real_escape_string($module);
+			$q = sqlquery("SELECT * FROM bigtree_module_actions WHERE module = '$id' ORDER BY position DESC, id ASC");
+			while ($f = sqlfetch($q)) {
+				$items[] = $f;
+			}
+			return $items;
+		}
+		
+		function getModuleActionById($id) { return $this->getModuleAction($id); }
+
+		function getModuleById($id) { return $this->getModule($id); }
+
+		function getModuleByRoute($route) {
+			$route = mysql_real_escape_string($route);
+			$module = sqlfetch(sqlquery("SELECT * FROM bigtree_modules WHERE route = '$route'"));
+			if (!$module) {
+				return false;
+			}
+			
+			$module["gbp"] = json_decode($module["gbp"],true);
+			return $module;
+		}
+		
+		function getModuleForm($id) {
+			$id = mysql_real_escape_string($id);
+			$item = sqlfetch(sqlquery("SELECT * FROM bigtree_module_forms WHERE id = '$id'"));
+			$item["fields"] = json_decode($item["fields"],true);
+			return $item;
+		}
+		
+		function getModuleGroup($id) {
+			$id = mysql_real_escape_string($id);
+			return sqlfetch(sqlquery("SELECT * FROM bigtree_module_groups WHERE id = '$id'"));
+		}
+		
+		function getModuleGroupById($id) { return $this->getModuleGroup($id); }
+		
+		function getModuleGroupByName($name) {
+			$name = mysql_real_escape_string($name);
+			return sqlfetch(sqlquery("SELECT * FROM bigtree_module_groups WHERE name = '$name'"));
+		}
+
+		function getModuleGroups($sort = "position DESC, id ASC") {
+			$items = array();
+			$q = sqlquery("SELECT * FROM bigtree_module_groups ORDER BY $sort");
+			while ($f = sqlfetch($q)) {
+				$items[$f["id"]] = $f;
+			}
+			return $items;
+		}
+		
+		function getModuleIdByRoute($route) {
+			$f = sqlfetch(sqlquery("SELECT id FROM bigtree_modules WHERE route = '$route'"));
+			if (!$f) {
+				return false;
+			}
+			return $f["id"];
+		}
+		
+		function getModuleNavigation($module) {
+			$items = array();
+			$q = sqlquery("SELECT * FROM bigtree_module_actions WHERE module = '$module' AND in_nav = 'on' ORDER BY position DESC, id ASC");
+			while ($f = sqlfetch($q)) {
+				$items[] = $f;
+			}
+			return $items;
+		}
+		
+		function getModulePackage($id) {
+			$id = mysql_real_escape_string($id);
+			$item = sqlfetch(sqlquery("SELECT * FROM bigtree_module_packages WHERE id = '$id'"));
+			if (!$item) {
+				return false;
+			}
+			$item["details"] = json_decode($item["details"],true);
+			return $item;
+		}
+		
+		function getModulePackageByFoundryId($id) {
+			$id = mysql_real_escape_string($id);
+			$item = sqlfetch(sqlquery("SELECT * FROM bigtree_module_packages WHERE foundry_id = '$id'"));
+			if (!$item) {
+				return false;
+			}
+			$item["details"] = json_decode($item["details"],true);
+			return $item;
+		}
+		
+		function getModulePackages($sort = "name ASC") {
+			$packages = array();
+			$q = sqlquery("SELECT * FROM bigtree_module_packages ORDER BY $sort");
+			while ($f = sqlfetch($q)) {
+				$packages[] = $f;
+			}
+			return $packages;
+		}
+
+		function getModules($sort = "id ASC",$auth = true) {
+			$items = array();
+			$q = sqlquery("SELECT bigtree_modules.*,bigtree_module_groups.name AS group_name FROM bigtree_modules LEFT JOIN bigtree_module_groups ON bigtree_modules.`group` = bigtree_module_groups.id ORDER BY $sort");
+			while ($f = sqlfetch($q)) {
+				if ($this->checkAccess($f["id"]) || !$auth) {
+					$items[$f["id"]] = $f;
+				}
+			}
+			return $items;
+		}
+
+		function getModulesByGroup($group,$sort = "position DESC, id ASC",$auth = true) {
+			if (is_array($group))
+				$group = $group["id"];
+			$items = array();
+			$q = sqlquery("SELECT * FROM bigtree_modules WHERE `group` = '$group' ORDER BY $sort");
+			while ($f = sqlfetch($q)) {
+				if ($this->checkAccess($f["id"]) || !$auth) {
+					$items[$f["id"]] = $f;
+				}
+			}
+			return $items;
+		}
+		
+		function getModuleView($id) {
+			$id = mysql_real_escape_string($id);
+			$item = sqlfetch(sqlquery("SELECT * FROM bigtree_module_views WHERE id = '$id'"));
+			$item["fields"] = json_decode($item["fields"],true);
+			$item["options"] = json_decode($item["options"],true);
+			$item["actions"] = json_decode($item["actions"],true);
+			return $item;
+		}
+
+		function moduleActionExists($module,$route) {
+			$module = mysql_real_escape_string($module);
+			$route = mysql_real_escape_string($route);
+			$f = sqlfetch(sqlquery("SELECT id FROM bigtree_module_actions WHERE module = '$module' AND route = '$route'"));
+			if ($f) {
+				return true;
+			}
+			
+			return false;
+		}
+
+		// !Users Module Functions
+
+		function createUser($data) {
+			global $config;
+			
+			foreach ($data as $key => $val) {
+				if (substr($key,0,1) != "_" && !is_array($val)) {
+					$$key = mysql_real_escape_string($val);
+				}
+			}
+			
+			// See if the user already exists
+			$r = sqlrows(sqlquery("SELECT * FROM bigtree_users WHERE email = '$email'"));
+			if ($r > 0) {
+				return false;
+			}
+			
+			$permissions = mysql_real_escape_string(json_encode($data["permissions"]));
+
+			if ($level > $this->Level) {
+				$level = $this->Level;
+			}
+
+			$phpass = new PasswordHash($config["password_depth"], TRUE);
+			$password = mysql_real_escape_string($phpass->HashPassword($data["password"]));
+
+			sqlquery("INSERT INTO bigtree_users (`email`,`password`,`name`,`company`,`level`,`permissions`) VALUES ('$email','$password','$name','$company','$level','$permissions')");
+			$id = sqlid();
+			
+			$this->track("bigtree_users",$id,"created");
+
+			return $id;
+		}
+
+		function deleteUser($id) {
+			$id = mysql_real_escape_string($id);
+			// If this person has higher access levels than the person trying to update them, fail.
+			$current = $this->getUserById($id);
+			if ($current["level"] > $this->Level) {
+				return false;
+			}
+
+			sqlquery("DELETE FROM bigtree_users WHERE id = '$id'");
+			$this->track("bigtree_users",$id,"deleted");
+			
+			return true;
+		}
+
+		function getAllUsers() {
+			$items = array();
+			$q = sqlquery("SELECT * FROM bigtree_users ORDER BY name");
+			while ($f = sqlfetch($q)) {
+				$items[] = $f;
+			}
+			
+			return $items;
+		}
+
+		function getPageOfUsers($page = 0,$query = "") {
+			if ($query) {
+				$qparts = explode(" ",$query);
+				$qp = array();
+				foreach ($qparts as $part) {
+					$part = mysql_real_escape_string($part);
+					$qp[] = "(name LIKE '%$part%' OR email LIKE '%$part%' OR company LIKE '%$part%')";
+				}
+				$q = sqlquery("SELECT * FROM bigtree_users WHERE ".implode(" AND ",$qp)." ORDER BY name LIMIT ".($page*$this->PerPage).",".$this->PerPage);
+			} else {
+				$q = sqlquery("SELECT * FROM bigtree_users ORDER BY name LIMIT ".($page*$this->PerPage).",".$this->PerPage);
+			}
+			
+			$items = array();
+			while ($f = sqlfetch($q)) {
+				$items[] = $f;
+			}
+			
+			return $items;
+		}
+		
+		function getUser($id) { return $this->getUserById($id); }
+
+		function getUserById($id) {
+			$id = mysql_real_escape_string($id);
+			$item = sqlfetch(sqlquery("SELECT * FROM bigtree_users WHERE id = '$id'"));
+			if ($item["level"] > 0) {
+				$permissions = array();
+				$q = sqlquery("SELECT * FROM bigtree_modules");
+				while ($f = sqlfetch($q))
+					$permissions[$f["id"]] = "p";
+				$item["permissions"] = $permissions;
+			} else {
+				$item["permissions"] = json_decode($item["permissions"],true);
+			}
+			return $item;
+		}
+
+		function getUsersPageCount($query = "") {
+			if ($query) {
+				$qparts = explode(" ",$query);
+				$qp = array();
+				foreach ($qparts as $part) {
+					$part = mysql_real_escape_string($part);
+					$qp[] = "(name LIKE '%$part%' OR email LIKE '%$part%' OR company LIKE '%$part%')";
+				}
+				$q = sqlquery("SELECT id FROM bigtree_users WHERE ".implode(" AND ",$qp));
+			} else {
+				$q = sqlquery("SELECT id FROM bigtree_users");
+			}
+			
+			$r = sqlrows($q);
+			$pages = ceil($r / $this->PerPage);
+			if ($pages == 0)
+				$pages = 1;
+			return $pages;
+		}
+
+		function updateUser($id,$data) {
+			global $config;
+			$id = mysql_real_escape_string($id);
+			
+			// See if there's an email collission
+			$r = sqlrows(sqlquery("SELECT * FROM bigtree_users WHERE email = '".mysql_real_escape_string($data["email"])."' AND id != '$id'"));
+			if ($r) {
+				return false;
+			}
+
+			
+			// If this person has higher access levels than the person trying to update them, fail.
+			$current = $this->getUserById($id);
+			if ($current["level"] > $this->Level) {
+				return false;
+			}
+
+			foreach ($data as $key => $val) {
+				if (substr($key,0,1) != "_" && !is_array($val)) {
+					$$key = mysql_real_escape_string($val);
+				}
+			}
+			
+			$permissions = mysql_real_escape_string(json_encode($data["permissions"]));
+
+			if ($data["password"]) {
+				$phpass = new PasswordHash($config["password_depth"], TRUE);
+				$password = mysql_real_escape_string($phpass->HashPassword($data["password"]));
+				sqlquery("UPDATE bigtree_users SET `email` = '$email',`password` = '$password',`name` = '$name',`company` = '$company',`level` = '$level',`permissions` = '$permissions' WHERE id = '$id'");
+			} else {
+				sqlquery("UPDATE bigtree_users SET `email` = '$email',`name` = '$name',`company` = '$company',`level` = '$level',`permissions` = '$permissions' WHERE id = '$id'");
+			}
+			
+			$this->track("bigtree_users",$id,"updated");
+			
+			return true;
+		}
+
+		// !Settings Module Functions
+
+		function createSetting($data) {
+			foreach ($data as $key => $val) {
+				if (substr($key,0,1) != "_" && !is_array($val)) {
+					$$key = mysql_real_escape_string($val);
+				}
+			}
+
+			// See if there's already a setting with this ID
+			$r = sqlrows(sqlquery("SELECT id FROM bigtree_settings WHERE id = '$id'"));
+			if ($r) {
+				return false;
+			}
+
+			sqlquery("INSERT INTO bigtree_settings (`id`,`name`,`description`,`type`,`locked`,`module`,`encrypted`,`system`) VALUES ('$id','$name','$description','$type','$locked','$module','$encrypted','$system')");
+			
+			$this->track("bigtree_settings",$id,"created");
+			
+			return true;
+		}
+
+		function getAllSettings() {
+			$items = array();
+			if ($this->Level < 2) {
+				$q = sqlquery("SELECT * FROM bigtree_settings WHERE locked != 'on' AND system != 'on' ORDER BY title");
+			} else {
+				$q = sqlquery("SELECT * FROM bigtree_settings WHERE system != 'on' ORDER BY title");
+			}
+			while ($f = sqlfetch($q)) {
+				foreach ($f as $key => $val) {
+					$f[$key] = str_replace("{wwwroot}",$GLOBALS["www_root"],$val);
+				}
+				$f["value"] = json_decode($f["value"],true);
+				if ($f["encrypted"] == "on") {
+					$f["value"] = "[Encrypted Text]";
+				}
+				$items[] = $f;
+			}
+			return $items;
+		}
+
+		function getModuleSettings($module) {
+			$items = array();
+			$module = mysql_real_escape_string($module);
+			if ($this->Level < 2) {
+				$q = sqlquery("SELECT * FROM bigtree_settings WHERE module = '$module' AND locked != 'on' AND system != 'on' ORDER BY title");
+			} else {
+				$q = sqlquery("SELECT * FROM bigtree_settings WHERE module = '$module' AND system != 'on' ORDER BY title");
+			}
+			while ($f = sqlfetch($q)) {
+				foreach ($f as $key => $val) {
+					$f[$key] = str_replace("{wwwroot}",$GLOBALS["www_root"],$val);
+				}
+				$f["value"] = json_decode($f["value"],true);
+				if ($f["encrypted"] == "on") {
+					$f["value"] = "[Encrypted Text]";
+				}
+				$items[] = $f;
+			}
+			return $items;
+		}
+
+		function getPageOfSettings($page = 0,$query = "") {
+			global $cms;
+			if ($query) {
+				$qparts = explode(" ",$query);
+				$qp = array();
+				foreach ($qparts as $part) {
+					$part = mysql_real_escape_string($part);
+					$qp[] = "(name LIKE '%$part%' OR `value` LIKE '%$part%' OR description LIKE '%$part%')";
+				}
+				if ($this->Level < 2) {
+					$q = sqlquery("SELECT * FROM bigtree_settings WHERE ".implode(" AND ",$qp)." AND locked != 'on' AND system != 'on' ORDER BY name LIMIT ".($page*$this->PerPage).",".$this->PerPage);
+				} else {
+					$q = sqlquery("SELECT * FROM bigtree_settings WHERE ".implode(" AND ",$qp)." AND system != 'on' ORDER BY name LIMIT ".($page*$this->PerPage).",".$this->PerPage);
+				}
+			} else {
+				if ($this->Level < 2) {
+					$q = sqlquery("SELECT * FROM bigtree_settings WHERE locked != 'on' AND system != 'on' ORDER BY name LIMIT ".($page*$this->PerPage).",".$this->PerPage);
+				} else {
+					$q = sqlquery("SELECT * FROM bigtree_settings WHERE system != 'on' ORDER BY name LIMIT ".($page*$this->PerPage).",".$this->PerPage);
+				}
+			}
+			$items = array();
+			while ($f = sqlfetch($q)) {
+				foreach ($f as $key => $val) {
+					$f[$key] = str_replace("{wwwroot}",$GLOBALS["www_root"],$val);
+				}
+				$f["value"] = json_decode($f["value"],true);
+				if ($f["encrypted"] == "on") {
+					$f["value"] = "[Encrypted Text]";
+				}
+				$items[] = $f;
+			}
+			return $items;
+		}
+		
+		function getSetting($id) { return $this->getSettingById($id); }
+		function getSettingById($id) {
+			global $config;
+			$id = mysql_real_escape_string($id);
+			
+			$f = sqlfetch(sqlquery("SELECT * FROM bigtree_settings WHERE id = '$id'"));
+			if (!$f) {
+				return false;
+			}
+			
+			foreach ($f as $key => $val) {
+				$f[$key] = str_replace("{wwwroot}",$GLOBALS["www_root"],$val);
+			}
+			if ($f["encrypted"]) {
+				$v = sqlfetch(sqlquery("SELECT AES_DECRYPT(`value`,'".mysql_real_escape_string($config["settings_key"])."') AS `value` FROM bigtree_settings WHERE id = '$id'"));
+				$f["value"] = $v["value"];
+			}
+			$f["value"] = json_decode($f["value"],true);
+			return $f;
+		}
+		
+		function getSettings() {
+			$settings = array();
+			$q = sqlquery("SELECT * FROM bigtree_settings ORDER BY name");
+			while ($f = sqlfetch($q)) {
+				$settings[] = $f;
+			}
+			
+			return $settings;
+		}
+
+		function getSettingsPageCount($query = "") {
+			if ($query) {
+				$qparts = explode(" ",$query);
+				$qp = array();
+				foreach ($qparts as $part) {
+					$part = mysql_real_escape_string($part);
+					$qp[] = "(name LIKE '%$part%' OR value LIKE '%$part%' OR description LIKE '%$part%')";
+				}
+				if ($this->Level < 2) {
+					$q = sqlquery("SELECT id FROM bigtree_settings WHERE system != 'on' AND locked != 'on' AND ".implode(" AND ",$qp));
+				} else {
+					$q = sqlquery("SELECT id FROM bigtree_settings WHERE system != 'on' AND ".implode(" AND ",$qp));
+				}
+			} else {
+				if ($this->Level < 2) {
+					$q = sqlquery("SELECT id FROM bigtree_settings WHERE system != 'on' AND locked != 'on'");
+				} else {
+					$q = sqlquery("SELECT id FROM bigtree_settings WHERE system != 'on'");
+				}
+			}
+			
+			$r = sqlrows($q);
+			$pages = ceil($r / $this->PerPage);
+			if ($pages == 0) {
+				$pages = 1;
+			}
+			
+			return $pages;
+		}
+		
+		function settingExists($id) {
+			return sqlrows(sqlquery("SELECT id FROM bigtree_settings WHERE id = '".mysql_real_escape_string($id)."'"));
+		}
+
+		function updateSetting($old_id,$data) {
+			$existing = $this->getSetting($old_id);
+			$old_id = mysql_real_escape_string($old_id);
+			
+			foreach ($data as $key => $val) {
+				if (substr($key,0,1) != "_" && !is_array($val)) {
+					$$key = mysql_real_escape_string($val);
+				}
+			}
+			
+			if ($old_id != $id) {
+				$r = sqlrows(sqlquery("SELECT id FROM bigtree_settings WHERE id = '$id'"));
+				if ($r) {
+					return false;
+				}
+			}
+			
+			sqlquery("UPDATE bigtree_settings SET id = '$id', type = '$type', name = '$name', description = '$description', locked = '$locked', module = '$module', encrypted = '$encrypted' WHERE id = '$old_id'");
+			
+			// If encryption status has changed, update the value
+			if ($existing["encrypted"] && !$encrypted) {
+				sqlquery("UPDATE bigtree_settings SET value = AES_DECRYPT(value,'".mysql_real_escape_string($config["settings_key"])."') WHERE id = '$id'");
+			}
+			if (!$existing["encrypted"] && $encrypted) {
+				sqlquery("UPDATE bigtree_settings SET value = AES_ENCRYPT(value,'".mysql_real_escape_string($config["settings_key"])."') WHERE id = '$id'");
+			}
+			
+			$this->track("bigtree_settings",$id,"updated");
+			
+			return true;
+		}
+
+		function updateSettingValue($id,$value) {
+			global $config;
+			$item = $this->getSetting($id);
+			$id = mysql_real_escape_string($id);
+			
+			$value = mysql_real_escape_string(json_encode($value));
+			
+			if ($item["encrypted"]) {
+				sqlquery("UPDATE bigtree_settings SET `value` = AES_ENCRYPT('$value','".mysql_real_escape_string($config["settings_key"])."') WHERE id = '$id'");
+			} else {
+				sqlquery("UPDATE bigtree_settings SET `value` = '$value' WHERE id = '$id'");
+			}
+			
+			$this->track("bigtree_settings",$id,"updated-value");
+		}
+		
+		// !Callout Functions
+		function getCallout($id) {
+			$id = mysql_real_escape_string($id);
+			$item = sqlfetch(sqlquery("SELECT * FROM bigtree_callouts WHERE id = '$id'"));
+			$item["resources"] = json_decode($item["resources"],true);
+			return $item;
+		}
+		
+		function getCalloutById($id) { return $this->getCallout($id); }
+		
+		function getCallouts() {
+			$callouts = array();
+			$q = sqlquery("SELECT * FROM bigtree_callouts ORDER BY position DESC, id ASC");
+			while ($f = sqlfetch($q)) {
+				$callouts[] = $f;
+			}
+			return $callouts;
+		}
+		
+		// !Feed Functions
+		function getFeed($item) {
+			if (!is_array($item)) {
+				$item = mysql_real_escape_string($item);
+				$item = sqlfetch(sqlquery("SELECT * FROM bigtree_feeds WHERE id = '$item'"));
+			}
+			if (!$item) {
+				return false;
+			}
+			$item["fields"] = json_decode($item["fields"],true);
+			$item["options"] = json_decode($item["options"],true);
+			return $item;
+		}
+		
+		function getFeedById($id) { return $this->getFeed($id); }
+		
+		function getFeedByRoute($route) {
+			return $this->getFeed(sqlfetch(sqlquery("SELECT * FROM bigtree_feeds WHERE route = '".mysql_real_escape_string($route)."'")));
+		}
+		
+		function getFeeds() {
+			$feeds = array();
+			$q = sqlquery("SELECT * FROM bigtree_feeds ORDER BY name");
+			while ($f = sqlfetch($q)) {
+				$feeds[] = $f;
+			}
+			return $feeds;
+		}
+		
+		// !Field Type Functions
+		function getFieldType($id) {
+			$id = mysql_real_escape_string($id);
+			$item = sqlfetch(sqlquery("SELECT * FROM bigtree_field_types WHERE id = '$id'"));
+			if (!$item) {
+				return false;
+			}
+			$item["files"] = json_decode($item["files"],true);
+			return $item;
+		}
+		
+		function getFieldTypeByFoundryId($id) {
+			$id = mysql_real_escape_string($id);
+			$item = sqlfetch(sqlquery("SELECT * FROM bigtree_field_types WHERE foundry_id = '$id'"));
+			if (!$item) {
+				return false;
+			}
+			$item["files"] = json_decode($item["files"],true);
+			return $item;
+		}
+		
+		function getFieldTypeById($id) { return $this->getFieldType($id); }
+		
+		function getFieldTypes($sort = "name ASC") {
+			$types = array();
+			$q = sqlquery("SELECT * FROM bigtree_field_types ORDER BY $sort");
+			while ($f = sqlfetch($q)) {
+				$types[] = $f;
+			}
+			return $types;
+		}
+
+		// !SEO Functions
+
+		function getPageSEORating($page,$content) {
+			global $cms;
+			$template = $cms->getTemplate($page["template"]);
+			$tsources = array();
+			foreach ($template["resources"] as $item) {
+				$tsources[$item["id"]] = $item;
+			}
+			
+			$textStats = new TextStatistics;
+			$recommendations = array();
+
+			// Get an SEO rating out of 100 points
+			// ===================================
+			// - Having a title - 5 points
+			// - Having a unique title - 5 points
+			// - Title does not exceed 72 characters and has at least 4 words - 5 points
+			// - Having a meta description - 5 points
+			// - Meta description that is less than 165 characters - 5 points
+			// - Having an h1 - 10 points
+			// - Having page content - 5 points
+			// - Having at least 300 words in your content - 15 points
+			// - Having links in your content - 5 points
+			// - Having external links in your content - 5 points
+			// - Having one link for every 120 words of content - 5 points
+			// - Readability Score - up to 20 points
+			// - Fresh content - up to 10 points
+
+			$score = 0;
+
+			// Check if they have a page title.
+			if ($page["title"]) {
+				$score += 5;
+				// They have a title, let's see if it's unique
+				$q = sqlquery("SELECT * FROM bigtree_pages WHERE title = '".mysql_real_escape_string($page["title"])."' AND id != '".$page["page"]."'");
+				if ($r == 0) {
+					// They have a unique title
+					$score += 5;
+				} else {
+					$recommendations[] = "Your page title should be unique. ".($r-1)." other page(s) have the same title.";
+				}
+				$words = $textStats->word_count($page["title"]);
+				$length = mb_strlen($page["title"]);
+				if ($words >= 4 && $length <= 72) {
+					// Fits the bill!
+					$score += 5;
+				} else {
+					$recommendations[] = "Your page title should be no more than 72 characters and should contain at least 4 words.";
+				}
+			} else {
+				$recommendations[] = "You should enter a page title.";
+			}
+
+			// Check for meta description
+			if ($page["meta_description"]) {
+				$score += 5;
+				// They have a meta description, let's see if it's no more than 165 characters.
+				if (mb_strlen($page["meta_description"]) <= 165) {
+					$score += 5;
+				} else {
+					$recommendations[] = "Your meta description should be no more than 165 characters.  It is currently ".mb_strlen($page["meta_description"])." characters.";
+				}
+			} else {
+				$recommendations[] = "You should enter a meta description.";
+			}
+
+			// Check for an H1
+			if ($content["page_header"] || !$tsources["page_header"]) {
+				$score += 10;
+			} else {
+				$recommendations[] = "You should enter a page header.";
+			}
+			// Check the content!
+			if (!$tsources["page_content"]) {
+				// If this template doesn't for some reason have a page_content resource, give the benefit of the doubt.
+				$score += 65;
+			} else {
+				$stripped_text = strip_tags($content["page_content"]);
+				// Check to see if there is any content
+				if ($stripped_text) {
+					$score += 5;
+					$words = $textStats->word_count($stripped_text);
+					$readability = $textStats->flesch_kincaid_reading_ease($stripped_text);
+					$number_of_links = substr_count($content["page_content"],"<a ");
+					$number_of_external_links = substr_count($content["page_content"],'href="http://');
+
+					// See if there are at least 300 words.
+					if ($words >= 300) {
+						$score += 15;
+					} else {
+						$recommendations[] = "You should enter at least 300 words of page content.  You currently have ".$words." word(s).";
+					}
+
+					// See if we have any links
+					if ($number_of_links) {
+						$score += 5;
+						// See if we have at least one link per 120 words.
+						if (floor($words / 120) <= $number_of_links) {
+							$score += 5;
+						} else {
+							$recommendations[] = "You should have at least one link for every 120 words of page content.  You currently have $number_of_links link(s).  You should have at least ".floor($words / 120).".";
+						}
+						// See if we have any external links.
+						if ($number_of_external_links) {
+							$score += 5;
+						} else {
+							$recommendations[] = "Having an external link helps build Page Rank.";
+						}
+					} else {
+						$recommendations[] = "You should have at least one link in your content.";
+					}
+
+					// Check on our readability score.
+					if ($readability >= 90) {
+						$score += 20;
+					} else {
+						$read_score = round(($readability / 90),2);
+						$recommendations[] = "Your readability score is ".($read_score*100)."%.  Using shorter sentences and words with less syllables will make your site easier to read by search engines and users.";
+						$score += ceil($read_score * 20);
+					}
+				} else {
+					$recommendations[] = "You should enter page content.";
+				}
+
+				// Check page freshness
+				$updated = strtotime($page["updated_at"]);
+				$age = time()-$updated-(60*24*60*60);
+				// See how much older it is than 2 months.
+				if ($age > 0) {
+					$age_score = 10 - floor(2 * ($age / (30*24*60*60)));
+					if ($age_score < 0) {
+						$age_score = 0;
+					}
+					$score += $age_score;
+					$recommendations[] = "Your content is around ".ceil(2 + ($age / (30*24*60*60)))." months old.  Updating your page more frequently will make it rank higher.";
+				} else {
+					$score += 10;
+				}
+			}
+
+			$color = "#008000";
+			if ($score <= 50) {
+				$color = color_mesh("#CCAC00","#FF0000",100-(100 * $score / 50));
+			} elseif ($score <= 80) {
+				$color = color_mesh("#008000","#CCAC00",100-(100 * ($score-50) / 30));
+			}
+
+			return array("score" => $score, "recommendations" => $recommendations, "color" => $color);
+		}
+
+		// !Authorization Functions
+
+		// Utility for form field types / views -- we already know module group permissions are enabled so we skip some overhead
+		function canAccessGroup($module,$group) {
+			if ($this->Level > 0) {
+				return true;
+			}
+			
+			$id = $module["id"];
+			
+			if ($this->Permissions["module"][$id] && $this->Permissions["module"][$id] != "n") {
+				return true;
+			}
+						
+			if (is_array($this->Permissions["module_gbp"][$id])) {
+				$gp = $this->Permissions["module_gbp"][$id][$group];
+				if ($gp && $gp != "n") {
+					return true;
+				}
+			}
+			
+			return false;
+		}
+
+		function checkAccess($module) {
+			if (is_array($module)) {
+				$module = $module["id"];
+			}
+			
+			if ($this->Level > 0) {
+				return true;
+			}
+			
+			if ($this->Permissions["module"][$module] && $this->Permissions["module"][$module] != "n") {
+				return true;
+			}
+			
+			if (is_array($this->Permissions["module_gbp"][$module])) {
+				foreach ($this->Permissions["module_gbp"][$module] as $p) {
+					if ($p != "n") {
+						return true;
+					}
+				}
+			}
+			
+			return false;
+		}
+		
+		// Pass in the entire module array (or just the ID if not passing in $item), returns the permission level for the given item.
+		// If no item is passed in, it will give the access level for the module ignoring gbp.
+		function getAccessLevel($module,$item = array(),$table = "") {
+			if ($this->Level > 0) {
+				return "p";
+			}
+			
+			$id = is_array($module) ? $module["id"] : $module;
+			
+			$perm = $this->Permissions["module"][$id];
+			
+			// If group based permissions aren't on or we're a publisher of this module it's an easy solution… or if we're not even using the table.
+			if (!$item || !$module["gbp"]["enabled"] || $perm == "p" || $table != $module["gbp"]["table"]) {
+				return $perm;
+			}
+			
+			if (is_array($this->Permissions["module_gbp"][$id])) {
+				$gv = $item[$module["gbp"]["group_field"]];
+				$gp = $this->Permissions["module_gbp"][$id][$gv];
+				
+				if ($gp != "n") {
+					return $gp;
+				}
+			}
+			
+			return $perm;
+		}
+		
+		// Since cached items don't use their normal columns...
+		function getCachedAccessLevel($module,$item = array(),$table = "") {
+			if ($this->Level > 0) {
+				return "p";
+			}
+			
+			$id = is_array($module) ? $module["id"] : $module;
+			
+			$perm = $this->Permissions["module"][$id];
+			
+			// If group based permissions aren't on or we're a publisher of this module it's an easy solution… or if we're not even using the table.
+			if (!$item || !$module["gbp"]["enabled"] || $perm == "p" || $table != $module["gbp"]["table"]) {
+				return $perm;
+			}
+			
+			if (is_array($this->Permissions["module_gbp"][$id])) {
+				$gv = $item["gbp_field"];
+				$gp = $this->Permissions["module_gbp"][$id][$gv];
+				
+				if ($gp != "n") {
+					return $gp;
+				}
+			}
+			
+			return $perm;
+		}
+		
+		// Get a list of all groups the user has access to in a module.
+		function getAccessGroups($module) {
+			if ($this->Level > 0) {
+				return true;
+			}
+			
+			if ($this->Permissions["module"][$module] && $this->Permissions["module"][$module] != "n") {
+				return true;
+			}
+			
+			$groups = array();
+			if (is_array($this->Permissions["module_gbp"][$module])) {
+				foreach ($this->Permissions["module_gbp"][$module] as $group => $permission) {
+					if ($permission && $permission != "n") {
+						$groups[] = $group;
+					}
+				}
+			}
+			return $groups;
+		}
+
+		function getPageAccessLevel($page) {
+			return $this->getPageAccessLevelByUserId($page,$this->ID);
+		}
+
+		function getPageAccessLevelByUserId($page,$user) {
+			$u = $this->getUserById($user);
+			if ($u["level"] > 0) {
+				return "p";
+			}
+			
+			if (!is_numeric($page) && $page[0] == "p") {
+				$f = sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE id = '".substr($page,1)."'"));
+				if ($f["user"] == $user) {
+					return "p";
+				}
+				$pdata = json_decode($f["changes"],true);
+				return $this->getPageAccessLevelByUserId($pdata["parent"],$admin->ID);
+			}
+			
+			$pp = $this->Permissions["page"][$page];
+			if ($pp == "n") {
+				return false;
+			}
+			
+			if ($pp && $pp != "i") {
+				return $pp;
+			}
+			
+			$parent = sqlfetch(sqlquery("SELECT parent FROM bigtree_pages WHERE id = '".mysql_real_escape_string($page)."'"),true);
+			$pp = $this->Permissions["page"][$parent];
+			while ((!$pp || $pp == "i") && $parent) {
+				$parent = sqlfetch(sqlquery("SELECT parent FROM bigtree_pages WHERE id = '$parent'"),true);
+				$pp = $this->Permissions["page"][$parent];
+			}
+			
+			if (!$pp || $pp == "i" || $pp == "n") {
+				return false;
+			}
+
+			return $pp;
+		}
+
+		function getPageAccessType($page) {
+			return $this->getPageAccessTypeByUserId($page,$this->ID);
+		}
+
+		function getPageAccessTypeByUserId($page,$user,$origin = true) {
+			$page = mysql_real_escape_string($page);
+			if ($origin) {
+				$u = $this->getUserById($user);
+				if ($u["level"] > 0) {
+					return "i";
+				}
+			}
+			$f = sqlfetch(sqlquery("SELECT permissions,parent FROM bigtree_pages WHERE id = '$page'"));
+			$rights = json_decode($f["permissions"],true);
+			if (isset($rights[$user])) {
+				if ($origin) {
+					return $rights[$user]["type"];
+				}
+				if ($rights[$user]["type"] == "t") {
+					return "i";
+				}
+			}
+			if ($f["parent"] > -1) {
+				return $this->getPageAccessTypeByUserId($f["parent"],$user,false);
+			}
+			return false;
+		}
+
+		function login($email,$password,$stay_logged_in = false) {
+			global $path;
+			$f = sqlfetch(sqlquery("SELECT * FROM bigtree_users WHERE email = '".mysql_real_escape_string($email)."'"));
+			$phpass = new PasswordHash($config["password_depth"], TRUE);
+			$ok = $phpass->CheckPassword($password,$f["password"]);
+			if ($ok) {
+				if ($stay_logged_in) {
+					setcookie('bigtree[email]',$f["email"],time()+31*60*60*24,str_replace($GLOBALS["domain"],"",$GLOBALS["www_root"]));
+					setcookie('bigtree[password]',$f["password"],time()+31*60*60*24,str_replace($GLOBALS["domain"],"",$GLOBALS["www_root"]));
+				}
+
+				$_SESSION["bigtree"]["id"] = $f["id"];
+				$_SESSION["bigtree"]["email"] = $f["email"];
+				$_SESSION["bigtree"]["level"] = $f["level"];
+				$_SESSION["bigtree"]["name"] = $f["name"];
+				$_SESSION["bigtree"]["permissions"] = json_decode($f["permissions"],true);
+
+				if ($path[1] == "login") {
+					header("Location: ".$GLOBALS["www_root"]."admin/");
+				} else {
+					header("Location: ".$GLOBALS["domain"].$_SERVER["REQUEST_URI"]);
+				}
+				die();
+			} else {
+				return false;
+			}
+		}
+
+		function logout() {
+			setcookie("bigtree[email]","",time()-3600,str_replace($GLOBALS["domain"],"",$GLOBALS["www_root"]));
+			setcookie("bigtree[password]","",time()-3600,str_replace($GLOBALS["domain"],"",$GLOBALS["www_root"]));
+			unset($_SESSION["bigtree"]);
+			header("Location: ".$GLOBALS["www_root"]."admin/");
+			die();
+		}
+
+		function requireAccess($module) {
+			global $cms,$aroot,$css,$js,$site;
+			if ($this->Level > 0)
+				return "p";
+			if (!isset($this->Permissions[$module]) || $this->Permissions[$module] == "") {
+				ob_clean();
+				include bigtree_path("admin/pages/_denied.php");
+				$content = ob_get_clean();
+				include bigtree_path("admin/layouts/default.php");
+				die();
+			}
+			return $this->Permissions[$module];
+		}
+
+		function requireLevel($level) {
+			global $cms,$aroot,$css,$js,$site;
+			if (!isset($this->Level) || $this->Level < $level) {
+				ob_start();
+				include bigtree_path("admin/pages/_denied.php");
+				$content = ob_get_clean();
+				include bigtree_path("admin/layouts/default.php");
+				die();
+			}
+		}
+
+		function requirePublisher($module) {
+			global $cms,$aroot,$css,$js,$site;
+			if ($this->Level > 0)
+				return true;
+			if ($this->Permissions[$module] != "p") {
+				ob_clean();
+				include bigtree_path("admin/pages/_denied.php");
+				$content = ob_get_clean();
+				include bigtree_path("admin/layouts/default.php");
+				die();
+			}
+			return true;
+		}
+		
+		//! Google Analytics Functions		
+		function getGADataByDateRange($dimension,$sort,$start,$end,$limit = 10000,$filter = null) {
+			global $cms;
+
+			if (strtotime($end) > strtotime(date("Y-m-d"))) {
+				$end = date("Y-m-d");
+			}
+			$cname = $GLOBALS["server_root"]."cache/ga-data-".md5("$dimension-$sort-$start-$end-$limit-$filter");
+			if (file_exists($cname)) {
+				$data = json_decode(file_get_contents($cname),true);
+				return $data;
+			}
+			$user = $cms->getSetting("google-analytics-email");
+			$pass = $cms->getSetting("google-analytics-password");
+			$profile = $cms->getSetting("google-analytics-profile");
+			if (!$user && !$pass && !$profile) {
+				return false;
+			}
+				
+			try {
+				$ga = new gapi($user,$pass);
+				$ga->requestReportData($profile,array($dimension),array('pageviews','visits','bounces','timeOnSite'),$sort,$filter,$start,$end,1,$limit);
+			} catch (Exception $e) {
+				return false;
+			}
+			
+			$data = array();
+			$data["views"] = $ga->getPageviews();
+			$data["visits"] = $ga->getVisits();
+			$data["bounces"] = $ga->getBounces();
+			@$data["average_time"] = round($ga->getTimeOnSite() / $data["visits"]);
+			@$data["bounce_rate"] = $data["bounces"] / $data["visits"] * 100;
+			foreach ($ga->getResults() as $result) {
+				eval('$key = $result->get'.$dimension.'();');
+				$data["results"][$key] = array(
+					"views" => $result->getPageviews(),
+					"visits" => $result->getVisits()
+				);
+			}
+			
+			file_put_contents($cname,json_encode($data));
+			return $data;
+		}
+		
+		function getGA30DayViewsForPage($id) {
+			global $cms;
+			if (!$this->gaPageData) {
+				$this->gaPageData = $this->getGADataByDateRange("pagePath","-visits",date("Y-m-d",strtotime("-31 days")),date("Y-m-d",strtotime("-1 day")));
+			}
+			
+			$path = str_replace($GLOBALS["domain"],"",$GLOBALS["www_root"]).$cms->getFullNavigationPath($id);
+			
+			$views = $this->gaPageData["results"][$path]["views"];
+			$path .= "/";
+			$views += $this->gaPageData["results"][$path]["views"];
+			
+			if ($views) {
+				$views = number_format($views);
+			}
+			
+			return $views;
+		}
+		
+		function getGAVisitsByDateRange($start,$end,$filter = null) {
+			global $cms;
+			
+			if (strtotime($end) > strtotime(date("Y-m-d"))) {
+				$end = date("Y-m-d");
+			}
+			
+			$cname = $GLOBALS["server_root"]."cache/ga-visits-by-date-range-".md5("$start-$end-$filter");
+			if (file_exists($cname)) {
+			  $data = json_decode(file_get_contents($cname),true);
+			  return $data;
+			}
+			$user = $cms->getSetting("google-analytics-email");
+			$pass = $cms->getSetting("google-analytics-password");
+			$profile = $cms->getSetting("google-analytics-profile");
+			if (!$user && !$pass && !$profile)
+				return false;
+			try {
+				$ga = new gapi($user,$pass);
+				$ga->requestReportData($profile,array('date'),array('visits'),"date",$filter,$start,$end);
+				$visits = array();
+	
+				foreach ($ga->getResults() as $result) {
+					$date = strval($result->getDate());
+					$year = substr($date,0,4);
+					$month = substr($date,4,2);
+					$day = substr($date,6,2);
+					$visits[$year."-".$month."-".$day] = $result->getVisits();
+				}
+				
+				file_put_contents($cname,json_encode($visits));
+				return $visits;
+			} catch (Exception $e) {
+				return false;
+			}
+		}
+		
+		function getGAViewsByDateRange($start,$end,$filter = null) {
+			global $cms;
+			
+			if (strtotime($end) > strtotime(date("Y-m-d"))) {
+				$end = date("Y-m-d");
+			}
+			
+			$cname = $GLOBALS["server_root"]."cache/ga-views-by-date-range-".md5("$start-$end-$filter");
+			if (file_exists($cname)) {
+				$data = json_decode(file_get_contents($cname),true);
+				return $data;
+			}
+			$user = $cms->getSetting("google-analytics-email");
+			$pass = $cms->getSetting("google-analytics-password");
+			$profile = $cms->getSetting("google-analytics-profile");
+			if (!$user && !$pass && !$profile) {
+				return false;
+			}
+			try {
+				$ga = new gapi($user,$pass);
+				$ga->requestReportData($profile,array('date'),array('pageviews'),"date",$filter,$start,$end);
+				
+				$visits = array();
+	
+				foreach ($ga->getResults() as $result) {
+					$date = strval($result);
+					$year = substr($date,0,4);
+					$month = substr($date,4,2);
+					$day = substr($date,6,2);
+					$visits[$year."-".$month."-".$day] = $result->getPageviews();
+				}
+				
+				file_put_contents($cname,json_encode($visits));
+				return $visits;
+			} catch (Exception $e) {
+				return false;
+			}
+		}
+
+		//! API Related Functions
+
+		function getAPIToken($email,$password) {
+			global $config;
+			$f = sqlfetch(sqlquery("SELECT * FROM bigtree_users WHERE email = '".mysql_real_escape_string($email)."'"));
+			$phpass = new PasswordHash($config["password_depth"], TRUE);
+			$ok = $phpass->CheckPassword($password,$f["password"]);
+			if ($ok) {
+				$existing = sqlfetch(sqlquery("SELECT * FROM bigtree_api_tokens WHERE temporary = 'on' AND user = '".$f["id"]."' AND expires > NOW()"));
+				if ($existing) {
+					sqlquery("UPDATE bigtree_api_tokens SET expires = '".date("Y-m-d H:i:s",strtotime("+1 day"))."' WHERE id = '".$existing["id"]."'");
+					return $existing["token"];
+				}
+				$token = str_rand(30);
+				$r = sqlrows(sqlquery("SELECT * FROM bigtree_api_tokens WHERE token = '$token'"));
+				while ($r) {
+					$token = str_rand(30);
+					$r = sqlrows(sqlquery("SELECT * FROM bigtree_api_tokens WHERE token = '$token'"));
+				}
+				sqlquery("DELETE FROM bigtree_api_tokens WHERE user = '".$f["id"]."' AND temporary = 'on'");
+				sqlquery("INSERT INTO bigtree_api_tokens (`token`,`user`,`expires`,`temporary`) VALUES ('$token','".$f["id"]."','".date("Y-m-d H:i:s",strtotime("+1 day"))."','on')");
+				return $token;
+			}
+			return false;
+		}
+
+
+		function getPageOfTokens($page = 0,$query = "") {
+			if ($query) {
+				$q = sqlquery("SELECT * FROM bigtree_api_tokens WHERE token LIKE '%".mysql_real_escape_string($query)."%' ORDER BY id DESC LIMIT ".($page*$this->PerPage).",".$this->PerPage);
+			} else {
+				$q = sqlquery("SELECT * FROM bigtree_api_tokens ORDER BY id DESC LIMIT ".($page*$this->PerPage).",".$this->PerPage);
+			}
+			$items = array();
+			while ($f = sqlfetch($q)) {
+				$f["user"] = $this->getUserById($f["user"]);
+				$items[] = $f;
+			}
+			return $items;
+		}
+
+		function getTokensPageCount($query = "") {
+			if ($query) {
+				$q = sqlquery("SELECT id FROM bigtree_api_tokens WHERE token LIKE '%".mysql_real_escape_string($query)."%'");
+			} else {
+				$q = sqlquery("SELECT id FROM bigtree_api_tokens");
+			}
+			$r = sqlrows($q);
+			$pages = ceil($r / $this->PerPage);
+			if ($pages == 0) {
+				$pages = 1;
+			}
+			return $pages;
+		}
+
+		function requireAPILevel($level) {
+			if ($this->Level < $level) {
+				echo bigtree_api_encode(array("success" => false,"error" => "Permission level is too low."));
+				die();
+			}
+		}
+
+		function requireAPIModuleAccess($module) {
+			if (!$this->Permissions[$module]) {
+				echo bigtree_api_encode(array("success" => false,"error" => "Not permitted."));
+				die();
+			}
+		}
+
+		function requireAPIModulePublisherAccess($module) {
+			if ($this->Permissions[$module] != "p") {
+				echo bigtree_api_encode(array("success" => false,"error" => "Publishing permission required."));
+				die();
+			}
+		}
+
+		function requireAPIWrite() {
+			if ($this->ReadOnly) {
+				echo bigtree_api_encode(array("success" => false,"error" => "Not available in read only mode."));
+				die();
+			}
+		}
+
+		function validateToken($token) {
+			$t = sqlfetch(sqlquery("SELECT * FROM bigtree_api_tokens WHERE token = '$token' AND (expires > NOW() OR temporary != 'on')"));
+			if (!$t) {
+				return false;
+			}
+
+			$user = $this->getUserById($t["user"]);
+			$this->ID = $user["id"];
+			$this->User = $user["email"];
+			$this->Level = $user["level"];
+			$this->Name = $user["name"];
+			$this->Permissions = $user["permissions"];
+			$this->ReadOnly = $t["readonly"];
+			return true;
+		}
+		
+		//!Foundry Methods
+		function getFoundryFieldTypes() {
+			if (!file_exists($GLOBALS["server_root"]."cache/foundry-field-types.json") || (time() - filemtime($GLOBALS["server_root"]."cache/foundry-field-types.json") > 300)) {
+				// We're going to pass in the author information in case we need private types.
+				$user = $this->getUserById($this->ID);
+				$author = json_decode($user["foundry_author"],true);
+				$types = bigtree_curl("http://developer.bigtreecms.com/ajax/foundry/get-types/",array("email" => $author["email"],"password" => $author["password"]));
+				file_put_contents($GLOBALS["server_root"]."cache/foundry-field-types.json",$types);
+				return json_decode($types,true);
+			} else {
+				return json_decode(file_get_contents($GLOBALS["server_root"]."cache/foundry-field-types.json"),true);
+			}
+		}
+		
+		function getFoundryModules() {
+			if (!file_exists($GLOBALS["server_root"]."cache/foundry-modules.json") || (time() - filemtime($GLOBALS["server_root"]."cache/foundry-modules.json") > 300)) {
+				// We're going to pass in the author information in case we need private modules.
+				$user = $this->getUserById($this->ID);
+				$author = json_decode($user["foundry_author"],true);
+				$modules = bigtree_curl("http://developer.bigtreecms.com/ajax/foundry/get-modules/",array("email" => $author["email"],"password" => $author["password"]));
+				file_put_contents($GLOBALS["server_root"]."cache/foundry-modules.json",$modules);
+				return json_decode($modules,true);
+			} else {
+				return json_decode(file_get_contents($GLOBALS["server_root"]."cache/foundry-modules.json"),true);
+			}
+		}
+	}
+?>
