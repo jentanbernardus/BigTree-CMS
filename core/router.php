@@ -1,5 +1,4 @@
 <?
-
 	// Handle Javascript Minifying and Caching
 	if ($path[0] == "js") {
 		clearstatcache();

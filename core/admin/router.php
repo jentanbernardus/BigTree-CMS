@@ -21,12 +21,13 @@
 		}
 		$type = explode(".",$path[$x]);
 		$type = strtolower($type[count($type)-1]);
-		if ($type == "gif")
+		if ($type == "gif") {
 			header("Content-type: image/gif");
-		if ($type == "jpg")
+		} elseif ($type == "jpg") {
 			header("Content-type: image/jpeg");
-		if ($type == "png")
+		} elseif ($type == "png") {
 			header("Content-type: image/png");
+		}
 		
 		echo file_get_contents($ifile);
 		header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_modified).' GMT', true, 200);
@@ -192,10 +193,11 @@
 						$x++;
 					}
 					if (substr($inc,-4,4) != ".php") {
-						if (file_exists($inc.end($path).".php"))
+						if (file_exists($inc.end($path).".php")) {
 							$inc .= end($path).".php";
-						else
+						} else {
 							$inc .= "default.php";
+						}
 					}
 					$commands = array_slice($path,$y+1);
 				}
@@ -220,19 +222,21 @@
 						$x++;
 					}
 					if (substr($inc,-4,4) != ".php") {
-						if (file_exists($inc.end($path).".php"))
+						if (file_exists($inc.end($path).".php")) {
 							$inc .= end($path).".php";
-						else
+						} else {
 							$inc .= "default.php";
+						}
 					}
 					$commands = array_slice($path,$y+1);
 				}
 			// It's a normal page.
 			} elseif (!$inc) {
-				if (file_exists("../custom/admin/pages/".$path[1].".php"))
+				if (file_exists("../custom/admin/pages/".$path[1].".php")) {
 					$inc = "../custom/admin/pages/".$path[1].".php";
-				elseif (file_exists("../core/admin/pages/".$path[1].".php"))
+				} elseif (file_exists("../core/admin/pages/".$path[1].".php")) {
 					$inc = "../core/admin/pages/".$path[1].".php";
+				}
 				$ispage = true;
 			}
 			
@@ -250,10 +254,12 @@
 			}
 			
 			// Ok, if this inc is real, let's include it -- otherwise see if it's an auto-module action.
-			if (isset($path[1]))
+			if (isset($path[1])) {
 				$module = $admin->getModuleByRoute($path[1]);
-			if (!isset($path[2]))
+			}
+			if (!isset($path[2])) {
 				$path[2] = "";
+			}
 			$action = sqlfetch(sqlquery("SELECT * FROM bigtree_module_actions WHERE module = '".$module["id"]."' AND route = '".$path[2]."'"));
 			
 			$inc_dir = str_replace("../",$server_root,$inc_dir);
@@ -266,15 +272,21 @@
 					include bigtree_path("admin/auto-modules/view.php");
 				}
 			} elseif (file_exists($inc)) {
-				if (!$ispage && file_exists(bigtree_path("admin/modules/".$path[1]."/_header.php")))
+				if (!$ispage && file_exists(bigtree_path("admin/modules/".$path[1]."/_header.php"))) {
 					include bigtree_path("admin/modules/".$path[1]."/_header.php");
-				if (!$ispage && file_exists($inc_dir."_header.php") && bigtree_path("admin/modules/".$path[1]."/_header.php") != ($inc_dir."_header.php"))
+				}
+				if (!$ispage && file_exists($inc_dir."_header.php") && bigtree_path("admin/modules/".$path[1]."/_header.php") != ($inc_dir."_header.php")) {
 					include $inc_dir."_header.php";
+				}
+				
 				include $inc;
-				if (!$ispage && file_exists(bigtree_path("admin/modules/".$path[1]."/_footer.php")))
+				
+				if (!$ispage && file_exists(bigtree_path("admin/modules/".$path[1]."/_footer.php"))) {
 					include bigtree_path("admin/modules/".$path[1]."/_footer.php");
-				if (!$ispage && file_exists($inc_dir."_footer.php"))
+				}
+				if (!$ispage && file_exists($inc_dir."_footer.php")) {
 					include $inc_dir."_footer.php";
+				}
 			} else {
 				include bigtree_path("admin/pages/_404.php");
 			}
