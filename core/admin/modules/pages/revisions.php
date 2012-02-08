@@ -76,7 +76,7 @@
 			<section class="pages_draft_author"><?=$draft_author["name"]?></section>
 			<section class="pages_publish"><a class="icon_publish" href="#"></a></section>
 			<section class="pages_edit"><a class="icon_edit" href="<?=$aroot?>pages/edit/<?=$pdata["id"]?>/"></a></section>
-			<section class="pages_delete"><a class="icon_delete" href="<?=$aroot?>pages/revisions/delete-draft/<?=$pdata["id"]?>/"></a></section>
+			<section class="pages_delete"><a class="icon_delete" href="<?=$aroot?>ajax/pages/delete-draft/?id=<?=$pdata["id"]?>"></a></section>
 		</li>
 		<?
 			}
@@ -131,13 +131,14 @@
 	</ul>
 </div>
 <script type="text/javascript">
+	var active_draft = <? if ($draft) { ?>true<? } else { ?>false<? } ?>;
 	var page = "<?=$pdata["id"]?>";
 	var page_updated_at = "<?=$pdata["updated_at"]?>";
 	lockTimer = setInterval("$.ajax('<?=$aroot?>ajax/pages/refresh-lock/', { type: 'POST', data: { id: '<?=$lockid?>' } });",60000);
 	
 	$(".icon_save").click(function() {
 		new BigTreeDialog("Save Revision",'<fieldset><label>Short Description <small>(quick reminder of what\'s special about this revision)</small></label><input type="text" name="description" /></fieldset>',$.proxy(function(d) {
-			$.ajax("<?=$aroot?>pages/revisions/save/" + BigTree.CleanHref($(this).attr("href")) + "/", { type: "POST", data: { description: d.description }, complete: function() {
+			$.ajax("<?=$aroot?>ajax/pages/save-revision/", { type: "POST", data: { id: BigTree.CleanHref($(this).attr("href")), description: d.description }, complete: function() {
 				window.location.reload();
 			}});
 		},this));
@@ -147,15 +148,17 @@
 	
 	$(".icon_delete").click(function() {
 		href = $(this).attr("href");
-		if (href.substr(1) == "#") {
+		if (href.substr(0,1) == "#") {
 			new BigTreeDialog("Delete Revision",'<p class="confirm">Are you sure you want to delete this revision?</p>',$.proxy(function() {
-				$.ajax("<?=$aroot?>pages/revisions/delete/?id=" + BigTree.CleanHref($(this).attr("href")));
+				$.ajax("<?=$aroot?>ajax/pages/delete-revision/?id=" + BigTree.CleanHref($(this).attr("href")));
 				$(this).parents("li").remove();
+				BigTree.growl("Pages","Deleted Revision");
 			},this),"delete",false,"OK");
 		} else {
 			new BigTreeDialog("Delete Draft",'<p class="confirm">Are you sure you want to delete this draft?</p>',$.proxy(function() {
 				$.ajax($(this).attr("href"));
 				$(this).parents("li").remove();
+				BigTree.growl("Pages","Deleted Draft");
 			},this),"delete",false,"OK");
 		}
 		
@@ -163,7 +166,13 @@
 	});
 	
 	$(".icon_draft").click(function() {
-	
+		if (active_draft) {
+			new BigTreeDialog("Use Revision",'<p class="confirm">Are you sure you want to overwrite your existing draft with this revision?</p>',$.proxy(function() {
+				document.location.href = "<?=$aroot?>ajax/pages/use-draft/?id=" + BigTree.CleanHref($(this).attr("href"));
+			},this),"",false,"OK");
+		} else {
+			document.location.href = "<?=$aroot?>ajax/pages/use-draft/?id=" + BigTree.CleanHref($(this).attr("href"));
+		}
 		return false;
 	});
 </script>
