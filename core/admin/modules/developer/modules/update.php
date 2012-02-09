@@ -18,11 +18,6 @@
 	
 	$gbp = mysql_real_escape_string(json_encode($_POST["gbp"]));
 	
-	if ($_FILES["image"]["tmp_name"]) {
-		move_uploaded_file($_FILES["image"]["tmp_name"],$GLOBALS["server_root"]."custom/admin/images/modules/".$id."_".$_FILES["image"]["name"]);
-		sqlquery("UPDATE bigtree_modules SET image = '".$id."_".mysql_real_escape_string($_FILES["image"]["name"])."' WHERE id = '$id'");
-	}
-	
 	$name = mysql_real_escape_string(htmlspecialchars($name));
 	sqlquery("UPDATE bigtree_modules SET name = '$name', `group` = '$group', class = '$class', `gbp` = '$gbp' WHERE id = '$id'");
 	

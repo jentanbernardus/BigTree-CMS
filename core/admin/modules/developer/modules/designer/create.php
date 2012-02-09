@@ -45,11 +45,6 @@
 	sqlquery("INSERT INTO bigtree_modules (`name`,`route`,`class`,`group`) VALUES ('$name','$route','".mysql_real_escape_string($class)."','$group')");
 	$id = sqlid();	
 	
-	if ($_FILES["image"]["tmp_name"]) {
-		move_uploaded_file($_FILES["image"]["tmp_name"],$GLOBALS["server_root"]."custom/admin/images/modules/".$id."_".$_FILES["image"]["name"]);
-		sqlquery("UPDATE bigtree_modules SET image = '".$id."_".mysql_real_escape_string($_FILES["image"]["name"])."' WHERE id = '$id'");
-	}
-	
 	if (!file_exists($GLOBALS["server_root"]."custom/inc/modules/$route.php")) {
 		// Create class module.
 		$f = fopen($GLOBALS["server_root"]."custom/inc/modules/$route.php","w");
