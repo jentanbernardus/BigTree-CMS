@@ -46,6 +46,7 @@
 	h1 .error { background-position: -345px 0px; width: 28px; }
 	h1 .messages { background-position: -483px 0px; width: 26px; }
 	h1 .add_message { background-position: 0px -31px; width: 27px; }
+	h1 .reply_message { background-position: -54px -31px; width: 28px; }
 
 	h2 { color: #444; float: left; font-size: 18px; height: 32px; line-height: 32px; text-shadow: 1px 1px 1px #FFF; font-weight: normal; padding: 5px 0 0 0; }
 	h2 small { font-size: 13px; color: #999999; display: inline-block; padding: 0 0 0 10px; }
@@ -359,7 +360,7 @@
 
 /* Table Styles */
 	div.table { border: 1px solid #CCC; border-radius: 5px; box-shadow: 0px 0px 3px #CCC; margin: 0 0 25px 0; overflow: hidden; }
-	.table > summary { background: url(../images/top-gradient.png) repeat-x; border-radius: 5px 5px 0 0; height: 37px; line-height: 37px; padding: 0 20px; }
+	.table > summary, .form_container > summary { background: url(../images/top-gradient.png) repeat-x; border-radius: 5px 5px 0 0; height: 37px; line-height: 37px; padding: 0 20px; }
 	.table > summary input { float: left; margin: 5px 25px 0 -10px; }
 	.table > summary p { color: #666; font-size: 12px; line-height: 37px; text-shadow: 1px 1px 1px #FFF; }
 	.table > summary.taller { height: 45px; line-height: 45px; }
@@ -539,6 +540,12 @@
 	.image_list li a.image:hover { background: #DDD; }
 	.image_list li a.image img { max-width: 108px; }
 	.image_list li a:last-child { margin: 0; }
+	
+/* Message Center */
+	.alert .message_from { float: left; width: 220px; }
+	.alert .message_to { float: left; width: 678px; }
+	.alert .message_from label, .alert .message_to label { font-size: 10px; text-transform: uppercase; display: block; color: #999; text-shadow: 0px -1px 1px rgba(255,255,255,0.75); margin: 0 0 5px 0; }
+	.alert .message_from p, .alert .message_to p { font-size: 13px; color: #666; margin: 0; line-height: 13px; }
 
 /* Users Stuff */
 	
@@ -826,6 +833,8 @@
 	.icon_small_broadcast { background-position: -208px 0px; }
 	.icon_small_car { background-position: -224px 0px; }
 	.icon_small_key { background-position: -240px 0px; }
+	.icon_small_reply { background-position: 0px -16px; }
+	.icon_small_reply_all { background-position: -16px -16px; }
 
 /* Developer Icons */
 	.icon_developer_templates { background: url(../images/developer-icons-sprite.png) no-repeat 0px 0px; height: 32px; width: 32px; display: inline-block; }
@@ -907,7 +916,7 @@
 	.multi_widget { border: 1px solid #CCC; border-radius: 2px; padding: 0; }
 	.multi_widget footer { padding: 20px; border-top: none; }
 	.multi_widget footer a { float: right; height: 30px; line-height: 30px; border-radius: 2px; }
-	.multi_widget footer a .icon_small { height: 30px; margin-top: 6px; }
+	.multi_widget footer a .icon_small { height: 16px; margin-top: 6px; }
 	.multi_widget li { padding: 0px 10px; border-bottom: 1px solid #DDD; overflow: hidden; }
 	.multi_widget li p { line-height: 35px; height: 35px; float: left; font-size: 14px; margin: 0; }
 	.multi_widget li a { float: right; margin: 0 0 0 10px; }

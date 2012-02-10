@@ -1,14 +1,15 @@
 <?
+	// Make sure the user has the right to see this message
+	$parent = sqlfetch(sqlquery("SELECT * FROM bigtree_messages WHERE id = '".mysql_real_escape_string(end($path))."'"));
+	if ($parent["sender"] != $admin->ID && strpos("|".$admin->ID."|",$parent["recipients"]) === false) {
+		$admin->stop("This message was not sent by you, or to you.");
+	}
+	
 	$users = array();
 	$q = sqlquery("SELECT id,name FROM bigtree_users ORDER BY name");
 	while ($f = sqlfetch($q)) {
-		$users[$f["id"]] = $f;
+		$users[$f["id"]] = $f["name"];
 	}
-	
-	$send_to = array();
-	$subject = "";
-	$message = "";
-	$error = false;
 	
 	if ($_SESSION["saved_message"]) {
 		$send_to = $_SESSION["saved_message"]["send_to"];
@@ -16,12 +17,31 @@
 		$message = htmlspecialchars($_SESSION["saved_message"]["message"]);
 		$error = true;
 		unset($_SESSION["saved_message"]);
+	} else {
+		$subject = "RE: ".$parent["subject"];
+		$message = "";
+		$error = false;
+		
+		// Generate the recipient names from the parent if we're replying to all, otherwise, just use the sender.
+		$send_to = array();
+		if ($reply_all) {
+			$p_recipients = explode("|",trim($parent["recipients"],"|"));
+			$p_recipients[] = $parent["sender"];
+			foreach ($p_recipients as $r) {
+				if ($r != $admin->ID) {
+					$send_to[] = $r;
+				}
+			}
+		} else {
+			$send_to[] = $parent["sender"];
+		}
 	}
 ?>
-<h1><span class="add_message"></span>New Message</h1>
+<h1><span class="reply_message"></span>Reply To Message</h1>
 <? include "_nav.php" ?>
 <div class="form_container">
-	<form method="post" action="../create/" id="message_form">
+	<form method="post" action="<?=$aroot?>dashboard/messages/create-reply/" id="message_form">
+		<input type="hidden" name="response_to" value="<?=htmlspecialchars(end($path))?>" />
 		<section>
 			<p<? if (!$error) { ?> style="display: none;"<? } ?> class="error_message">Errors found! Please fix the highlighted fields before submitting.</p>
 			<fieldset id="send_to"<? if ($error && !count($send_to)) { ?> class="form_error"<? } ?>>
@@ -47,10 +67,10 @@
 					<footer>
 						<select>
 							<?
-								foreach ($users as $item) {
+								foreach ($users as $id => $name) {
 									if ($item["id"] != $admin->ID) {
 							?>
-							<option value="<?=$item["id"]?>"><?=htmlspecialchars($item["name"])?></option>
+							<option value="<?=$id?>"><?=htmlspecialchars($name)?></option>
 							<?
 									}
 								}
