@@ -7,7 +7,7 @@
 
 <div class="tags" id="bigtree_tag_browser">
 	<fieldset>
-		<label>Tags <img src="<?=$aroot?>images/4.0/tag.png" alt="" /></label>
+		<label>Tags <img src="<?=$aroot?>images/tag.png" alt="" /></label>
 		<ul id="tag_list">
 			<? foreach ($tags as $tag) { ?>
 			<li><input type="hidden" name="_tags[]" value="<?=$tag["id"]?>" /><a href="#"><?=$tag["tag"]?><span>x</span></a></li>

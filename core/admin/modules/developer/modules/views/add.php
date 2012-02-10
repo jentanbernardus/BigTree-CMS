@@ -17,7 +17,7 @@
 		<section>
 			<? if ($r > 0) { ?>
 			<div class="alert">
-				<img src="<?=$aroot?>images/4.0/alert.png" alt="" />
+				<img src="<?=$aroot?>images/alert.png" alt="" />
 				<p><strong>Default View Taken:</strong> If this view is for a different edit action, please specify the suffix below (i.e. edit-group's suffix is "group").</p>
 			</div>
 			<fieldset>

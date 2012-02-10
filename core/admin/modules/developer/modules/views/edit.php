@@ -15,7 +15,7 @@
 		<section>
 			<? if ($action["route"]) { ?>
 			<div class="alert">
-				<img src="<?=$aroot?>images/4.0/alert.png" alt="" />
+				<img src="<?=$aroot?>images/alert.png" alt="" />
 				<p><strong>This is not the default view:</strong>  You may specify an action suffix below.</p>
 			</div>
 			<fieldset>

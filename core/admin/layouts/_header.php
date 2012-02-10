@@ -87,7 +87,7 @@
 					?>
 				</ul>
 				<form method="post" action="<?=$aroot?>search/">
-					<input type="image" src="<?=$aroot?>images/4.0/quick-search-icon.png" />
+					<input type="image" src="<?=$aroot?>images/quick-search-icon.png" />
 					<input type="search" name="query" autocomplete="off" placeholder="Quick Search" />
 					<div id="quick_search_results" style="display: none;"></div>
 				</form>

@@ -68,7 +68,7 @@
 <h1>Advanced Search</h1>
 <form class="adv_search" method="post" action="<?=$aroot?>search/">
 	<h3><?=number_format($total_results)?> Search results for &ldquo;<?=end($path)?>&rdquo;</h3>
-	<input type="image" src="<?=$aroot?>images/4.0/quick-search-icon.png" />
+	<input type="image" src="<?=$aroot?>images/quick-search-icon.png" />
 	<input type="search" name="query" autocomplete="off" value="<?=htmlspecialchars(end($path))?>" />
 </form>
 
