@@ -14,18 +14,17 @@
   Elements
 ---------------------------*/
 	body { background: #fff url(../images/install/bg_body.png) repeat top center; color: #666; font-family: "Lucida Grande", sans-serif; }
-	
+
 	h1, h2, h3, h4, h5, h6 { color: #333; font-family: "news-gothic-std-1", "news-gothic-std-2", sans-serif; text-transform: uppercase; }
 	h1 { font-size: 36px; line-height: 42px; }
 	h2 { color: #284846; font-size: 28px; line-height: 34px; text-transform: none; }
 	h3 { font-size: 15px; line-height: 18px; }
-	h4 { font-size: 14px; color: #69BAB1; font-weight: normal; }
-	
+	h4 { color: #69BAB1; font-size: 14px; font-weight: normal; }
+
 	p { font-size: 14px; line-height: 21px; }
-	a { text-decoration: none; color: #68B9B1; }
-	
-	hr { background: url(../images/install/divider_horizontal.png) repeat-x left top; border: 2px solid transparent; }
-	
+	a { color: #68B9B1; text-decoration: none; }
+
+	hr { background: url(../images/install/divider_horizontal.png) repeat-x left top; border: 2px solid transparent; }	
 	
 /*-------------------------------------------
   Global

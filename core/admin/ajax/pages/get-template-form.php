@@ -25,7 +25,7 @@
 	$htmls = array();
 	$small_htmls = array();
 ?>
-<div class="alert">
+<div class="alert template_message">
 	<img src="<?=$image?>" alt="" />
 	<label>Template</label>
 	<p><? if ($template == "") { ?>External Link<? } elseif ($template == "!") { ?>Redirect Lower<? } else { ?><?=str_replace("Module - ","",$tdata["name"])?><? } ?></p>
