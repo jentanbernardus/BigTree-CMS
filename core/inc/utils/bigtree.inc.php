@@ -35,10 +35,12 @@
 			
 			if ($action) {
 				$mod = "ALTER TABLE `$table_a` $action COLUMN `$key` ".$column["type"];
-				if ($column["size"])
+				if ($column["size"]) {
 					$mod .= "(".$column["size"].")";
-				if ($column["type_extras"])
+				}
+				if ($column["type_extras"]) {
 					$mod .= " ".$column["type_extras"];
+				}
 				if ($column["null"] == "NO") {
 					$mod .= " NOT NULL";
 				} else {
@@ -52,8 +54,9 @@
 						$mod .= " DEFAULT '".mysql_real_escape_string($d)."'";
 					}
 				}
-				if ($column["extra"])
+				if ($column["extra"]) {
 					$mod .= " ".$column["extra"];
+				}
 				
 				if ($last_key) {
 					$mod .= " AFTER `$last_key`";
@@ -258,8 +261,9 @@
 			$command = explode("/",rtrim(str_replace($GLOBALS["www_root"],"",$href),"/"));
 			list($navid,$commands) = $cms->getNavId($command);
 			$page = $cms->getPageById($navid,false);
-			if ($navid && (!$commands[0] || substr($page["template"],0,6) == "module" || substr($commands[0],0,1) == "#"))
+			if ($navid && (!$commands[0] || substr($page["template"],0,6) == "module" || substr($commands[0],0,1) == "#")) {
 				$href = "ipl://".$navid."//".base64_encode(json_encode($commands));
+			}
 		}
 		$href = str_replace($GLOBALS["www_root"],"{wwwroot}",$href);
 		return 'href="'.$href.'"';
@@ -301,19 +305,23 @@
 		echo '<option></option>';
 		foreach ($cols as $col) {
 			if ($sorting) {
-				if ($default == $col["name"]." asc")
+				if ($default == $col["name"]." asc") {
 					echo '<option selected="selected">'.$col["name"].' asc</option>';
-				else
+				} else {
 					echo '<option>'.$col["name"].' asc</option>';
-				if ($default == $col["name"]." desc")
+				}
+				
+				if ($default == $col["name"]." desc") {
 					echo '<option selected="selected">'.$col["name"].' desc</option>';
-				else
+				} else {
 					echo '<option>'.$col["name"].' desc</option>';
+				}
 			} else {
-				if ($default == $col["name"])
+				if ($default == $col["name"]) {
 					echo '<option selected="selected">'.$col["name"].'</option>';
-				else
+				} else {
 					echo '<option>'.$col["name"].'</option>';
+				}
 			}
 		}
 	}
@@ -334,14 +342,16 @@
 		while ($f = sqlfetch($q)) {
 			$tname = $f["Tables_in_".$GLOBALS["config"]["db"]["name"]];
 			if ($GLOBALS["config"]["show_all_tables_in_dropdowns"] || ((substr($tname,0,8) !== "bigtree_" && substr($tname,0,3) !== "ap_" && substr($tname,0,7) !== "willow_" && substr($tname,0,4) !== "btm_") || $tname == "ap_forms")) {
-				if ($default == $f["Tables_in_".$GLOBALS["config"]["db"]["name"]])
+				if ($default == $f["Tables_in_".$GLOBALS["config"]["db"]["name"]]) {
 					echo '<option selected="selected">'.$f["Tables_in_".$GLOBALS["config"]["db"]["name"]].'</option>';
-				else
+				} else {
 					echo '<option>'.$f["Tables_in_".$GLOBALS["config"]["db"]["name"]].'</option>';
+				}
 			}
 		}
 	}
 	
+	// Crop from the center of an image
 	function center_crop($file, $newfile, $cw, $ch) {
 		list($w, $h) = getimagesize($file);
 		
@@ -361,7 +371,8 @@
 			create_crop($file,$newfile,$x,$y,$cw,$ch,$w,($h - $y * 2));
 		}
 	}
-
+	
+	// Find a color between the two given hex values
 	function color_mesh($first_color,$second_color,$perc) {
 		$perc = intval(str_replace("%","",$perc));
 		$first_color = ltrim($first_color,"#");
@@ -407,27 +418,28 @@
 		}
 	}
 
-	function create_crop($file,$newfile,$x,$y,$crop_width,$crop_height,$width,$height) {
+	function create_crop($file,$newfile,$x,$y,$crop_width,$crop_height,$width,$height,$jpeg_quality = 90) {
 		if (!class_exists("Imagick",false)) {
 			list($w, $h, $type) = getimagesize($file);
 			$image_p = imagecreatetruecolor($crop_width,$crop_height);
-			if ($type == IMAGETYPE_JPEG)
+			if ($type == IMAGETYPE_JPEG) {
 				$image = imagecreatefromjpeg($file);
-			if ($type == IMAGETYPE_GIF)
+			} elseif ($type == IMAGETYPE_GIF) {
 				$image = imagecreatefromgif($file);
-			if ($type == IMAGETYPE_PNG)
+			} elseif ($type == IMAGETYPE_PNG) {
 				$image = imagecreatefrompng($file);
+			}
 
 			imagealphablending($image, true);
 			imagealphablending($image_p, false);
 			imagesavealpha($image_p, true);
 			imagecopyresampled($image_p, $image, 0, 0, $x, $y, $crop_width, $crop_height, $width, $height);
 
-			if ($type == IMAGETYPE_JPEG)
-   		 		imagejpeg($image_p,$newfile,90);
-   	 		if ($type == IMAGETYPE_GIF)
+			if ($type == IMAGETYPE_JPEG) {
+				imagejpeg($image_p,$newfile,$jpeg_quality);
+			} elseif ($type == IMAGETYPE_GIF) {
 				imagegif($image_p,$newfile);
-			if ($type == IMAGETYPE_PNG) {
+			} elseif ($type == IMAGETYPE_PNG) {
 				imagepng($image_p,$newfile);
 			}
 			chmod($newfile,0777);
@@ -443,7 +455,7 @@
 		return $newfile;
 	}
 
-	function create_thumbnail($file,$newfile,$maxwidth,$maxheight) {
+	function create_thumbnail($file,$newfile,$maxwidth,$maxheight,$jpeg_quality = 90) {
 		list($w, $h, $type) = getimagesize($file);
 		if ($w > $maxwidth && $maxwidth) {
 			$perc = $maxwidth / $w;
@@ -470,23 +482,24 @@
 
 		if (!class_exists("Imagick",false)) {
 			$image_p = imagecreatetruecolor($nw, $nh);
-			if ($type == IMAGETYPE_JPEG)
+			if ($type == IMAGETYPE_JPEG) {
 				$image = imagecreatefromjpeg($file);
-			if ($type == IMAGETYPE_GIF)
+			} elseif ($type == IMAGETYPE_GIF) {
 				$image = imagecreatefromgif($file);
-			if ($type == IMAGETYPE_PNG)
+			} elseif ($type == IMAGETYPE_PNG) {
 				$image = imagecreatefrompng($file);
+			}
 
 			imagealphablending($image, true);
 			imagealphablending($image_p, false);
 			imagesavealpha($image_p, true);
 			imagecopyresampled($image_p, $image, 0, 0, 0, 0, $nw, $nh, $w, $h);
 
-			if ($type == IMAGETYPE_JPEG)
-				imagejpeg($image_p,$newfile,90);
-			if ($type == IMAGETYPE_GIF)
+			if ($type == IMAGETYPE_JPEG) {
+				imagejpeg($image_p,$newfile,$jpeg_quality);
+			} elseif ($type == IMAGETYPE_GIF) {
 				imagegif($image_p,$newfile);
-			if ($type == IMAGETYPE_PNG) {
+			} elseif ($type == IMAGETYPE_PNG) {
 				imagepng($image_p,$newfile);
 			}
 			imagedestroy($image);
@@ -505,42 +518,6 @@
 	function file_prefix($file,$prefix) {
 		$pinfo = safe_pathinfo($value);
 		return $pinfo["dirname"]."/".$prefix.$pinfo["basename"];
-	}
-	
-	// Get file permissions for an FTP file/directory
-	function ftp_get_permissions($ftp,$path) {
-		$path_pieces = explode("/",$path);
-		$lookingfor = end($path);
-		$path = "/".implode("/",$path_pieces);
-		$list = ftp_rawlist($ftp,$path);
-		foreach ($list as $item) {
-			$item = ereg_replace (' +', ' ', $item);
-			list($permissions,$q,$user,$group,$size,$month,$day,$time,$file) = explode(" ",$item);
-			if ($file == $lookingfor) {
-				return substr($permissions,1);
-			}
-		}
-		return false;
-	}
-	
-	function ftp_mkdir_recursive($ftpconn_id, $mode, $path) {
-		$dir = split("/", $path);
-		$path = "";
-		$ret = true;
-		
-		for ($i=0; $i<count($dir); $i++) {
-			$path .= "/".$dir[$i];
-			if (!@ftp_chdir($ftpconn_id,$path)) {
-				@ftp_chdir($ftpconn_id,"/");
-				if (!@ftp_mkdir($ftpconn_id,$path)) {
-					$ret=false;
-					break;
-				} else {
-					@ftp_chmod($ftpconn_id, $mode, $path);
-				}
-			}
-		}
-		return $ret;
 	}
 	
 	function get_user_browser() {
@@ -606,8 +583,9 @@
 
 	function safe_pathinfo($file) {
 		$parts = pathinfo($file);
-		if (!defined('PATHINFO_FILENAME'))
+		if (!defined('PATHINFO_FILENAME')) {
 			$parts["filename"] = substr($parts["basename"],0,strrpos($parts["basename"],'.'));
+		}
 		return $parts;
 	}
 
@@ -621,13 +599,14 @@
 	function array_to_xml($array,$tab) {
 		$xml = "";
 		foreach ($array as $key => $val) {
-			if (is_array($val))
+			if (is_array($val)) {
 				$xml .= "$tab<$key>\n".arraytoxml($val,"$tab\t")."$tab</$key>\n";
-			else {
-				if (strpos($val,">") === false && strpos($val,"<") === false && strpos($val,"&") === false)
+			} else {
+				if (strpos($val,">") === false && strpos($val,"<") === false && strpos($val,"&") === false) {
 					$xml .= "$tab<$key>$val</$key>\n";
-				else
+				} else {
 					$xml .= "$tab<$key><![CDATA[$val]]></$key>\n";
+				}
 			}
 		}
 		return $xml;
@@ -635,10 +614,12 @@
 
 	// copy but with support for directories that don't exist yet.
 	function bigtree_copy($from,$to) {
-		if (!bigtree_is_writable($to))
+		if (!bigtree_is_writable($to)) {
 			return false;
-		if (!is_readable($from))
+		}
+		if (!is_readable($from)) {
 			return false;
+		}
 		$pathinfo = safe_pathinfo($to);
 		$file_name = $pathinfo["basename"];
 		$directory = $pathinfo["dirname"];
@@ -675,29 +656,33 @@
 
 	// is_writable with support for directories that don't exist yet.
 	function bigtree_is_writable($path) {
-		if (is_writable($path))
+		if (is_writable($path)) {
 			return true;
+		}
 		$parts = explode("/",ltrim($path,"/"));
 		unset($parts[count($parts)-1]);
 		$path = "/".implode("/",$parts);
-		if (!is_dir($path))
+		if (!is_dir($path)) {
 			return bigtree_is_writable($path);
+		}
 		return is_writable($path);
 	}
 
 	// Wrapper for bigtree_copy that removes the original file after copying
 	function bigtree_move($from,$to) {
 		$success = bigtree_copy($from,$to);
-		if (!$success)
+		if (!$success) {
 			return false;
+		}
 		unlink($from);
 		return true;
 	}
 
 	// touch with support for directories that don't exist yet
 	function bigtree_touch($file) {
-		if (!bigtree_is_writable($file))
+		if (!bigtree_is_writable($file)) {
 			return false;
+		}
 		$pathinfo = safe_pathinfo($file);
 		$file_name = $pathinfo["basename"];
 		$directory = $pathinfo["dirname"];
@@ -729,8 +714,9 @@
 			}
 			return $parray;
 		}
-		if ($page < 6)
+		if ($page < 6) {
 			return array(1,2,3,4,5,6,"...",$pages);
+		}
 		if ($page > $pages - 5) {
 			$parray[] = 1;
 			$parray[] = "...";
@@ -754,9 +740,59 @@
 		return $parray;
 	}
 
-	// Cleans up HTML to take out tags we don't want in a body.
-	function htmlclean($html) {
-		return str_replace("<br></br>","<br />",strip_tags($html,"<h1><h2><h3><h4><h5><h6><p><br><br/><br /><hr /><hr/><hr><b><big><em><i><small><strong><sub><sup><ins><del><s><strike><u><pre><blockquote><address><cite><q><a><table><tr><td><thead><th><tbody><ul><ol><li><dl><dt><dd><form><input><select><textarea><label><fieldset><legend><option><optgroup><img><map><area><font><span><div><button><caption><center><param><tfoot><iframe><frame><frameset><embed><object>"));
+	// Cleans up HTML to take out tags we don't want in a body, based on a modified version of Christian Stocker's lx_externalinput_clean Class
+	// Modified to allow embeds and iframes to still exist but to take out crazy scripting things.
+	//
+	// +----------------------------------------------------------------------+
+	// | Copyright (c) 2001-2008 Liip AG                                      |
+	// +----------------------------------------------------------------------+
+	// | Licensed under the Apache License, Version 2.0 (the "License");      |
+	// | you may not use this file except in compliance with the License.     |
+	// | You may obtain a copy of the License at                              |
+	// | http://www.apache.org/licenses/LICENSE-2.0                           |
+	// | Unless required by applicable law or agreed to in writing, software  |
+	// | distributed under the License is distributed on an "AS IS" BASIS,    |
+	// | WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or      |
+	// | implied. See the License for the specific language governing         |
+	// | permissions and limitations under the License.                       |
+	// +----------------------------------------------------------------------+
+	// | Author: Christian Stocker <christian.stocker@liip.ch>                |
+	// +----------------------------------------------------------------------+
+	
+	function htmlclean($string) {
+		$string = str_replace(array("&amp;", "&lt;", "&gt;"), array("&amp;amp;", "&amp;lt;", "&amp;gt;"), $string);
+        
+        // fix &entitiy\n;
+        $string = preg_replace('#(&\#*\w+)[\x00-\x20]+;#u', "$1;", $string);
+        $string = preg_replace('#(&\#x*)([0-9A-F]+);*#iu', "$1$2;", $string);
+
+        $string = html_entity_decode($string, ENT_COMPAT, "UTF-8");
+        
+        // remove any attribute starting with "on" or xmlns
+        $string = preg_replace('#(<[^>]+[\x00-\x20\"\'\/])(on|xmlns)[^>]*>#iUu', "$1>", $string);
+        
+        // remove javascript: and vbscript: protocol
+        $string = preg_replace('#([a-z]*)[\x00-\x20\/]*=[\x00-\x20\/]*([\`\'\"]*)[\x00-\x20\/]*j[\x00-\x20]*a[\x00-\x20]*v[\x00-\x20]*a[\x00-\x20]*s[\x00-\x20]*c[\x00-\x20]*r[\x00-\x20]*i[\x00-\x20]*p[\x00-\x20]*t[\x00-\x20]*:#iUu', '$1=$2nojavascript...', $string);
+        $string = preg_replace('#([a-z]*)[\x00-\x20\/]*=[\x00-\x20\/]*([\`\'\"]*)[\x00-\x20\/]*v[\x00-\x20]*b[\x00-\x20]*s[\x00-\x20]*c[\x00-\x20]*r[\x00-\x20]*i[\x00-\x20]*p[\x00-\x20]*t[\x00-\x20]*:#iUu', '$1=$2novbscript...', $string);
+        $string = preg_replace('#([a-z]*)[\x00-\x20\/]*=[\x00-\x20\/]*([\`\'\"]*)[\x00-\x20\/]*-moz-binding[\x00-\x20]*:#Uu', '$1=$2nomozbinding...', $string);
+        $string = preg_replace('#([a-z]*)[\x00-\x20\/]*=[\x00-\x20\/]*([\`\'\"]*)[\x00-\x20\/]*data[\x00-\x20]*:#Uu', '$1=$2nodata...', $string);
+        
+        // remove any style attributes, IE allows too much stupid things in them, eg.
+        // <span style="width: expression(alert('Ping!'));"></span> 
+        // and in general you really don't want style declarations in your UGC
+
+        $string = preg_replace('#(<[^>]+[\x00-\x20\"\'\/])style[^>]*>#iUu', "$1>", $string);
+
+        // remove namespaced elements (we do not need them...)
+        $string = preg_replace('#</*\w+:\w[^>]*>#i', "", $string);
+        
+        // remove really unwanted tags
+        do {
+            $oldstring = $string;
+            $string = preg_replace('#</*(applet|meta|xml|blink|link|style|script|frame|frameset|ilayer|layer|bgsound|title|base)[^>]*>#i', "", $string);
+        } while ($oldstring != $string);
+        
+		return str_replace("<br></br>","<br />",strip_tags($string,"<h1><h2><h3><h4><h5><h6><p><br><br/><br /><hr /><hr/><hr><b><big><em><i><small><strong><sub><sup><ins><del><s><strike><u><pre><blockquote><address><cite><q><a><table><tr><td><thead><th><tbody><ul><ol><li><dl><dt><dd><form><input><select><textarea><label><fieldset><legend><option><optgroup><img><map><area><font><span><div><button><caption><center><param><tfoot><iframe><embed><object>"));
 	}
 
 	// Trims while not breaking HTML tags or counting them as length.	Closes all open tags once it's done trimming.
@@ -764,10 +800,12 @@
 		$ns = "";
 		$opentags = array();
 		$string = trim($string);
-		if (strlen(html_entity_decode(strip_tags($string))) < $length)
+		if (strlen(html_entity_decode(strip_tags($string))) < $length) {
 			return $string;
-		if (strpos($string," ") === false && strlen(html_entity_decode(strip_tags($string))) > $length)
+		}
+		if (strpos($string," ") === false && strlen(html_entity_decode(strip_tags($string))) > $length) {
 			return substr($string,0,$length)."...";
+		}
 		$x = 0;
 		$z = 0;
 		while ($z < $length && $x <= strlen($string)) {
@@ -874,8 +912,9 @@
 		$s = explode(" ", $string);
 		foreach ($s as $k => $v) {
 			$cnt = strlen($v);
-			if ($cnt > $width)
+			if ($cnt > $width) {
 				$v = wordwrap($v, $width, "<br />", true);
+			}
 			$new_string .= "$v ";
 		}
 		return $new_string;
@@ -884,8 +923,9 @@
 	// Checks to see if a URL exists
 	function url_exists($url) {
 		$handle = curl_init($url);
-		if (false === $handle)
+		if (false === $handle) {
 			return false;
+		}
 		curl_setopt($handle,CURLOPT_HEADER,false);
 		curl_setopt($handle,CURLOPT_FAILONERROR,true);
 		curl_setopt($handle,CURLOPT_NOBODY,true);

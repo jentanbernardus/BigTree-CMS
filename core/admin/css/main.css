@@ -44,6 +44,8 @@
 	h1 .integrity { background-position: -315px 0px; width: 30px; }
 	h1 .refresh { background-position: -427px 0px; width: 28px; }
 	h1 .error { background-position: -345px 0px; width: 28px; }
+	h1 .messages { background-position: -483px 0px; width: 26px; }
+	h1 .add_message { background-position: 0px -31px; width: 27px; }
 
 	h2 { color: #444; float: left; font-size: 18px; height: 32px; line-height: 32px; text-shadow: 1px 1px 1px #FFF; font-weight: normal; padding: 5px 0 0 0; }
 	h2 small { font-size: 13px; color: #999999; display: inline-block; padding: 0 0 0 10px; }
@@ -55,6 +57,9 @@
 	h2 .archived { background-position: -39px center; width: 18px; }
 	h2 .published { background-position: -103px center; width: 22px; }
 	h2 .saved { background-position: -125px center; width: 22px; }
+	h2 .unread { background-position: -148px center; width: 24px; }
+	h2 .read { background-position: -173px center; width: 24px; }
+	h2 .sent { background-position: -197px center; width: 26px; }
 
 	ul.styled { list-style: outside disc; margin: 0 0 10px 15px; }
 	ul.styled li { line-height: 16px; font-size: 12px; }
@@ -417,6 +422,11 @@
 	.table .analytics_metric_name { width: 668px; padding: 0 0 0 20px; text-align: left; }
 	.table .analytics_visit_count { width: 135px; }
 	.table .analytics_view_count { width: 135px; }	
+	
+	.table .messages_from_to { padding: 0 0 0 20px; width: 230px; text-align: left; }
+	.table .messages_subject { padding: 0 0 0 20px; width: 453px; text-align: left; }
+	.table .messages_date_time { padding: 0 20px 0 0; width: 65px; text-align: right; }
+	.table .messages_view { padding: 0 20px 0 0; text-align: center; width: 45px; }
 	
 	.form_container .save_and_preview span { background: url(../images/icon-preview.png) no-repeat 0px center; width: 22px; height: 35px; float: left; margin: 0 10px 0 0; }
 
@@ -790,6 +800,7 @@
 	.icon_publish { width: 22px; height: 35px; display: inline-block; background: url(../images/icons.png) no-repeat -334px 5px; }
 	.icon_draft { width: 22px; height: 35px; display: inline-block; background: url(../images/icons.png) no-repeat -356px 5px; }
 	.icon_email { width: 24px; height: 35px; display: inline-block; background: url(../images/icons.png) no-repeat -377px 9px; }
+	.icon_message { width: 20px; height: 35px; display: inline-block; background: url(../images/icons.png) no-repeat -401px 6px; }
 	
 	.icon_edit_small { width: 16px; height: 17px; display: inline-block; background: url(../images/icons-smaller.png) no-repeat -53px 0; }
 	.icon_delete_small { width: 12px; height: 17px; display: inline-block; background: url(../images/icons-smaller.png) no-repeat -28px 3px; }
@@ -896,7 +907,7 @@
 	.multi_widget { border: 1px solid #CCC; border-radius: 2px; padding: 0; }
 	.multi_widget footer { padding: 20px; border-top: none; }
 	.multi_widget footer a { float: right; height: 30px; line-height: 30px; border-radius: 2px; }
-	.multi_widget footer a .icon_small { height: 30px; margin-top: -1px; }
+	.multi_widget footer a .icon_small { height: 30px; margin-top: 6px; }
 	.multi_widget li { padding: 0px 10px; border-bottom: 1px solid #DDD; overflow: hidden; }
 	.multi_widget li p { line-height: 35px; height: 35px; float: left; font-size: 14px; margin: 0; }
 	.multi_widget li a { float: right; margin: 0 0 0 10px; }
