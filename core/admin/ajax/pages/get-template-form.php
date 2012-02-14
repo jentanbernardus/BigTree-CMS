@@ -6,7 +6,7 @@
 	}
 	
 	if (isset($_POST["page"])) {
-		$page = $cms->getPendingPageById($_POST["page"]);
+		$page = $cms->getPendingPage($_POST["page"]);
 		$resources = $page["resources"];
 		$callouts = $page["callouts"];
 	} elseif (!$resources) {
@@ -89,7 +89,7 @@
 			$x = 0;
 			foreach ($callouts as $callout) {
 				$description = "";
-				$type = $cms->getCalloutById($callout["type"]);
+				$type = $cms->getCallout($callout["type"]);
 		?>
 		<li>
 			<input type="hidden" class="callout_data" value="<?=base64_encode(json_encode($callout))?>" />

@@ -178,6 +178,8 @@ $(document).ready(function() {
 				return false;
 			},"callout",false,false,true);
 		}});
+		
+		return false;
 	});
 	
 	$("#bigtree_callouts").on("click",".icon_delete_small",function() {

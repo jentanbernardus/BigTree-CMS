@@ -22,7 +22,7 @@
 	$year_start = date("Y-01-01");
 	$year_end = date("Y-m-d");
 	
-	$page = $cms->getPageById(end($path),false);
+	$page = $cms->getPage(end($path),false);
 ?>
 <h3>Page Report for: &ldquo;<?=$page["nav_title"]?>&rdquo;</h3>
 <graph>

@@ -1363,7 +1363,11 @@ var BigTree = {
 		t.focus();
 	},
 	
-	SetPageCount: function(pages,current_page) {
+	SetPageCount: function(selector,pages,current_page) {
+		if (pages == 0) {
+			pages = 1;
+		}
+		
 		if (current_page == 0) {
 			prev_page = 0;
 		} else {
@@ -1383,19 +1387,21 @@ var BigTree = {
 			end_page = pages;
 		}
 		
-		if (start_page < 0)
+		if (start_page < 0) {
 			start_page = 0;
+		}
 			
 		content = '<li><a href="#' + prev_page + '">&laquo;</a></li>';
 		for (i = start_page; i < end_page; i++) {
 			content += '<li><a href="#' + i + '"';
-			if (i == current_page)
+			if (i == current_page) {
 				content += ' class="active"';
+			}
 			content += '>' + (i + 1) + '</a></li>';
 		}
 		content += '<li><a href="#' + next_page + '">&raquo;</a></li>';
 		
-		$("#view_paging").html(content);
+		$(selector).html(content);
 	},
 
 	SettingsAnimation: false,

@@ -52,8 +52,9 @@
 	}
 	
 	if ($page[0] != "p") {
+		// The below area is changing, but why are we wastefully calling getLink twice?
 ?>
-<p class="page_url"><a href="<?=$cms->getLinkById($page)?>" target="_blank" title="View Page"><img src="<?=$icon_root?>world.png" alt="" /> <?=$cms->getLinkById($page)?></a></p>
+<p class="page_url"><a href="<?=$cms->getLink($page)?>" target="_blank" title="View Page"><img src="<?=$icon_root?>world.png" alt="" /> <?=$cms->getLink($page)?></a></p>
 <?
 	}
 ?>

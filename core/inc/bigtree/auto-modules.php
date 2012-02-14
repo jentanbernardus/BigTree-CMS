@@ -4,7 +4,7 @@
 	// Handles various functions for Auto Modules.
 
 
-	class BigTreeAutoModule extends BigTreeModule {
+	class BigTreeAutoModule {
 	
 		// This will grab all the data from a view and do parsing on it based on automatic assumptions and manual parsers.
 		static function cacheViewData($view) {

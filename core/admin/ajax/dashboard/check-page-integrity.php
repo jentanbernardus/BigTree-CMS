@@ -6,7 +6,7 @@
 		$external = false;
 	}
 	
-	$page = $cms->getPageById($id);
+	$page = $cms->getPage($id);
 	$template = $cms->getTemplate($page["template"]);
 	$resources = $page["resources"];
 	$htmlerrors = array();
@@ -15,7 +15,7 @@
 		$data = false;
 		if ($resource["type"] == "html") {
 			$data = $resources[$rid];
-			$htmlerrors[] = $admin->checkHTML($cms->getLinkById($id),$data,$external);
+			$htmlerrors[] = $admin->checkHTML($cms->getLink($id),$data,$external);
 		}
 	}
 	$errorhtml = "";

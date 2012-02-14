@@ -9,8 +9,9 @@
 		$last_modified = file_exists($cfile) ? filemtime($cfile) : 0;
 		foreach ($config["js"][$js_file] as $script) {
 			$m = filemtime($site_root."js/$script");
-			if ($m > $mtime)
+			if ($m > $mtime) {
 				$mtime = $m;
+			}
 		}
 		// If we have a newer Javascript file to include or we haven't cached yet, do it now.
 		if (!file_exists($cfile) || $mtime > $last_modified) {
@@ -56,8 +57,9 @@
 		$last_modified = filemtime($cfile);
 		foreach ($config["css"][$css_file] as $style) {
 			$m = filemtime($site_root."css/$style");
-			if ($m > $mtime)
+			if ($m > $mtime) {
 				$mtime = $m;
+			}
 		}
 		// If we have a newer CSS file to include or we haven't cached yet, do it now.
 		if (!file_exists($cfile) || $mtime > $last_modified) {
@@ -123,10 +125,11 @@
 				$x++;
 			}
 			if (substr($inc,-4,4) != ".php") {
-				if (file_exists($inc.end($path).".php"))
+				if (file_exists($inc.end($path).".php")) {
 					$inc .= end($path).".php";
-				else
+				} else {
 					$inc .= "default.php";
+				}
 			}
 			$commands = array_slice($path,$y+1);
 			if (file_exists($inc)) {
@@ -140,8 +143,9 @@
 	
 	// Handle API calls.
 	if ($path[0] == "api") {
-		if (!count($_POST) && count($_GET))
+		if (!count($_POST) && count($_GET)) {
 			$_POST = $_GET;
+		}
 		include bigtree_path("inc/bigtree/admin.php");
 		include bigtree_path("inc/bigtree/auto-modules.php");
 		$admin = new BigTreeAdmin;
@@ -178,8 +182,9 @@
 	if ($path[0] == "_preview" && $_SESSION["bigtree"]["id"]) {
 		$npath = array();
 		foreach ($path as $item) {
-			if ($item != "_preview")
+			if ($item != "_preview") {
 				$npath[] = $item;
+			}
 		}
 		$path = $npath;
 		$preview = true;
@@ -192,13 +197,18 @@
 		$navid = $path[1];
 	}
 	
+	// So we don't lost this.
+	define("BIGTREE_PREVIEWING",$preview);
+	
 	// Sitemap setup
 	$sitemap = false;
 	$sitemap_xml = false;
-	if ($path[0] == "sitemap")
+	if ($path[0] == "sitemap") {
 		$sitemap = true;
-	if ($path[0] == "sitemap.xml")
+	}
+	if ($path[0] == "sitemap.xml") {
 		$sitemap_xml = true;
+	}
 	if ($path[0] == "feeds") {
 		$route = $path[1];
 		$feed = $cms->getFeedByRoute($route);
@@ -210,8 +220,9 @@
 		}
 	}
 	
-	if (!$navid)
+	if (!$navid) {
 		list($navid,$commands) = $cms->getNavId($path);
+	}
 	
 	// Pre-init a bunch of vars to keep away notices.
 	$module_title = "";
@@ -221,9 +232,9 @@
 	if ($navid) {
 		// If we're previewing, get pending data as well.
 		if ($preview) {
-			$page = $cms->getPendingPageById($navid);
+			$page = $cms->getPendingPage($navid);
 		} else {
-			$page = $cms->getPageById($navid);
+			$page = $cms->getPage($navid);
 		}
 			
 		$resources = $page["resources"];
@@ -242,7 +253,7 @@
 		if ($page["template"] == "!") {
 			$nav = $cms->getNavByParent($page["id"],1);
 			$first = $nav[0];
-			header("Location: ".$cms->getLinkById($first["id"]));
+			header("Location: ".$cms->getLink($first["id"]));
 			die();
 		}
 		
@@ -277,22 +288,26 @@
 			$commands = $module_commands;
 			
 			// Include the module's header
-			if (file_exists("../templates/modules/".substr($page["template"],7)."/_header.php"))
+			if (file_exists("../templates/modules/".substr($page["template"],7)."/_header.php")) {
 				include_once "../templates/modules/".substr($page["template"],7)."/_header.php";
+			}
 			
 			// Include the sub-module's header if it exists.
-			if (file_exists($inc_dir."_header.php"))
+			if (file_exists($inc_dir."_header.php")) {
 				include_once $inc_dir."_header.php";
+			}
 			
 			include $inc;
 
 			// Include the sub-module's footer if it exists.
-			if (file_exists($inc_dir."_footer.php"))
+			if (file_exists($inc_dir."_footer.php")) {
 				include_once $inc_dir."_footer.php";
+			}
 			
 			// Include the module's footer
-			if (file_exists("../templates/modules/".substr($page["template"],7)."/_footer.php"))
+			if (file_exists("../templates/modules/".substr($page["template"],7)."/_footer.php")) {
 				include_once "../templates/modules/".substr($page["template"],7)."/_footer.php";
+			}
 
 		} elseif ($page["template"]) {
 			include "../templates/pages/".$page["template"].".php";
@@ -420,7 +435,7 @@
 			$return_link = $_SERVER["HTTP_REFERER"];
 		}
 				
-		$content = str_replace('</body>','<script type="text/javascript">var bigtree_is_previewing = '.($preview ? "true" : "false").'; var bigtree_current_page_id = '.$page["id"].'; var bigtree_bar_show = '.$show_bar_default.'; var bigtree_user_name = "'.$_SESSION["bigtree"]["name"].'"; var bigtree_preview_bar_show = '.$show_preview_bar.'; var bigtree_return_link = "'.$return_link.'";</script><script type="text/javascript" src="'.$www_root.'admin/js/bar.js"></script></body>',$content);
+		$content = str_replace('</body>','<script type="text/javascript">var bigtree_is_previewing = '.(BIGTREE_PREVIEWING ? "true" : "false").'; var bigtree_current_page_id = '.$page["id"].'; var bigtree_bar_show = '.$show_bar_default.'; var bigtree_user_name = "'.$_SESSION["bigtree"]["name"].'"; var bigtree_preview_bar_show = '.$show_preview_bar.'; var bigtree_return_link = "'.$return_link.'";</script><script type="text/javascript" src="'.$www_root.'admin/js/bar.js"></script></body>',$content);
 		$nocache = true;
 	}
 	
@@ -430,8 +445,9 @@
 	if ($config["cache"] && !$nocache) {
 		$cache = ob_get_flush();
 		$curl = $_GET["bigtree_htaccess_url"];
-		if (!$curl)
+		if (!$curl) {
 			$curl = "home";
+		}
 		file_put_contents("../cache/".base64_encode($curl),$cache);
 	}
 ?>

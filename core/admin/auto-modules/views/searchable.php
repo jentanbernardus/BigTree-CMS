@@ -9,7 +9,7 @@
 <div class="table">
 	<summary>
 		<input type="search" class="form_search" id="search" placeholder="Search" />
-		<ul id="view_paging"></ul>
+		<ul id="view_paging" class="view_paging"></ul>
 	</summary>
 	<header>
 		<?

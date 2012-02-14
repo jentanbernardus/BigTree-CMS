@@ -73,7 +73,7 @@
 	
 	// Get the templates we're passing in.
 	foreach ($_POST["templates"] as $template) {
-		$item = $cms->getTemplateById($template);
+		$item = $cms->getTemplate($template);
 		$index .= "Template::||::".json_encode($item)."\n";
 		
 		// If we're bringing over a module template, copy the whole darn folder.
@@ -89,7 +89,7 @@
 	
 	// Get the callouts we're passing in.
 	foreach ($_POST["callouts"] as $callout) {
-		$item = $cms->getCalloutById($callout);
+		$item = $cms->getCallout($callout);
 		$index .= "Callout::||::".json_encode($item)."\n";
 		$x++;
 		$index .= "File::||::$x.part.bpz::||::templates/callouts/$callout.php\n";
@@ -98,13 +98,13 @@
 	
 	// Get the feeds
 	foreach ($_POST["feeds"] as $feed) {
-		$item = $cms->getFeedById($feed);
+		$item = $cms->getFeed($feed);
 		$index .= "Feed::||::".json_encode($item)."\n";
 	}
 	
 	// Get the settings
 	foreach ($_POST["settings"] as $setting) {
-		$item = $admin->getSettingById($setting);
+		$item = $admin->getSetting($setting);
 		$index .= "Setting::||::".json_encode($item)."\n";
 	}
 	

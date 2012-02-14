@@ -1,6 +1,7 @@
 <?
-	$id = $_POST["page"];
-	$route = "/".$cms->getFullNavigationPath($id)."/";
+	// Get the page's path
+	$f = sqlfetch(sqlquery("SELECT path FROM bigtree_pages WHERE id = '".mysql_real_escape_string($_POST["page"])."'"));
+	$route = "/".$f["path"]."/";
 	
 	$visits = $admin->getGAViewsByDateRange($_POST["start_date"],$_POST["end_date"],"pagePath==$route");
 	

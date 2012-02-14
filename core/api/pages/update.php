@@ -34,7 +34,7 @@
 			echo bigtree_api_encode(array("success" => false,"error" => "You did not provide a Page ID."));
 			die();
 		}
-		$page = $cms->getPageById($_POST["id"]);
+		$page = $cms->getPage($_POST["id"]);
 		
 		if ($_POST["parent"] == 0) {
 			if ($admin->Level < 2) {
@@ -88,7 +88,7 @@
 			}
 			
 			$callout = array();
-			$sdata = $cms->getCalloutById($data["type"]);
+			$sdata = $cms->getCallout($data["type"]);
 			$sresources = json_decode($sdata["resources"],true);
 			
 			foreach ($sresources as $options) {

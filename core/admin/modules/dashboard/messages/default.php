@@ -21,10 +21,17 @@
 			}
 		}
 	}
+	
+	$unread_pages = ceil(count($unread) / 5);
+	$read_pages = ceil(count($read) / 5);
+	$sent_pages = ceil(count($sent) / 5);
 ?>
 
 <div class="table">
-	<summary><h2><span class="unread"></span>Unread Messages</h2></summary>
+	<summary>
+		<h2><span class="unread"></span>Unread Messages</h2>
+		<ul id="unread_paging" class="view_paging"></ul>
+	</summary>
 	<header>
 		<span class="messages_from_to">From</span>
 		<span class="messages_subject">Subject</span>
@@ -33,7 +40,14 @@
 		<span class="messages_view">View</span>
 	</header>
 	<ul>
-		<? foreach ($unread as $item) { ?>
+		<?
+			if (count($unread) == 0) {
+		?>
+		<li><section class="no_content">You have no unread messages.</section></li>
+		<?	
+			} else {
+				foreach ($unread as $item) {
+		?>
 		<li>
 			<section class="messages_from_to"><?=$item["sender_name"]?></section>
 			<section class="messages_subject"><?=$item["subject"]?></section>
@@ -41,12 +55,18 @@
 			<section class="messages_date_time"><?=date("g:ia",strtotime($item["date"]))?></section>
 			<section class="messages_view"><a href="view/<?=$item["id"]?>/" class="icon_message"></a></section>
 		</li>
-		<? } ?>
+		<?
+				}
+			}
+		?>
 	</ul>
 </div>
 
 <div class="table">
-	<summary><h2><span class="read"></span>Read Messages</h2></summary>
+	<summary>
+		<h2><span class="read"></span>Read Messages</h2>
+		<ul id="read_paging" class="view_paging"></ul>
+	</summary>
 	<header>
 		<span class="messages_from_to">From</span>
 		<span class="messages_subject">Subject</span>
@@ -55,7 +75,14 @@
 		<span class="messages_view">View</span>
 	</header>
 	<ul>
-		<? foreach ($read as $item) { ?>
+		<?
+			if (count($unread) == 0) {
+		?>
+		<li><section class="no_content">You have no read messages.</section></li>
+		<?	
+			} else {
+				foreach ($read as $item) {
+		?>
 		<li>
 			<section class="messages_from_to"><?=$item["sender_name"]?></section>
 			<section class="messages_subject"><?=$item["subject"]?></section>
@@ -63,12 +90,18 @@
 			<section class="messages_date_time"><?=date("g:ia",strtotime($item["date"]))?></section>
 			<section class="messages_view"><a href="view/<?=$item["id"]?>/" class="icon_message"></a></section>
 		</li>
-		<? } ?>
+		<?
+				}
+			}
+		?>
 	</ul>
 </div>
 
 <div class="table">
-	<summary><h2><span class="sent"></span>Sent Messages</h2></summary>
+	<summary>
+		<h2><span class="sent"></span>Sent Messages</h2>
+		<ul id="sent_paging" class="view_paging"></ul>
+	</summary>
 	<header>
 		<span class="messages_from_to">To</span>
 		<span class="messages_subject">Subject</span>
@@ -78,14 +111,19 @@
 	</header>
 	<ul>
 		<?
-			foreach ($sent as $item) {
-				// Get the recipient names
-				$recipients = explode("|",trim($item["recipients"],"|"));
-				$r_names = array();
-				foreach ($recipients as $r) {
-					$u = sqlfetch(sqlquery("SELECT name FROM bigtree_users WHERE id = '".mysql_real_escape_string($r)."'"));
-					$r_names[] = $u["name"];
-				}
+			if (count($sent) == 0) {
+		?>
+		<li><section class="no_content">You have no sent messages.</section></li>
+		<?	
+			} else {
+				foreach ($sent as $item) {
+					// Get the recipient names
+					$recipients = explode("|",trim($item["recipients"],"|"));
+					$r_names = array();
+					foreach ($recipients as $r) {
+						$u = sqlfetch(sqlquery("SELECT name FROM bigtree_users WHERE id = '".mysql_real_escape_string($r)."'"));
+						$r_names[] = $u["name"];
+					}
 		?>
 		<li>
 			<section class="messages_from_to"><?=implode(", ",$r_names)?></section>
@@ -94,6 +132,19 @@
 			<section class="messages_date_time"><?=date("g:ia",strtotime($item["date"]))?></section>
 			<section class="messages_view"><a href="view/<?=$item["id"]?>/" class="icon_message"></a></section>
 		</li>
-		<? } ?>
+		<?
+				}
+			}
+		?>
 	</ul>
 </div>
+<script type="text/javascript">
+	BigTree.SetPageCount("#unread_paging",<?=$unread_pages?>,0);
+	BigTree.SetPageCount("#read_paging",<?=$read_pages?>,0);
+	BigTree.SetPageCount("#sent_paging",<?=$sent_pages?>,0);
+	
+	$(".view_paging a").click(function() {
+	
+		return false;
+	});
+</script>

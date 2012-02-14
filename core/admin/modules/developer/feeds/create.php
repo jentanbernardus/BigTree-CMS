@@ -14,10 +14,10 @@
 	$route = $cms->urlify($_POST["name"]);
 	$x = 2;
 	$oroute = $route;
-	$f = $admin->getFeedByRoute($route);
+	$f = $cms->getFeedByRoute($route);
 	while ($f) {
 		$route = $oroute."-".$x;
-		$f = $admin->getFeedByRoute($route);
+		$f = $cms->getFeedByRoute($route);
 		$x++;
 	}
 	

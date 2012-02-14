@@ -3,7 +3,7 @@
 	$data = $_POST;
 	$key = $_POST["setting-id"];
 	$value = $_POST[$_POST["setting-id"]];
-	$setting = $admin->getSettingById($key);
+	$setting = $admin->getSetting($key);
 	if ($setting["locked"]) {
 		$admin->requireLevel(2);
 	} else {

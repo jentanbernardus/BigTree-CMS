@@ -10,9 +10,9 @@
 		page: Page Object|
 	*/
 
-	$page = $cms->getPageById($_POST["id"]);
+	$page = $cms->getPage($_POST["id"]);
 	if ($page) {
-		$template = $cms->getTemplateById($page["template"]);
+		$template = $cms->getTemplate($page["template"]);
 		if ($template["level"] > $admin->Level) {
 			$page["template_locked"] = true;
 		} else {

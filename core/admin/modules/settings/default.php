@@ -3,7 +3,7 @@
 <div class="table">
 	<summary>
 		<input type="search" name="query" id="query" placeholder="Search" class="form_search" autocomplete="off" />
-		<ul id="view_paging"></ul>
+		<ul id="view_paging" class="view_paging"></ul>
 	</summary>
 	<header>
 		<span class="settings_name">Name</span>

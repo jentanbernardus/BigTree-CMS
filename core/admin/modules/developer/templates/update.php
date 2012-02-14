@@ -17,7 +17,7 @@
 		}
 	}
 	
-	$template = $cms->getTemplateById($id);
+	$template = $cms->getTemplate($id);
 
 	if ($_FILES["image"]["tmp_name"]) {
 		$image = get_safe_filename($GLOBALS["server_root"]."custom/admin/images/templates/",$_FILES["image"]["name"]);
@@ -35,8 +35,8 @@
 	$name = mysql_real_escape_string(htmlspecialchars($_POST["name"]));
 	$description = mysql_real_escape_string(htmlspecialchars($_POST["description"]));
 
-	sqlquery("UPDATE bigtree_templates SET resources = '$resources', image = '$image', name = '$name', module = '$module', description = '$description', level = '$level', callouts_enabled = '$calloutss_enabled' WHERE id = '$id'");
-
+	sqlquery("UPDATE bigtree_templates SET resources = '$resources', image = '$image', name = '$name', module = '$module', description = '$description', level = '$level', callouts_enabled = '$callouts_enabled' WHERE id = '$id'");
+	
 	$admin->growl("Developer","Updated Template");
 	header("Location: ".$saroot."templates/view/");
 	die();

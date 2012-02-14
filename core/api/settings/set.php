@@ -24,7 +24,7 @@
 	
 	$success = $admin->updateSetting($_POST["setting"],$_POST);
 	if ($success) {
-		echo bigtree_api_encode(array("success" => true,"setting" => $admin->getSettingById($_POST["id"])));
+		echo bigtree_api_encode(array("success" => true,"setting" => $admin->getSetting($_POST["id"])));
 	} else {
 		echo bigtree_api_encode(array("success" => true,"error" => "A setting already exists with that id."));
 	}

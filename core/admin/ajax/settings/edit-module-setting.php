@@ -1,5 +1,5 @@
 <?
-	$setting = $admin->getSettingById($_POST["id"]);
+	$setting = $admin->getSetting($_POST["id"]);
 	if ($setting["locked"]) {
 		$admin->requireLevel(2);
 	} else {

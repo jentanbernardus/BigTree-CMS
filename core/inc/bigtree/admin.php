@@ -381,7 +381,7 @@
 
 		function unCache($page) {
 			global $cms;
-			$file = $GLOBALS["server_root"]."cache/".base64_encode(str_replace($GLOBALS["www_root"],"",$cms->getLinkById($page)));
+			$file = $GLOBALS["server_root"]."cache/".base64_encode(str_replace($GLOBALS["www_root"],"",$cms->getLink($page)));
 			if (file_exists($file)) {
 				unlink($file);
 			}
@@ -391,17 +391,27 @@
 
 		function getArchivedNavigationByParent($parent) {
 			$nav = array();
-			$q = sqlquery("SELECT id,nav_title as title,parent,external,new_window,template,publish_at FROM bigtree_pages WHERE parent = '$parent' AND archived = 'on' ORDER BY nav_title asc");
+			$q = sqlquery("SELECT id,nav_title as title,parent,external,new_window,template,publish_at,path FROM bigtree_pages WHERE parent = '$parent' AND archived = 'on' ORDER BY nav_title asc");
 			while ($nav_item = sqlfetch($q)) {
 				$nav_item["external"] = str_replace("{wwwroot}",$GLOBALS["www_root"],$nav_item["external"]);
 				$nav[] = $nav_item;
 			}
 			return $nav;
 		}
+		
+		function getFullNavigationPath($child, $path = array()) {
+			$f = sqlfetch(sqlquery("SELECT route,id,parent FROM bigtree_pages WHERE id = '$child'"));
+			$path[] = $this->urlify($f["route"]);
+			if ($f["parent"] != $GLOBALS["root_page"] && $f["parent"] != 0) {
+				return $this->getFullNavigationPath($f["parent"],$path);
+			}
+			$path = implode("/",array_reverse($path));
+			return $path;
+		}
 
 		function getHiddenNavigationByParent($parent) {
 			$nav = array();
-			$q = sqlquery("SELECT id,nav_title as title,parent,external,new_window,template,publish_at FROM bigtree_pages WHERE parent = '$parent' AND in_nav = '' AND archived != 'on' ORDER BY nav_title asc");
+			$q = sqlquery("SELECT id,nav_title as title,parent,external,new_window,template,publish_at,path FROM bigtree_pages WHERE parent = '$parent' AND in_nav = '' AND archived != 'on' ORDER BY nav_title asc");
 			while ($nav_item = sqlfetch($q)) {
 				$nav_item["external"] = str_replace("{wwwroot}",$GLOBALS["www_root"],$nav_item["external"]);
 				$nav[] = $nav_item;
@@ -411,7 +421,7 @@
 
 		function getNaturalNavigationByParent($parent,$levels = 1) {
 			$nav = array();
-			$q = sqlquery("SELECT id,nav_title as title,parent,external,new_window,template,publish_at FROM bigtree_pages WHERE parent = '$parent' AND in_nav = 'on' AND archived != 'on' ORDER BY position DESC, id ASC");
+			$q = sqlquery("SELECT id,nav_title as title,parent,external,new_window,template,publish_at,path FROM bigtree_pages WHERE parent = '$parent' AND in_nav = 'on' AND archived != 'on' ORDER BY position DESC, id ASC");
 			while ($nav_item = sqlfetch($q)) {
 				$nav_item["external"] = str_replace("{wwwroot}",$GLOBALS["www_root"],$nav_item["external"]);
 				if ($levels > 1) {
@@ -548,7 +558,7 @@
 			}
 			
 			if ($parent) {
-				$path = $cms->getFullNavigationPath($parent)."/".$route;
+				$path = $this->getFullNavigationPath($parent)."/".$route;
 			} else {
 				$path = $route;
 			}
@@ -584,7 +594,7 @@
 				}
 			}
 
-			$newpath = $cms->getFullNavigationPath($id);
+			$newpath = $this->getFullNavigationPath($id);
 			sqlquery("DELETE FROM bigtree_route_history WHERE old_route = '$newpath'");
 
 			$this->clearCache();
@@ -671,7 +681,7 @@
 
 		function getPendingPageById($id) {
 			global $cms;
-			$page = $cms->getPageById($id);
+			$page = $cms->getPage($id);
 			$page["tags"] = $this->getTagsForPage($id);
 			
 			$f = sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE `table` = 'bigtree_pages' AND item_id = '$id'"));
@@ -723,7 +733,7 @@
 				$type = "NEW";
 			} else {
 				$pending = false;
-				$pdata = $cms->getPageById($page);
+				$pdata = $cms->getPage($page);
 			}
 
 			$template = $pdata["template"];
@@ -838,7 +848,7 @@
 			$q = sqlquery("SELECT * FROM bigtree_pages WHERE parent = '$page'");
 			while ($f = sqlfetch($q)) {
 				$oldpath = $f["path"];
-				$path = $cms->getFullNavigationPath($f["id"]);
+				$path = $this->getFullNavigationPath($f["id"]);
 				if ($oldpath != $path) {
 					sqlquery("DELETE FROM bigtree_route_history WHERE old_route = '$path' OR old_route = '$oldpath'");
 					sqlquery("INSERT INTO bigtree_route_history (`old_route`,`new_route`) VALUES ('$oldpath','$path')");
@@ -927,7 +937,7 @@
 			
 			// Set the full path, saves DB access time on the front end.
 			if ($parent) {
-				$path = $cms->getFullNavigationPath($parent)."/".$route;
+				$path = $this->getFullNavigationPath($parent)."/".$route;
 			} else {
 				$path = $route;
 			}
@@ -1453,8 +1463,7 @@
 			return $items;
 		}
 		
-		function getSetting($id) { return $this->getSettingById($id); }
-		function getSettingById($id) {
+		function getSetting($id) {
 			global $config;
 			$id = mysql_real_escape_string($id);
 			
@@ -1585,26 +1594,7 @@
 			return $callouts;
 		}
 		
-		// !Feed Functions
-		function getFeed($item) {
-			if (!is_array($item)) {
-				$item = mysql_real_escape_string($item);
-				$item = sqlfetch(sqlquery("SELECT * FROM bigtree_feeds WHERE id = '$item'"));
-			}
-			if (!$item) {
-				return false;
-			}
-			$item["fields"] = json_decode($item["fields"],true);
-			$item["options"] = json_decode($item["options"],true);
-			return $item;
-		}
-		
-		function getFeedById($id) { return $this->getFeed($id); }
-		
-		function getFeedByRoute($route) {
-			return $this->getFeed(sqlfetch(sqlquery("SELECT * FROM bigtree_feeds WHERE route = '".mysql_real_escape_string($route)."'")));
-		}
-		
+		// !Feed Functions		
 		function getFeeds() {
 			$feeds = array();
 			$q = sqlquery("SELECT * FROM bigtree_feeds ORDER BY name");
@@ -2116,7 +2106,8 @@
 				$this->gaPageData = $this->getGADataByDateRange("pagePath","-visits",date("Y-m-d",strtotime("-31 days")),date("Y-m-d",strtotime("-1 day")));
 			}
 			
-			$path = str_replace($GLOBALS["domain"],"",$GLOBALS["www_root"]).$cms->getFullNavigationPath($id);
+			// Fix this later, it shouldn't be calling such a DB expensive function to get the path.
+			$path = str_replace($GLOBALS["domain"],"",$GLOBALS["www_root"]).$this->getFullNavigationPath($id);
 			
 			$views = $this->gaPageData["results"][$path]["views"];
 			$path .= "/";

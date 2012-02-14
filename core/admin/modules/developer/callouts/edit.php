@@ -1,6 +1,6 @@
 <?
 	$breadcrumb[] = array("title" => "Edit Callout", "link" => "#");
-	$callout = $cms->getCalloutById(end($path));
+	$callout = $cms->getCallout(end($path));
 	
 	bigtree_clean_globalize_array($callout);
 	

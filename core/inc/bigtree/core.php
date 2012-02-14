@@ -1,14 +1,21 @@
 <?
-	// BigTree Core Navigation Class
+	/*
+		Class: BigTreeCMS
+			The primary interface to BigTree that is used by the front end of the site for pulling settings, navigation, and page content.
+	*/
 
 	include bigtree_path("inc/bigtree/modules.php");
 	include bigtree_path("inc/bigtree/forms.php");
 
 	class BigTreeCMS {
 
-		// !Constructor
-		function __construct() {
+		/*
+			Constructor:
+			Builds a flat file module class list so that module classes can be autoloaded instead of always in memory.
+		*/
 		
+		function __construct() {
+			// If the cache exists, just use it.
 			if (file_exists($GLOBALS["server_root"]."cache/module-class-list.btc")) {
 				$items = json_decode(file_get_contents($GLOBALS["server_root"]."cache/module-class-list.btc"),true);
 			} else {
@@ -19,74 +26,43 @@
 					$items[$f["class"]] = $f["route"];
 				}
 				
+				// Cache it so we don't hit the database.
 				file_put_contents($GLOBALS["server_root"]."cache/module-class-list.btc",json_encode($items));
 			}
 			
 			$this->ModuleClassList = $items;
 		}
-
-		// !Utility Methods
-
-		function getSetting($id) { return $this->getSettingById($id); }
-		function getSettingById($id) {
-			global $config;
-			$id = mysql_real_escape_string($id);
-			$f = sqlfetch(sqlquery("SELECT * FROM bigtree_settings WHERE id = '$id'"));
-			if ($f["encrypted"]) {
-				$f = sqlfetch(sqlquery("SELECT AES_DECRYPT(`value`,'".mysql_real_escape_string($config["settings_key"])."') AS `value` FROM bigtree_settings WHERE id = '$id'"));
-			}
-			return json_decode($f["value"],true);
-		}
 		
-		function makeSecure() {
-			if ($_SERVER["SERVER_PORT"] == 80) {
-				header("Location: ".str_replace("http://","https://",$GLOBALS["www_root"]).$_GET["bigtree_htaccess_url"]);
-				die();
-			}
-			$this->Secure = true;
-		}
-
-		function stripe($reset = false) {
-			static $x;
-			if ($reset) {
-				$x = 0;
-				return;
-			}
-			$x++;
-			if ($x % 2 == 1) {
-				return "odd";
-			} else {
-				return "even";
-			}
-		}
-		
-		function tabindex($reset = false) {
-			static $x;
-			if ($reset) {
-				$x = 1;
-				return 1;
-			}
-			$x++;
-			return $x;
-		}
-
-		// !Navigation/Page Methods
-		
+		/*
+			Function: decodeCallouts
+				Turns the JSON callout data into a PHP array of callouts with links being translated into front-end readable links.
+				This function is called by BigTree's router and is generally not a function needed to end users.
+			
+			Parameters:
+				data - JSON encoded callout data.
+			
+			Returns:
+				An array of callouts.
+		*/	
+			
 		function decodeCallouts($data) {
-			if (!is_array($data)) {
-				$data = json_decode($data,true);
-			}
 			$parsed = array();
 			if (!is_array($data)) {
 				$data = json_decode($data,true);
 			}
+			// Just in case it was empty, we do an is_array to avoid warnings
 			if (is_array($data)) {
 				foreach ($data as $key => $d) {
 					$p = array();
 					foreach ($d as $kk => $dd) {
-						if (is_array(json_decode($dd,true))) {
+						if (is_array($dd)) {
+							// If this value is an array, untranslate it so that {wwwroot} and ipls get fixed.
+							$p[$kk] = bigtree_untranslate_array($dd);
+						} elseif (is_array(json_decode($dd,true))) {
+							// If this value is an array, untranslate it so that {wwwroot} and ipls get fixed.
 							$p[$kk] = bigtree_untranslate_array(json_decode($dd,true));
 						} else {
+							// Otherwise it's a string, just replace the {wwwroot} and ipls.
 							$p[$kk] = $this->replaceInternalPageLinks($dd);
 						}
 					}
@@ -95,6 +71,18 @@
 			}
 			return $parsed;
 		}
+		
+		/*
+			Function: decodeResources
+				Turns the JSON resources data into a PHP array of resources with links being translated into front-end readable links.
+				This function is called by BigTree's router and is generally not a function needed to end users.
+			
+			Parameters:
+				data - JSON encoded callout data.
+			
+			Returns:
+				An array of resources.
+		*/
 
 		function decodeResources($data) {
 			if (!is_array($data)) {
@@ -103,10 +91,13 @@
 			if (is_array($data)) {
 				foreach ($data as $key => $val) {
 					if (is_array($val)) {
+						// If this value is an array, untranslate it so that {wwwroot} and ipls get fixed.
 						$val = bigtree_untranslate_array($val);
 					} elseif (is_array(json_decode($val,true))) {
+						// If this value is an array, untranslate it so that {wwwroot} and ipls get fixed.
 						$val = bigtree_untranslate_array(json_decode($val,true));
 					} else {
+						// Otherwise it's a string, just replace the {wwwroot} and ipls.
 						$val = $this->replaceInternalPageLinks($val);				
 					}
 					$data[$key] = $val;
@@ -115,47 +106,20 @@
 			return $data;
 		}
 		
-		function generateMySQLReplace($content,$array,$val) {
-			$string = str_repeat("REPLACE(",count($array));
-			$string .= $content;
-			foreach ($array as $piece) {
-				$string .= ",'".mysql_real_escape_string($piece)."','$val')";
-			}
-			return $string;
-		}
-		
-		function getAlphabeticalNavByParent($parent = 0,$levels = 1,$hidden = false) {
-			$nav = array();
-			if ($hidden) {
-				$q = sqlquery("SELECT id,nav_title,parent,external,new_window,template,route FROM bigtree_pages WHERE parent = '$parent' AND archived != 'on' ORDER BY nav_title");
-			} else {
-				$q = sqlquery("SELECT id,nav_title,parent,external,new_window,template,route FROM bigtree_pages WHERE parent = '$parent' AND in_nav = 'on' AND archived != 'on' ORDER BY nav_title");
-			}
-			while ($f = sqlfetch($q)) {
-				if ($f["external"] && $f["template"] == "") {
-					if (substr($f["external"],0,6) == "ipl://") {
-						$f["external"] = $this->getInternalPageLink($f["external"]);
-					} else {
-						$f["external"] = str_replace("{wwwroot}",$GLOBALS["www_root"],$f["external"]);
-					}
-				}
-				if ($f["template"] == "") {
-					$nav_item = array("id" => $f["id"], "title" => htmlspecialchars($f["nav_title"]), "external" => $f["external"], "new_window" => $f["new_window"]);
-				} else {
-					$nav_item = array("id" => $f["id"], "title" => htmlspecialchars($f["nav_title"]), "route" => $f["route"]);
-				}
-				if ($levels > 1) {
-					$nav_item["children"] = $this->getNavByParent($f["id"],$levels - 1);
-				}
-				$nav[] = $nav_item;
-			}
-			$f = sqlfetch(sqlquery("SELECT id,nav_title,parent,external,new_window,template FROM bigtree_pages WHERE id = '$parent'"));
-			if (substr($f["template"],0,7) == "module-") {
-				$module_children = $this->getModuleNav($f["id"],$f["template"]);
-				$nav = array_merge($module_children,$nav);
-			}
-			return $nav;
-		}
+		/*
+			Function: getBreadcrumb
+				Returns an array of titles, links, and ids for pages above the current page.
+				If a page variable is passed in, this function will return information on the given page rather than the globalized $page variable generated by the router.
+			
+			Parameters:
+				data - A page array (containing at least the "path" from the database) *(optional)*
+			
+			Returns:
+				An array of arrays with "title", "link", and "id" of each of the pages above the current (or passed in) page.
+			
+			See Also:
+				<getBreadcrumbByPage>
+		*/
 		
 		function getBreadcrumb($data = false) {
 			global $page;
@@ -166,9 +130,24 @@
 			}
 		}
 		
+		/*
+			Function: getBreadcrumbByPage
+				Returns an array of titles, links, and ids for the pages above the given page.
+			
+			Parameters:
+				page - A page array (containing at least the "path" from the database) *(optional)*
+			
+			Returns:
+				An array of arrays with "title", "link", and "id" of each of the pages above the current (or passed in) page.
+			
+			See Also:
+				<getBreadcrumb>
+		*/
+		
 		function getBreadcrumbByPage($page) {
 			$bc = array();
 			
+			// Break up the pieces so we can get each piece of the path individually and pull all the pages above this one.
 			$pieces = explode("/",$page["path"]);
 			$paths = array();
 			$path = "";
@@ -177,6 +156,7 @@
 				$paths[] = "path = '".mysql_real_escape_string(trim($path,"/"))."'";
 			}
 			
+			// Get all the ancestors, ordered by the page length so we get the oldest first.
 			$q = sqlquery("SELECT id,nav_title,path FROM bigtree_pages WHERE (".implode(" OR ",$paths).") ORDER BY LENGTH(path) ASC");
 			while ($f = sqlfetch($q)) {
 				if ($f["external"] && $f["template"] == "") {
@@ -196,18 +176,50 @@
 			if ($mod["class"]) {
 				if (class_exists($m["class"])) {
 					eval('$module = new '.$m["class"].';');
-					if (method_exists($module,"getBreadcrumb")) {
-						$bc += $module->getBreadcrumb($id);
-					}
+					$bc += $module->getBreadcrumb($page);
 				}
 			}
 			
 			return $bc;
 		}
 		
-		function getFeedById($id) {
-			$id = mysql_real_escape_string($id);
-			$item = sqlfetch(sqlquery("SELECT * FROM bigtree_feeds WHERE id = '$id'"));
+		/*
+			Function: getCallout
+				Returns a callout template from the database.
+			
+			Parameters:
+				id - The ID of the callout.
+			
+			Returns:
+				A callout template row from the database.
+		*/
+		
+		function getCallout($id) {
+			return sqlfetch(sqlquery("SELECT * FROM bigtree_callouts WHERE id = '$id'"));
+		}
+		
+		/*
+			Function: getFeed
+				Gets a feed's information from the database.
+			
+			Parameters:
+				item - Either the ID of the feed to pull or a raw database row of the feed data
+			
+			Returns:
+				An array of feed information with options and fields decoded from JSON.
+				
+			See Also:
+				<getFeedByRoute>
+		*/
+		
+		function getFeed($item) {
+			if (!is_array($item)) {
+				$item = mysql_real_escape_string($item);
+				$item = sqlfetch(sqlquery("SELECT * FROM bigtree_feeds WHERE id = '$item'"));
+			}
+			if (!$item) {
+				return false;
+			}
 			$item["options"] = json_decode($item["options"],true);
 			if (is_array($item["options"])) {
 				foreach ($item["options"] as &$option) {
@@ -218,50 +230,54 @@
 			return $item;
 		}
 		
+		/*
+			Function: getFeedByRoute
+				Gets a feed's information from the database
+			
+			Parameters:
+				route - The route of the feed to pull.
+			
+			Returns:
+				An array of feed information with options and fields decoded from JSON.
+			
+			See Also:
+				<getFeed>
+		*/
+		
 		function getFeedByRoute($route) {
 			$route = mysql_real_escape_string($route);
 			$item = sqlfetch(sqlquery("SELECT * FROM bigtree_feeds WHERE route = '$route'"));
-			$item["options"] = json_decode($item["options"],true);
-			if (is_array($item["options"])) {
-				foreach ($item["options"] as &$option) {
-					$option = str_replace("{wwwroot}",$GLOBALS["www_root"],$option);
-				}
-			}
-			$item["fields"] = json_decode($item["fields"],true);
-			return $item;		
+			return $this->getFeed($item);
 		}
 		
-		function getFullNavigationPath($child, $path = array()) {
-			$f = sqlfetch(sqlquery("SELECT route,id,parent FROM bigtree_pages WHERE id = '$child'"));
-			$path[] = $this->urlify($f["route"]);
-			if ($f["parent"] != $GLOBALS["root_page"] && $f["parent"] != 0) {
-				return $this->getFullNavigationPath($f["parent"],$path);
-			}
-			$path = implode("/",array_reverse($path));
-			return $path;
-		}
+		/*
+			Function: getHiddenNavByParent
+				Returns an alphabetical list of pages that are not visible in navigation.
+			
+			Parameters:
+				parent - The parent ID for which to pull child pages.
+			
+			Returns:
+				An array of page entries from the database (without resources or callouts).
+				
+			See Also:
+				<getNavByParent>
+		*/
 		
 		function getHiddenNavByParent($parent = 0) {
-			$nav = array();
-			$q = sqlquery("SELECT id,nav_title,parent,external,new_window,template,route FROM bigtree_pages WHERE parent = '$parent' AND in_nav != 'on' AND archived != 'on' ORDER BY nav_title");
-			while ($f = sqlfetch($q)) {
-				if ($f["external"] && $f["template"] == "") {
-					if (substr($f["external"],0,6) == "ipl://") {
-						$f["external"] = $this->getInternalPageLink($f["external"]);
-					} else {
-						$f["external"] = str_replace("{wwwroot}",$GLOBALS["www_root"],$f["external"]);
-					}
-				}
-				if ($f["template"] == "") {
-					$nav_item = array("id" => $f["id"], "title" => htmlspecialchars($f["nav_title"]), "external" => true, "link" => $f["external"], "new_window" => $f["new_window"]);
-				} else {
-					$nav_item = array("id" => $f["id"], "title" => htmlspecialchars($f["nav_title"]), "external" => false, "link" => $GLOBALS["www_root"].$f["path"], "new_window" => false);
-				}
-				
-				$nav[] = $nav_item;
-			}
-			return $nav;
+			return $this->getNavByParent($parent,1,false,true);
 		}
+		
+		/*
+			Function: getInternalPageLink
+				Returns a hard link to the page's publicly accessible URL from its encoded soft link URL.
+			
+			Parameters:
+				ipl - Internal Page Link (ipl://, {wwwroot}, or regular URL encoding)
+			
+			Returns:
+				Public facing URL.
+		*/
 		
 		function getInternalPageLink($ipl) {
 			if (substr($ipl,0,6) != "ipl://") {
@@ -273,8 +289,22 @@
 			if ($commands && strpos($commands,"?") === false) {
 				$commands .= "/";
 			}
-			return $GLOBALS["www_root"].$this->getFullNavigationPath($navid)."/".$commands;
+			
+			// Get the page's path
+			$f = sqlfetch(sqlquery("SELECT path FROM bigtree_pages WHERE id = '".mysql_real_escape_string($navid)."'"));
+			return $GLOBALS["www_root"].$f["path"]."/".$commands;
 		}
+		
+		/*
+			Function: getLink
+				Returns the public link to a page in the database.
+			
+			Parameters:
+				id - The ID of the page.
+			
+			Returns:
+				Public facing URL.
+		*/
 		
 		function getLink($id) {
 			if ($id == 0) {
@@ -284,51 +314,49 @@
 			return $GLOBALS["www_root"].$f["path"]."/";
 		}
 		
-		function getLinkById($id) { return $this->getLink($id); }
-		
-		function getModuleBreadcrumb($id,$template) {
-			$t = $this->getTemplateById($template);
-			if (!$t["module"]) {
-				return array();
-			}
-			$m = sqlfetch(sqlquery("SELECT * FROM bigtree_modules WHERE route = '".$t["module"]."'"));
-			if (class_exists($m["class"])) {
-				$s = '$module = new '.$m["class"].';';
-				eval($s);
-				if (method_exists($module,"getBreadcrumb")) {
-					return $module->getBreadcrumb($id);
-				}
-			}
-			return array();
-		}
-		
-		function getModuleNav($class) {
-			eval('$module = new '.$class.';');
-			if (method_exists($module,"getNav")) {
-				return $module->getNav($id);
-			} else {
-				return array();
-			}
-		}
-
-		function getNavByParent($parent = 0,$levels = 1,$follow_module = true) {
+		/*
+			Function: getNavByParent
+				Returns a multi-level navigation array of pages visible in navigation
+				(or hidden, if $only_hidden is set to true)
+			
+			Parameters:
+				parent - Either a single page ID or an array of page IDs -- the latter is used internally
+				levels - The number of levels of navigation depth to recurse
+				follow_module - Whether to pull module navigation or not
+				only_hidden - Whether to pull visible (false) or hidden (true) pages
+			
+			Returns:
+				A multi-level navigation array containing "id", "parent", "title", "route", "link", "new_window", and "children"
+		*/
+			
+		function getNavByParent($parent = 0,$levels = 1,$follow_module = true,$only_hidden = false) {
 			$nav = array();
 			$find_children = array();
 			
+			// If the parent is an array, this is actually a recursed call.
+			// We're finding all the children of all the parents at once -- then we'll assign them back to the proper parent instead of doing separate calls for each.
 			if (is_array($parent)) {
 				$where_parent = array();
 				foreach ($parent as $p) {
 					$where_parent[] = "parent = '".mysql_real_escape_string($p)."'";
 				}
-				$q = sqlquery("SELECT id,nav_title,parent,external,new_window,template,route,path FROM bigtree_pages WHERE (".implode(" OR ",$where_parent).") AND in_nav = 'on' AND archived != 'on' AND (publish_at <= NOW() OR publish_at IS NULL) ORDER BY position DESC, id ASC");
+				$where_parent = "(".implode(" OR ",$where_parent).")";
+			// If it's an integer, let's just pull the children for the provided parent.
 			} else {
 				$parent = mysql_real_escape_string($parent);
-				$q = sqlquery("SELECT id,nav_title,parent,external,new_window,template,route,path FROM bigtree_pages WHERE parent = '$parent' AND in_nav = 'on' AND archived != 'on' AND (publish_at <= NOW() OR publish_at IS NULL) ORDER BY position DESC, id ASC");
+				$where_parent = "parent = '$parent'";
 			}
 			
+			$in_nav = $only_hidden ? "" : "on";
+			
+			$q = sqlquery("SELECT id,nav_title,parent,external,new_window,template,route,path FROM bigtree_pages WHERE $where_parent AND in_nav = '$in_nav' AND archived != 'on' AND (publish_at <= NOW() OR publish_at IS NULL) ORDER BY position DESC, id ASC");
+			
+			// Wrangle up some kids
 			while ($f = sqlfetch($q)) {
 				$link = $GLOBALS["www_root"].$f["path"]."/";
 				$new_window = false;
+				
+				// If we're REALLY an external link we won't have a template, so let's get the real link and not the encoded version.  Then we'll see if we should open this thing in a new window.
 				if ($f["external"] && $f["template"] == "") {
 					if (substr($f["external"],0,6) == "ipl://") {
 						$link = $this->getInternalPageLink($f["external"]);
@@ -340,30 +368,39 @@
 					}
 				}
 				
+				// Add it to the nav array
 				$nav[$f["id"]] = array("id" => $f["id"], "parent" => $f["parent"], "title" => $f["nav_title"], "route" => $f["route"], "link" => $link, "new_window" => $new_window, "children" => array());
 				
+				// If we're going any deeper, mark down that we're looking for kids of this kid.
 				if ($levels > 1) {
 					$find_children[] = $f["id"];
 				}
 			}
 			
+			// If we're looking for children, send them all back into getNavByParent, decrease the depth we're looking for by one.
 			if (count($find_children)) {
 				$subnav = $this->getNavByParent($find_children,$levels - 1,$follow_module);
 				foreach ($subnav as $item) {
+					// Reassign these new children back to their parent node.
 					$nav[$item["parent"]]["children"][$item["id"]] = $item;
 				}
 			}
 			
+			// If we're pulling in module navigation...
 			if ($follow_module) {
+				// This is a recursed iteration.
 				if (is_array($parent)) {
 					$where_parent = array();
 					foreach ($parent as $p) {
 						$where_parent[] = "bigtree_pages.id = '".mysql_real_escape_string($p)."'";
 					}
-					$q = sqlquery("SELECT bigtree_modules.class,bigtree_templates.routed,bigtree_templates.module,bigtree_pages.id,bigtree_pages.template FROM bigtree_modules JOIN bigtree_templates JOIN bigtree_pages ON bigtree_templates.id = bigtree_pages.template WHERE bigtree_modules.id = bigtree_templates.module AND (".implode(" OR ",$where_parent).")");
+					$q = sqlquery("SELECT bigtree_modules.class,bigtree_templates.routed,bigtree_templates.module,bigtree_pages.id,bigtree_pages.path,bigtree_pages.template FROM bigtree_modules JOIN bigtree_templates JOIN bigtree_pages ON bigtree_templates.id = bigtree_pages.template WHERE bigtree_modules.id = bigtree_templates.module AND (".implode(" OR ",$where_parent).")");
 					while ($f = sqlfetch($q)) {
-						if ($f["class"]) {
-							$modNav = $this->getModuleNav($f["class"]);
+						// If the class exists, instantiate it and call it
+						if ($f["class"] && class_exists($f["class"])) {
+							eval('$module = new '.$f["class"].';');
+							$modNav = $module->getNav($f);
+							// Give the parent back to each of the items it returned so they can be reassigned to the proper parent.
 							foreach ($modNav as $item) {
 								$item["parent"] = $f["id"];
 								unset($item["id"]);
@@ -371,10 +408,13 @@
 							}
 						}
 					}
+				// This is the first iteration.
 				} else {
-					$f = sqlfetch(sqlquery("SELECT bigtree_templates.routed,bigtree_templates.module,bigtree_pages.id,bigtree_pages.template FROM bigtree_templates JOIN bigtree_pages ON bigtree_templates.id = bigtree_pages.template WHERE bigtree_pages.id = '$parent'"));
-					if ($f["routed"] && $f["module"]) {
-						$nav += $this->getModuleNav($parent,$f["template"]);
+					$f = sqlfetch(sqlquery("SELECT bigtree_modules.class,bigtree_templates.routed,bigtree_templates.module,bigtree_pages.id,bigtree_pages.path,bigtree_pages.template FROM bigtree_modules JOIN bigtree_templates JOIN bigtree_pages ON bigtree_templates.id = bigtree_pages.template WHERE bigtree_modules.id = bigtree_templates.module AND bigtree_pages.id = '$parent'"));
+					// If the class exists, instantiate it and call it.
+					if ($f["class"] && class_exists($f["class"])) {
+						eval('$module = new '.$f["class"].';');
+						$nav += $module->getNav($f);
 					}
 				}
 			}
@@ -382,22 +422,37 @@
 			return $nav;
 		}
 		
+		/*
+			Function: getNavId
+				Provides the page ID for a given path array.
+				This is a method used by the router and the admin and can generally be ignored.
+			
+			Paramaters:
+				path - An array of path elements from a URL
+			
+			Returns:
+				An array containing the page ID and any additional commands.
+		*/
+		
 		function getNavId($path) {
 			$commands = array();
 			
+			// See if we have a straight up perfect match to the path.
 			$spath = implode("/",$path);
 			$f = sqlfetch(sqlquery("SELECT id FROM bigtree_pages WHERE path = '$spath' AND archived = ''"));
 			if ($f) {
 				return array($f["id"],$commands);
 			}
 			
+			// Guess we don't, let's chop off commands until we find a page.
 			$x = 0;
 			while ($x < count($path)) {
 				$x++;
 				$commands[] = $path[count($path)-$x];
 				$spath = implode("/",array_slice($path,0,-1 * $x));
-				$f = sqlfetch(sqlquery("SELECT id,template FROM bigtree_pages WHERE path = '$spath' AND archived = ''"));
-				if ($f && substr($f["template"],0,6) == "module") {
+				// We have additional commands, so we're now making sure the template is also routed, otherwise it's a 404.
+				$f = sqlfetch(sqlquery("SELECT bigtree_pages.id FROM bigtree_pages JOIN bigtree_templates ON bigtree_pages.template = bigtree_templates.id WHERE bigtree_pages.path = '$spath' AND bigtree_pages.archived = '' AND bigtree_templates.routed = 'on'"));
+				if ($f) {
 					return array($f["id"],array_reverse($commands));
 				}
 			}
@@ -405,11 +460,19 @@
 			return false;
 		}
 		
-		function getPage($child) {
-			return $this->getPageById($child);
-		}
+		/*
+			Function: getPage
+				Returns a page along with its resources and callouts decoded.
+			
+			Parameters:
+				child - The ID of the page.
+				decode - Whether to decode resources and callouts or not (setting to false saves processing time)
+			
+			Returns:
+				A page array from the database.
+		*/
 		
-		function getPageById($child,$decode = true) {
+		function getPage($child,$decode = true) {
 			$f = sqlfetch(sqlquery("SELECT * FROM bigtree_pages WHERE id = '$child'"));
 			if (!$f) {
 				return false;
@@ -424,15 +487,20 @@
 			return $f;
 		}
 		
-		function getPageDepth($page) {
-			if (!is_array($page)) {
-				$page = sqlfetch(sqlquery("SELECT path FROM bigtree_pages WHERE id = '".mysql_real_escape_string($page)."'"));
-			}
+		/*
+			Function: getPendingPage
+				Returns a page along with pending changes applied.
 			
-			return count(explode("/",$page["path"]));
-		}
+			Parameters:
+				child - The ID of the page.
+				decode - Whether to decode resources and callouts or not (setting to false saves processing time)
+			
+			Returns:
+				A page array from the database.
+		*/
 		
-		function getPendingPageById($id,$decode = true) {
+		function getPendingPage($id,$decode = true) {
+			// If the id starts with "p" the page has no published copy.
 			if ($id[0] == "p") {
 				$page = array();
 				$f = sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE id = '".substr($id,1)."'"));
@@ -443,10 +511,12 @@
 					}
 					$page[$key] = $val;
 				}
+			// It has a published copy, grab that first.
 			} else {
-				$page = $this->getPageById($id);
+				$page = $this->getPage($id);
 				$f = sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE `table` = 'bigtree_pages' AND item_id = '$id'"));
 				if ($f) {
+					// Apply each of the changes over the published version.
 					$changes = json_decode($f["changes"],true);
 					foreach ($changes as $key => $val) {
 						if ($key == "external") {
@@ -456,6 +526,7 @@
 					}
 				}
 			}
+			
 			if ($decode) {
 				$page["resources"] = $this->decodeResources($page["resources"]);
 				$page["callouts"] = $this->decodeCallouts($page["callouts"]);
@@ -463,11 +534,21 @@
 			return $page;
 		}
 		
+		/*
+			Function: getPreviewLink
+				Returns a URL to where this page can be previewed.
+			
+			Parameters:
+				id - The ID of the page (or pending page)
+			
+			Returns:
+				A URL.
+		*/
+		
 		function getPreviewLink($id) {
 			if ($id == 0) {
 				return $GLOBALS["www_root"];
-			}
-			if (substr($id,0,1) == "p") {
+			} elseif (substr($id,0,1) == "p") {
 				return $GLOBALS["www_root"]."_preview-pending/".substr($id,1)."/";
 			} else {
 				$f = sqlfetch(sqlquery("SELECT path FROM bigtree_pages WHERE id = '".mysql_real_escape_string($id)."'"));
@@ -475,7 +556,18 @@
 			}
 		}
 		
-		function getRelatedPagesByTags($tags = array(),$exclude = false) {
+		/*
+			Function: getRelatedPagesByTags
+				Returns pages related to the given set of tags.
+			
+			Parameters:
+				tags - An array of tags to search for.
+			
+			Returns:
+				An array of related pages sorted by relevance (how many tags get matched).
+		*/
+		
+		function getRelatedPagesByTags($tags = array()) {
 			$results = array();
 			$relevance = array();
 			foreach ($tags as $tag) {
@@ -501,9 +593,38 @@
 			return $items;
 		}
 		
-		function getCalloutById($id) {
-			return sqlfetch(sqlquery("SELECT * FROM bigtree_callouts WHERE id = '$id'"));
+		/*
+			Function: getSetting
+				Gets the value of a setting.
+			
+			Parameters:
+				id - The ID of the setting.
+			
+			Returns:				
+				A string or array of the setting's value.
+		*/
+		
+		function getSetting($id) {
+			global $config;
+			$id = mysql_real_escape_string($id);
+			$f = sqlfetch(sqlquery("SELECT * FROM bigtree_settings WHERE id = '$id'"));
+			// If the setting is encrypted, we need to re-pull just the value.
+			if ($f["encrypted"]) {
+				$f = sqlfetch(sqlquery("SELECT AES_DECRYPT(`value`,'".mysql_real_escape_string($config["settings_key"])."') AS `value` FROM bigtree_settings WHERE id = '$id'"));
+			}
+			return json_decode($f["value"],true);
 		}
+		
+		/*
+			Function: getTagsForPage
+				Returns a list of tags the page was tagged with.
+			
+			Parameters:
+				page - Either a page array (containing at least the page's ID) or a page ID.
+			
+			Returns:
+				An array of tags.
+		*/
 		
 		function getTagsForPage($page) {
 			if (!is_numeric($page)) {
@@ -517,9 +638,18 @@
 			return $tags;
 		}
 		
-		function getTemplate($id) { return $this->getTemplateById($id); }
-
-		function getTemplateById($id) {
+		/*
+			Function: getTemplate
+				Returns a template from the database with resources decoded.
+			
+			Parameters:
+				id - The ID of the template.
+			
+			Returns:
+				The template row from the database with resources decoded.
+		*/
+		
+		function getTemplate($id) {
 			$t = sqlfetch(sqlquery("SELECT * FROM bigtree_templates WHERE id = '$id'"));
 			if (!$t) {
 				return false;
@@ -528,15 +658,68 @@
 			return $t;
 		}
 		
-		function getTopLevelNavigationId($child,$top = 0) {
-			return $this->getTopLevelNavigationIdForPage(sqlfetch(sqlquery("SELECT path FROM bigtree_pages WHERE id = '".mysql_real_escape_string($child)."'")));
+		/*
+			Function: getToplevelNavigationId
+				Returns the highest level ancestor for the current page.
+			
+			Returns:
+				The ID of the highest ancestor of the current page.
+			
+			See Also:
+				<getToplevelNavigationIdForPage>
+			
+		*/
+		
+		function getTopLevelNavigationId() {
+			global $page;
+			return $this->getTopLevelNavigationIdForPage($page);
 		}
+		
+		/*
+			Function: getToplevelNavigationIdForPage
+				Returns the highest level ancestor for a given page.
+			
+			Parameters:
+				page - A page array (containing at least the page's "path").
+			
+			Returns:
+				The ID of the highest ancestor of the given page.
+			
+			See Also:
+				<getToplevelNavigationId>
+			
+		*/
 		
 		function getTopLevelNavigationIdForPage($page) {
 			$parts = explode("/",$page["path"]);
 			$f = sqlfetch(sqlquery("SELECT id FROM bigtree_pages WHERE path = '".mysql_real_escape_string($parts[0])."'"));
 			return $f["id"];
 		}
+		
+		/*
+			Function: makeSecure
+				Forces the site into Secure mode.
+				When Secure mode is enabled, BigTree will enforce the user being at HTTPS and will rewrite all insecure resources (like CSS, JavaScript, and images) to use HTTPS.
+		*/
+		
+		function makeSecure() {
+			if ($_SERVER["SERVER_PORT"] == 80) {
+				header("Location: ".str_replace("http://","https://",$GLOBALS["www_root"]).$_GET["bigtree_htaccess_url"]);
+				die();
+			}
+			$this->Secure = true;
+		}
+		
+		/*
+			Function: replaceInternalPageLinks
+				Replaces the page links in an HTML block with soft links (ipl and {wwwroot}).
+			
+			Parameters:
+				html - An HTML block
+			
+			Returns:
+				An HTML block with links soft-linked.
+		*/
 		
 		function replaceInternalPageLinks($html) {
 			$drop_count = 0;
@@ -549,6 +732,17 @@
 
 			return $html;
 		}
+		
+		/*
+			Function: urlify
+				Turns a string into one suited for URL routes.
+			
+			Parameters:
+				title - A short string.
+			
+			Returns:
+				A string suited for a URL route.
+		*/
 
 		function urlify($title) {
 			$accent_match = array('Â', 'Ã', 'Ä', 'À', 'Á', 'Å', 'Æ', 'Ç', 'È', 'É', 'Ê', 'Ë', 'Ì', 'Í', 'Î', 'Ï', 'Ð', 'Ñ', 'Ò', 'Ó', 'Ô', 'Õ', 'Ö', 'Ø', 'Ù', 'Ú', 'Û', 'Ü', 'Ý', 'ß', 'à', 'á', 'â', 'ã', 'ä', 'å', 'æ', 'ç', 'è', 'é', 'ê', 'ë', 'ì', 'í', 'î', 'ï', 'ð', 'ñ', 'ò', 'ó', 'ô', 'õ', 'ö', 'ø', 'ù', 'ú', 'û', 'ü', 'ý', 'ÿ');

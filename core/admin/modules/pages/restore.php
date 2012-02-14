@@ -1,6 +1,6 @@
 <?
 	$id = end($path);
-	$page = $cms->getPageById($id,false);
+	$page = $cms->getPage($id,false);
 	$access = $admin->unarchivePage($id);
 
 	$admin->growl("Pages","Restored Page");

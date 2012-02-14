@@ -17,7 +17,7 @@
 			}
 			
 			$callout = array();
-			$sdata = $cms->getCalloutById($data["type"]);
+			$sdata = $cms->getCallout($data["type"]);
 			$sresources = json_decode($sdata["resources"],true);
 			
 			foreach ($sresources as $options) {

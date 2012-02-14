@@ -11,5 +11,5 @@
 	*/
 
 	$admin->requireAPILevel(1);
-	echo bigtree_api_encode(array("success" => true,"setting" => $admin->getSettingById($_POST["id"])));
+	echo bigtree_api_encode(array("success" => true,"setting" => $admin->getSetting($_POST["id"])));
 ?>

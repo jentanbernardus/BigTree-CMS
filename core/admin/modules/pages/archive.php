@@ -1,6 +1,6 @@
 <?
 	$id = end($path);
-	$page = $cms->getPageById($id,false);
+	$page = $cms->getPage($id,false);
 	$access = $admin->archivePage($id);
 	
 	$admin->growl("Pages","Archived Page");

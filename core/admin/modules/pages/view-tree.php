@@ -2,8 +2,8 @@
 	$ga_on = $cms->getSetting("google-analytics-profile");
 	
 	$parent = is_array($commands) ? end($commands) : 0;
-	$page = $cms->getPageById($parent,false);
-	$ppage = $cms->getPageById($page["parent"],false);
+	$page = $cms->getPage($parent,false);
+	$ppage = $cms->getPage($page["parent"],false);
 	$parent_access = $admin->getPageAccessLevelByUserId($parent,$admin->ID);
 	
 	// Setup the page breadcrumb
@@ -59,7 +59,7 @@
 					$status = '<a href="'.$www_root.'_preview-pending/'.$item["id"].'/" target="_blank">Pending</a>';
 					$status_class = "pending";
 				} elseif (sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE `table` = 'bigtree_pages' AND item_id = '".$item["id"]."'"))) {
-					$status = '<a href="'.$www_root.'_preview/'.$cms->getFullNavigationPath($item["id"]).'/" target="_blank">Changed</a>';
+					$status = '<a href="'.$www_root.'_preview/'.$item["path"].'/" target="_blank">Changed</a>';
 					$status_class = "pending";
 				} elseif (strtotime($item["publish_at"]) > time()) {
 					$status = "Scheduled";

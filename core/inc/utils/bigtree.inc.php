@@ -260,7 +260,7 @@
 			// It's an internal page link.  Let's find it, hopefully.
 			$command = explode("/",rtrim(str_replace($GLOBALS["www_root"],"",$href),"/"));
 			list($navid,$commands) = $cms->getNavId($command);
-			$page = $cms->getPageById($navid,false);
+			$page = $cms->getPage($navid,false);
 			if ($navid && (!$commands[0] || substr($page["template"],0,6) == "module" || substr($commands[0],0,1) == "#")) {
 				$href = "ipl://".$navid."//".base64_encode(json_encode($commands));
 			}

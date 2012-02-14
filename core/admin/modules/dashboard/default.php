@@ -1,4 +1,7 @@
+<h1><span class="dashboard"></span>Overview</h1>
 <?
+	$breadcrumb[] = array("title" => "Overview", "link" => "#");
+	
 	// Get all the messages we've received.
 	$sent = array();
 	$read = array();
@@ -18,16 +21,90 @@
 			}
 		}
 	}
+	
+	// Get Google Analytics Traffic
+	$ga_user = $cms->getSetting("google-analytics-email");
+	$ga_pass = $cms->getSetting("google-analytics-password");
+	$ga_profile = $cms->getSetting("google-analytics-profile");
+	// Only show this thing if they have Google Analytics setup already
+	if ($ga_user && $ga_pass && $ga_profile) {
+		$visits = $admin->getGAVisitsByDateRange(date("Y-m-d",strtotime("-2 weeks")),date("Y-m-d",strtotime("-1 day")));
+	
+		$min = min($visits);
+		$max = max($visits) - $min;
+
+		$bar_height = 70;
+
+		$x = 0;
 ?>
-<h1><span class="dashboard"></span>Dashboard</h1>
 <div class="table">
 	<summary><h2 class="full"><span class="world"></span>Recent Traffic<a href="analytics/" class="more">View Analytics</a></h2></summary>
+	<section>
+		<div class="graph">
+			<?
+			    foreach ($visits as $date => $count) {
+			    	$height = round($bar_height * ($count - $min) / $max) + 12;
+			    	$x++;
+			?>
+			<section class="bar<? if ($x == 14) { ?> last<? } elseif ($x == 1) { ?> first<? } ?>" style="height: <?=$height?>px; margin-top: <?=(82-$height)?>px;">
+			    <?=$count?>
+			</section>
+			<?
+			    }
+			    
+			    $x = 0;
+			    foreach ($visits as $date => $count) {
+			    	$x++;
+			?>
+			<section class="date<? if ($x == 14) { ?> last<? } elseif ($x == 1) { ?> first<? } ?>"><?=date("n/j/y",strtotime($date))?></section>
+			<?
+			    }
+			?>
+		</div>
+	</section>
 </div>
+<?
+	}
+?>
 
 <div class="table">
-	<summary><h2 class="full"><span class="pending"></span>Pending Changes<a href="pending/" class="more">View All Pending Changes</a></h2></summary>
+	<summary><h2 class="full"><span class="pending"></span>Pending Changes <small>Awaiting Your Approval</small><a href="pending/" class="more">View All Pending Changes</a></h2></summary>
+	<ul>
+		<?
+			if (count($changes) == 0) {
+		?>
+		<li><section class="no_content"><p>You have no changes awaiting your approval.</p></section></li>
+		<?	
+			} else {
+				foreach ($changes as $item) {
+				
+				}
+			}
+		?>
+	</ul>
 </div>
 
 <div class="table">
 	<summary><h2 class="full"><span class="unread"></span>Unread Messages<a href="messages/" class="more">View All Messages</a></h2></summary>
+	<ul>
+		<?
+			if (count($unread) == 0) {
+		?>
+		<li><section class="no_content"><p>You have no unread messages.</p></section></li>
+		<?
+			} else {
+				foreach ($unread as $item) {
+		?>
+		<li>
+			<section class="messages_from_to"><?=$item["sender_name"]?></section>
+			<section class="messages_subject"><?=$item["subject"]?></section>
+			<section class="messages_date_time"><?=date("n/j/y",strtotime($item["date"]))?></section>
+			<section class="messages_date_time"><?=date("g:ia",strtotime($item["date"]))?></section>
+			<section class="messages_view"><a href="view/<?=$item["id"]?>/" class="icon_message"></a></section>
+		</li>
+		<?
+				}
+			}
+		?>
+	</ul>
 </div>
