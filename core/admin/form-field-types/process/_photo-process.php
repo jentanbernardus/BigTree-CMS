@@ -2,7 +2,11 @@
 	$failed = false;
 		
 	// Let's check the minimum requirements for the image first before we store it anywhere.
-	list($iwidth,$iheight,$itype,$iattr) = getimagesize($temp_name);
+	$image_info = getimagesize($temp_name);
+	$iwidth = $image_info[0];
+	$iheight = $image_info[1];
+	$itype = $image_info[2];
+	$channels = $image_info["channels"];
 
 	// If the minimum height or width is not meant, do NOT let the image through.  Erase the change or update from the database.
 	if ((isset($options["min_height"]) && $iheight < $options["min_height"]) || (isset($options["min_width"]) && $iwidth < $options["min_width"])) {
@@ -12,7 +16,13 @@
 	
 	// If it's not a valid image, throw it out!
 	if ($itype != IMAGETYPE_GIF && $itype != IMAGETYPE_JPEG && $itype != IMAGETYPE_PNG) {
-		$fails[] = array("field" => $options["title"], "error" =>  "An invalid file was uploaded.  Valid file types: JPG, GIF, PNG.");
+		$fails[] = array("field" => $options["title"], "error" =>  "An invalid file was uploaded. Valid file types: JPG, GIF, PNG.");
+		$failed = true;
+	}
+	
+	// See if it's CMYK
+	if ($channels == 4) {
+		$fails[] = array("field" => $options["title"], "error" =>  "A CMYK encoded file was uploaded. Please upload an RBG image.");
 		$failed = true;
 	}
 
