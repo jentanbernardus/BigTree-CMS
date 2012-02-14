@@ -465,6 +465,7 @@
 
 	#callout_type { background-gradient: #F6F6F6 #FFFFFF; border-bottom: 1px solid #E5E5E5; margin: -20px -20px 20px -20px; padding: 20px; }
 	#callout_resources { height: 250px; margin: -20px; overflow: auto; padding: 20px; width: 450px; }
+	#bigtree_dialog_form #callout_resources fieldset:last-child { margin: 0 0 20px 0; }
 
 	.page_url { float: right; padding: 8px 10px 0 0; }
 	.page_url a { color: #333; }
