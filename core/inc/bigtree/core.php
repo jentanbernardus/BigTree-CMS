@@ -11,7 +11,7 @@
 
 		/*
 			Constructor:
-			Builds a flat file module class list so that module classes can be autoloaded instead of always in memory.
+				Builds a flat file module class list so that module classes can be autoloaded instead of always in memory.
 		*/
 		
 		function __construct() {
