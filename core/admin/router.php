@@ -120,8 +120,9 @@
 		$admin = new BigTreeAdmin;
 	}
 		
-	if (!isset($path[1]))
+	if (!isset($path[1])) {
 		$path[1] = "";
+	}
 	
 	$css = array();
 	$js = array();
@@ -144,7 +145,7 @@
 	} else {
 		// We're logged in, let's go somewhere.
 		if (!$path[1]) {
-			header("Location: dashboard/");
+			header("Location: ".$www_root."admin/dashboard/");
 			die();
 		// We're hitting an ajax page.
 		} elseif ($path[1] == "ajax") {
