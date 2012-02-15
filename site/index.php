@@ -6,21 +6,17 @@
 	
 	$debug = false;
 	$config = array();
-	include str_replace("site/index.php","templates/config.php",__FILE__);
+	include str_replace("site/index.php","templates/config.php",__FILE__);	
 	
 	// Let admin bootstrap itself.
 	if ($path[0] == "admin") {
-		if (file_exists("../custom/admin/router.php")) {
-			include "../custom/admin/router.php";		
-		} else {
-			include "../core/admin/router.php";
-		}
+		include "../core/admin/router.php";
 		die();
 	}
 	
 	// See if this thing is cached
-	if ($config["cache"] && !count($_POST) && $path[0] != "_preview" && $path[0] != "_preview-pending") {
-		$curl = json_encode($_GET);
+	if ($config["cache"] && $path[0] != "_preview" && $path[0] != "_preview-pending") {
+		$curl = $_GET["bigtree_htaccess_url"];
 		if (!$curl) {
 			$curl = "home";
 		}
@@ -38,11 +34,6 @@
 	}
 
 	// Bootstrap BigTree 4.0
-	if (file_exists("../custom/bootstrap.php")) {
-		include "../custom/bootstrap.php";
-	} else {
-		include "../core/bootstrap.php";
-	}
-	
-	include bigtree_path("router.php");
+	include "../core/bootstrap.php";
+	include "../core/router.php";
 ?>
