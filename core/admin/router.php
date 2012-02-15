@@ -108,6 +108,7 @@
 	} else {
 		include "../core/bootstrap.php";
 	}
+	bigtree_setup_sql_connection();
 	ob_start();
 	session_start();
 	include bigtree_path("inc/bigtree/admin.php");
