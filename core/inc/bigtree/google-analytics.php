@@ -178,13 +178,14 @@
 			$cache["year_ago_year"] = $this->parseDataNodes($response["body"]);
 			
 			// Quarter
-			$parameters['start-date'] = date("Y-m-d",strtotime(date("Y")."-".(date("m") - (date("m") % 3))."-01"));
+			$current_quarter_month = date("m") - date("m") % 3 + 1;
+			$parameters['start-date'] = date("Y-".str_pad($current_quarter_month,2,"0",STR_PAD_LEFT)."-01");
 			$parameters['end-date'] = date("Y-m-d");
 			$response = $this->httpRequest("https://www.google.com/analytics/feeds/data", $parameters, null, array('Authorization: GoogleLogin auth='.$this->AuthToken));
 			$cache["quarter"] = $this->parseDataNodes($response["body"]);
 			
 			// Year ago Quarter
-			$parameters['start-date'] = date("Y-m-d",strtotime((date("Y") - 1)."-".(date("m") - (date("m") % 3))."-01"));
+			$parameters['start-date'] = date("Y-".str_pad($current_quarter_month,2,"0",STR_PAD_LEFT)."-01",strtotime("-1 year"));
 			$parameters['end-date'] = date("Y-m-d",strtotime("-1 year"));
 			$response = $this->httpRequest("https://www.google.com/analytics/feeds/data", $parameters, null, array('Authorization: GoogleLogin auth='.$this->AuthToken));
 			$cache["year_ago_quarter"] = $this->parseDataNodes($response["body"]);
