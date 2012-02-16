@@ -1,28 +1,44 @@
-<?	
-	include bigtree_path("admin/modules/dashboard/analytics/_check.php");
+<?
+	include bigtree_path($relative_path."_check.php");
 	
-	$tw_start = date("Y-m-d",strtotime("-14 days"));
-	$tw_end = date("Y-m-d",strtotime("-1 day"));
-
-	$quarter_start = date("Y-m-d",strtotime(date("Y")."-".(date("m") - (date("m") % 3))."-01"));
-	$quarter_end = date("Y-m-d");
+	$breadcrumb[] = array("link" => "dashboard/analytics/", "title" => "Traffic Report");
 	
-	$year_start = date("Y-01-01");
-	$year_end = date("Y-m-d");
+	$cache = $cms->getSetting("bigtree-internal-google-analytics-cache");
 	
-	$breadcrumb[] = array("link" => "dashboard/analytics/", "title" => "Dashboard");
+	$two_week_visits = $cache["two_week"];
+	$graph_min = min($two_week_visits);
+	$graph_max = max($two_week_visits) - $graph_min;
+	$graph_bar_height = 70;
 ?>
 <h1><span class="analytics"></span>Analytics</h1>
+<? include bigtree_path($relative_path."_nav.php"); ?>
 <div class="table">
 	<summary>
 		<h2>Two Week Heads-Up <small>(visits)</small></h2>
 	</summary>
 	<section>
-		<graph>
-			<data id="graph_data">
-				<loader>Loading...</loader>
-			</data>
-		</graph>
+		<div class="graph">
+			<?
+				$x = 0;
+			    foreach ($two_week_visits as $date => $count) {
+			    	$height = round($graph_bar_height * ($count - $graph_min) / $graph_max) + 12;
+			    	$x++;
+			?>
+			<section class="bar<? if ($x == 14) { ?> last<? } elseif ($x == 1) { ?> first<? } ?>" style="height: <?=$height?>px; margin-top: <?=(82-$height)?>px;">
+			    <?=$count?>
+			</section>
+			<?
+			    }
+			    
+			    $x = 0;
+			    foreach ($two_week_visits as $date => $count) {
+			    	$x++;
+			?>
+			<section class="date<? if ($x == 14) { ?> last<? } elseif ($x == 1) { ?> first<? } ?>"><?=date("n/j/y",strtotime($date))?></section>
+			<?
+			    }
+			?>
+		</div>
 	</section>
 </div>
 

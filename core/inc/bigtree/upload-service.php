@@ -10,7 +10,7 @@
 		
 		function __construct() {
 			global $cms;
-			$ups = $cms->getSetting("upload-service");
+			$ups = $cms->getSetting("bigtree-internal-upload-service");
 			$this->Service = $ups["service"];
 			$this->optipng = $ups["optipng"];
 			$this->jpegtran = $ups["jpegtran"];
@@ -48,12 +48,12 @@
 			global $cms;
 			
 			if (!$this->S3) {
-				$keys = $cms->getSetting("s3-keys");
+				$keys = $cms->getSetting("bigtree-internal-s3-keys");
 				$this->S3 = new S3($keys["access_key_id"],$keys["secret_access_key"]);
 			}
 			
 			if (!$this->S3Buckets) {
-				$this->S3Buckets = $cms->getSetting("s3-buckets");
+				$this->S3Buckets = $cms->getSetting("bigtree-internal-s3-buckets");
 			}
 			
 			// If we don't have a bucket for this path yet, make one.
@@ -63,7 +63,7 @@
 				$this->S3Buckets[$relative_path] = $bucket;
 				$this->S3->putBucket($bucket,S3::ACL_PUBLIC_READ);
 				$admin = new BigTreeAdmin;
-				$admin->updateSettingValue("s3-buckets",$this->S3Buckets);
+				$admin->updateSettingValue("bigtree-internal-s3-buckets",$this->S3Buckets);
 			}
 			
 			// Check to see if this is a unique file name for this bucket, if not, get one.
@@ -107,14 +107,14 @@
 			global $cms;
 						
 			if (!$this->Rackspace) {
-				$keys = $cms->getSetting("rackspace-keys");
+				$keys = $cms->getSetting("bigtree-internal-rackspace-keys");
 				$this->RSAuth = new CF_Authentication($keys["username"],$keys["api_key"]);
 				$this->RSAuth->authenticate();
 				$this->RSConn = new CF_Connection($this->RSAuth);
 			}
 			
 			if (!$this->RSContainers) {
-				$this->RSContainers = $cms->getSetting("rackspace-containers");
+				$this->RSContainers = $cms->getSetting("bigtree-internal-rackspace-containers");
 			}
 
 			$relative_path = str_replace("/","-",rtrim($relative_path,"/"));
@@ -127,7 +127,7 @@
 
 				$this->RSContainers[$relative_path] = $url;
 				$admin = new BigTreeAdmin;
-				$admin->updateSettingValue("rackspace-containers",$this->RSContainers);
+				$admin->updateSettingValue("bigtree-internal-rackspace-containers",$this->RSContainers);
 			} else {
 				$container = $this->RSConn->get_container($relative_path);
 			}
@@ -201,12 +201,12 @@
 			global $cms;
 			
 			if (!$this->S3) {
-				$keys = $cms->getSetting("s3-keys");
+				$keys = $cms->getSetting("bigtree-internal-s3-keys");
 				$this->S3 = new S3($keys["access_key_id"],$keys["secret_access_key"]);
 			}
 			
 			if (!$this->S3Buckets) {
-				$this->S3Buckets = $cms->getSetting("s3-buckets");
+				$this->S3Buckets = $cms->getSetting("bigtree-internal-s3-buckets");
 			}
 			
 			// If we don't have a bucket for this path yet, make one.
@@ -216,7 +216,7 @@
 				$this->S3Buckets[$relative_path] = $bucket;
 				$this->S3->putBucket($bucket,S3::ACL_PUBLIC_READ);
 				$admin = new BigTreeAdmin;
-				$admin->updateSettingValue("s3-buckets",$this->S3Buckets);
+				$admin->updateSettingValue("bigtree-internal-s3-buckets",$this->S3Buckets);
 			}
 			
 			$this->S3->putObjectFile($local_file,$this->S3Buckets[$relative_path],$file_name,S3::ACL_PUBLIC_READ);
@@ -237,14 +237,14 @@
 			global $cms;
 			
 			if (!$this->Rackspace) {
-				$keys = $cms->getSetting("rackspace-keys");
+				$keys = $cms->getSetting("bigtree-internal-rackspace-keys");
 				$this->RSAuth = new CF_Authentication($keys["username"],$keys["api_key"]);
 				$this->RSAuth->authenticate();
 				$this->RSConn = new CF_Connection($this->RSAuth);
 			}
 			
 			if (!$this->RSContainers) {
-				$this->RSContainers = $cms->getSetting("rackspace-containers");
+				$this->RSContainers = $cms->getSetting("bigtree-internal-rackspace-containers");
 			}
 			
 			$relative_path = str_replace("/","-",rtrim($relative_path,"/"));
@@ -257,7 +257,7 @@
 
 				$this->RSContainers[$relative_path] = $url;
 				$admin = new BigTreeAdmin;
-				$admin->updateSettingValue("rackspace-containers",$this->RSContainers);
+				$admin->updateSettingValue("bigtree-internal-rackspace-containers",$this->RSContainers);
 			} else {
 				$container = $this->RSConn->get_container($relative_path);
 			}
@@ -298,7 +298,7 @@
 			global $cms;
 			
 			if (!$this->S3) {
-				$keys = $cms->getSetting("s3-keys");
+				$keys = $cms->getSetting("bigtree-internal-s3-keys");
 				$this->S3 = new S3($keys["access_key_id"],$keys["secret_access_key"]);
 			}
 			
@@ -314,14 +314,14 @@
 			global $cms;
 			
 			if (!$this->Rackspace) {
-				$keys = $cms->getSetting("rackspace-keys");
+				$keys = $cms->getSetting("bigtree-internal-rackspace-keys");
 				$this->RSAuth = new CF_Authentication($keys["username"],$keys["api_key"]);
 				$this->RSAuth->authenticate();
 				$this->RSConn = new CF_Connection($this->RSAuth);
 			}
 			
 			if (!$this->RSContainers) {
-				$this->RSContainers = $cms->getSetting("rackspace-containers");
+				$this->RSContainers = $cms->getSetting("bigtree-internal-rackspace-containers");
 			}
 			
 			$parts = safe_pathinfo($file_location);

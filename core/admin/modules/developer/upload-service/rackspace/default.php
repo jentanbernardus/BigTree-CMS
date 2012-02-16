@@ -2,9 +2,9 @@
 	$breadcrumb[] = array("title" => "Upload Service", "link" => "developer/upload-service/");
 	$breadcrumb[] = array("title" => "Rackspace Cloud Files", "link" => "#");
 	
-	$current_service = $cms->getSetting("upload-service");
+	$current_service = $cms->getSetting("bigtree-internal-upload-service");
 
-	$keys = $cms->getSetting("rackspace-keys");
+	$keys = $cms->getSetting("bigtree-internal-rackspace-keys");
 	if (is_array($keys)) {
 		foreach ($keys as $k => $v) {
 			$$k = htmlspecialchars($v);

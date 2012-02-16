@@ -2,8 +2,8 @@
 	$breadcrumb[] = array("title" => "Upload Service", "link" => "developer/upload-service/");
 	$breadcrumb[] = array("title" => "Amazon S3", "link" => "#");
 	
-	$current_service = $cms->getSetting("upload-service");
-	$keys = $cms->getSetting("s3-keys");
+	$current_service = $cms->getSetting("bigtree-internal-upload-service");
+	$keys = $cms->getSetting("bigtree-internal-s3-keys");
 	if (is_array($keys)) {
 		foreach ($keys as $k => $v) {
 			$$k = htmlspecialchars($v);

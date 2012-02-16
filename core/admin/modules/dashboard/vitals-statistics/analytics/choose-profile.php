@@ -1,13 +1,15 @@
 <?
 	if ($admin->Level < 1) {
 ?>
-<h1>Access Denied</h1>
+<h1><span class="analytics"></span>Analytics: Access Denied</h1>
 <p>Analytics is not presently setup.  Please contact an administrator to setup Analytics before proceeding.</p>
 <?
 	} else {
-		$breadcrumb[] = array("link" => "dashboard/analytics/choose-profile/", "title" => "Choose Profile");
+		$breadcrumb[] = array("link" => "dashboard/vitals-statistics/analytics/choose-profile/", "title" => "Choose Profile");
+		$ga = new BigTreeGoogleAnalytics;
+		$accounts = $ga->getAvailableProfiles();
 ?>
-<h1>Choose Profile</h1>
+<h1><span class="analytics"></span>Analytics Setup</h1>
 <div class="form_container">
 	<header>
 		<p>Please choose the correct site profile below.</p>
@@ -18,17 +20,12 @@
 				<label>Profile</label>
 				<select name="profile">
 					<?
-						try {
-							$ga = new gapi($user,$pass);
-						} catch (Exception $e) {
-							header("Location: ".$mroot."setup/");
-							die();
-						}
-						$ga->requestAccountData(1,100);
-						foreach ($ga->getResults() as $result) {
+						foreach ($accounts as $account => $profiles) {
+							foreach ($profiles as $profile) {
 					?>
-					<option value="<?=$result->getProfileId()?>"><?=$result?></option>
+					<option value="<?=$profile["id"]?>"><?=$account?> &mdash; <?=$profile["title"]?></option>
 					<?
+							}
 						}
 					?>
 				</select>

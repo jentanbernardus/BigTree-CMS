@@ -2,23 +2,23 @@
 	$keys = json_encode(array("access_key_id" => $_POST["access_key_id"], "secret_access_key" => $_POST["secret_access_key"]));
 	
 	// If we've never used S3 before, setup our settings for it.
-	if (!$admin->settingExists("s3-keys")) {
+	if (!$admin->settingExists("bigtree-internal-s3-keys")) {
 		$admin->createSetting(array(
-			"id" => "s3-keys",
+			"id" => "bigtree-internal-s3-keys",
 			"system" => "on",
 			"encrypted" => "on"
 		));
 	}
-	if (!$admin->settingExists("s3-buckets")) {
+	if (!$admin->settingExists("bigtree-internal-s3-buckets")) {
 		$admin->createSetting(array(
-			"id" => "s3-buckets",
+			"id" => "bigtree-internal-s3-buckets",
 			"system" => "on"
 		));
 	}
 	
-	$admin->updateSettingValue("s3-keys",$keys);
+	$admin->updateSettingValue("bigtree-internal-s3-keys",$keys);
 	
-	$ups = $cms->getSetting("upload-service");
+	$ups = $cms->getSetting("bigtree-internal-upload-service");
 	
 	// Check if we have optipng installed.
 	if (file_exists("/usr/bin/optipng")) {
@@ -40,7 +40,7 @@
 		$ups["service"] = "";
 	}
 
-	$admin->updateSettingValue("upload-service",json_encode($ups));	
+	$admin->updateSettingValue("bigtree-internal-upload-service",json_encode($ups));	
 	
 	$admin->growl("Developer","Updated Amazon S3 Keys");
 	header("Location: $saroot");

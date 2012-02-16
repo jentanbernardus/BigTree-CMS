@@ -2,7 +2,7 @@
 	$breadcrumb[] = array("title" => "Upload Service", "link" => "developer/upload-service/");
 	$breadcrumb[] = array("title" => "Local Storage", "link" => "#");
 	
-	$current_service = $cms->getSetting("upload-service");
+	$current_service = $cms->getSetting("bigtree-internal-upload-service");
 	
 	$csl = array(
 		"local" => "Local Storage",

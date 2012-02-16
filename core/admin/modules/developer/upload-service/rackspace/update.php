@@ -1,23 +1,23 @@
 <?
 	$keys = array("api_key" => $_POST["api_key"], "username" => $_POST["username"]);
 	// If we've never used S3 before, setup our settings for it.
-	if (!$admin->settingExists("rackspace-keys")) {
+	if (!$admin->settingExists("bigtree-internal-rackspace-keys")) {
 		$admin->createSetting(array(
-			"id" => "rackspace-keys",
+			"id" => "bigtree-internal-rackspace-keys",
 			"system" => "on",
 			"encrypted" => "on"
 		));
 	}
-	if (!$admin->settingExists("rackspace-containers")) {
+	if (!$admin->settingExists("bigtree-internal-rackspace-containers")) {
 		$admin->createSetting(array(
-			"id" => "rackspace-containers",
+			"id" => "bigtree-internal-rackspace-containers",
 			"system" => "on"
 		));
 	}
 	
-	$admin->updateSettingValue("rackspace-keys",$keys);
+	$admin->updateSettingValue("bigtree-internal-rackspace-keys",$keys);
 	
-	$ups = $cms->getSetting("upload-service");
+	$ups = $cms->getSetting("bigtree-internal-upload-service");
 	
 	
 	// Check if we have optipng installed.
@@ -40,7 +40,7 @@
 		$ups["service"] = "";
 	}
 
-	$admin->updateSettingValue("upload-service",$ups);
+	$admin->updateSettingValue("bigtree-internal-upload-service",$ups);
 	
 	$admin->growl("Developer","Updated Rackspace Keys");
 	header("Location: $saroot");

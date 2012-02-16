@@ -1,5 +1,5 @@
 <?
-	$ga_on = $cms->getSetting("google-analytics-profile");
+	$ga_on = $cms->getSetting("bigtree-internal-google-analytics-profile");
 	
 	$parent = is_array($commands) ? end($commands) : 0;
 	$page = $cms->getPage($parent,false);
@@ -94,7 +94,7 @@
 					if ($ga_on) {
 			?>
 			<section class="pages_views">
-				<a class="tooltip" tooltip="Click to view detailed analytics." href="<?=$proot?>analytics/details/<?=$item["id"]?>/"><?=$admin->getGA30DayViewsForPage($item["id"])?></a>
+				<?=number_format($item["ga_page_views"])?>
 			</section>
 			<?
 					}

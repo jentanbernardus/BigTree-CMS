@@ -1,7 +1,7 @@
 <?
-	$user = $cms->getSetting("google-analytics-email");
-	$pass = $cms->getSetting("google-analytics-password");
-	$profile = $cms->getSetting("google-analytics-profile");
+	$user = $cms->getSetting("bigtree-internal-google-analytics-email");
+	$pass = $cms->getSetting("bigtree-internal-google-analytics-password");
+	$profile = $cms->getSetting("bigtree-internal-google-analytics-profile");
 	
 	if (!$user || !$pass) {
 		header("Location: ".$mroot."setup/");

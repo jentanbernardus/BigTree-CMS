@@ -23,25 +23,20 @@
 	}
 	
 	// Get Google Analytics Traffic
-	$ga_user = $cms->getSetting("google-analytics-email");
-	$ga_pass = $cms->getSetting("google-analytics-password");
-	$ga_profile = $cms->getSetting("google-analytics-profile");
+	$ga_cache = $cms->getSetting("bigtree-internal-google-analytics-cache");
 	// Only show this thing if they have Google Analytics setup already
-	if ($ga_user && $ga_pass && $ga_profile) {
-		$visits = $admin->getGAVisitsByDateRange(date("Y-m-d",strtotime("-2 weeks")),date("Y-m-d",strtotime("-1 day")));
-	
+	if (count($ga_cache["two_week"])) {
+		$visits = $ga_cache["two_week"];
 		$min = min($visits);
 		$max = max($visits) - $min;
-
 		$bar_height = 70;
-
-		$x = 0;
 ?>
 <div class="table">
-	<summary><h2 class="full"><span class="world"></span>Recent Traffic<a href="analytics/" class="more">View Analytics</a></h2></summary>
+	<summary><h2 class="full"><span class="world"></span>Recent Traffic <small>(In Visits)</small><a href="analytics/" class="more">View Analytics</a></h2></summary>
 	<section>
 		<div class="graph">
 			<?
+				$x = 0;
 			    foreach ($visits as $date => $count) {
 			    	$height = round($bar_height * ($count - $min) / $max) + 12;
 			    	$x++;

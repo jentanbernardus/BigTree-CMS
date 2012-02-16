@@ -1,5 +1,5 @@
 <?
-	$ups = $cms->getSetting("upload-service");
+	$ups = $cms->getSetting("bigtree-internal-upload-service");
 	
 	// Check if we have optipng installed.
 	if (file_exists("/usr/bin/optipng")) {
@@ -17,7 +17,7 @@
 	
 	$ups["service"] = "";
 	
-	$admin->updateSettingValue("upload-service",json_encode($ups));	
+	$admin->updateSettingValue("bigtree-internal-upload-service",json_encode($ups));	
 	
 	$admin->growl("Developer","Updated Upload Service");
 	header("Location: $saroot");

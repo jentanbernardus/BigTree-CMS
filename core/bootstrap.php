@@ -67,6 +67,7 @@
 		"TextStatistics" => "inc/utils/text-statistics.php",
 		"BigTreeUploadService" => "inc/bigtree/upload-service.php",
 		"BigTreeAdmin" => "inc/bigtree/admin.php",
+		"BigTreeGoogleAnalytics" => "inc/bigtree/google-analytics.php",
 		"S3" => "inc/utils/amazon-s3.php",
 		"CF_Authentication" => "inc/utils/rackspace-cloud.php"
 	);

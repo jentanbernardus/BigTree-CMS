@@ -9,6 +9,7 @@
 		/*
 			Constructor:
 				Connects to Google to retrieve an Authorization Key for future transactions.
+				If no parameters are passed in, this constructor will use Google Analytics defaults from bigtree_settings.
 				
 			Parameters:
 				email - Google account email/username
@@ -16,7 +17,14 @@
 				profile - Google Analytics profile ID *(optional)*
 		*/
 		
-		function __construct($email,$password,$profile = false) {
+		function __construct($email = false,$password = false,$profile = false) {
+			if (!$email) {
+				global $cms;
+				$email = $cms->getSetting("bigtree-internal-google-analytics-email");
+				$password = $cms->getSetting("bigtree-internal-google-analytics-password");
+				$profile = $cms->getSetting("bigtree-internal-google-analytics-profile");
+			}
+			
 			$response = $this->httpRequest("https://www.google.com/accounts/ClientLogin",null,array(
 				'accountType' => 'GOOGLE',
 				'Email' => $email,
@@ -192,6 +200,28 @@
 			$parameters['end-date'] = date("Y-m-d",strtotime("-1 year"));
 			$response = $this->httpRequest("https://www.google.com/analytics/feeds/data", $parameters, null, array('Authorization: GoogleLogin auth='.$this->AuthToken));
 			$cache["year_ago_month"] = $this->parseDataNodes($response["body"]);
+			
+			// Two Week View
+			$parameters['start-date'] = date('Y-m-d',strtotime("-2 weeks"));
+			$parameters['end-date'] = date("Y-m-d",strtotime("-1 day"));
+			// Switch to the date dimension and just page views metric
+			$parameters['dimensions'] = "ga:date";
+			$parameters['metrics'] = "ga:visits";
+			$parameters['sort'] = "ga:date";
+			$response = $this->httpRequest("https://www.google.com/analytics/feeds/data", $parameters, null, array('Authorization: GoogleLogin auth='.$this->AuthToken));
+			$xml = simplexml_load_string($response["body"]);
+			foreach ($xml->entry as $entry) {
+				$title = str_replace("ga:date=","",$entry->title);
+				foreach ($entry->children("http://schemas.google.com/analytics/2009") as $key => $v) {
+					if ($key == "metric") {
+						$a = $v->attributes();
+						if ($a["name"] == "ga:visits") {
+							$visits = intval($a["value"]);
+						}
+					}
+				}
+				$cache["two_week"][$title] = $visits;
+			}
 			
 			// Let's cache this sucker in bigtree_settings now as an internal setting.
 			if (!$admin) {
