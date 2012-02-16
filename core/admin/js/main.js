@@ -122,9 +122,11 @@ var BigTreeCheckbox = Class.extend({
 	init: function(element,text) {
 		this.Element = $(element);
 		
+		label = this.Element.next("label");
 		div = $("<div>").addClass("checkbox");
 		a = $("<a>").attr("href","#checkbox");
 		a.click($.proxy(this.click,this));
+		label.click($.proxy(this.click,this));
 		a.focus($.proxy(this.focus,this));
 		a.blur($.proxy(this.blur,this));
 		a.keydown($.proxy(this.keydown,this));

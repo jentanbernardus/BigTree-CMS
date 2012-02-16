@@ -31,6 +31,6 @@
 		<input type="text" class="date" id="publish_at" name="publish_at" tabindex="4" value="<? if ($pdata["publish_at"]) { echo date("Y-m-d",strtotime($pdata["publish_at"])); } ?>" />
 	</fieldset>
 	<script type="text/javascript">
-		$("#publish_at").datepicker();
+		$("#publish_at").datepicker({ durration: 200, showAnim: "slideDown" });
 	</script>
 </div>
