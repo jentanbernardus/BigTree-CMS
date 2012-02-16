@@ -21,7 +21,7 @@
 	// Cache the data in case it's not there.
 	BigTreeAutoModule::cacheViewData($view);
 	
-	$query = "SELECT DISTINCT(group_field) FROM bigtree_cache WHERE view = '".$view["id"]."'";
+	$query = "SELECT DISTINCT(group_field) FROM bigtree_module_view_cache WHERE view = '".$view["id"]."'";
 	if ($o["ot_sort_field"]) {
 		$query .= " ORDER BY group_sort_field ".$o["ot_sort_direction"];
 	} else {

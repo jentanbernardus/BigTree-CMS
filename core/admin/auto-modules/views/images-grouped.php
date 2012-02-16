@@ -19,7 +19,7 @@
 	}
 	
 	$groups = array();
-	$q = sqlquery("SELECT DISTINCT(`group_field`) FROM bigtree_cache WHERE view = '".$view["id"]."' ORDER BY `group_field`");
+	$q = sqlquery("SELECT DISTINCT(`group_field`) FROM bigtree_module_view_cache WHERE view = '".$view["id"]."' ORDER BY `group_field`");
 	while ($f = sqlfetch($q)) {
 		$groups[] = $f["group_field"];
 	}

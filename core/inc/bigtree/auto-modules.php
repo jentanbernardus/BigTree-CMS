@@ -9,7 +9,7 @@
 		// This will grab all the data from a view and do parsing on it based on automatic assumptions and manual parsers.
 		static function cacheViewData($view) {
 			// See if we already have cached data.
-			$r = sqlrows(sqlquery("SELECT id FROM bigtree_cache WHERE view = '".$view["id"]."'"));
+			$r = sqlrows(sqlquery("SELECT id FROM bigtree_module_view_cache WHERE view = '".$view["id"]."'"));
 			if ($r) {
 				return;
 			}
@@ -36,11 +36,11 @@
 			
 			// See if we need to modify the cache table to add more fields.
 			$field_count = count($view["fields"]);
-			$cache_columns = sqlcolumns("bigtree_cache");
+			$cache_columns = sqlcolumns("bigtree_module_view_cache");
 			$cc = count($cache_columns) - 10;
 			while ($field_count > $cc) {
 				$cc++;
-				sqlquery("ALTER TABLE bigtree_cache ADD COLUMN column$cc TEXT AFTER column".($cc-1));
+				sqlquery("ALTER TABLE bigtree_module_view_cache ADD COLUMN column$cc TEXT AFTER column".($cc-1));
 			}
 			
 			// Cache all records that are published (and include their pending changes)
@@ -146,7 +146,7 @@
 					}
 				}
 				
-				sqlquery("INSERT INTO bigtree_cache (".implode(",",$fields).") VALUES (".implode(",",$vals).")");
+				sqlquery("INSERT INTO bigtree_module_view_cache (".implode(",",$fields).") VALUES (".implode(",",$vals).")");
 			}
 		}
 		
@@ -171,7 +171,7 @@
 			$q = sqlquery("SELECT * FROM bigtree_module_views WHERE `table` = '$table'");
 			while ($view = sqlfetch($q)) {
 				if ($recache) {
-					sqlquery("DELETE FROM bigtree_cache WHERE `view` = '".$view["id"]."' AND id = '$id'");
+					sqlquery("DELETE FROM bigtree_module_view_cache WHERE `view` = '".$view["id"]."' AND id = '$id'");
 				}
 				
 				$view["fields"] = json_decode($view["fields"],true);
@@ -210,14 +210,14 @@
 		static function uncacheItem($id,$table) {
 			$q = sqlquery("SELECT * FROM bigtree_module_views WHERE `table` = '$table'");
 			while ($view = sqlfetch($q)) {
-				sqlquery("DELETE FROM bigtree_cache WHERE `view` = '".$view["id"]."' AND id = '$id'");
+				sqlquery("DELETE FROM bigtree_module_view_cache WHERE `view` = '".$view["id"]."' AND id = '$id'");
 			}
 		}
 		
 		// Clear a view's cache
 		static function clearCache($view) {
 			$view = is_array($view) ? $view["id"] : mysql_real_escape_string($view);
-			sqlquery("DELETE FROM bigtree_cache WHERE view = '$view'");
+			sqlquery("DELETE FROM bigtree_module_view_cache WHERE view = '$view'");
 		}
 
 		static function createItem($table,$data,$many_to_many = array(),$tags = array(),$resources = array()) {
@@ -412,11 +412,11 @@
 			
 			$items = array();
 			if ($type == "both") {
-				$q = sqlquery("SELECT * FROM bigtree_cache WHERE view = '".$view["id"]."'".self::getFilterQuery($view)." ORDER BY $sort");
+				$q = sqlquery("SELECT * FROM bigtree_module_view_cache WHERE view = '".$view["id"]."'".self::getFilterQuery($view)." ORDER BY $sort");
 			} elseif ($type == "active") {
-				$q = sqlquery("SELECT * FROM bigtree_cache WHERE status != 'p' AND view = '".$view["id"]."'".self::getFilterQuery($view)." ORDER BY $sort");	
+				$q = sqlquery("SELECT * FROM bigtree_module_view_cache WHERE status != 'p' AND view = '".$view["id"]."'".self::getFilterQuery($view)." ORDER BY $sort");	
 			} elseif ($type == "pending") {
-				$q = sqlquery("SELECT * FROM bigtree_cache WHERE status = 'p' AND view = '".$view["id"]."'".self::getFilterQuery($view)." ORDER BY $sort");				
+				$q = sqlquery("SELECT * FROM bigtree_module_view_cache WHERE status = 'p' AND view = '".$view["id"]."'".self::getFilterQuery($view)." ORDER BY $sort");				
 			}
 			
 			while ($f = sqlfetch($q)) {
@@ -433,11 +433,11 @@
 			
 			$items = array();
 			if ($type == "both") {
-				$q = sqlquery("SELECT * FROM bigtree_cache WHERE group_field = '".mysql_real_escape_string($group)."' AND view = '".$view["id"]."'".self::getFilterQuery($view)." ORDER BY $sort");
+				$q = sqlquery("SELECT * FROM bigtree_module_view_cache WHERE group_field = '".mysql_real_escape_string($group)."' AND view = '".$view["id"]."'".self::getFilterQuery($view)." ORDER BY $sort");
 			} elseif ($type == "active") {
-				$q = sqlquery("SELECT * FROM bigtree_cache WHERE group_field = '".mysql_real_escape_string($group)."' AND status != 'p' AND view = '".$view["id"]."'".self::getFilterQuery($view)." ORDER BY $sort");
+				$q = sqlquery("SELECT * FROM bigtree_module_view_cache WHERE group_field = '".mysql_real_escape_string($group)."' AND status != 'p' AND view = '".$view["id"]."'".self::getFilterQuery($view)." ORDER BY $sort");
 			} elseif ($type == "pending") {
-				$q = sqlquery("SELECT * FROM bigtree_cache WHERE group_field = '".mysql_real_escape_string($group)."' AND status = 'p' AND view = '".$view["id"]."'".self::getFilterQuery($view)." ORDER BY $sort");
+				$q = sqlquery("SELECT * FROM bigtree_module_view_cache WHERE group_field = '".mysql_real_escape_string($group)."' AND status = 'p' AND view = '".$view["id"]."'".self::getFilterQuery($view)." ORDER BY $sort");
 			}
 			
 			while ($f = sqlfetch($q)) {
@@ -547,9 +547,9 @@
 			$view_columns = count($view["fields"]);
 			
 			if ($group !== false) {
-				$query = "SELECT * FROM bigtree_cache WHERE view = '".$view["id"]."' AND group_field = '".mysql_real_escape_string($group)."'".self::getFilterQuery($view);				
+				$query = "SELECT * FROM bigtree_module_view_cache WHERE view = '".$view["id"]."' AND group_field = '".mysql_real_escape_string($group)."'".self::getFilterQuery($view);				
 			} else {
-				$query = "SELECT * FROM bigtree_cache WHERE view = '".$view["id"]."'".self::getFilterQuery($view);
+				$query = "SELECT * FROM bigtree_module_view_cache WHERE view = '".$view["id"]."'".self::getFilterQuery($view);
 			}
 
 			foreach ($search_parts as $part) {

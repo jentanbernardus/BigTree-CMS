@@ -1485,7 +1485,7 @@
 		
 		function getSettings() {
 			$settings = array();
-			$q = sqlquery("SELECT * FROM bigtree_settings ORDER BY name");
+			$q = sqlquery("SELECT * FROM bigtree_settings WHERE system != 'on' ORDER BY name");
 			while ($f = sqlfetch($q)) {
 				$settings[] = $f;
 			}

@@ -38,6 +38,8 @@
 		*/
 		
 		function cacheInformation() {
+			global $admin;
+			
 			$used_paths = array();
 			$cache = array();
 			
@@ -191,7 +193,18 @@
 			$response = $this->httpRequest("https://www.google.com/analytics/feeds/data", $parameters, null, array('Authorization: GoogleLogin auth='.$this->AuthToken));
 			$cache["year_ago_month"] = $this->parseDataNodes($response["body"]);
 			
-			print_r($cache);
+			// Let's cache this sucker in bigtree_settings now as an internal setting.
+			if (!$admin) {
+				$admin = new BigTreeAdmin;
+			}
+			if (!$admin->settingExists("bigtree-internal-google-analytics-cache")) {
+				$admin->createSetting(array(
+					"id" => "bigtree-internal-google-analytics-cache",
+					"name" => "BigTree's Internal Google Analytics Data Cache",
+					"system" => "on"
+				));
+			}
+			$admin->updateSettingValue("bigtree-internal-google-analytics-cache",$cache);
 		}
 		
 		/*
