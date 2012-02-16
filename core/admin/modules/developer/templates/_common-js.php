@@ -45,5 +45,6 @@
 		return false;
 	});
 	
-	$("#resource_table").sortable({ items: "li", handle: ".icon_sort" });
+	/* THIS CONFIGURATION FEELS MOST NATURAL */
+	$("#resource_table").sortable({ axis: "y", containment: "parent", handle: ".icon_sort", items: "li", placeholder: "ui-sortable-placeholder", tolerance: "pointer" });
 </script>

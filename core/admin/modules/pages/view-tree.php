@@ -131,7 +131,7 @@
 		if ($draggable && $parent_access) {
 ?>
 <script type="text/javascript">
-	$("#pages_<?=$class?>").sortable({ items: "li", axis: "y", handle: ".icon_sort", update: function() {
+	$("#pages_<?=$class?>").sortable({ axis: "y", containment: "parent",  handle: ".icon_sort", items: "li", placeholder: "ui-sortable-placeholder", tolerance: "pointer", update: function() {
 		$.ajax("<?=$aroot?>ajax/pages/order/?id=<?=$parent?>&sort=" + escape($("#pages_<?=$class?>").sortable("serialize")));
 	}});
 </script>

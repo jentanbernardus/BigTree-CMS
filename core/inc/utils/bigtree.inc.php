@@ -142,36 +142,38 @@
 		'),$css);
 		
 		// Box Shadow - box-shadow: 0px 0px 5px #color
-		$css = preg_replace_callback('/box-shadow:([^\"]*);/iU',create_function('$data','
-			$d = trim($data[1]);
-			return "box-shadow: $d; -moz-box-shadow: $d; -webkit-box-shadow: $d;";
-		'),$css);
+		$css = preg_replace_callback('/box-shadow:([^\"]*);/iU', 'bigtree_format_css3', $css);
 		
 		// Column Count - column-count: number
-		$css = preg_replace_callback('/column-count:([^\"]*);/iU',create_function('$data','
-			$d = trim($data[1]);
-			return "column-count: $d; -moz-column-count: $d; -webkit-column-count: $d;";
-		'),$css);
+		$css = preg_replace_callback('/column-count:([^\"]*);/iU', 'bigtree_format_css3', $css);
 		
 		// Column Rule - column-rule: 1px solid color
-		$css = preg_replace_callback('/column-rule:([^\"]*);/iU',create_function('$data','
-			$d = trim($data[1]);
-			return "column-rule: $d; -moz-column-rule: $d; -webkit-column-rule: $d;";
-		'),$css);
+		$css = preg_replace_callback('/column-rule:([^\"]*);/iU', 'bigtree_format_css3', $css);
 		
 		// Column Gap - column-gap: number
-		$css = preg_replace_callback('/column-gap:([^\"]*);/iU',create_function('$data','
-			$d = trim($data[1]);
-			return "column-gap: $d; -moz-column-gap: $d; -webkit-column-gap: $d;";
-		'),$css);
+		$css = preg_replace_callback('/column-gap:([^\"]*);/iU', 'bigtree_format_css3', $css);
 		
 		// Transition - transition: definition
-		$css = preg_replace_callback('/transition:([^\"]*);/iU',create_function('$data','
-			$d = trim($data[1]);
-			return "transition: $d; -moz-transition: $d; -webkit-transition: $d;";
-		'),$css);
+		$css = preg_replace_callback('/transition:([^\"]*);/iU', 'bigtree_format_css3', $css);
+		
+		// User Select - user-select: none | text | toggle | element | elements | all | inherit
+		$css = preg_replace_callback('/user-select:([^\"]*);/iU', 'bigtree_format_css3', $css);
 		
 		return $css;
+	}
+	
+	function bigtree_format_css3($data)
+	{
+		$p = explode(":", $data[0]);
+		$d = trim($data[1]);
+		
+		$return = $p[0] . ": $d; ";
+		$return .= "-webkit-".$p[0].": $d; ";
+		$return .= "-moz-".$p[0].": $d; ";
+		$return .= "-ms-".$p[0].": $d; ";
+		$return .= "-o-".$p[0].": $d; ";
+		
+		return $return;
 	}
 	
 	function bigtree_process_get_vars($non_array_functions = array()) {
