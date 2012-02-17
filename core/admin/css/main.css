@@ -2,8 +2,6 @@
 	BigTree CMS 4.0 CSS
 ---------------------------*/
 
-
-
 /*-----------------------------------------------------------------------------------
   Global Reset v0.2 (based on http://meyerweb.com/eric/tools/css/reset/ - v1.0 | 20080212)
 -----------------------------------------------------------------------------------*/
@@ -64,9 +62,15 @@
 	h2 .read { background-position: -173px center; width: 24px; }
 	h2 .sent { background-position: -197px center; width: 26px; }
 	h2 .pending { background-position: -81px center; width: 22px; }
+	
+	h3 { color: #999; font-size: 15px; font-weight: normal; text-shadow: 0px 1px 1px #FFF; text-transform: uppercase; margin: 0 0 10px 0; overflow: hidden; }
+	h3 span { float: left; line-height: 17px; }
+	h3.properties { cursor: pointer; }
 
 	ul.styled { list-style: outside disc; margin: 0 0 10px 15px; }
 	ul.styled li { font-size: 12px; line-height: 16px; }
+	
+	hr { background: #CCC; height: 1px; box-shadow: 0px 1px #FFF; opacity: 0.5; border: none; margin: 20px 0; }
 
 /* Form Styles */
 	fieldset { margin: 0 0 15px 0; overflow: hidden; }
@@ -368,6 +372,20 @@
 	.move_page section ul.depth_9 li .title { width: 776px; }
 	.move_page section ul.depth_10 li .depth { width: 90px; }
 	.move_page section ul.depth_10 li .title { width: 766px; }
+	
+	.property_block { border-radius: 5px; border-bottom: 1px solid #E3E3E3; border-left: 1px solid #D0D0D0; border-right: 1px solid #D0D0D0; border-top: 1px solid #B8B8B8; background: #FFF; padding: 20px; box-shadow: inset 0px 0px 3px rgba(0,0,0,0.4); margin: 0 0 15px 0; overflow: hidden; }
+	.property_block article { float: left; width: 250px; margin: 0 0 10px 0; height: 20px; }
+	.property_block article:last-child { margin: 0; }
+	.property_block label { font-size: 10px; color: #848484; line-height: 20px; float: left; width: 80px; height: 20px; text-transform: uppercase; margin: 0; }
+	.property_block p { float: left; height: 20px; line-height: 20px; font-size: 13px; width: 170px; color: #191919; }
+	.property_block p a { color: #191919; }
+	.property_block p span { float: left; }
+	.property_block .published { color: #2CAA56; }
+	.property_block .changes_pending { color: #666; }
+	.property_block .unpublished { color: #333; }
+	.property_block .icon_small { margin: 1px 5px; }
+	.property_block .link { width: 918px; }
+	.property_block .link p { width: 838px; }
 
 /* Table Styles */
 	div.table { border: 1px solid #CCC; border-radius: 5px; box-shadow: 0px 0px 3px #CCC; margin: 0 0 20px 0; overflow: hidden; }
@@ -860,6 +878,9 @@
 	.icon_small_key { background-position: -240px 0px; }
 	.icon_small_reply { background-position: 0px -16px; }
 	.icon_small_reply_all { background-position: -16px -16px; }
+	.icon_small_help { background-position: -32px -16px; }
+	.icon_small_caret_down { background-position: -48px -16px; }
+	.icon_small_caret_right { background-position: -64px -16px; }
 
 /* Developer Icons */
 	.icon_developer_templates { background: url(../images/developer-icons-sprite.png) no-repeat 0px 0px; display: inline-block; height: 32px; width: 32px; }

@@ -77,6 +77,19 @@ $(document).ready(function() {
 
 		return false;
 	});
+	
+	// Property Block Hide/Show
+	$("h3.properties").click(function() {
+		if ($(this).find(".icon_small").hasClass("icon_small_caret_right")) {
+			// Set a cookie to keep it open next time.
+			$.cookie("bigtree_default_properties_open","1", { expires: 365, path: "/" });
+		} else {
+			$.cookie("bigtree_default_properties_open","0", { path: "/" });
+		}
+		$(this).find(".icon_small").toggleClass("icon_small_caret_right").toggleClass("icon_small_caret_down");
+		$(".property_block").toggle().next().toggle();
+		return false;
+	});
 });
 
 function BigTreeCustomControls() {
@@ -745,6 +758,7 @@ var BigTreeDialog = Class.extend({
 	onComplete: false,
 
 	init: function(title,content,oncomplete,icon,noSave,altSaveText,altOnComplete) {
+		$("#bigtree_dialog_overlay, #bigtree_dialog_window").remove();
 		this.onComplete = oncomplete;
 		overlay = $('<div id="bigtree_dialog_overlay">');
 		ddwindow = $('<div id="bigtree_dialog_window">');

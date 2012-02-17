@@ -9,7 +9,7 @@
 	<fieldset>
 		<label>Tags <img src="<?=$aroot?>images/tag.png" alt="" /></label>
 		<ul id="tag_list">
-			<? foreach ($tags as $tag) { ?>
+			<? foreach ($pdata["tags"] as $tag) { ?>
 			<li><input type="hidden" name="_tags[]" value="<?=$tag["id"]?>" /><a href="#"><?=$tag["tag"]?><span>x</span></a></li>
 			<? } ?>
 		</ul>

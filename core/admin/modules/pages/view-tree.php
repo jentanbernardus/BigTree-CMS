@@ -3,7 +3,6 @@
 	
 	$parent = is_array($commands) ? end($commands) : 0;
 	$page = $cms->getPage($parent,false);
-	$ppage = $cms->getPage($page["parent"],false);
 	$parent_access = $admin->getPageAccessLevelByUserId($parent,$admin->ID);
 	
 	// Setup the page breadcrumb
@@ -144,7 +143,8 @@
 <h1><span class="error"></span>Error</h1>
 <p class="error">The page you are trying to view no longer exists.</p>
 <?
-	} else {
+		$admin->stop();
+	}
 ?>
 <h1>
 	<? if (!$parent) { ?>
@@ -154,24 +154,26 @@
 	<? } ?>
 </h1>
 <?
-		include bigtree_path("admin/modules/pages/_nav.php");
-		
-		// Drag Visible Pages
-		$nav = array_merge($admin->getNaturalNavigationByParent($parent,1),$admin->getPendingNavigationByParent($parent));
-		if (count($nav)) {
-			local_drawPageTree($nav,"Visible","","visible",true);
-		}
-		
-		// Draw Hidden Pages
-		$nav = array_merge($admin->getHiddenNavigationByParent($parent),$admin->getPendingNavigationByParent($parent,""));	
-		if (count($nav)) {
-			local_drawPageTree($nav,"Hidden","Not Appearing In Navigation","hidden",false);
-		}
-		
-		// Draw Archived Pages
-		$nav = $admin->getArchivedNavigationByParent($parent);
-		if (count($nav)) {
-			local_drawPageTree($nav,"Archived","Not Accessible By Users","archived",false);
-		}
+	include bigtree_path("admin/modules/pages/_nav.php");
+	include bigtree_path("admin/modules/pages/_properties.php");
+?>
+<h3>Children</h3>
+<?
+	// Drag Visible Pages
+	$nav = array_merge($admin->getNaturalNavigationByParent($parent,1),$admin->getPendingNavigationByParent($parent));
+	if (count($nav)) {
+	    local_drawPageTree($nav,"Visible","","visible",true);
+	}
+	
+	// Draw Hidden Pages
+	$nav = array_merge($admin->getHiddenNavigationByParent($parent),$admin->getPendingNavigationByParent($parent,""));	
+	if (count($nav)) {
+	    local_drawPageTree($nav,"Hidden","Not Appearing In Navigation","hidden",false);
+	}
+	
+	// Draw Archived Pages
+	$nav = $admin->getArchivedNavigationByParent($parent);
+	if (count($nav)) {
+	    local_drawPageTree($nav,"Archived","Not Accessible By Users","archived",false);
 	}
 ?>

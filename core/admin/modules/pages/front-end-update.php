@@ -11,7 +11,7 @@
 		$r = $admin->getPageAccessLevelByUserId($pdata["parent"],$admin->ID);
 	} else {
 		$r = $admin->getPageAccessLevelByUserId($page,$admin->ID);
-		$pdata = $admin->getPendingPageById($page);
+		$pdata = $admin->getPendingPage($page);
 	}
 	
 	// Work out the permissions	

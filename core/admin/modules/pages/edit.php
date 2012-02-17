@@ -1,29 +1,12 @@
 <?
 	$page = end($path);
 	
-	$show_revert = false;
+	$pdata = $admin->getPendingPage($page);
 	if ($page[0] == "p") {
-		$cid = substr($page,1);
-		$f = $admin->getPendingChange($cid);
-		$pdata = $f["changes"];
-		$pdata["updated_at"] = $f["date"];
 		$r = $admin->getPageAccessLevelByUserId($pdata["parent"],$admin->ID);
-
-		$tags = array();
-		$temp_tags = json_decode($f["tags_changes"],true);
-		if (is_array($temp_tags)) {
-			foreach ($temp_tags as $tag) {
-				$tags[] = sqlfetch(sqlquery("SELECT * FROM bigtree_tags WHERE id = '$tag'"));
-			}
-		}
-		$presources = json_decode($f["resources_changes"],true);
-		
-		$pdata["id"] = $page;
 	} else {
 		$r = $admin->getPageAccessLevelByUserId($page,$admin->ID);
-		$pdata = $admin->getPendingPageById($page);
-		$tags = $pdata["tags"];
-		if (sqlrows(sqlquery("SELECT * FROM bigtree_pending_changes WHERE `table` = 'bigtree_pages' AND item_id = '$page'"))) {
+		if ($pdata["changed_applied"]) {
 			$show_revert = true;
 		}
 	}
@@ -50,17 +33,12 @@
 	} else {
 		die("You do not have access to this page.");
 	}
-	
-	if ($page[0] != "p") {
-		// The below area is changing, but why are we wastefully calling getLink twice?
-?>
-<p class="page_url"><a href="<?=$cms->getLink($page)?>" target="_blank" title="View Page"><img src="<?=$icon_root?>world.png" alt="" /> <?=$cms->getLink($page)?></a></p>
-<?
-	}
 ?>
 <h1><span class="edit_page"></span><?=$pdata["nav_title"]?></h1>
 <?
 	include bigtree_path("admin/modules/pages/_nav.php");
+	include bigtree_path("admin/modules/pages/_properties.php");
+	
 	// Force your way through the page lock
 	if (isset($_GET["force"])) {
 		$f = sqlfetch(sqlquery("SELECT * FROM bigtree_locks WHERE `table` = 'bigtree_pages' AND item_id = '$page'"));
