@@ -58,7 +58,11 @@
 			}
 			
 			foreach ($f as $key => $val) {
-				$f[$key] = $cms->replaceInternalPageLinks($val);
+				if (is_array(json_decode($val,true))) {
+					$f[$key] = bigtree_untranslate_array(json_decode($val,true));
+				} else {
+					$f[$key] = $cms->replaceInternalPageLinks($val);
+				}
 			}
 			
 			return $f;

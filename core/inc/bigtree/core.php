@@ -285,7 +285,7 @@
 			}
 			$ipl = explode("//",$ipl);
 			$navid = $ipl[1];
-			$commands = implode("/",json_decode(base64_decode($ipl[2])),true);
+			$commands = implode("/",json_decode(base64_decode($ipl[2]),true));
 			if ($commands && strpos($commands,"?") === false) {
 				$commands .= "/";
 			}
@@ -726,9 +726,13 @@
 			if (!trim($html)) {
 				return "";
 			}
-
-			$html = str_replace(array("{wwwroot}","%7Bwwwroot%7D"),$GLOBALS["www_root"],$html);
-			$html = preg_replace_callback('^="(ipl:\/\/[a-zA-Z0-9\:\/\.\?\=\-]*)"^','bigtree_regex_get_ipl',$html);
+			
+			if (substr($html,0,6) == "ipl://") {
+				$html = $this->getInternalPageLink($html);
+			} else {
+				$html = str_replace(array("{wwwroot}","%7Bwwwroot%7D"),$GLOBALS["www_root"],$html);
+				$html = preg_replace_callback('^="(ipl:\/\/[a-zA-Z0-9\:\/\.\?\=\-]*)"^','bigtree_regex_get_ipl',$html);
+			}
 
 			return $html;
 		}

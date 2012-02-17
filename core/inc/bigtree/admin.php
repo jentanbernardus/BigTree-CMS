@@ -140,15 +140,22 @@
 			global $cms;
 
 			$html = preg_replace_callback('^href="([a-zA-Z0-9\:\/\.\?\=\-]*)"^','bigtree_regex_set_ipl',$html);
-			$html = str_replace($GLOBALS["resource_root"],"{wwwroot}",$html);
-			$html = str_replace($GLOBALS["www_root"],"{wwwroot}",$html);
+			// If this string is actually just a URL, IPL it.
+			if (substr($html,0,7) == "http://" || substr($html,0,8) == "https://") {
+				$html = $this->makeIPL($html);
+			// Otherwise, switch all the image srcs and javascripts srcs and whatnot to {wwwroot}.
+			} else {
+				$html = str_replace($GLOBALS["www_root"],"{wwwroot}",$html);
+			}
+			
 
 			return $html;
 		}
 
 		function checkHTML($dpath,$html,$external = false) {
-			if (!$html)
+			if (!$html) {
 				return array();
+			}
 			$errors = array();
 			$doc = new DOMDocument();
 			$doc->loadHTML($html);
@@ -530,8 +537,9 @@
 				}
 			}
 
-			if ($external)
+			if ($external) {
 				$external = $this->makeIPL($external);
+			}
 
 			$resources = mysql_real_escape_string(json_encode($d["resources"]));
 			$callouts = mysql_real_escape_string(json_encode($d["callouts"]));
