@@ -128,21 +128,9 @@
 	$css = array();
 	$js = array();
 	$layout = "default";
-	if (!$admin->ID) {
-		if ($path[1] == "ajax") {
-			if ($path[2] == "change-password") {
-				include bigtree_path("admin/ajax/change-password.php");
-			} else {
-				include bigtree_path("admin/ajax/login.php");
-			}
-			die();
-		} else {
-			if ($path[1] == "change-password") {
-				include bigtree_path("admin/pages/change-password.php");
-			} else {
-				include bigtree_path("admin/pages/login.php");
-			}
-		}
+	if (!$admin->ID && $path[1] != "login") {
+		header("Location: ".$www_root."admin/login/");
+		die();
 	} else {
 		// We're logged in, let's go somewhere.
 		if (!$path[1]) {
