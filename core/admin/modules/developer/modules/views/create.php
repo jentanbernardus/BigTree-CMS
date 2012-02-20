@@ -70,9 +70,6 @@
 <h1><span class="icon_developer_modules"></span>Created View</h1>
 <? include bigtree_path("admin/modules/developer/modules/_nav.php"); ?>
 <div class="form_container">
-	<header>
-		<p>View <?=$title?></p>
-	</header>
 	<section>
 		<p>Your view for <?=$mod["name"]?> is now created!<br />You may continue to create a form for this view or choose to test the view instead.</p>
 	</section>

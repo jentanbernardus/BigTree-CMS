@@ -74,11 +74,11 @@
 </div>
 
 <script type="text/javascript">
-	$("#basic_templates").sortable({ items: "li", handle: ".icon_sort", update: function() {
+	$("#basic_templates").sortable({ axis: "y", containment: "parent", handle: ".icon_sort", items: "li", placeholder: "ui-sortable-placeholder", tolerance: "pointer", update: function() {
 		$.ajax("<?=$aroot?>ajax/developer/order-templates/?sort=" + escape($("#basic_templates").sortable("serialize")), { type: "POST", data: { rel: <?=json_encode($rel_table)?> } }); 
 	}});
 	
-	$("#routed_templates").sortable({ items: "li", handle: ".icon_sort", update: function() {
+	$("#routed_templates").sortable({ axis: "y", containment: "parent", handle: ".icon_sort", items: "li", placeholder: "ui-sortable-placeholder", tolerance: "pointer", update: function() {
 		$.ajax("<?=$aroot?>ajax/developer/order-templates/?sort=" + escape($("#routed_templates").sortable("serialize")), { type: "POST", data: { rel: <?=json_encode($rel_table)?> } }); 
 	}});
 	

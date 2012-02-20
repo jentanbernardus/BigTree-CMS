@@ -42,11 +42,11 @@
 		unlink($GLOBALS["server_root"]."cache/module-class-list.btc");
 	}	
 ?>
-<h1><span class="icon_developer_modules"></span>Created Module</h1>
+<h1><span class="icon_developer_modules"></span>Module Created</h1>
 <div class="form_container">
 	<header><p><?=$name?></p></header>
 	<section>
-		<p>If you're going to program this module manually, you can leave now.  Otherwise, click the continue button below to setup the module's landing page.</p>
+		<p>If you plan on programming this module manually, you can leave now. Otherwise, click the continue button below to setup the module's landing page.</p>
 	</section>
 	<footer>
 		<a href="<?=$saroot?>modules/views/add/<?=$id?>/<?=$table?>/<?=urlencode($name)?>/" class="button blue">Continue</a>	

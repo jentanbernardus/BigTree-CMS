@@ -32,12 +32,14 @@
 <div class="form_container">
 	<form method="post" action="<?=$saroot?>modules/update/<?=end($path)?>/" enctype="multipart/form-data" class="module left">
 		<section>
-			<fieldset>
-				<label class="required">Name</label>
-				<input name="name" type="text" value="<?=$mod["name"]?>" class="required" />
-			</fieldset>
-			
-			<fieldset class="developer_module_group">
+			<div class="left">
+				<fieldset>
+					<label class="required">Name</label>
+					<input name="name" type="text" value="<?=$mod["name"]?>" class="required" />
+				</fieldset>
+			</div>
+			<br class="clear" /><br />
+			<fieldset class="clear developer_module_group">
 				<label>Group <small>(if a new group name is chosen, the select box is ignored)</small></label>
 				<input name="group_new" type="text" placeholder="New Group" />
 				<span>OR</span> 
@@ -48,21 +50,24 @@
 					<? } ?>
 				</select>
 			</fieldset>
-			
-			<fieldset>
-				<label>Class Name <small>(only change this if you renamed your class manually)</small></label>
-				<input name="class" type="text" value="<?=htmlspecialchars($mod["class"])?>" />
-			</fieldset>
-			
-			<fieldset>
-				<input type="checkbox" name="gbp[enabled]" id="gbp_on" <? if ($gbp["enabled"]) { ?>checked="checked" <? } ?>/><label class="for_checkbox">Enable Advanced Permissions</label>
-			</fieldset>
+			<div class="left">
+				<fieldset>
+					<label>Class Name <small>(only change this if you renamed your class manually)</small></label>
+					<input name="class" type="text" value="<?=htmlspecialchars($mod["class"])?>" />
+				</fieldset>
+				<fieldset>
+					<input type="checkbox" name="gbp[enabled]" id="gbp_on" <? if ($gbp["enabled"]) { ?>checked="checked" <? } ?>/><label class="for_checkbox">Enable Advanced Permissions</label>
+				</fieldset>
+			</div>
 		</section>
 		<section class="sub" id="gbp"<? if (!$gbp["enabled"]) { ?> style="display: none;"<? } ?>>
-			<fieldset>
-				<label>Grouping Name <small>(i.e. "Category")</small></label>
-				<input type="text" name="gbp[name]" value="<?=htmlspecialchars($gbp["name"])?>" />
-			</fieldset>
+			<div class="left">
+				<fieldset>
+					<label>Grouping Name <small>(i.e. "Category")</small></label>
+					<input type="text" name="gbp[name]" value="<?=htmlspecialchars($gbp["name"])?>" />
+				</fieldset>
+			</div>
+			<br class="clear" />
 			<article>
 				<fieldset>
 					<label>Main Table</label>
@@ -181,7 +186,7 @@
 <? include bigtree_path("admin/modules/developer/modules/_module-add-edit-js.php") ?>
 
 <script type="text/javascript">
-	$("#actions").sortable({ items: "li", handle: ".icon_sort", update: function() {
+	$("#actions").sortable({ axis: "y", containment: "parent", handle: ".icon_sort", items: "li", placeholder: "ui-sortable-placeholder", tolerance: "pointer", update: function() {
 		$.ajax("<?=$aroot?>ajax/developer/order-module-actions/?sort=" + escape($("#actions").sortable("serialize"))); 
 	}});
 

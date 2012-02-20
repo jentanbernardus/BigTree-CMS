@@ -1,8 +1,9 @@
 <div id="login">
 	<form method="post" action="" class="module">
-		<h2><span>Reset Password</span></h2>
-		<fieldset>
-			<p>Your password has been successfully updated.<br /><a href="<?=$aroot?>login/">Click Here</a> to return to the login screen and login with your new password.</p>
+		<h2>Password Set</h2>
+		<fieldset class="clear">
+			<p>Your password has been successfully updated. <a href="<?=$aroot?>login/">Click Here</a> to login with your new password.</p>
 		</fieldset>
+		<br />
 	</form>
 </div>

@@ -11,10 +11,12 @@
 	<form method="post" action="<?=$saroot?>modules/groups/update/<?=$id?>/" class="module">
 		<header><h2>Group Details</h2></header>
 		<section>
-			<fieldset>
-				<label class="required">Name</label>
-				<input type="text" name="name" value="<?=htmlspecialchars($item["name"])?>" class="required" />
-			</fieldset>
+			<div class="left">
+				<fieldset>
+					<label class="required">Name</label>
+					<input type="text" name="name" value="<?=htmlspecialchars($item["name"])?>" class="required" />
+				</fieldset>
+			</div>
 		</section>
 		<footer>
 			<input type="submit" class="button blue" value="Update" />

@@ -2,12 +2,10 @@
 	$breadcrumb[] = array("title" => "Created Field Type", "link" => "#");
 	$type = $admin->getFieldType(end($commands));
 ?>
-<h1><span class="icon_developer_field_types"></span>Created Field Type</h1>
+<h1><span class="icon_developer_field_types"></span>Field Type Created</h1>
 <div class="form_container">
-	<header>
-		<p>Your new field type is setup and ready to use.</p>
-	</header>
 	<section>
+		<p>Your new field type is setup and ready to use.</p>
 		<ul class="styled clear">
 			<li><?=$server_root?>custom/admin/form-field-types/draw/<?=$type["file"]?> &mdash; Your drawing file.</li>
 			<li><?=$server_root?>custom/admin/form-field-types/process/<?=$type["file"]?> &mdash; Your processing file.</li>

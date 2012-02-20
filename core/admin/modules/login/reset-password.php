@@ -13,21 +13,24 @@
 ?>
 <div id="login">
 	<form method="post" action="" class="module">
-		<h2><span>Password Reset</span></h2>
+		<h2>Reset Your Password</h2>
+		<? if ($failure) { ?><p class="error_message clear">Passwords did not match. Please try again.</p><? } ?>
 		<? if (!$user) { ?>
-		<fieldset>
-			<p>The password request link you followed has expired.<br /><a href="<?=$aroot?>login/forgot-password/">Click Here</a> to request a new password reset link.</p>
+		<fieldset class="clear">
+			<p>This reset request has expired. <a href="<?=$aroot?>login/forgot-password/">Click Here</a> to request a new link.</p>
 		</fieldset>
+		<br />
 		<? } else { ?>
 		<fieldset>
 			<label>New Password</label>
 			<input class="text" type="password" name="password" />
+		</fieldset>
+		<fieldset>
 			<label>Confirm New Password</label>
 			<input class="text" type="password" name="confirm_password" />
 		</fieldset>
 		<fieldset class="lower">
-			<? if ($failure) { ?><p class="error">Passwords did not match. Please try again.</p><? } ?>
-			<input type="submit" class="button white" value="Submit" />
+			<input type="submit" class="button blue" value="Reset" />
 		</fieldset>
 		<? } ?>
 	</form>

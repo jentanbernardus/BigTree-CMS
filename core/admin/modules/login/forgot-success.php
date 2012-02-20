@@ -1,9 +1,9 @@
 <div id="login">
-	<form method="post" action="" class="module">
-		<h2><span>Forgot Password</span></h2>
-		<fieldset>
-			<p>An email has been sent to the email address you provided containing a link to change your password.</p>
+	<form method="post" action="" class="module ">
+		<h2>Check Your Email</h2>
+		<fieldset class="clear">
+			<p>A link to change your password has been email to you.</p>
 		</fieldset>
-
+		<br />
 	</form>
 </div>

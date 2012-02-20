@@ -87,7 +87,7 @@
 	});
 		
 	
-	$("#sort_table").sortable({ items: "li", handle: ".icon_sort" });
+	$("#sort_table").sortable({ axis: "y", containment: "parent", handle: ".icon_sort", items: "li", placeholder: "ui-sortable-placeholder", tolerance: "pointer" });
 	
 	$("#field_area .add").click(function() {
 		un = $("#unused_field").get(0);

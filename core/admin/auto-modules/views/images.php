@@ -137,7 +137,7 @@
 <? include bigtree_path("admin/auto-modules/views/_common-js.php") ?>
 <script type="text/javascript">
 	<? if ($perm == "p" && $view["options"]["draggable"]) { ?>
-	$("#image_list").sortable({ items: "li", update: function() {
+	$("#image_list").sortable({ axis: "y", containment: "parent", handle: ".icon_sort", items: "li", placeholder: "ui-sortable-placeholder", tolerance: "pointer", update: function() {
 		$.ajax("<?=$aroot?>ajax/auto-modules/views/order/?view=<?=$view["id"]?>&table_name=image_list&sort=" + escape($("#image_list").sortable("serialize")));
 	}});
 	<? } ?>

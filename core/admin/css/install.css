@@ -1,45 +1,76 @@
- /*-----------------------------------------------------------------------------------
-  Global Reset v0.3 (based on http://meyerweb.com/eric/tools/css/reset/ - v1.0 | 20080212) - SUPPORT SITE
+/*-----------------------------------------------------------------------------------
+  Global Reset v0.2 (based on http://meyerweb.com/eric/tools/css/reset/ - v1.0 | 20080212)
 -----------------------------------------------------------------------------------*/
-  html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, code, em, img, small, strike, strong, sub, sup, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td { margin: 0; padding: 0; border: 0; outline: 0; font-size: 100%; vertical-align: baseline; background: transparent; }
-  body { line-height: 1; }
-  ol, ul { list-style: none; }
-  :focus { outline: 0; }
-  table { border-collapse: collapse; border-spacing: 0; }
-  /* HTML5 RESET */
-  header, nav, section, article, figure, aside, footer, details { display: block; }
-
-
-/*---------------------------
-  Elements
----------------------------*/
-	body { background: #fff url(../images/install/bg_body.png) repeat top center; color: #666; font-family: "Lucida Grande", sans-serif; }
-
-	h1, h2, h3, h4, h5, h6 { color: #333; font-family: "news-gothic-std-1", "news-gothic-std-2", sans-serif; text-transform: uppercase; }
-	h1 { font-size: 36px; line-height: 42px; }
-	h2 { color: #284846; font-size: 28px; line-height: 34px; text-transform: none; }
-	h3 { font-size: 15px; line-height: 18px; }
-	h4 { color: #69BAB1; font-size: 14px; font-weight: normal; }
-
-	p { font-size: 14px; line-height: 21px; }
-	a { color: #68B9B1; text-decoration: none; }
-
-	hr { background: url(../images/install/divider_horizontal.png) repeat-x left top; border: 2px solid transparent; }	
-	
-/*-------------------------------------------
-  Global
--------------------------------------------*/
-	.left { float: left; }
-	.block_left { float: left; margin: 0 10px 10px 0; }
-	.right { float: right; }
-	.block_right { float: right; margin: 0 0 10px 10px; }
-	.center { text-align: center; }
+ 	html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, code, em, img, small, strike, strong, sub, sup, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td { background: transparent; border: 0; font-size: 100%; margin: 0; outline: 0; padding: 0; }
+ 	img { vertical-align: middle; }
+	body { background: url(../images/footer-pattern.png); color: #666; font-family: Helvetica, sans-serif; font-size: 12px; line-height: 1; }
+	ul { list-style: none; }
+	ol { margin-bottom: 10px; margin-left: 18px; }
+	ol li { font-size: 12px; line-height: 18px; }
+	p { font-size: 12px; line-height: 16px; margin: 0 0 10px 0; }
+	p:last-child { margin: 0; }
+	p small { font-size: 10px; }
+ 	:focus { outline: 0; }
+ 	:invalid { box-shadow: none; }
+	table { border-collapse: collapse; border-spacing: 0; }
+	a { color: #86ACC3; text-decoration: none; }
+	header, footer, nav, summary, section, article { display: block; }
 	.clear { clear: both; }
+	body { overflow-y: scroll; }
 	
-	/* CONTAINER */
+	/* Hack To Stop WebKit From Styling input[type=search] */
+	input[type=search] { -webkit-appearance: textfield; -webkit-box-sizing: content-box; }
+	input::-webkit-search-decoration, input::-webkit-search-cancel-button { display: none; }
+
+	h2 { float: left; font-size: 18px; font-weight: normal; height: 32px; line-height: 30px; padding: 5px 0 0 0; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.75); }
+	
+	
+	/* Installer Styles */
+	body.install { background: url(../images/repeat-bg.png) repeat top center; }
+	.install_fade { background: url(../images/login-bg.png) repeat-x top center fixed; }
+	.install_wrapper { margin: 0 auto; padding: 75px 0 50px; width: 650px; }
+	.install_wrapper hr { border: 1px solid #fff; border-top-color: #eee; margin: 20px 0; }
+	.install_wrapper h1 { color: #FFF; font-size: 30px; font-weight: normal; margin: 0 0 25px 0; text-align: center; text-shadow: 0 1px 0 #000; }
+	.install_wrapper form { background: #FFF; border: 1px solid #CCCCCC; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 1); overflow: hidden; padding: 30px 0 0; }
+	.install_wrapper h2 { color: #444; font-size: 20px; font-weight: normal; line-height: 30px; overflow: hidden; margin: 0 30px 5px; padding: 0; text-shadow: 0 1px 0 #FFF; }
+	.install_wrapper h2 span { background: url(../images/icons-install.png) no-repeat; display: block; float: left; height: 25px; margin: 0 5px 0 0; width: 25px; }
+	.install_wrapper h2.database span { background-position: -25px 2px; width: 20px; }
+	.install_wrapper h2.security span { background-position: -45px 4px; margin-right: 7px; width: 23px; }
+	.install_wrapper h2.account span { background-position: -68px 1px; margin-right: 7px; width: 23px; }
+	.install_wrapper h2.example span { background-position: -91px 3px; margin-right: 7px; width: 23px; }
+	.install_wrapper fieldset { padding: 0 30px; }
+	.install_wrapper fieldset.left { float: left; padding: 0 0 0 30px; }
+	.install_wrapper fieldset.right { float: right; padding: 0 30px 0 0; }
+	.install_wrapper label { color: #666; display: block; font-size: 13px; margin: 0 0 12px 0; }
+	.install_wrapper input.text { border: 1px solid #CCC; border-radius: 3px; color: #666; display: block; height: 32px; margin: 0 0 20px 0; padding: 0 10px; width: 260px; }
+	.install_wrapper input.text:last-child { margin: 0; }
+	.install_wrapper p { clear: both; color: #666; font-size: 13px; margin: 0; }
+	.install_wrapper fieldset.lower { background: #F5F5F5; border-top: 1px solid #E5E5E5; margin: 30px 0 0; padding: 25px 30px; }
+	.install_wrapper .forgot_password { color: #666; float: right; line-height: 36px; }
+	.install_wrapper .forgot_password:hover { color: #3E667D; }
+	.install_wrapper .error_message { background: #990000; border-radius: 2px; box-shadow: 0 1px 0 rgba(0, 0, 0, 0.5); color: #FFF; font-size: 12px; line-height: 18px; margin: 0 30px 10px 30px; padding: 5px 10px; text-shadow: 0px -1px 0 rgba(0,0,0,0.25); }
+	.install_wrapper .warning_message { background: #D58410; border-radius: 2px; box-shadow: 0 1px 0 rgba(0, 0, 0, 0.5); color: #FFF; font-size: 12px; line-height: 18px; margin: 0 30px 10px 30px; padding: 5px 10px; text-shadow: 0px -1px 0 rgba(0,0,0,0.25); }
+	
+	.install_logo { background: url(../images/login-logo.png); display: block; height: 30px; margin: 25px auto; width: 155px; }
+	.install_copyright { background: url(../images/login-copyright.png); display: block; height: 15px; margin: 50px auto; opacity: 0.5; width: 222px; }
+	
+	label.for_checkbox { cursor: pointer; line-height: 17px; margin: 0; user-select: none; }
+	.checkbox { float: left; margin: 0 7px 0 0; }
+	.checkbox a { background: url(../images/checkbox-sprite.png); cursor: pointer; display: block; height: 16px; width: 16px; }
+	.checkbox a.checked { background-position: 0px 16px; }
+	.checkbox a.focused { background-position: -16px 0px; }
+	.checkbox a.checked.focused { background-position: -16px 16px; }
+	
+	.form_error label { color: #990000; }
+	.form_error input[type=text], .form_error input[type=password], .form_error input[type=email], .form_error input[type=url] { background: #FCE8E8; border-color: #990000; }
+	
+	input[type=submit], a.button { background: #BBB url(../images/button-bg.png) repeat-x; border: 1px solid #CCCCCC; border-radius: 5px; color: #333; cursor: pointer; font-family: Helvetica, sans-serif; font-size: 14px; height: 36px; line-height: 14px; padding: 10px 18px 12px 18px; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.75); transition: background-color 0.2s, border-color 0.2s; }
+	input[type=submit].blue, a.button.blue { background: #3E667D url(../images/button-bg-dark.png) repeat-x; border: 1px solid #243D4C; color: #FFF; text-shadow: 0px -1px 0 rgba(0, 0, 0, 0.5); }
+	input[type=submit].blue:hover, a.button.blue:hover { background-color: #4f829f; }
+	
+/*
 	.container { margin: 0 auto; position: relative; width: 960px; }
 	
-	/* BUTTONS */
 	.button { display: block; text-indent: -99999px; 
 		-moz-border-radius: 7px; -webkit-border-radius: 7px; border-radius: 7px;
 	}
@@ -48,11 +79,9 @@
 	.button:active { -moz-transform: translateY(1px); -webkit-transform: translateY(1px); -moz-box-shadow: none; -webkit-box-shadow: none; }
 	
 	
-	/* HEADER */
 	#logo { display: block; height: 51px; position: absolute; top: 35px; width: 164px; background: url(../images/install/logo.png); }
 	header { background: url(../images/install/bg_header.png) repeat-x center top; height: 134px; }	
 	
-	/* FOOTER */
 	footer { background: url(../images/install/bg_footer.png) repeat-x center top; overflow: hidden; padding: 40px 0; }
 	footer .block { border-right: 1px solid #28353C; border-left: 1px solid #111; float: left; height: 90px; margin: 0; padding: 12px 20px 10px; width: 205px; }
 	footer .block.first { border-left: none; padding-left: 0; }
@@ -75,16 +104,13 @@
 	footer .icon.rss { background-position: 0 -78px; }
 	footer .icon.twitter { background-position: 0 -100px; }
 	
-	/* PAGE */
 	#page { padding: 0; text-shadow: 0 1px 0 #fff; }	
 	
-	/* SUB PAGE */
 	#page.sub { margin: 20px 0 30px; }
 	.sub .intro { margin: 0 0 30px; }
 	.sub .intro h4 { color: #333; font-size: 18px; margin: 30px 0 16px; text-transform: none; }
 	.sub .intro hr { margin: 0 0 20px; }	
 	
-	/* CONTACT / FORMS */
 	.form .column { padding: 20px 40px 10px; margin: 60px 0 0; }
 	.form .column.logo { background: url(../images/install/divider_vertical.png) repeat-y top right; float: left; height: 135px; width: 100px; }
 	.form .column.logo a.logo { background: url(../images/install/logo_contact.png) no-repeat left top; display: block; height: 77px; margin: 25px 0; text-indent: -99999px; width: 94px; }
@@ -122,3 +148,4 @@
 	.formbuilder select { display: block; margin: 0 0 5px 0; }
 	.formbuilder .error { background: #FDEEED; border-color: #B38989 !important; }
 	.formbuilder p.error { border: 1px solid #B38989; font-size: 12px; margin: 0 0 20px 0; padding: 10px 15px 9px; width: 538px; }
+*/

@@ -189,7 +189,7 @@ $(document).ready(function() {
 		return false;
 	});
 	
-	$("#bigtree_callouts ul").sortable({ items: "li", handle: ".icon_sort" });
+	$("#bigtree_callouts ul").sortable({ axis: "y", containment: "parent", handle: ".icon_sort", items: "li", placeholder: "ui-sortable-placeholder", tolerance: "pointer" });
 });
 
 /*

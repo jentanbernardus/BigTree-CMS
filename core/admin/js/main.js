@@ -1157,7 +1157,7 @@ var BigTreeArrayOfItems = Class.extend({
 		this.options = options;
 		this.key = key;
 		this.field = $("#" + id);
-		this.field.find("ul").sortable({ items: "li", handle: ".icon_sort" });
+		this.field.find("ul").sortable({ axis: "y", containment: "parent", handle: ".icon_sort", items: "li", placeholder: "ui-sortable-placeholder", tolerance: "pointer" });
 		this.field.find(".add").click($.proxy(this.addItem,this));
 		this.field.on("click",".icon_edit",$.proxy(this.editItem,this));
 		this.field.on("click",".icon_delete",this.deleteItem);

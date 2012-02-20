@@ -31,7 +31,7 @@
 </div>
 
 <script type="text/javascript">
-	$("#groups").sortable({ items: "li", handle: ".icon_sort", update: function() {
+	$("#groups").sortable({ axis: "y", containment: "parent", handle: ".icon_sort", items: "li", placeholder: "ui-sortable-placeholder", tolerance: "pointer", update: function() {
 		$.ajax("<?=$aroot?>ajax/developer/order-module-groups/?sort=" + escape($("#groups").sortable("serialize"))); 
 	}});
 

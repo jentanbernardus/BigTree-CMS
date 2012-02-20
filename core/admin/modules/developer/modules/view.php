@@ -37,7 +37,7 @@
 </div>
 
 <script type="text/javascript">
-	$("#group_<?=$group["id"]?>").sortable({ items: "li", handle: ".icon_sort", update: function() {
+	$("#group_<?=$group["id"]?>").sortable({ axis: "y", containment: "parent", handle: ".icon_sort", items: "li", placeholder: "ui-sortable-placeholder", tolerance: "pointer", update: function() {
 		$.ajax("<?=$aroot?>ajax/developer/order-modules/?sort=" + escape($("#group_<?=$group["id"]?>").sortable("serialize")));
 	}});
 </script>
@@ -71,7 +71,7 @@
 </div>
 
 <script type="text/javascript">
-	$("#group_0").sortable({ items: "li", handle: ".icon_sort", update: function() {
+	$("#group_0").sortable({ axis: "y", containment: "parent", handle: ".icon_sort", items: "li", placeholder: "ui-sortable-placeholder", tolerance: "pointer", update: function() {
 		$.ajax("<?=$aroot?>ajax/developer/order-modules/?sort=" + escape($("#group_0").sortable("serialize")));
 	}});
 

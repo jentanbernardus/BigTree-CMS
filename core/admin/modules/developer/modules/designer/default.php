@@ -10,13 +10,14 @@
 	<form method="post" action="<?=$saroot?>modules/designer/create/" enctype="multipart/form-data" class="module">
 		<section>
 			<p class="error_message"<? if (!count($e)) { ?> style="display: none;"<? } ?>>Errors found! Please fix the highlighted fields before submitting.</p>
-
-			<fieldset>
-				<label class="required">Module Name <small>(for example, News)</small></label>
-				<input name="name" class="required" type="text" value="<?=$name?>" />
-			</fieldset>
-			
-			<fieldset class="developer_module_group">
+			<div class="left">
+				<fieldset>
+					<label class="required">Module Name <small>(for example, News)</small></label>
+					<input name="name" class="required" type="text" value="<?=$name?>" />
+				</fieldset>
+			</div>
+			<br class="clear" /><br />
+			<fieldset class="clear developer_module_group">
 				<label>Module Group <small>(if a new group name is chosen, the select box is ignored)</small></label> 
 				<input name="group_new" type="text" placeholder="New Group" value="<?=$group_new?>" />
 				<span>OR</span>
@@ -27,16 +28,16 @@
 					<? } ?>
 				</select>
 			</fieldset>
-			
-			<fieldset<? if ($e["table"]) { ?> class="form_error"<? } ?>>
-				<label class="required">Table Name <small>(for example, my_site_news)</small><? if ($e["table"]) { ?><span class="form_error_reason">Table Already Exists</span><? } ?></label>
-				<input name="table" class="required" type="text" value="<?=$table?>" />
-			</fieldset>
-			
-			<fieldset<? if ($e["class"]) { ?> class="form_error"<? } ?>>
-				<label class="required">Class Name <small>(for example, MySiteNews)</small><? if ($e["class"]) { ?><span class="form_error_reason">Class Already Exists</span><? } ?></label>
-				<input name="class" class="required" type="text" value="<?=$class?>" />
-			</fieldset>
+			<div class="left">
+				<fieldset<? if ($e["table"]) { ?> class="form_error"<? } ?>>
+					<label class="required">Table Name <small>(for example, my_site_news)</small><? if ($e["table"]) { ?><span class="form_error_reason">Table Already Exists</span><? } ?></label>
+					<input name="table" class="required" type="text" value="<?=$table?>" />
+				</fieldset>
+				<fieldset<? if ($e["class"]) { ?> class="form_error"<? } ?>>
+					<label class="required">Class Name <small>(for example, MySiteNews)</small><? if ($e["class"]) { ?><span class="form_error_reason">Class Already Exists</span><? } ?></label>
+					<input name="class" class="required" type="text" value="<?=$class?>" />
+				</fieldset>
+			</div>
 		</section>
 		<footer>
 			<input type="submit" class="button blue" value="Continue" />

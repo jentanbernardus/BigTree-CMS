@@ -40,7 +40,7 @@
 	function _local_createSortable() {
 		<? if ($perm == "p") { ?>
 		if ($("#search").val() == "") {
-			$("#sort_table").sortable({ items: "li", handle: ".icon_sort", update: function() {
+			$("#sort_table").sortable({ axis: "y", containment: "parent", handle: ".icon_sort", items: "li", placeholder: "ui-sortable-placeholder", tolerance: "pointer", update: function() {
 				$.ajax("<?=$aroot?>ajax/auto-modules/views/order/?view=<?=$view["id"]?>&sort=" + escape($("#sort_table").sortable("serialize")));
 			}});
 		}

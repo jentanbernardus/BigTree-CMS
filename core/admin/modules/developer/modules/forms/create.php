@@ -34,10 +34,8 @@
 <h1><span class="icon_developer_modules"></span>Created Form</h1>
 <? include bigtree_path("admin/modules/developer/modules/_nav.php"); ?>
 <div class="form_container">
-	<header>
-		<p>Add/Edit <?=$title?></p>
-	</header>
 	<section>
+		<h3 class="action_title">Add/Edit <?=$title?></h3>
 		<p>Your form is now created.  If you were creating a module from scratch, the process is now complete.</p>
 	</section>
 	<footer>

@@ -38,7 +38,7 @@
 </div>
 
 <script type="text/javascript">
-	$("#callouts").sortable({ items: "li", handle: ".icon_sort", update: function() {
+	$("#callouts").sortable({ axis: "y", containment: "parent", handle: ".icon_sort", items: "li", placeholder: "ui-sortable-placeholder", tolerance: "pointer", update: function() {
 		$.ajax("<?=$aroot?>ajax/developer/order-callouts/?sort=" + escape($("#callouts").sortable("serialize")), { type: "POST", data: { rel: <?=json_encode($rel_table)?> }});
 	}});
 	

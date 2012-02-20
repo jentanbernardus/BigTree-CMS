@@ -42,10 +42,10 @@
 		$("#resource_table").append(li);
 		li.find("select").get(0).customControl = new BigTreeSelect(li.find("select").get(0));
 
-		$("#resource_table").sortable({ items: "li", handle: ".icon_sort" });
+		$("#resource_table").sortable({ axis: "y", containment: "parent", handle: ".icon_sort", items: "li", placeholder: "ui-sortable-placeholder", tolerance: "pointer" });
 
 		return false;
 	});
 	
-	$("#resource_table").sortable({ items: "li", handle: ".icon_sort" });
+	$("#resource_table").sortable({ axis: "y", containment: "parent", handle: ".icon_sort", items: "li", placeholder: "ui-sortable-placeholder", tolerance: "pointer" });
 </script>

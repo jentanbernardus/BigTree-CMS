@@ -7,10 +7,12 @@
 	<form method="post" action="<?=$saroot?>modules/groups/create/" class="module">
 		<header><h2>Group Details</h2></header>
 		<section>
-			<fieldset>
-				<label class="required">Name</label>
-				<input type="text" name="name" value="" class="required" />
-			</fieldset>
+			<div class="left">
+				<fieldset>
+					<label class="required">Name</label>
+					<input type="text" name="name" value="" class="required" />
+				</fieldset>
+			</div>
 		</section>
 		<footer>
 			<input type="submit" class="button blue" value="Create" />

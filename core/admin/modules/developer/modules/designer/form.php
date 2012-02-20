@@ -24,11 +24,12 @@
 		<input type="hidden" name="table" value="<?=$table?>" />
 		<section>
 			<p class="error_message"<? if (!count($e)) { ?> style="display: none;"<? } ?>>Errors found! Please fix the highlighted fields before submitting.</p>
-
-			<fieldset>
-				<label class="required">Item Title <small>(for example, "Question" as in "Adding Question")</small></label>
-				<input type="text" class="required" name="title" value="<?=$title?>" />
-			</fieldset>
+			<div class="left">
+				<fieldset>
+					<label class="required">Item Title <small>(for example, "Question" as in "Adding Question")</small></label>
+					<input type="text" class="required" name="title" value="<?=$title?>" />
+				</fieldset>
+			</div>
 		</section>
 		<section id="field_area" class="sub">
 			<fieldset<? if ($e["fields"]) { ?> class="form_error"<? } ?>>
@@ -128,7 +129,7 @@
 	});
 	
 	function _local_hooks() {
-		$("#resource_table").sortable({ items: "li", handle: ".icon_sort" });
+		$("#resource_table").sortable({ axis: "y", containment: "parent", handle: ".icon_sort", items: "li", placeholder: "ui-sortable-placeholder", tolerance: "pointer" });
 		BigTreeCustomControls();
 	}
 	

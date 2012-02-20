@@ -17,7 +17,7 @@
 		<? if ($perm == "p" && $o["draggable"]) { ?>
 		$("#table_contents ul").each(function() {
 			if ($("#search").val() == "") {
-				$(this).sortable({ items: "li", handle: ".icon_sort", update: $.proxy(function() {
+				$(this).sortable({ axis: "y", containment: "parent", handle: ".icon_sort", items: "li", placeholder: "ui-sortable-placeholder", tolerance: "pointer", update: $.proxy(function() {
 					$.ajax("<?=$aroot?>ajax/auto-modules/views/order/?view=<?=$view["id"]?>&table_name=" + $(this).attr("id") + "&sort=" + escape($(this).sortable("serialize")));
 				},this) });
 			}

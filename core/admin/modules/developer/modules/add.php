@@ -9,12 +9,13 @@
 	<form method="post" action="<?=$sroot?>create/" class="module">
 		<section>
 			<p class="error_message" style="display: none;">Errors found! Please fix the highlighted fields before submitting.</p>
-			
-			<fieldset>
-				<label class="required">Name</label>
-				<input name="name" class="required" type="text" value="<?=$name?>" />
-			</fieldset>
-			
+			<div class="left">
+				<fieldset>
+					<label class="required">Name</label>
+					<input name="name" class="required" type="text" value="<?=$name?>" />
+				</fieldset>
+			</div>
+			<br class="clear" /><br />
 			<fieldset class="developer_module_group">
 				<label>Group <small>(if a new group name is chosen, the select box is ignored)</small></label> 
 				<input name="group_new" type="text" placeholder="New Group" value="<?=$group_new?>" /><span>OR</span> 
@@ -25,30 +26,32 @@
 					<? } ?>
 				</select>
 			</fieldset>
-			
-			<fieldset>
-				<label class="required">Related Table</label>
-				<select name="table" id="rel_table" class="required">
-					<option></option>
-					<? bigtree_table_select($table) ?>
-				</select>
-			</fieldset>
-			
-			<fieldset>
-				<label class="required">Class Name <small>(will create a class file in custom/inc/modules/)</small></label>
-				<input name="class" type="text" value="<?=$class?>" class="required" />
-			</fieldset>
-			
-			<fieldset>
-				<label>Enable Advanced Permissions <small>(allows setting permissions on grouped views)</small></label>
-				<input type="checkbox" name="gbp[enabled]" id="gbp_on" <? if ($gbp["enabled"]) { ?>checked="checked" <? } ?>/>
-			</fieldset>
+			<div class="left">
+				<fieldset>
+					<label class="required">Related Table</label>
+					<select name="table" id="rel_table" class="required">
+						<option></option>
+						<? bigtree_table_select($table) ?>
+					</select>
+				</fieldset>
+				<fieldset>
+					<label class="required">Class Name <small>(will create a class file in custom/inc/modules/)</small></label>
+					<input name="class" type="text" value="<?=$class?>" class="required" />
+				</fieldset>
+				<fieldset>
+					<input type="checkbox" name="gbp[enabled]" id="gbp_on" <? if ($gbp["enabled"]) { ?>checked="checked" <? } ?>/>
+					<label class="for_checkbox">Enable Advanced Permissions <small>(allows setting permissions on grouped views)</small></label>
+				</fieldset>
+			</div>
 		</section>
 		<section class="sub" id="gbp"<? if (!$gbp["enabled"]) { ?> style="display: none;"<? } ?>>
-			<fieldset>
-				<label>Grouping Name <small>(i.e. "Category")</small></label>
-				<input type="text" name="gbp[name]" value="<?=htmlspecialchars($gbp["name"])?>" />
-			</fieldset>
+			<div class="left">
+				<fieldset>
+					<label>Grouping Name <small>(i.e. "Category")</small></label>
+					<input type="text" name="gbp[name]" value="<?=htmlspecialchars($gbp["name"])?>" />
+				</fieldset>
+			</div>
+			<br class="clear" /><br />
 			<article>
 				<fieldset>
 					<label>Main Table</label>

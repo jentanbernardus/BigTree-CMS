@@ -1,4 +1,4 @@
-<h4>Fields <a href="#" class="add_option"><img src="<?=$icon_root?>add.png" alt="" /></a></h4>
+<h4>Fields <a href="#" class="add_option"><img src="<?=$aroot?>images/add.png" alt="" /></a></h4>
 <fieldset>
 	<div class="list_attr" id="pop_option_list">
 		<ul>
@@ -18,7 +18,7 @@
 			<li>
 				<input type="text" name="fields[<?=$x?>][key]" value="<?=htmlspecialchars($option["key"])?>" />
 			</li>
-			<li class="del"><a href="#"><img src="<?=$icon_root?>delete.png" alt="" /></a></li>
+			<li class="del"><a href="#"><img src="<?=$aroot?>images/currently-kill.png" alt="" /></a></li>
 		</ul>
 		<?
 					$x++;
@@ -34,7 +34,7 @@
 			<li>
 				<input type="text" name="fields[<?=$x?>][key]" value="" />
 			</li>
-			<li class="del"><a href="#"><img src="<?=$icon_root?>delete.png" alt="" /></a></li>
+			<li class="del"><a href="#"><img src="<?=$aroot?>images/currently-kill.png" alt="" /></a></li>
 		</ul>
 		<?
 			}
@@ -64,7 +64,7 @@
 		ul.append(li_description);
 		
 		li_del = $('<li class="del">');
-		li_del.html('<a href="#"><img src="<?=$icon_root?>delete.png" alt="" /></a>');
+		li_del.html('<a href="#"><img src="<?=$aroot?>images/currently-kill.png" alt="" /></a>');
 		li_del.find("a").click(function() {
 			this.parents("ul").remove();
 			return false;
