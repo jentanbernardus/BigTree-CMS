@@ -36,7 +36,7 @@
 <div class="form_container">
 	<section>
 		<h3 class="action_title">Add/Edit <?=$title?></h3>
-		<p>Your form is now created.  If you were creating a module from scratch, the process is now complete.</p>
+		<p>Your form has been created. If you were creating a module from scratch, the process is now complete.</p>
 	</section>
 	<footer>
 		<a href="<?=$aroot?><?=$mod["route"]?>/" class="button white">View Module</a>

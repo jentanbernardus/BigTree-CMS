@@ -53,12 +53,21 @@
 	$fields = mysql_real_escape_string(json_encode($fields));
 	$options = mysql_real_escape_string($_POST["options"]);
 	
-	if (count($errors)) {
-		echo "<h3>Add Module View</h3>";
-		foreach ($errors as $error) {
-			echo "<p>".$error."</p>";
-		}
-	} else {	
+	if (count($errors)) {	
+?>
+<h1><span class="icon_developer_modules"></span>View Error</h1>
+<div class="form_container">
+	<section>
+		<? foreach ($errors as $error) { ?>
+		<p class="error_message"><?=$error?></p>
+		<? } ?>
+	</section>
+	<footer>
+		<a href="javascript: history.back();" class="button white">Back</a>
+	</footer>
+</div>
+<?
+	} else {
 		sqlquery("INSERT INTO bigtree_module_views (`title`,`description`,`type`,`fields`,`actions`,`table`,`options`,`suffix`,`uncached`,`preview_url`) VALUES ('$title','$description','$type','$fields','$actions','$table','$options','$suffix','$uncached','$preview_url')");
 		
 		$vid = sqlid();
@@ -71,7 +80,8 @@
 <? include bigtree_path("admin/modules/developer/modules/_nav.php"); ?>
 <div class="form_container">
 	<section>
-		<p>Your view for <?=$mod["name"]?> is now created!<br />You may continue to create a form for this view or choose to test the view instead.</p>
+		<h3 class="action_title">View <?=$title?></h3>
+		<p>Your view for <?=$mod["name"]?> has been created. You may continue to create a form for this view or choose to test the view instead.</p>
 	</section>
 	<footer>
 		<a href="<?=$aroot?><?=$mod["route"]?>/<?=$route?>/" class="button white">Test View</a> &nbsp; 

@@ -9,22 +9,23 @@
 ?>
 <h1><span class="analytics"></span>Analytics Setup</h1>
 <div class="form_container">
-	<header>
-		<p>Please enter your Google Analytics email address and password below.</p>
-	</header>
 	<form method="post" action="<?=$mroot?>authenticate/" class="module">
 		<section>
+			<p>Please enter your Google Analytics email address and password below.</p>
+			<br />
 			<? if (end($path) == "error") { ?>
 			<p class="error_message">Google Login Failed.</p>
 			<? } ?>
-			<fieldset>
-				<label>Email Address</label>
+			<div class="left">
+				<fieldset>
+					<label>Email Address</label>
 				<input type="text" name="email" />
-			</fieldset>
-			<fieldset>
-				<label>Password</label>
-				<input type="password" name="password" />
-			</fieldset>
+				</fieldset>
+				<fieldset>
+					<label>Password</label>
+					<input type="password" name="password" />
+				</fieldset>
+			</div>
 		</section>
 		<footer>
 			<input type="submit" value="Authenticate" class="blue" />

@@ -16,7 +16,7 @@
 		}
 ?>
 <div class="table">
-	<summary><p>Drag the bounds of the columns to resize them.  Click save to save your changes.</p></summary>
+	<summary><p>Drag the bounds of the columns to resize them. Don't forget to save your changes.</p></summary>
 	<header>
 		<?
 			$x = 0;

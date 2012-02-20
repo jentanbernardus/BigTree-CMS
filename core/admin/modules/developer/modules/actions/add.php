@@ -8,14 +8,17 @@
 <div class="form_container">
 	<form method="post" action="<?=$saroot?>modules/actions/create/<?=$module["id"]?>/" class="module">
 		<section>
-			<fieldset>
-				<label class="required">Name</label>
-				<input type="text" name="name" class="required" />
-			</fieldset>
-			<fieldset>
-				<label>Route</label>
-				<input type="text" name="route" />
-			</fieldset>
+			<div class="left">
+				<fieldset>
+					<label class="required">Name</label>
+					<input type="text" name="name" class="required" />
+				</fieldset>
+				<fieldset>
+					<label>Route</label>
+					<input type="text" name="route" />
+				</fieldset>
+			</div>
+			<br class="clear" /><br />
 			<fieldset>
 				<label class="required">Image</label>
 				<input type="hidden" name="class" id="selected_icon" />
@@ -28,8 +31,8 @@
 				</ul>
 			</fieldset>
 			<fieldset>
-				<label>In Navigation</label>
 				<input type="checkbox" name="in_nav" checked="checked" />
+				<label class="for_checkbox">In Navigation</label>
 			</fieldset>
 		</section>
 		<footer>

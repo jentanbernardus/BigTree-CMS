@@ -11,11 +11,10 @@
 ?>
 <h1><span class="analytics"></span>Analytics Setup</h1>
 <div class="form_container">
-	<header>
-		<p>Please choose the correct site profile below.</p>
-	</header>
 	<form method="post" action="<?=$mroot?>set-profile/" class="module">
 		<section>
+			<p>Please choose the correct site profile below.</p>
+			<br />
 			<fieldset>
 				<label>Profile</label>
 				<select name="profile">

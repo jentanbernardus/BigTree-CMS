@@ -112,7 +112,7 @@
 			</section>
 			<section class="pages_edit">
 				<? if ($perm) { ?>
-				<a href="<?=$proot?>edit/<?=$item["id"]?>/" title="Edit Page" class="icon_edit"></a>
+				<a href="<?=$proot?>edit/<?=$item["id"]?>/" title="Edit Page" class="icon_edit page"></a>
 				<? } else { ?>
 				<span class="icon_no_access"></span>
 				<? } ?>

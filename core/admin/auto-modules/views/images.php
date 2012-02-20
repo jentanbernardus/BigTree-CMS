@@ -19,7 +19,7 @@
 	$items = BigTreeAutoModule::getViewData($view,$order,"active");
 	$pending_items = BigTreeAutoModule::getViewData($view,$order,"pending");
 ?>
-<div class="table">
+<div class="table auto_modules">
 	<summary>
 		<p><? if ($perm == "p" && $view["options"]["draggable"]) { ?>Click and drag the light gray area of an item to sort the images. <? } ?>Click an image to edit it.</p>
 	</summary>

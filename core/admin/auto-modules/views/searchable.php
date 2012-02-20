@@ -6,7 +6,7 @@
 	
 	$suffix = $suffix ? "-".$suffix : "";
 ?>
-<div class="table">
+<div class="table auto_modules">
 	<summary>
 		<input type="search" class="form_search" id="search" placeholder="Search" />
 		<ul id="view_paging" class="view_paging"></ul>
