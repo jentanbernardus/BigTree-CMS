@@ -26,9 +26,8 @@
 	
 	
 	/* Installer Styles */
-	body.install { background: url(../images/repeat-bg.png) repeat top center; }
-	.install_fade { background: url(../images/login-bg.png) repeat-x top center fixed; }
-	.install_wrapper { margin: 0 auto; padding: 75px 0 50px; width: 650px; }
+	body.install { background: url(../images/login-bg.png), url(../images/repeat-bg.png); background-repeat: repeat-x, repeat; background-position: top center, top center; background-attachment: fixed, scroll; }
+	.install_wrapper { margin: 0 auto; padding: 75px 0 25px; width: 650px; }
 	.install_wrapper hr { border: 1px solid #fff; border-top-color: #eee; margin: 20px 0; }
 	.install_wrapper h1 { color: #FFF; font-size: 30px; font-weight: normal; margin: 0 0 25px 0; text-align: center; text-shadow: 0 1px 0 #000; }
 	.install_wrapper form { background: #FFF; border: 1px solid #CCCCCC; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 1); overflow: hidden; padding: 30px 0 0; }
@@ -50,9 +49,9 @@
 	.install_wrapper .forgot_password:hover { color: #3E667D; }
 	.install_wrapper .error_message { background: #990000; border-radius: 2px; box-shadow: 0 1px 0 rgba(0, 0, 0, 0.5); color: #FFF; font-size: 12px; line-height: 18px; margin: 0 30px 10px 30px; padding: 5px 10px; text-shadow: 0px -1px 0 rgba(0,0,0,0.25); }
 	.install_wrapper .warning_message { background: #D58410; border-radius: 2px; box-shadow: 0 1px 0 rgba(0, 0, 0, 0.5); color: #FFF; font-size: 12px; line-height: 18px; margin: 0 30px 10px 30px; padding: 5px 10px; text-shadow: 0px -1px 0 rgba(0,0,0,0.25); }
-	
-	.install_logo { background: url(../images/login-logo.png); display: block; height: 30px; margin: 25px auto; width: 155px; }
-	.install_copyright { background: url(../images/login-copyright.png); display: block; height: 15px; margin: 50px auto; opacity: 0.5; width: 222px; }
+	.install_logo { background: url(../images/logo.png) no-repeat center; display: block; height: 32px; margin: 40px auto 0; width: 123px; text-indent: -99999px; }
+	.install_copyright { color: #777; display: block; margin: 25px auto 0; text-align: center; text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5); width: 100px; }
+	.install_copyright:hover { color: #ccc; }
 	
 	label.for_checkbox { cursor: pointer; line-height: 17px; margin: 0; user-select: none; }
 	.checkbox { float: left; margin: 0 7px 0 0; }
