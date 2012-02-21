@@ -69,7 +69,7 @@
 	h3 span { float: left; line-height: 17px; }
 	h3.properties { cursor: pointer; }
 	
-	h3.action_title { color: #333; font-size: 17px; font-weight: normal; margin: 0 0 15px; text-transform: none; }
+	h3.action_title { color: #333; font-size: 17px; font-weight: normal; line-height: 1.2; margin: 0 0 5px; text-transform: none; }
 
 	ul.styled { list-style: outside disc; margin: 0 0 10px 15px; }
 	ul.styled li { font-size: 12px; line-height: 16px; }
