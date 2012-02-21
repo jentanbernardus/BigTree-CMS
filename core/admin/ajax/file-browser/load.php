@@ -52,10 +52,10 @@
 					$image = $www_root.str_replace("site/","",$postdirectory).$file;
 					$class = "image";
 				} else {
-					if (file_exists(bigtree_path("admin/images/icons/file-types/$ext.png"))) {
-						$image = $aroot."images/icons/file-types/$ext.png";
+					if (file_exists(bigtree_path("admin/images/file-types/$ext.png"))) {
+						$image = $aroot."images/file-types/$ext.png";
 					} else {
-						$image = $aroot."images/icons/file-types/other.png";
+						$image = $aroot."images/file-types/other.png";
 					}
 					$class = "file";
 				}

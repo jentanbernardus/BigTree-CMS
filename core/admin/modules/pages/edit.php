@@ -33,9 +33,17 @@
 	} else {
 		die("You do not have access to this page.");
 	}
+	
+	if ($page == 0) {
+?>
+<h1><span class="home"></span>Home</h1>
+<?
+	} else {
 ?>
 <h1><span class="edit_page"></span><?=$pdata["nav_title"]?></h1>
 <?
+	}
+	
 	include bigtree_path("admin/modules/pages/_nav.php");
 	include bigtree_path("admin/modules/pages/_properties.php");
 	

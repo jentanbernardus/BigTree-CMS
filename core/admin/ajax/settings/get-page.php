@@ -8,10 +8,15 @@
 	$results = $admin->getPageOfSettings($page,$query);
 	
 	foreach ($results as $item) {
+		if (is_array($item["value"])) {
+			$value = "&mdash; Click Edit To View &mdash;";
+		} else {
+			$value = smarter_trim(strip_tags($item["value"]),100);
+		}
 ?>
 <li>
 	<section class="settings_name"><?=$item["name"]?></section>
-	<section class="settings_value"><?=smarter_trim(strip_tags($item["value"]),100)?></section>
+	<section class="settings_value"><?=$value?></section>
 	<section class="view_action"><a href="<?=$aroot?>settings/edit/<?=$item["id"]?>/" class="icon_edit"></a></section>
 </li>
 <?

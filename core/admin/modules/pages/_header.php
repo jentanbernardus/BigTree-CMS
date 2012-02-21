@@ -18,8 +18,10 @@
 			array("link" => "pages/view-tree/0/", "title" => "Home")
 		);
 		
-		foreach ($bc as $item) {
-			$breadcrumb[] = array("link" => "pages/view-tree/".$item["id"]."/", "title" => $item["title"]);
+		if ($parent != 0) {
+			foreach ($bc as $item) {
+				$breadcrumb[] = array("link" => "pages/view-tree/".$item["id"]."/", "title" => $item["title"]);
+			}
 		}
 	}
 ?>

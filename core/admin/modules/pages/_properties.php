@@ -1,18 +1,23 @@
 <?
+	$live_url = false;
+	$preview_url = false;
 	$page_data = $admin->getPendingPage(is_array($page) ? $page["id"] : $page);
 	$age = floor((time() - strtotime($page_data["updated_at"])) / (60 * 60 * 24));
 	$seo = $admin->getPageSEORating($page_data,$page_data["resources"]);
 	if (is_numeric($page_data["id"])) {
-		$url = $www_root.$page_data["path"]."/";
-		$link_type = "Live";
+		if ($page_data["id"] == 0) {
+			$live_url = $www_root;
+		} else {
+			$live_url = $www_root.$page_data["path"]."/";
+		}
 		if ($page_data["changes_applied"]) {
 			$status = "Changes Pending";
+			$preview_url = $www_root."_preview/".$page_data["path"]."/";
 		} else {
 			$status = "Published";
 		}
 	} else {
-		$url = $www_root."_preview-pending/".substr($page_data["id"],1)."/";
-		$link_type = "Preview";
+		$preview_url = $www_root."_preview-pending/".substr($page_data["id"],1)."/";
 		$status = "Unpublished";
 	}
 	
@@ -24,7 +29,7 @@
 		<label>Status</label>
 		<p class="<?=str_replace(" ","_",strtolower($status))?>"><?=$status?></p>
 	</article>
-	<article>
+	<article class="seo">
 		<label>SEO Rating</label>
 		<p style="color: <?=$seo["color"]?>"><span><?=$seo["score"]?>%</span><a href="#" class="icon_small icon_small_help"></a></p>
 	</article>
@@ -32,9 +37,24 @@
 		<label>Content Age</label>
 		<p><?=$age?> Days</p>
 	</article>
+	<?
+		if ($live_url) {
+	?>
 	<article class="link">
-		<label><?=$link_type?> URL</label>
-		<p><a href="<?=$url?>" target="_blank"><?=$url?></a></p>
+		<label>Live URL</label>
+		<p><a href="<?=$live_url?>" target="_blank"><?=$live_url?></a></p>
 	</article>
+	<?
+		}
+		
+		if ($preview_url) {
+	?>
+	<article class="link">
+		<label>Preview URL</label>
+		<p><a href="<?=$preview_url?>" target="_blank"><?=$preview_url?></a></p>
+	</article>
+	<?
+		}
+	?>
 </section>
 <hr <? if ($open) { ?>style="display: none;" <? } ?>/>
