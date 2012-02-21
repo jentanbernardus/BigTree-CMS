@@ -12,7 +12,7 @@
 				</article>
 				<article class="fastspot">
 					<p>Designed &amp; Developed by Fastspot</p>
-					<a href="http://www.fastspot.com/" target="_blank">Learn More</a> &nbsp;&middot;&nbsp; <a href="http://www.fastspot.com/agency/contact/" target="_blank">Contact Us</a>
+					<a href="<?=$aroot?>credits/">Credits</a> &nbsp;&middot;&nbsp; <a href="http://www.fastspot.com/" target="_blank">Learn More</a> &nbsp;&middot;&nbsp; <a href="http://www.fastspot.com/agency/contact/" target="_blank">Contact Us</a>
 				</article>
 			</section>
 		</footer>
