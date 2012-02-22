@@ -46,9 +46,16 @@
 		<li><section class="no_content">You have no unread messages.</section></li>
 		<?	
 			} else {
+				$page = 0;
+				$x = 0;
 				foreach ($unread as $item) {
+					if ($x == 5) {
+						$page++;
+						$x = 0;
+					}
+					$x++;
 		?>
-		<li>
+		<li class="page_<?=$page?>"<? if ($page > 0) { ?> style="display: none;"<? } ?>>
 			<section class="messages_from_to"><?=$item["sender_name"]?></section>
 			<section class="messages_subject"><?=$item["subject"]?></section>
 			<section class="messages_date_time"><?=date("n/j/y",strtotime($item["date"]))?></section>
@@ -81,9 +88,16 @@
 		<li><section class="no_content">You have no read messages.</section></li>
 		<?	
 			} else {
+				$page = 0;
+				$x = 0;
 				foreach ($read as $item) {
+					if ($x == 5) {
+						$page++;
+						$x = 0;
+					}
+					$x++;
 		?>
-		<li>
+		<li class="page_<?=$page?>"<? if ($page > 0) { ?> style="display: none;"<? } ?>>
 			<section class="messages_from_to"><?=$item["sender_name"]?></section>
 			<section class="messages_subject"><?=$item["subject"]?></section>
 			<section class="messages_date_time"><?=date("n/j/y",strtotime($item["date"]))?></section>
@@ -116,7 +130,14 @@
 		<li><section class="no_content">You have no sent messages.</section></li>
 		<?	
 			} else {
+				$page = 0;
+				$x = 0;
 				foreach ($sent as $item) {
+					if ($x == 5) {
+						$page++;
+						$x = 0;
+					}
+					$x++;
 					// Get the recipient names
 					$recipients = explode("|",trim($item["recipients"],"|"));
 					$r_names = array();
@@ -125,7 +146,7 @@
 						$r_names[] = $u["name"];
 					}
 		?>
-		<li>
+		<li class="page_<?=$page?>"<? if ($page > 0) { ?> style="display: none;"<? } ?>>
 			<section class="messages_from_to"><?=implode(", ",$r_names)?></section>
 			<section class="messages_subject"><?=$item["subject"]?></section>
 			<section class="messages_date_time"><?=date("n/j/y",strtotime($item["date"]))?></section>
@@ -139,12 +160,20 @@
 	</ul>
 </div>
 <script type="text/javascript">
+	var pages_of_messages = { unread_paging: <?=$unread_pages?>, read_paging: <?=$read_pages?>, sent_paging: <?=$sent_pages?> };
+	
 	BigTree.SetPageCount("#unread_paging",<?=$unread_pages?>,0);
 	BigTree.SetPageCount("#read_paging",<?=$read_pages?>,0);
 	BigTree.SetPageCount("#sent_paging",<?=$sent_pages?>,0);
 	
-	$(".view_paging a").click(function() {
-	
+	$(".view_paging a").live("click",function() {
+		page = parseInt($(this).attr("href").substr(1));
+		$(this).parents("summary").siblings("ul").find("li").hide().filter(".page_" + page).show();
+		$(this).parents("ul").find(".active").removeClass("active");
+		
+		id = $(this).parents("ul").attr("id");
+		BigTree.SetPageCount("#" + id,pages_of_messages[id],page);
+		
 		return false;
 	});
 </script>
