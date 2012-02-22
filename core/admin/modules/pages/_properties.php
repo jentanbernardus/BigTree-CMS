@@ -22,6 +22,12 @@
 	}
 	
 	$open = $_COOKIE["bigtree_default_properties_open"] ? true : false;
+	
+	$seo_recs = "<ul>";
+	foreach ($seo["recommendations"] as $rec) {
+		$seo_recs .= "<li>$rec</li>";
+	}
+	$seo_recs .= "</ul>";
 ?>
 <h3 class="properties"><span>Properties</span><span class="icon_small icon_small_caret_<? if ($open) { ?>down<? } else { ?>right<? } ?>"></span></h3>
 <section class="property_block"<? if (!$open) { ?> style="display: none;"<? } ?>>
@@ -58,3 +64,7 @@
 	?>
 </section>
 <hr <? if ($open) { ?>style="display: none;" <? } ?>/>
+
+<script type="text/javascript">
+	new BigTreeToolTip(".seo .icon_small_help","<p><strong>SEO Goals</strong></p><?=$seo_recs?>","below","seo",true);
+</script>

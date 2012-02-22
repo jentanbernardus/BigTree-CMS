@@ -257,13 +257,13 @@
 	#growl article { background: url(../images/growl-bg.png); border-bottom: 1px solid #222; border-radius: 4px; box-shadow: 0px 2px 4px rgba(0,0,0,0.5); margin: 5px 0 0 0; overflow: hidden; padding: 15px; }
 	#growl article span { display: inline-block; }
 	#growl article .close { background: url(../images/growl-icons.png) no-repeat -100px 0px; height: 10px; margin: -9px 0 0 214px; position: absolute; width: 10px; }
-	#growl article .icon_growl_success { background: url(../images/growl-icons.png) no-repeat -1px -2px; height: 28px; width: 33px; }
-	#growl article .icon_growl_error { background: url(../images/growl-icons.png) no-repeat -68px 0px; height: 30px; width: 30px; }
-	#growl article .icon_growl_alert { background: url(../images/growl-icons.png) no-repeat -36px 0px; height: 31px; width: 30px; }
 	#growl article section { float: right; width: 170px; }
 	#growl article section h3 { color: #fff; font-size: 13px; line-height: 13px; margin: 0 0 5px 0; text-shadow: 0 -1px 0 rgba(0,0,0,0.75); }
 	#growl article section p { color: #eee; font-size: 12px; margin: 0; padding: 0; text-shadow: 0 -1px 0 rgba(0,0,0,0.75); }
-
+	.icon_growl_success { background: url(../images/growl-icons.png) no-repeat -1px -2px; height: 28px; width: 33px; }
+	.icon_growl_error { background: url(../images/growl-icons.png) no-repeat -68px 0px; height: 30px; width: 30px; }
+	.icon_growl_alert { background: url(../images/growl-icons.png) no-repeat -36px 0px; height: 31px; width: 30px; }
+	.icon_growl_seo { background: url(../images/growl-icons.png) no-repeat -110px 0px; height: 31px; width: 30px; }
 
 /* Sub Navigation */
 	.nav_shadow { background: url(../images/nav-shadow.png) repeat-x; display: none; height: 4px; }
@@ -903,7 +903,7 @@
 	.icon_small_key { background-position: -240px 0px; }
 	.icon_small_reply { background-position: 0px -16px; }
 	.icon_small_reply_all { background-position: -16px -16px; }
-	.icon_small_help { background-position: -32px -16px; }
+	.icon_small_help { background-position: -32px -16px; cursor: help; }
 	.icon_small_caret_down { background-position: -48px -16px; }
 	.icon_small_caret_right { background-position: -64px -16px; }
 
@@ -996,7 +996,7 @@
 	.ui-datepicker-rtl .ui-datepicker-group-last .ui-datepicker-header { border-left-width: 1px; border-right-width: 0; }
 	.ui-datepicker-rtl .ui-datepicker-group-middle .ui-datepicker-header { border-left-width: 1px; border-right-width: 0; }
 	
-	/* Array of Items / Many to Many Widget */
+/* Array of Items / Many to Many Widget */
 	.multi_widget { border: 1px solid #CCC; border-radius: 2px; padding: 0; }
 	.multi_widget footer { border-top: none; padding: 20px; }
 	.multi_widget footer a { border-radius: 3px; float: left; height: 30px; line-height: 30px; }
@@ -1006,3 +1006,21 @@
 	.multi_widget li a { float: right; margin: 0 0 0 10px; }
 	.multi_widget li:nth-child(even) { background: #F8F8F8; }
 	.many_to_many footer a { float: left; margin: 0 0 0 10px; }
+	
+/* ToolTip */
+	.tooltip { position: absolute; }
+	.tooltip article { border-radius: 5px; background: url(../images/growl-bg.png); padding: 15px; overflow: hidden; box-shadow: 0px 0px 4px rgba(0,0,0,0.5); z-index: 1000; }
+	.tooltip article .icon_tooltip { width: 30px; height: 31px; float: left; margin: 0 10px 0 0; }
+	.tooltip article .content { float: left; max-width: 250px; }
+	.tooltip article .content p { color: rgba(255,255,255,0.8); font-size: 12px; line-height: 14px; text-shadow: 0 -1px 1px rgba(0,0,0,0.75); margin: 0 0 5px 0; }
+	.tooltip article .content p strong { font-size: 13px; font-weight: normal; color: #FFF; }
+	.tooltip article .content li { color: rgba(255,255,255,0.8); font-size: 12px; line-height: 14px; text-shadow: 0 -1px 1px rgba(0,0,0,0.75); list-style: square outside; margin: 0 0 5px 15px; }
+	.tooltip article .content li:last-child { margin: 0 0 0 15px; }
+	.tooltip article .close { float: right; background: url(../images/growl-icons.png) no-repeat -100px 0px; height: 10px; margin: -5px -5px 0 0; width: 10px; }
+	.tooltip .arrow { background: url(../images/tooltip-arrows.png); position: relative; z-index: 1001; }
+	.tooltip_below .arrow { background-position: -21px 0; height: 10px; width: 21px; float: none; display: block; margin: 0 0 0 18px; }
+	.tooltip_above .arrow { background-position: 0px 0; height: 10px; width: 21px; float: none; display: block; margin: 0 0 0 18px; }
+	.tooltip_right article { float: left; }
+	.tooltip_right .arrow { float: left; background-position: -42px 0; height: 21px; width: 10px; margin: 18px 0 0 0; }
+	.tooltip_left article { float: left; }
+	.tooltip_left .arrow { float: right; background-position: -52px 0; height: 21px; width: 10px; margin: 18px 0 0 0; }

@@ -1342,6 +1342,83 @@ var BigTreeFormValidator = Class.extend({
 	}
 });
 
+// !BigTreeToolTip
+var BigTreeToolTip = Class.extend({
+	container: false,	
+	init: function(selector,content,position,icon,auto_close) {
+		// If you don't specify an icon, just use the alert one.
+		if (!icon) {
+			icon = "alert";
+		}
+		// Create the container, add the tip to the container.
+		container = $('<div class="tooltip">');
+		// The arrow is below the tip if the position is above.
+		if (position != "above") {
+			container.append($('<span class="arrow">'));
+		}
+		tip = $('<article>');
+		tip.html('<section class="icon_tooltip icon_growl_' + icon + '"></section><section class="content">' + content + '</section>');
+		// If the tip should stay open, add a close button.  Otherwise it'll close when you roll off the target.
+		if (!auto_close) {
+			tip.append($('<a href="#" class="close"></a>'));
+			tip.find(".close").click($.proxy(this.close,this));
+		}
+		container.append(tip);
+		
+		// Figure out where the target is in the DOM, add the container to the DOM so we can get its width/height for some positions.
+		offset = $(selector).offset();
+		w = $(selector).width();
+		h = $(selector).height();
+		$("body").append(container);
+		
+		// The tip is below the target.
+		if (position == "below") {
+			container.addClass("tooltip_below");
+			l = offset.left - 28 + Math.round(w / 2);
+			t = offset.top + h + 5;
+		}
+		
+		// The tip is to the right of the target.
+		if (position == "right") {
+			container.addClass("tooltip_right");
+			l = offset.left + w + 5;
+			t = offset.top - 28 + Math.round(h / 2);
+		}
+		
+		// The tip is to the left of the target.
+		if (position == "left") {
+			container.addClass("tooltip_left");
+			l = offset.left - container.width() - 5;
+			t = offset.top - 28 + Math.round(h / 2);
+		}
+		
+		// The tip is above of the target.
+		if (position == "above") {
+			container.addClass("tooltip_above").append($('<span class="arrow">'));
+			l = offset.left - 28 + Math.round(w / 2);
+			t = offset.top - container.height() - 5;
+		}
+		
+		container.css({ left: l + "px", top: t + "px" }).hide();
+		this.container = container;
+		
+		if (auto_close) {
+			$(selector).mouseenter($.proxy(function() { this.container.fadeIn(300); },this));
+			$(selector).mouseleave($.proxy(function() { this.container.fadeOut(300); },this));
+		} else {
+			$(selector).click($.proxy(function() {
+				this.container.fadeIn(300);
+				return false;
+			},this));
+		}
+	},
+	
+	close: function() {
+		this.container.fadeOut(300);
+		return false;
+	}
+});
+
 // !BigTree Object
 var BigTree = {
 
