@@ -27,6 +27,9 @@
 	foreach ($seo["recommendations"] as $rec) {
 		$seo_recs .= "<li>$rec</li>";
 	}
+	if (!count($seo["recommendations"])) {
+		$seo_recs .= "<li>Keep up the good work!</li>";
+	}
 	$seo_recs .= "</ul>";
 ?>
 <h3 class="properties"><span>Properties</span><span class="icon_small icon_small_caret_<? if ($open) { ?>down<? } else { ?>right<? } ?>"></span></h3>

@@ -178,8 +178,8 @@
 					if (!$this->iplExists($ipl)) {
 						$errors["a"][] = $href;
 					}
-				} elseif (substr($href,0,7) == "mailto:" || substr($href,0,1) == "#") {
-					// Don't do anything, it's a page mark or email address
+				} elseif (substr($href,0,7) == "mailto:" || substr($href,0,1) == "#" || substr($href,0,5) == "data:") {
+					// Don't do anything, it's a page mark, data URI, or email address
 				} elseif (substr($href,0,4) == "http") {
 					// It's a local hard link
 					if (!$this->urlExists($href)) {
@@ -210,6 +210,8 @@
 					if (!$this->iplExists($ipl)) {
 						$errors["a"][] = $href;
 					}
+				} elseif (substr($href,0,5) == "data:") {
+					// Do nothing, it's a data URI
 				} elseif (substr($href,0,4) == "http") {
 					// It's a local hard link
 					if (!$this->urlExists($href)) {
@@ -1759,9 +1761,26 @@
 			global $cms;
 			$template = $cms->getTemplate($page["template"]);
 			$tsources = array();
+			$h1_field = "";
+			$body_fields = array();
+			
 			foreach ($template["resources"] as $item) {
+				if ($item["seo_body"]) {
+					$body_fields[] = $item["id"];
+				}
+				if ($item["seo_h1"]) {
+					$h1_field = $item["id"];
+				}
 				$tsources[$item["id"]] = $item;
 			}
+			
+			if (!$h1_field && $tsources["page_header"]) {
+				$h1_field = "page_header";
+			}
+			if (!count($body_fields) && $tsources["page_content"]) {
+				$body_fields[] = "page_content";
+			}
+			
 			
 			$textStats = new TextStatistics;
 			$recommendations = array();
@@ -1821,24 +1840,29 @@
 			}
 
 			// Check for an H1
-			if ($content["page_header"] || !$tsources["page_header"]) {
+			if (!$h1_field || $content[$h1_field]) {
 				$score += 10;
 			} else {
 				$recommendations[] = "You should enter a page header.";
 			}
 			// Check the content!
-			if (!$tsources["page_content"]) {
-				// If this template doesn't for some reason have a page_content resource, give the benefit of the doubt.
+			if (!count($body_fields)) {
+				// If this template doesn't for some reason have a seo body resource, give the benefit of the doubt.
 				$score += 65;
 			} else {
-				$stripped_text = strip_tags($content["page_content"]);
+				$regular_text = "";
+				$stripped_text = "";
+				foreach ($body_fields as $field) {
+					$regular_text .= $content[$field]." ";
+					$stripped_text .= strip_tags($content[$field])." ";
+				}
 				// Check to see if there is any content
 				if ($stripped_text) {
 					$score += 5;
 					$words = $textStats->word_count($stripped_text);
 					$readability = $textStats->flesch_kincaid_reading_ease($stripped_text);
-					$number_of_links = substr_count($content["page_content"],"<a ");
-					$number_of_external_links = substr_count($content["page_content"],'href="http://');
+					$number_of_links = substr_count($regular_text,"<a ");
+					$number_of_external_links = substr_count($regular_text,'href="http://');
 
 					// See if there are at least 300 words.
 					if ($words >= 300) {

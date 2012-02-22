@@ -8,6 +8,12 @@
 		"phone" => "Phone Number"
 	);
 ?>
+<? if ($_POST["template"]) { ?>
+<fieldset>
+	<label>Use For &lt;H1&gt; SEO Score <small>(only a single field can be used)</small></label>
+	<input type="checkbox" name="seo_h1"<? if ($d["seo_h1"]) { ?> checked="checked"<? } ?> /> Enabled
+</fieldset>
+<? } ?>
 <fieldset>
 	<label>Sub Type</label>
 	<select name="sub_type">
