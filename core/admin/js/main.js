@@ -148,6 +148,10 @@ var BigTreeCheckbox = Class.extend({
 			a.addClass("checked");
 		}
 		
+		if (element.disabled) {
+			a.addClass("disabled");
+		}
+		
 		if (element.tabIndex) {
 			a.attr("tabindex",element.tabIndex);
 		}
@@ -174,14 +178,16 @@ var BigTreeCheckbox = Class.extend({
 	},
 
 	click: function() {
-		if (this.Link.hasClass("checked")) {
-			this.Link.removeClass("checked");
-			$(this.Element).attr("checked",false);
-		} else {
-			this.Link.addClass("checked");
-			$(this.Element).attr("checked",true);
+		if (!this.Element.attr("disabled")) {
+			if (this.Link.hasClass("checked")) {
+				this.Link.removeClass("checked");
+				$(this.Element).attr("checked",false);
+			} else {
+				this.Link.addClass("checked");
+				$(this.Element).attr("checked",true);
+			}
+			this.Element.trigger("checked:click");
 		}
-		this.Element.trigger("checked:click");
 		return false;
 	}
 });

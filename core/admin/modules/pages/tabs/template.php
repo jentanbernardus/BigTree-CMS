@@ -63,7 +63,7 @@
 
 <div class="left">
 	<fieldset>
-		<label>External Link <small>Include http://</small></label>
+		<label>External Link <small>(include http://)</small></label>
 		<input type="text" name="external" value="<?=$pdata["external"]?>" id="external_link" tabindex="1" <? if ($default_template == "") { ?> class="active"<? } ?>/>
 	</fieldset>
 	<fieldset>

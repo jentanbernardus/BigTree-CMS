@@ -122,15 +122,15 @@
 				"name" => "Feature",
 				"class" => "icon_feature icon_feature_on"
 			),
-			"delete" => array(
-				"key" => "id",
-				"name" => "Delete",
-				"class" => "icon_delete"
-			),
 			"edit" => array(
 				"key" => "id",
 				"name" => "Edit",
 				"class" => "icon_edit"
+			),			
+			"delete" => array(
+				"key" => "id",
+				"name" => "Delete",
+				"class" => "icon_delete"
 			)
 		);
 
@@ -401,7 +401,7 @@
 
 		function getArchivedNavigationByParent($parent) {
 			$nav = array();
-			$q = sqlquery("SELECT id,nav_title as title,parent,external,new_window,template,publish_at,path FROM bigtree_pages WHERE parent = '$parent' AND archived = 'on' ORDER BY nav_title asc");
+			$q = sqlquery("SELECT id,nav_title as title,parent,external,new_window,template,publish_at,expire_at,path FROM bigtree_pages WHERE parent = '$parent' AND archived = 'on' ORDER BY nav_title asc");
 			while ($nav_item = sqlfetch($q)) {
 				$nav_item["external"] = str_replace("{wwwroot}",$GLOBALS["www_root"],$nav_item["external"]);
 				$nav[] = $nav_item;
@@ -421,7 +421,7 @@
 
 		function getHiddenNavigationByParent($parent) {
 			$nav = array();
-			$q = sqlquery("SELECT id,nav_title as title,parent,external,new_window,template,publish_at,path FROM bigtree_pages WHERE parent = '$parent' AND in_nav = '' AND archived != 'on' ORDER BY nav_title asc");
+			$q = sqlquery("SELECT id,nav_title as title,parent,external,new_window,template,publish_at,expire_at,path FROM bigtree_pages WHERE parent = '$parent' AND in_nav = '' AND archived != 'on' ORDER BY nav_title asc");
 			while ($nav_item = sqlfetch($q)) {
 				$nav_item["external"] = str_replace("{wwwroot}",$GLOBALS["www_root"],$nav_item["external"]);
 				$nav[] = $nav_item;
@@ -431,7 +431,7 @@
 
 		function getNaturalNavigationByParent($parent,$levels = 1) {
 			$nav = array();
-			$q = sqlquery("SELECT id,nav_title as title,parent,external,new_window,template,publish_at,path FROM bigtree_pages WHERE parent = '$parent' AND in_nav = 'on' AND archived != 'on' ORDER BY position DESC, id ASC");
+			$q = sqlquery("SELECT id,nav_title as title,parent,external,new_window,template,publish_at,expire_at,path FROM bigtree_pages WHERE parent = '$parent' AND in_nav = 'on' AND archived != 'on' ORDER BY position DESC, id ASC");
 			while ($nav_item = sqlfetch($q)) {
 				$nav_item["external"] = str_replace("{wwwroot}",$GLOBALS["www_root"],$nav_item["external"]);
 				if ($levels > 1) {
@@ -580,13 +580,19 @@
 				$publish_at = "NULL";
 			}
 			
+			if ($expire_at) {
+				$expire_at = "'".date("Y-m-d",strtotime($expire_at))."'";
+			} else {
+				$expire_at = "NULL";
+			}
+			
 			$title = htmlspecialchars($title);
 			$nav_title = htmlspecialchars($nav_title);
 			$meta_description = htmlspecialchars($meta_description);
 			$meta_keywords = htmlspecialchars($meta_keywords);
 			$external = htmlspecialchars($external);
 
-			sqlquery("INSERT INTO bigtree_pages (`parent`,`nav_title`,`route`,`path`,`in_nav`,`title`,`template`,`external`,`new_window`,`resources`,`callouts`,`meta_keywords`,`meta_description`,`last_edited_by`,`created_at`,`publish_at`) VALUES ('$parent','$nav_title','$route','$path','$in_nav','$title','$template','$external','$new_window','$resources','$callouts','$meta_keywords','$meta_description','".$this->ID."',NOW(),$publish_at)");
+			sqlquery("INSERT INTO bigtree_pages (`parent`,`nav_title`,`route`,`path`,`in_nav`,`title`,`template`,`external`,`new_window`,`resources`,`callouts`,`meta_keywords`,`meta_description`,`last_edited_by`,`created_at`,`publish_at`,`expire_at`,`max_age`) VALUES ('$parent','$nav_title','$route','$path','$in_nav','$title','$template','$external','$new_window','$resources','$callouts','$meta_keywords','$meta_description','".$this->ID."',NOW(),$publish_at,$expire_at,'$max_age')");
 
 			$id = sqlid();
 			
@@ -803,7 +809,7 @@
 						"comment" => "A new revision has been made."
 					);
 				} else {
-					$user = $this->getUserById($this->ID);
+					$user = $this->getUser($this->ID);
 					$comments[] = array(
 						"user" => "BigTree",
 						"date" => date("F j, Y @ g:ia"),
@@ -982,6 +988,13 @@
 				$publish_at = "NULL";
 			}
 			
+			// Same goes for the expiration date.
+			if ($expire_at) {
+				$expire_at = "'".date("Y-m-d",strtotime($expire_at))."'";
+			} else {
+				$expire_at = "NULL";
+			}
+			
 			// Set the full path, saves DB access time on the front end.
 			if ($parent) {
 				$path = $this->getFullNavigationPath($parent)."/".$route;
@@ -997,7 +1010,7 @@
 			$external = htmlspecialchars($external);
 
 			// Update the database
-			sqlquery("UPDATE bigtree_pages SET `parent` = '$parent', `nav_title` = '$nav_title',`route` = '$route', `path` = '$path', `in_nav` = '$in_nav',`title` = '$title',`template` = '$template',`external` = '$external',`new_window` = '$new_window',`resources` = '$resources',`callouts` = '$callouts',`meta_keywords` = '$meta_keywords',`meta_description` = '$meta_description', `last_edited_by` = '".$this->ID."', publish_at = $publish_at WHERE id = '$page'");
+			sqlquery("UPDATE bigtree_pages SET `parent` = '$parent', `nav_title` = '$nav_title',`route` = '$route', `path` = '$path', `in_nav` = '$in_nav',`title` = '$title',`template` = '$template',`external` = '$external',`new_window` = '$new_window',`resources` = '$resources',`callouts` = '$callouts',`meta_keywords` = '$meta_keywords',`meta_description` = '$meta_description', `last_edited_by` = '".$this->ID."', publish_at = $publish_at, expire_at = $expire_at, max_age = '$max_age' WHERE id = '$page'");
 			
 			// Remove any pending drafts
 			sqlquery("DELETE FROM bigtree_pending_changes WHERE `table` = 'bigtree_pages' AND item_id = '$page'");
@@ -1322,7 +1335,7 @@
 		function deleteUser($id) {
 			$id = mysql_real_escape_string($id);
 			// If this person has higher access levels than the person trying to update them, fail.
-			$current = $this->getUserById($id);
+			$current = $this->getUser($id);
 			if ($current["level"] > $this->Level) {
 				return false;
 			}
@@ -1393,20 +1406,20 @@
 			return $items;
 		}
 		
-		function getUser($id) { return $this->getUserById($id); }
-
-		function getUserById($id) {
+		function getUser($id) {
 			$id = mysql_real_escape_string($id);
 			$item = sqlfetch(sqlquery("SELECT * FROM bigtree_users WHERE id = '$id'"));
 			if ($item["level"] > 0) {
 				$permissions = array();
 				$q = sqlquery("SELECT * FROM bigtree_modules");
-				while ($f = sqlfetch($q))
+				while ($f = sqlfetch($q)) {
 					$permissions[$f["id"]] = "p";
+				}
 				$item["permissions"] = $permissions;
 			} else {
 				$item["permissions"] = json_decode($item["permissions"],true);
 			}
+			$item["alerts"] = json_decode($item["alerts"],true);
 			return $item;
 		}
 
@@ -1442,7 +1455,7 @@
 
 			
 			// If this person has higher access levels than the person trying to update them, fail.
-			$current = $this->getUserById($id);
+			$current = $this->getUser($id);
 			if ($current["level"] > $this->Level) {
 				return false;
 			}
@@ -1454,13 +1467,14 @@
 			}
 			
 			$permissions = mysql_real_escape_string(json_encode($data["permissions"]));
+			$alerts = mysql_real_escape_string(json_encode($data["alerts"]));
 
 			if ($data["password"]) {
 				$phpass = new PasswordHash($config["password_depth"], TRUE);
 				$password = mysql_real_escape_string($phpass->HashPassword($data["password"]));
-				sqlquery("UPDATE bigtree_users SET `email` = '$email',`password` = '$password',`name` = '$name',`company` = '$company',`level` = '$level',`permissions` = '$permissions' WHERE id = '$id'");
+				sqlquery("UPDATE bigtree_users SET `email` = '$email',`password` = '$password',`name` = '$name',`company` = '$company',`level` = '$level',`permissions` = '$permissions', `alerts` = '$alerts' WHERE id = '$id'");
 			} else {
-				sqlquery("UPDATE bigtree_users SET `email` = '$email',`name` = '$name',`company` = '$company',`level` = '$level',`permissions` = '$permissions' WHERE id = '$id'");
+				sqlquery("UPDATE bigtree_users SET `email` = '$email',`name` = '$name',`company` = '$company',`level` = '$level',`permissions` = '$permissions', `alerts` = '$alerts' WHERE id = '$id'");
 			}
 			
 			$this->track("bigtree_users",$id,"updated");
@@ -2019,7 +2033,7 @@
 		}
 
 		function getPageAccessLevelByUserId($page,$user) {
-			$u = $this->getUserById($user);
+			$u = $this->getUser($user);
 			if ($u["level"] > 0) {
 				return "p";
 			}
@@ -2063,7 +2077,7 @@
 		function getPageAccessTypeByUserId($page,$user,$origin = true) {
 			$page = mysql_real_escape_string($page);
 			if ($origin) {
-				$u = $this->getUserById($user);
+				$u = $this->getUser($user);
 				if ($u["level"] > 0) {
 					return "i";
 				}
@@ -2194,7 +2208,7 @@
 			}
 			$items = array();
 			while ($f = sqlfetch($q)) {
-				$f["user"] = $this->getUserById($f["user"]);
+				$f["user"] = $this->getUser($f["user"]);
 				$items[] = $f;
 			}
 			return $items;
@@ -2248,7 +2262,7 @@
 				return false;
 			}
 
-			$user = $this->getUserById($t["user"]);
+			$user = $this->getUser($t["user"]);
 			$this->ID = $user["id"];
 			$this->User = $user["email"];
 			$this->Level = $user["level"];
@@ -2262,7 +2276,7 @@
 		function getFoundryFieldTypes() {
 			if (!file_exists($GLOBALS["server_root"]."cache/foundry-field-types.json") || (time() - filemtime($GLOBALS["server_root"]."cache/foundry-field-types.json") > 300)) {
 				// We're going to pass in the author information in case we need private types.
-				$user = $this->getUserById($this->ID);
+				$user = $this->getUser($this->ID);
 				$author = json_decode($user["foundry_author"],true);
 				$types = bigtree_curl("http://developer.bigtreecms.com/ajax/foundry/get-types/",array("email" => $author["email"],"password" => $author["password"]));
 				file_put_contents($GLOBALS["server_root"]."cache/foundry-field-types.json",$types);
@@ -2275,7 +2289,7 @@
 		function getFoundryModules() {
 			if (!file_exists($GLOBALS["server_root"]."cache/foundry-modules.json") || (time() - filemtime($GLOBALS["server_root"]."cache/foundry-modules.json") > 300)) {
 				// We're going to pass in the author information in case we need private modules.
-				$user = $this->getUserById($this->ID);
+				$user = $this->getUser($this->ID);
 				$author = json_decode($user["foundry_author"],true);
 				$modules = bigtree_curl("http://developer.bigtreecms.com/ajax/foundry/get-modules/",array("email" => $author["email"],"password" => $author["password"]));
 				file_put_contents($GLOBALS["server_root"]."cache/foundry-modules.json",$modules);

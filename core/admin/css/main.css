@@ -122,6 +122,9 @@
 	.checkbox a.checked { background-position: 0px 16px; }
 	.checkbox a.focused { background-position: -16px 0px; }
 	.checkbox a.checked.focused { background-position: -16px 16px; }
+	.checkbox a.disabled { opacity: 0.3; cursor: default; }
+	.checkbox a.disabled.focused { background-position: 0px 0px; }
+	.checkbox a.disabled.focused.checked { background-position: 0px 16px; }
 
 	.radio_button { float: left; margin: 0 7px 0 0; }
 	.radio_button a { background: url(../images/radio-sprite.png) -16px 0; cursor: pointer; display: block; height: 16px; width: 16px; }
@@ -156,6 +159,9 @@
 	form .right { float: right; width: 435px; }
 	form .left input[type=text], form .right input[type=text], form .left input[type=password], form .right input[type=password] { width: 410px; }
 	form .left textarea, form .right textarea { width: 413px; }
+	form .triplets { margin: 15px 0; overflow: hidden; float: left; }
+	form .triplets fieldset { float: left; width: 280px; margin: 0 29px 0 0; }
+	form .triplets fieldset:last-child { margin: 0; }
 
 	.image_field .file_wrapper { float: left; }
 	.image_field .or { float: left; height: 30px; line-height: 30px; padding: 0 10px; }
@@ -382,11 +388,11 @@
 	.move_page section ul.depth_10 li .depth { width: 90px; }
 	.move_page section ul.depth_10 li .title { width: 766px; }
 	
-	.property_block { border-radius: 3px; border: 1px solid #eee; border-bottom-color: #fff; background: #FFF; padding: 20px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.4); margin: 0 0 15px 0; overflow: hidden; }
-	.property_block article { float: left; width: 250px; margin: 0 0 10px 0; height: 20px; }
+	.property_block { background: #FFF; border: 1px solid #eee; border-bottom-color: #fff; border-radius: 3px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.4); margin: 0 0 15px 0; overflow: hidden; padding: 20px; }
+	.property_block article { float: left; height: 20px; margin: 0 0 10px 0; width: 250px; }
 	.property_block article.link { margin: 0; }
-	.property_block label { font-size: 10px; color: #848484; line-height: 20px; float: left; width: 80px; height: 20px; text-transform: uppercase; margin: 0; }
-	.property_block p { float: left; height: 20px; line-height: 20px; font-size: 13px; width: 170px; color: #191919; overflow: hidden; text-overflow: ellipsis; }
+	.property_block label { color: #848484; float: left; font-size: 10px; height: 20px; line-height: 20px; margin: 0; text-transform: uppercase; width: 80px; }
+	.property_block p { color: #191919; float: left; font-size: 13px; height: 20px; line-height: 20px; overflow: hidden; padding: 0 0 0 2px; text-overflow: ellipsis; width: 168px; }
 	.property_block p a { color: #191919; }
 	.property_block p span { float: left; }
 	.property_block .published { color: #2CAA56; }
@@ -394,9 +400,9 @@
 	.property_block .unpublished { color: #333; }
 	.property_block .icon_small { margin: 1px 5px; }
 	.property_block .link { width: 459px; }
-	.property_block .link p { width: 359px; }
+	.property_block .link p { width: 357px; }
 	.property_block .seo { width: 209px; }
-	.property_block .seo p { width: 129px; }
+	.property_block .seo p { width: 127px; }
 
 /* Table Styles */
 	div.table { border: 1px solid #CCC; border-radius: 5px; box-shadow: 0px 0px 3px #CCC; margin: 0 0 20px 0; overflow: hidden; }
@@ -605,40 +611,42 @@
 	.table .users_api_type { text-align: left; width: 250px; }
 	.table .users_api_token { text-align: left; width: 250px; }
 
-	.user_permissions .labels .permission_label { padding: 0 0 0 20px; text-align: left; text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.5); width: 596px; }
+	.user_permissions .labels .permission_label { padding: 0 0 0 20px; text-align: left; text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.5); width: 466px; }
 	.user_permissions .labels .permission_label_wider { width: 666px; }
 	.user_permissions .labels .permission_level { width: 70px; }
+	.user_permissions .labels .permission_alerts { width: 130px; }
 	.user_permissions section ul { float: left; }
 	.user_permissions section ul li.top { border: none; }
 	.user_permissions section ul li { background: #FFF; border-top: 1px solid #E5E5E5; overflow: hidden; transition: background 0.2s; }
 	.user_permissions section ul li:hover { background: #F9F9F9; }
-	.user_permissions section ul li .permission_label { background: url(../images/blue-arrow-sprite.png) no-repeat 17px 0px; color: #333; display: block; float: left; font-size: 15px; height: 32px; line-height: 32px; padding: 0 0 0 40px; width: 576px; }
+	.user_permissions section ul li .permission_label { background: url(../images/blue-arrow-sprite.png) no-repeat 17px 0px; color: #333; display: block; float: left; font-size: 15px; height: 32px; line-height: 32px; padding: 0 0 0 40px; width: 446px; }
 	.user_permissions section ul li .permission_label_wider { width: 646px; }
 	.user_permissions section ul li .permission_label.expanded { background: url(../images/blue-arrow-sprite.png) no-repeat 17px -64px; }
 	.user_permissions section ul li .permission_label.disabled { background: url(../images/blue-arrow-sprite.png) no-repeat 17px -32px; }
 	.user_permissions section ul li .permission_label.disabled.expanded { background: url(../images/blue-arrow-sprite.png) no-repeat 17px -96px; }
 	.user_permissions section ul li .permission_level { float: left; height: 16px; padding: 8px 27px; width: 16px; }
+	.user_permissions section ul li .permission_alerts { float: left; height: 16px; padding: 8px 57px; width: 16px; }
 
 	.user_permissions .depth { background: #ECECEC; float: left; height: 32px; }
 	.user_permissions section ul.depth_2 li .depth { width: 10px; }
-	.user_permissions section ul.depth_2 li .permission_label { width: 566px; }
+	.user_permissions section ul.depth_2 li .permission_label { width: 436px; }
 	.user_permissions section ul.depth_2 li .permission_label_wider { width: 636px; }
 	.user_permissions section ul.depth_3 li .depth { width: 20px; }
-	.user_permissions section ul.depth_3 li .permission_label { width: 556px; }
+	.user_permissions section ul.depth_3 li .permission_label { width: 426px; }
 	.user_permissions section ul.depth_4 li .depth { width: 30px; }
-	.user_permissions section ul.depth_4 li .permission_label { width: 546px; }
+	.user_permissions section ul.depth_4 li .permission_label { width: 416px; }
 	.user_permissions section ul.depth_5 li .depth { width: 40px; }
-	.user_permissions section ul.depth_5 li .permission_label { width: 536px; }
+	.user_permissions section ul.depth_5 li .permission_label { width: 406px; }
 	.user_permissions section ul.depth_6 li .depth { width: 50px; }
-	.user_permissions section ul.depth_6 li .permission_label { width: 526px; }
+	.user_permissions section ul.depth_6 li .permission_label { width: 396px; }
 	.user_permissions section ul.depth_7 li .depth { width: 60px; }
-	.user_permissions section ul.depth_7 li .permission_label { width: 516px; }
+	.user_permissions section ul.depth_7 li .permission_label { width: 386px; }
 	.user_permissions section ul.depth_8 li .depth { width: 70px; }
-	.user_permissions section ul.depth_8 li .permission_label { width: 506px; }
+	.user_permissions section ul.depth_8 li .permission_label { width: 376px; }
 	.user_permissions section ul.depth_9 li .depth { width: 80px; }
-	.user_permissions section ul.depth_9 li .permission_label { width: 496px; }
+	.user_permissions section ul.depth_9 li .permission_label { width: 366px; }
 	.user_permissions section ul.depth_10 li .depth { width: 90px; }
-	.user_permissions section ul.depth_10 li .permission_label { width: 486px; }
+	.user_permissions section ul.depth_10 li .permission_label { width: 356px; }
 	
 /* Settings Stuff */
 	.table .settings_name { padding: 0 20px; text-align: left; width: 250px; }
@@ -872,6 +880,8 @@
 	.icon_dialog_caption { background: url(../images/popup-icons.png) no-repeat 0px 0px; display: inline-block; height: 23px; width: 24px; }
 	.icon_dialog_delete { background: url(../images/popup-icons.png) no-repeat -55px 0px; display: inline-block; height: 23px; width: 16px; }
 	
+	.disabled_icon { cursor: default; opacity: 0.3; }
+
 /* Smaller Icons */
 	.icon_small { background: url(../images/icons-16x16.png) no-repeat; float: left; height: 16px; margin: 0 5px 0 0; width: 16px; }
 	.icon_small_add { background-position: 0px 0px; }

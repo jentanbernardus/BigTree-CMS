@@ -1,3 +1,7 @@
+<fieldset>
+	<label>URL Route <small>(leave blank to auto generate)</small></label>
+	<input type="text" name="route" value="<?=$pdata["route"]?>" tabindex="2" />
+</fieldset>
 <div class="left">
 	<fieldset>
 		<label>Meta Keywords</label>

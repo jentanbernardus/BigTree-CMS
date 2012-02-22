@@ -1,7 +1,7 @@
 <?
 	$breadcrumb[] = array("link" => "#", "title" => "Edit User");
 	
-	$user = $admin->getUserById($commands[0]);
+	$user = $admin->getUser($commands[0]);
 	bigtree_clean_globalize_array($user,array("htmlspecialchars"));
 	
 	if (!$permissions) {
@@ -11,8 +11,8 @@
 		);
 	}
 	
-	function _local_userDrawNavLevel($parent,$depth) {
-		global $permissions;
+	function _local_userDrawNavLevel($parent,$depth,$alert_above = false) {
+		global $permissions,$alerts;
 		$q = sqlquery("SELECT * FROM bigtree_pages WHERE parent = '$parent' AND archived != 'on' ORDER BY nav_title ASC");
 		$r = sqlrows($q);
 		if ($r) {
@@ -23,15 +23,17 @@
 		while ($f = sqlfetch($q)) {
 			$x++;
 			$r = sqlrows(sqlquery("SELECT id FROM bigtree_pages WHERE parent = '".$f["id"]."' AND archived != 'on'"));
+			$alert_below = ($alert_above || $alerts[$f["id"]]) ? true : false;
 	?>
 	<li>
 		<span class="depth"></span>
 		<a class="permission_label<? if (!$r) { ?> disabled<? } ?>" href="#"><?=$f["nav_title"]?></a>
+		<span class="permission_alerts"><input type="checkbox" name="alerts[<?=$f["id"]?>]"<? if ($alerts[$f["id"]] == "on" || $alert_above) { ?> checked="checked"<? } ?><? if ($alert_above) { ?> disabled="disabled"<? } ?>/></span>
 		<span class="permission_level"><input type="radio" name="permissions[page][<?=$f["id"]?>]" value="p" <? if ($permissions["page"][$f["id"]] == "p") { ?>checked="checked" <? } ?>/></span>
 		<span class="permission_level"><input type="radio" name="permissions[page][<?=$f["id"]?>]" value="e" <? if ($permissions["page"][$f["id"]] == "e") { ?>checked="checked" <? } ?>/></span>
 		<span class="permission_level"><input type="radio" name="permissions[page][<?=$f["id"]?>]" value="n" <? if ($permissions["page"][$f["id"]] == "n") { ?>checked="checked" <? } ?>/></span>
 		<span class="permission_level"><input type="radio" name="permissions[page][<?=$f["id"]?>]" value="i" <? if (!$permissions["page"][$f["id"]] || $permissions["page"][$f["id"]] == "i") { ?>checked="checked" <? } ?>/></span>
-		<? _local_userDrawNavLevel($f["id"],$depth + 1) ?>
+		<? _local_userDrawNavLevel($f["id"],$depth + 1,$alert_below) ?>
 	</li>
 	<?
 		}
@@ -106,6 +108,7 @@
 					<div id="page_permissions">
 						<div class="labels">
 							<span class="permission_label">Page</span>
+							<span class="permission_alerts">Content Alerts</span>
 							<span class="permission_level">Publisher</span>
 							<span class="permission_level">Editor</span>
 							<span class="permission_level">No Access</span>
@@ -116,11 +119,12 @@
 								<li class="top">
 									<span class="depth"></span>
 									<a class="permission_label expanded" href="#">All Pages</a>
+									<span class="permission_alerts"><input type="checkbox" name="alerts[0]"<? if ($alerts[0] == "on") { ?> checked="checked"<? } ?>/></span>
 									<span class="permission_level"><input type="radio" name="permissions[page][<?=$f["id"]?>]" value="p" <? if ($permissions["page"][0] == "p") { ?>checked="checked" <? } ?>/></span>
 									<span class="permission_level"><input type="radio" name="permissions[page][<?=$f["id"]?>]" value="e" <? if ($permissions["page"][0] == "e") { ?>checked="checked" <? } ?>/></span>
 									<span class="permission_level"><input type="radio" name="permissions[page][<?=$f["id"]?>]" value="n" <? if ($permissions["page"][0] == "n" || !$permissions["page"][0]) { ?>checked="checked" <? } ?>/></span>
 									<span class="permission_level">&nbsp;</span>
-									<? _local_userDrawNavLevel(0,2) ?>
+									<? _local_userDrawNavLevel(0,2,$alerts[0]) ?>
 								</li>
 							</ul>
 						</section>
@@ -217,5 +221,19 @@
 		}
 		
 		return false;
+	});
+	
+	$("input[type=checkbox]").on("checked:click",function() {
+		if ($(this).attr("checked")) {
+			$(this).parent().parent().find("ul input[type=checkbox]").each(function() {
+				$(this).attr("checked","checked").attr("disabled","disabled");
+				this.customControl.Link.addClass("checked").addClass("disabled");
+			});
+		} else {
+			$(this).parent().parent().find("ul input[type=checkbox]").each(function() {
+				$(this).attr("checked",false).attr("disabled",false);
+				this.customControl.Link.removeClass("checked").removeClass("disabled");
+			});
+		}
 	});
 </script>

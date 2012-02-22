@@ -3,7 +3,7 @@
 		<div class="sticky_controls">
 			<div class="shadow">
 				<nav class="left">
-					<a href="#navigation_tab"<? if ($action == "create") { ?> class="active"<? } ?>>Navigation</a>
+					<a href="#properties_tab"<? if ($action == "create") { ?> class="active"<? } ?>>Properties</a>
 					<a href="#template_tab">Template</a>
 					<a href="#content_tab"<? if ($action == "update") { ?> class="active"<? } ?>>Content</a>
 					<a href="#seo_tab">SEO</a>
@@ -57,8 +57,8 @@
 		<input type="hidden" name="parent" value="<?=$parent?>" />
 		<? } ?>
 		
-		<section id="navigation_tab"<? if ($action == "update") { ?> style="display: none;"<? } ?>>
-			<? include bigtree_path("admin/modules/pages/tabs/navigation.php") ?>
+		<section id="properties_tab"<? if ($action == "update") { ?> style="display: none;"<? } ?>>
+			<? include bigtree_path("admin/modules/pages/tabs/properties.php") ?>
 		</section>
 		<section id="template_tab" style="display: none;">
 			<? include bigtree_path("admin/modules/pages/tabs/template.php") ?>
