@@ -186,9 +186,8 @@
 	#bigtree_tag_browser { margin: 30px -30px -30px; }
 
 /* Login Styles */
-	body.login { background: url(../images/repeat-bg.png) repeat top center; }
-	.login_fade { background: url(../images/login-bg.png) repeat-x top center fixed; height: 100%; width: 100%; }
-	.login_wrapper { margin: 0 auto; padding: 75px 0 50px; width: 445px; }
+	body.login { background: url(../images/login-bg.png), url(../images/repeat-bg.png); background-repeat: repeat-x, repeat; background-position: top center, top center; background-attachment: scroll, fixed; }
+	.login_wrapper { margin: 0 auto; padding: 75px 0 25px; width: 445px; }
 	.login_wrapper h1 { color: #FFF; font-size: 30px; font-weight: normal; margin: 0 0 25px 0; text-align: center; text-shadow: 0 1px 0 #000; }
 	.login_wrapper form { background: #FFF; border: 1px solid #CCCCCC; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 1); overflow: hidden; padding: 30px 0 0; }
 	.login_wrapper h2 { color: #333; font-size: 20px; font-weight: normal; line-height: 1; overflow: hidden; margin: 0 30px 5px; padding: 0; text-shadow: 0 1px 0 #FFF; }
@@ -201,8 +200,10 @@
 	.login_wrapper .forgot_password { color: #666; float: right; line-height: 36px; }
 	.login_wrapper .forgot_password:hover { color: #3E667D; }
 	.login_wrapper .error_message { background: #990000; border-radius: 2px; box-shadow: 0 1px 0 rgba(0, 0, 0, 0.5); color: #FFF; font-size: 12px; line-height: 18px; margin: 0 30px 20px 30px; padding: 5px 10px; text-shadow: 0px -1px 0 rgba(0,0,0,0.25); }
-	.login_logo { background: url(../images/login-logo.png); display: block; height: 30px; margin: 25px auto; width: 155px; }
-	.login_copyright { background: url(../images/login-copyright.png); display: block; height: 15px; margin: 50px auto; opacity: 0.5; width: 222px; }
+	.login_logo { background: url(../images/logo.png) no-repeat center; display: block; height: 32px; margin: 40px auto 0; width: 123px; text-indent: -99999px; }
+	.login_copyright { color: #777; display: block; margin: 25px auto 0; text-align: center; text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5); width: 300px; }
+	.login_copyright a { color: #777; }
+	.login_copyright a:hover { color: #ccc; }
 
 /* Header */
 	header.main { background: url(../images/header-bg.png); height: 55px; min-width: 960px; }
@@ -220,7 +221,7 @@
 	header.main div { background: url(../images/header-icons.png) -18px 0px; float: right; height: 10px; margin: 22px 7px; width: 5px; }
 	
 /* Main Navigation */
-	nav.main { background: #FFF; box-shadow: 0 0 5px rgba(0, 0, 0, 0.5); height: 36px; min-width: 960px; position: relative; z-index: 2; }
+	nav.main { background: #FFF; box-shadow: 0 -1px 6px rgba(0, 0, 0, 0.75); height: 36px; min-width: 960px; position: relative; z-index: 2; }
 	nav.main section { margin: 0 auto; width: 960px; }
 	nav.main ul { border-right: 1px solid #DCDCDC; float: left; }
 	nav.main li { background: #FFF; float: left; margin-right: -1px; position: relative; z-index: 1; }
@@ -284,18 +285,18 @@
 	.breadcrumb li.first a { color: #777; }
 
 /* Footer */
-	footer.main { background: url(../images/footer-bg.png) repeat-x; margin: -5px 0 0; padding: 35px 0 30px; min-width: 960px; }
+	footer.main { background: #16252D; border-top: 3px solid #fff; box-shadow: 0 -2px 2px rgba(0, 0, 0, 0.25); padding: 20px 0; min-width: 960px; }
 	footer.main section { margin: 0 auto; overflow: hidden; width: 960px; }
 	footer.main .bigtree { float: left; }
-	footer.main .bigtree .logo { background: url(../images/footer-logo.png); display: block; float: left; height: 30px; margin: 0 20px 0 0; width: 153px; }
+	footer.main .bigtree .logo { background: url(../images/logo.png); display: block; float: left; height: 32px; margin: 0; width: 123px; }
 	footer.main .bigtree .links { float: left; padding: 14px 0 0 0; }
 	footer.main .bigtree .links a { color: #CCC; float: left; font-size: 12px; height: 12px; text-transform: uppercase; }
 	footer.main .bigtree .links a:hover { color: #FFF; }
 	footer.main .bigtree .links span { background: url(../images/header-icons.png) -18px 0px; display: block; float: left; height: 10px; margin: 0 7px; width: 5px; }
-	footer.main .fastspot { background: url(../images/footer-fs.png) no-repeat; color: #6C7679; float: right; font-size: 10px; height: 25px; padding: 0 0 0 50px; width: 245px; }
-	footer.main .fastspot p { color: #DDD; font-size: 12px; line-height: 12px; margin: 0 0 5px 0; }
+	footer.main .fastspot { background: url(../images/footer-fs.png) no-repeat; color: #6C7679; float: right; font-size: 10px; height: 25px; padding: 0 0 0 50px; width: 245px; text-align: right; text-shadow: 0 1px 0 rgba(0, 0, 0, 1); }
+	footer.main .fastspot p { color: #DADADA; font-size: 12px; line-height: 12px; margin: 0 0 7px 0; }
 	footer.main .fastspot a { color: #6C7679; }
-	footer.main .fastspot a:hover { color: #FFF; }
+	footer.main .fastspot a:hover { color: #DADADA; }
 	
 /* Form Container Styles */
 	.form_container { background: #FFF; border: 1px solid #CCC; border-radius: 5px; box-shadow: 0px 0px 3px #CCC; margin: 0 0 25px 0; overflow: hidden; }
@@ -328,7 +329,7 @@
 	.form_table:last-child { margin: 0; }
 	.form_table header { height: 35px; }
 	.form_table header nav { padding: 8px 0 0 15px; width: auto; }
-	.form_table header nav a, .form_table header nav a:hover { background: #D4D4D4; border-radius: 3px 3px 0 0; border: 1px solid #D4D4D4; border-top-color: #B9B9B9; border-width: 1px 1px 0 1px; color: #666; display: block; float: left; height: 26px; line-height: 26px; margin: 0 5px 0 0; padding: 0 15px; /* transition: background 0.2s, color 0.2s, text-shadow 0.2s; */ text-shadow: 0px 1px 0 rgba(255, 255, 255, 0.5); }
+	.form_table header nav a, .form_table header nav a:hover { background: #D4D4D4; border-radius: 3px 3px 0 0; border: 1px solid #D4D4D4; border-top-color: #B9B9B9; border-width: 1px 1px 0 1px; color: #666; display: block; float: left; height: 26px; line-height: 26px; margin: 0 5px 0 0; padding: 0 15px; text-shadow: 0px 1px 0 rgba(255, 255, 255, 0.5); }
 	.form_table header nav a:hover { background: #C7C7C7; color: #333; }
 	.form_table header nav a.active { background: #AFAFAF; border-color: #AFAFAF; color: #fff; padding: 0 15px; text-shadow: 0px -1px 0 rgba(0, 0, 0, 0.3); }
 	

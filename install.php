@@ -42,9 +42,8 @@
 		<script type="text/javascript" src="core/admin/js/install.js"></script>
 	</head>
 	<body class="install">
-		<div class="install_fade">
-			<div class="install_wrapper">
-				<h1>Install BigTree</h1>
+		<div class="install_wrapper">
+			<h1>Install BigTree</h1>
 <?php
 
 	foreach ($_POST as $key => $val) {
@@ -272,148 +271,147 @@ php_flag magic_quotes_gpc Off');
 	RewriteRule    (.*) site/$1    [L]
 </IfModule>');
 ?>
-					<h1>BigTree CMS Installed</h1>
-					<p>Thanks for using BigTree CMS.  Your install was successful.  Ready to hit the admin? <a href="admin/">CLICK HERE</a>.</p>
-				</section>
+				<h1>BigTree CMS Installed</h1>
+				<p>Thanks for using BigTree CMS.  Your install was successful.  Ready to hit the admin? <a href="admin/">CLICK HERE</a>.</p>
+			</section>
 <?
 	} else {
 		if (!$host)
 			$host = "localhost";
 ?>
-				<form method="post" action="" class="module">
-					<h2 class="getting_started"><span></span>Getting Started</h2>
-					<fieldset class="clear">
-						<p>Welcome to the BigTree installer. If you have not done so already, please make the current working directory writable and create a MySQL database for your new BigTree powered site.</p>
-					</fieldset>
-					<? if (count($warnings)) { ?>
+			<form method="post" action="" class="module">
+				<h2 class="getting_started"><span></span>Getting Started</h2>
+				<fieldset class="clear">
+					<p>Welcome to the BigTree installer. If you have not done so already, please make the current working directory writable and create a MySQL database for your new BigTree powered site.</p>
+				</fieldset>
+				<? if (count($warnings)) { ?>
+				<br />
+				<? foreach ($warnings as $warning) { ?>
+				<p class="warning_message clear"><?=$warning?></p>
+				<? } ?>
+				<? } ?>
+				<? if ($error) { ?>
+				<p class="error_message clear"><?=$error?></p>
+				<? } ?>
+				<hr />
+				
+				<h2 class="database"><span></span>Database Properties</h2>
+				<fieldset class="clear">
+					<p>Enter your MySQL database information below.</p>
 					<br />
-					<? foreach ($warnings as $warning) { ?>
-					<p class="warning_message clear"><?=$warning?></p>
-					<? } ?>
-					<? } ?>
-					<? if ($error) { ?>
-					<p class="error_message clear"><?=$error?></p>
-					<? } ?>
+				</fieldset>
+				<fieldset class="left<? if (count($_POST) && !$host) { ?> form_error<? } ?>">
+					<label>Hostname</label>
+					<input class="text" type="text" id="db_host" name="host" value="<?=htmlspecialchars($host)?>" tabindex="0" />
+				</fieldset>
+				<fieldset class="right<? if (count($_POST) && !$db) { ?> form_error<? } ?>">
+					<label>Database</label>
+					<input class="text" type="text" id="db_name" name="db" value="<?=htmlspecialchars($db)?>" tabindex="1" />
+				</fieldset>
+				<br class="clear" /><br />
+				<fieldset class="left<? if (count($_POST) && !$user) { ?> form_error<? } ?>">
+					<label>Username</label>
+					<input class="text" type="text" id="db_user" name="user" value="<?=htmlspecialchars($user)?>" tabindex="2" />
+				</fieldset>
+				<fieldset class="right<? if (count($_POST) && !$password) { ?> form_error<? } ?>">
+					<label>Password</label>
+					<input class="text" type="text" id="db_pass" name="password" value="<?=htmlspecialchars($password)?>" tabindex="3" />
+				</fieldset>
+				<fieldset>
+					<br />
+					<input type="checkbox" class="checkbox" name="loadbalanced" id="loadbalanced"<? if ($loadbalanced) { ?> checked="checked"<? } ?> />
+					<label class="for_checkbox">Load Balanced MySQL</label>
+				</fieldset>
+				
+				<div id="loadbalanced_settings"<? if (!$loadbalanced) { ?> style="display: none;"<? } ?>>
+					<br class="clear" />
 					<hr />
 					
-					<h2 class="database"><span></span>Database Properties</h2>
+					<h2 class="database"><span></span>Write Database Properties</h2>
 					<fieldset class="clear">
-						<p>Enter your MySQL database information below.</p>
+						<p>If you are hosting a load balanced setup with multiple MySQL servers, enter the master write server information below.</p>
 						<br />
 					</fieldset>
-					<fieldset class="left<? if (count($_POST) && !$host) { ?> form_error<? } ?>">
+					<fieldset class="left<? if (count($_POST) && !$write_host) { ?> form_error<? } ?>">
 						<label>Hostname</label>
-						<input class="text" type="text" id="db_host" name="host" value="<?=htmlspecialchars($host)?>" tabindex="0" />
+						<input class="text" type="text" id="db_write_host" name="write_host" value="<?=htmlspecialchars($host)?>" tabindex="0" />
 					</fieldset>
-					<fieldset class="right<? if (count($_POST) && !$db) { ?> form_error<? } ?>">
+					<fieldset class="right<? if (count($_POST) && !$write_db) { ?> form_error<? } ?>">
 						<label>Database</label>
-						<input class="text" type="text" id="db_name" name="db" value="<?=htmlspecialchars($db)?>" tabindex="1" />
+						<input class="text" type="text" id="db_write_name" name="write_db" value="<?=htmlspecialchars($db)?>" tabindex="1" />
 					</fieldset>
 					<br class="clear" /><br />
-					<fieldset class="left<? if (count($_POST) && !$user) { ?> form_error<? } ?>">
+					<fieldset class="left<? if (count($_POST) && !$write_user) { ?> form_error<? } ?>">
 						<label>Username</label>
-						<input class="text" type="text" id="db_user" name="user" value="<?=htmlspecialchars($user)?>" tabindex="2" />
+						<input class="text" type="text" id="db_write_user" name="write_user" value="<?=htmlspecialchars($user)?>" tabindex="2" />
 					</fieldset>
-					<fieldset class="right<? if (count($_POST) && !$password) { ?> form_error<? } ?>">
+					<fieldset class="right<? if (count($_POST) && !$write_password) { ?> form_error<? } ?>">
 						<label>Password</label>
-						<input class="text" type="text" id="db_pass" name="password" value="<?=htmlspecialchars($password)?>" tabindex="3" />
+						<input class="text" type="text" id="db_write_pass" name="write_password" value="<?=htmlspecialchars($password)?>" tabindex="3" />
 					</fieldset>
-					<fieldset>
-						<br />
-						<input type="checkbox" class="checkbox" name="loadbalanced" id="loadbalanced"<? if ($loadbalanced) { ?> checked="checked"<? } ?> />
-						<label class="for_checkbox">Load Balanced MySQL</label>
-					</fieldset>
-					
-					<div id="loadbalanced_settings"<? if (!$loadbalanced) { ?> style="display: none;"<? } ?>>
-						<br class="clear" />
-						<hr />
-						
-						<h2 class="database"><span></span>Write Database Properties</h2>
-						<fieldset class="clear">
-							<p>If you are hosting a load balanced setup with multiple MySQL servers, enter the master write server information below.</p>
-							<br />
-						</fieldset>
-						<fieldset class="left<? if (count($_POST) && !$write_host) { ?> form_error<? } ?>">
-							<label>Hostname</label>
-							<input class="text" type="text" id="db_write_host" name="write_host" value="<?=htmlspecialchars($host)?>" tabindex="0" />
-						</fieldset>
-						<fieldset class="right<? if (count($_POST) && !$write_db) { ?> form_error<? } ?>">
-							<label>Database</label>
-							<input class="text" type="text" id="db_write_name" name="write_db" value="<?=htmlspecialchars($db)?>" tabindex="1" />
-						</fieldset>
-						<br class="clear" /><br />
-						<fieldset class="left<? if (count($_POST) && !$write_user) { ?> form_error<? } ?>">
-							<label>Username</label>
-							<input class="text" type="text" id="db_write_user" name="write_user" value="<?=htmlspecialchars($user)?>" tabindex="2" />
-						</fieldset>
-						<fieldset class="right<? if (count($_POST) && !$write_password) { ?> form_error<? } ?>">
-							<label>Password</label>
-							<input class="text" type="text" id="db_write_pass" name="write_password" value="<?=htmlspecialchars($password)?>" tabindex="3" />
-						</fieldset>
-						<br class="clear" />
-					</div>
-					
 					<br class="clear" />
-					<hr />
-					
-					<h2 class="security"><span></span>Site Security</h2>
-					<fieldset class="clear">
-						<p>Customize your site's security settings below.</p>
-						<br />
-					</fieldset>
-					<fieldset class="left<? if (count($_POST) && !$settings_key) { ?> form_error<? } ?>">
-						<label>Settings Encryption Key</label>
-						<input class="text" type="text" name="settings_key" id="settings_key" value="<?=htmlspecialchars($settings_key)?>" tabindex="11" />
-					</fieldset>
-					<fieldset class="clear">
-						<br />
-						<input type="checkbox" class="checkbox" name="force_secure_login" id="force_secure_login"<? if ($force_secure_login) { ?> checked="checked"<? } ?> />
-						<label class="for_checkbox">Force HTTPS Logins</label>
-					</fieldset>
-					
-					<br class="clear" />
-					<hr />
-					
-					<h2 class="account"><span></span>Administrator Account</h2>
-					<fieldset class="clear">
-						<p>Create the default account your administration area.</p>
-						<br />
-					</fieldset>
-					<fieldset class="left<? if (count($_POST) && !$cms_user) { ?> form_error<? } ?>">
-						<label>Email Address</label>
-						<input class="text" type="text" id="cms_user" name="cms_user" value="<?=htmlspecialchars($cms_user)?>" tabindex="9" />
-					</fieldset>
-					<fieldset class="right<? if (count($_POST) && !$cms_pass) { ?> form_error<? } ?>">
-						<label>Password</label>
-						<input class="text" type="text" id="cms_pass" name="cms_pass" value="<?=htmlspecialchars($cms_pass)?>" tabindex="10" />
-					</fieldset>
-					
-					<br class="clear" />
+				</div>
+				
+				<br class="clear" />
+				<hr />
+				
+				<h2 class="security"><span></span>Site Security</h2>
+				<fieldset class="clear">
+					<p>Customize your site's security settings below.</p>
 					<br />
-					<hr />
-					
-					<h2 class="example"><span></span>Example Site</h2>
-					<fieldset class="clear">
-						<p>If you would also like to install the BigTree example site, check the box below. These optional demo files include example templates and modules to help learn how BigTree works, behind the scenes.</p>
-					</fieldset>
-					<fieldset class="clear">
-						<br />
-						<input type="checkbox" class="checkbox" name="install_example_site" id="install_example_site"<? if ($install_example_site) { ?> checked="checked"<? } ?> />
-						<label class="for_checkbox">Install Example Site</label>
-					</fieldset>
-					
-					<br class="clear" />
-					
-					<fieldset class="lower">
-						<input type="submit" class="button blue" value="Install Now" />
-					</fieldset>
-				</form>
+				</fieldset>
+				<fieldset class="left<? if (count($_POST) && !$settings_key) { ?> form_error<? } ?>">
+					<label>Settings Encryption Key</label>
+					<input class="text" type="text" name="settings_key" id="settings_key" value="<?=htmlspecialchars($settings_key)?>" tabindex="11" />
+				</fieldset>
+				<fieldset class="clear">
+					<br />
+					<input type="checkbox" class="checkbox" name="force_secure_login" id="force_secure_login"<? if ($force_secure_login) { ?> checked="checked"<? } ?> />
+					<label class="for_checkbox">Force HTTPS Logins</label>
+				</fieldset>
+				
+				<br class="clear" />
+				<hr />
+				
+				<h2 class="account"><span></span>Administrator Account</h2>
+				<fieldset class="clear">
+					<p>Create the default account your administration area.</p>
+					<br />
+				</fieldset>
+				<fieldset class="left<? if (count($_POST) && !$cms_user) { ?> form_error<? } ?>">
+					<label>Email Address</label>
+					<input class="text" type="text" id="cms_user" name="cms_user" value="<?=htmlspecialchars($cms_user)?>" tabindex="9" />
+				</fieldset>
+				<fieldset class="right<? if (count($_POST) && !$cms_pass) { ?> form_error<? } ?>">
+					<label>Password</label>
+					<input class="text" type="text" id="cms_pass" name="cms_pass" value="<?=htmlspecialchars($cms_pass)?>" tabindex="10" />
+				</fieldset>
+				
+				<br class="clear" />
+				<br />
+				<hr />
+				
+				<h2 class="example"><span></span>Example Site</h2>
+				<fieldset class="clear">
+					<p>If you would also like to install the BigTree example site, check the box below. These optional demo files include example templates and modules to help learn how BigTree works, behind the scenes.</p>
+				</fieldset>
+				<fieldset class="clear">
+					<br />
+					<input type="checkbox" class="checkbox" name="install_example_site" id="install_example_site"<? if ($install_example_site) { ?> checked="checked"<? } ?> />
+					<label class="for_checkbox">Install Example Site</label>
+				</fieldset>
+				
+				<br class="clear" />
+				
+				<fieldset class="lower">
+					<input type="submit" class="button blue" value="Install Now" />
+				</fieldset>
+			</form>
 <?php
 	}
 ?>
-				<a href="http://www.bigtreecms.com" class="install_logo" target="_blank"></a>
-				<a href="http://www.fastspot.com" class="install_copyright" target="_blank"></a>
-			</div>
+			<a href="http://www.bigtreecms.com" class="install_logo" target="_blank">BigTree</a>
+			<a href="http://www.fastspot.com" class="install_copyright" target="_blank">&copy; <?=date("Y")?> Fastspot</a>
 		</div>
 	</body>
 </html>

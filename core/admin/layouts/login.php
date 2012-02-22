@@ -15,14 +15,14 @@
 		<script type="text/javascript" src="<?=$aroot?>js/main.js"></script>
 	</head>
 	<body class="login">
-		<div class="login_fade">
-			<div class="login_wrapper">
-				<h1><?=$site["nav_title"]?></h1>
-				<?=$content?>
-				
-				<a href="http://www.bigtreecms.com" class="login_logo" target="_blank"></a>
-				<a href="http://www.fastspot.com" class="login_copyright" target="_blank"></a>
-			</div>
+		<div class="login_wrapper">
+			<h1><?=$site["nav_title"]?></h1>
+			<?=$content?>
+			
+			<a href="http://www.bigtreecms.com" class="login_logo" target="_blank"></a>
+			<span class="login_copyright">
+				Version <?=$GLOBALS["bigtree"]["version"]?>&nbsp;&nbsp;&middot;&nbsp;&nbsp;&copy; <?=date("Y")?> <a href="http://www.fastspot.com" target="_blank"> Fastspot</a>
+			</span>
 		</div>
 	</body>
 </html>

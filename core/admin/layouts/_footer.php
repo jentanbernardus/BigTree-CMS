@@ -4,15 +4,19 @@
 			<section>
 				<article class="bigtree">
 					<a href="http://www.bigtreecms.com/" target="_blank" class="logo"></a>				
+<!--
 					<div class="links">
 						<a href="http://support.bigtreecms.com/4/" target="_blank">Support</a>
 						<span></span>
 						<a href="http://developer.bigtreecms.com/" target="_blank">Developer</a>
 					</div>
+-->
 				</article>
 				<article class="fastspot">
-					<p>Designed &amp; Developed by Fastspot</p>
-					<a href="<?=$aroot?>credits/">Credits</a> &nbsp;&middot;&nbsp; <a href="http://www.fastspot.com/" target="_blank">Learn More</a> &nbsp;&middot;&nbsp; <a href="http://www.fastspot.com/agency/contact/" target="_blank">Contact Us</a>
+					<p>
+						Version <?=$GLOBALS["bigtree"]["version"]?>&nbsp;&nbsp;&middot;&nbsp;&nbsp;&copy; <?=date("Y")?> Fastspot
+					</p>
+					<a href="<?=$aroot?>credits/">Credits</a>&nbsp;&nbsp;&middot;&nbsp;&nbsp;<a href="http://www.bigtreecms.com/" target="_blank">Support</a>&nbsp;&nbsp;&middot;&nbsp;&nbsp;<a href="http://www.fastspot.com/agency/contact/" target="_blank">Contact Us</a>
 				</article>
 			</section>
 		</footer>
