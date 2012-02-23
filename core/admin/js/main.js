@@ -275,6 +275,11 @@ var BigTreeSelect = Class.extend({
 		// The original select element that's hidden off screen.
 		el = this.Element.get(0);
 		
+		// If a modifier has been pressed, ignore this.
+		if (ev.ctrlKey || ev.altKey || ev.metaKey) {
+			return true;
+		}
+		
 		// Get the original index and save it so we know when it changes.
 		index = el.selectedIndex;
 		oindex = index;
@@ -328,9 +333,10 @@ var BigTreeSelect = Class.extend({
 			}
 			this.Container.find("span").html(el.options[index].text);
 			this.Element.trigger("select:changed", { value: el.options[index].value, text: el.options[index].text });
+			return false;
 		}
-
-		// If they didn't hit tab, don't let the event go messing with the original select… except that Firefox ignores it anyway.
+		
+		// Stop the event if it's not a tab.
 		if (ev.keyCode != 9) {
 			return false;
 		}
