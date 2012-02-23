@@ -1048,31 +1048,44 @@
 		function getChangeById($id) {
 			return sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE id = '$id'"));
 		}
+		
+		/*
+			Function: getChangeEditLink
+				Returns a link to where the item involved in the pending change can be edited.
+			
+			Parameters:
+				change - The ID of the change or the change array from the database.
+			
+			Returns:
+				A string containing a link to the admin.
+		*/
 
 		function getChangeEditLink($change) {
-			$f = sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE id = '$change'"));
-			
-			if ($f["table"] == "bigtree_pages" && $f["item_id"]) {
-				return $GLOBALS["www_root"]."admin/pages/edit/".$f["item_id"]."/";
+			if (!is_array($change)) {
+				$change = sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE id = '$change'"));
 			}
 			
-			if ($f["table"] == "bigtree_pages") {
-				return $GLOBALS["www_root"]."admin/pages/edit/p".$f["id"]."/";
+			if ($change["table"] == "bigtree_pages" && $change["item_id"]) {
+				return $GLOBALS["www_root"]."admin/pages/edit/".$change["item_id"]."/";
+			}
+			
+			if ($change["table"] == "bigtree_pages") {
+				return $GLOBALS["www_root"]."admin/pages/edit/p".$change["id"]."/";
 			}
 
-			$modid = $f["module"];
+			$modid = $change["module"];
 			$module = sqlfetch(sqlquery("SELECT * FROM bigtree_modules WHERE id = '$modid'"));
-			$form = sqlfetch(sqlquery("SELECT * FROM bigtree_module_forms WHERE `table` = '".$f["table"]."'"));
+			$form = sqlfetch(sqlquery("SELECT * FROM bigtree_module_forms WHERE `table` = '".$change["table"]."'"));
 			$action = sqlfetch(sqlquery("SELECT * FROM bigtree_module_actions WHERE `form` = '".$form["id"]."' AND in_nav = ''"));
 
-			if (!$f["item_id"]) {
-				$f["item_id"] = "p".$f["id"];
+			if (!$change["item_id"]) {
+				$change["item_id"] = "p".$change["id"];
 			}
 
 			if ($action) {
-				return $GLOBALS["www_root"]."admin/".$module["route"]."/".$action["route"]."/".$f["item_id"]."/";
+				return $GLOBALS["www_root"]."admin/".$module["route"]."/".$action["route"]."/".$change["item_id"]."/";
 			} else {
-				return $GLOBALS["www_root"]."admin/".$module["route"]."/edit/".$f["item_id"]."/";
+				return $GLOBALS["www_root"]."admin/".$module["route"]."/edit/".$change["item_id"]."/";
 			}
 		}
 

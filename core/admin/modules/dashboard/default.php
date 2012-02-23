@@ -39,7 +39,7 @@
 		<h2 class="full">
 			<span class="world"></span>
 			Recent Traffic <small>Visits In The Past Two Weeks</small>
-			<a href="analytics/" class="more">View Analytics</a>
+			<a href="<?=$aroot?>dashboard/analytics/" class="more">View Analytics</a>
 		</h2>
 	</summary>
 	<section>
@@ -76,7 +76,7 @@
 		<h2 class="full">
 			<span class="pending"></span>
 			Pending Changes <small>Recent Changes Awaiting Your Approval</small>
-			<a href="pending/" class="more">View All Pending Changes</a>
+			<a href="<?=$aroot?>dashboard/pending-changes/" class="more">View All Pending Changes</a>
 		</h2>
 	</summary>
 	<header>
@@ -106,7 +106,7 @@
 			<section class="changes_author"><?=$item["user"]["name"]?></section>
 			<section class="changes_date"><?=date("n/j/y",strtotime($item["date"]))?></section>
 			<section class="changes_action"><a href="#" class="icon_preview"></a></section>
-			<section class="changes_action"><a href="#" class="icon_edit"></a></section>
+			<section class="changes_action"><a href="<?=$admin->getChangeEditLink($item)?>" class="icon_edit"></a></section>
 			<section class="changes_action"><a href="#" class="icon_approve icon_approve_on"></a></section>
 			<section class="changes_action"><a href="#" class="icon_deny"></a></section>
 		</li>
@@ -122,7 +122,7 @@
 		<h2 class="full">
 			<span class="unread"></span>
 			Unread Messages
-			<a href="messages/" class="more">View All Messages</a>
+			<a href="<?=$aroot?>dashboard/messages/" class="more">View All Messages</a>
 		</h2>
 	</summary>
 	<header>
