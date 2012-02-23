@@ -4,7 +4,7 @@
 	$change = sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE id = '".$_GET["change"]."'"));
 	
 	if ($change["table"] == "bigtree_pages")
-		$r = $admin->getPageAccessLevelByUserId($page,$admin->ID);
+		$r = $admin->getPageAccessLevelByUser($page,$admin->ID);
 	else {
 		$user = $admin->getUser($admin->ID);
 		$r = $user["permissions"][$change["module"]];

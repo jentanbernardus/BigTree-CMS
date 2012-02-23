@@ -25,7 +25,7 @@
 			$f = $admin->getPendingChange($cid);
 			$pdata = $f["changes"];
 			$pdata["updated_at"] = $f["date"];
-			$r = $admin->getPageAccessLevelByUserId($pdata["parent"],$admin->ID);
+			$r = $admin->getPageAccessLevelByUser($pdata["parent"],$admin->ID);
 		
 			$tags = array();
 			$temp_tags = json_decode($f["tags_changes"],true);
@@ -38,7 +38,7 @@
 			
 			$pdata["id"] = $page;
 		} else {
-			$r = $admin->getPageAccessLevelByUserId($page,$admin->ID);
+			$r = $admin->getPageAccessLevelByUser($page,$admin->ID);
 			$pdata = $admin->getPendingPage($page);
 			$tags = $pdata["tags"];
 			if (sqlrows(sqlquery("SELECT * FROM bigtree_pending_changes WHERE `table` = 'bigtree_pages' AND item_id = '$page'"))) {

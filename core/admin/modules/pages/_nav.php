@@ -1,5 +1,5 @@
 <?
-	$access = $admin->getPageAccessLevelByUserId(end($path),$admin->ID);
+	$access = $admin->getPageAccessLevelByUser(end($path),$admin->ID);
 	$available_actions = array(
 		array("route" => "view-tree", "name" => "View Child Pages", "icon" => "list")
 	);

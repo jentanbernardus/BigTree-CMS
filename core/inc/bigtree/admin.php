@@ -655,7 +655,7 @@
 			
 			$page = mysql_real_escape_string($page);
 			
-			$r = $this->getPageAccessLevelByUserId($page,$this->ID);
+			$r = $this->getPageAccessLevelByUser($page,$this->ID);
 			if ($r == "p") {
 				if (!is_numeric($page)) {
 					sqlquery("DELETE FROM bigtree_pending_changes WHERE id = '".mysql_real_escape_string(substr($page,1))."'");
@@ -1408,6 +1408,87 @@
 			return $items;
 		}
 		
+		/*
+			Function: getPendingChanges
+				Returns a list of changes that the logged in user has access to publish.
+			
+			Returns:
+				An array of changes sorted by most recent.
+		*/
+		
+		function getPendingChanges() {
+			$user = $this->getUser($this->ID);
+			
+			$changes = array();
+			// Setup the default search array to just be pages
+			$search = array("`module` = ''");
+			// Add each module the user has publisher permissions to
+			if (is_array($user["permissions"]["module"])) {
+				foreach ($user["permissions"]["module"] as $module => $permission) {
+					if ($permission == "p") {
+						$search[] = "`module` = '$module'";
+					}
+				}
+			}
+			// Add module group based permissions as well
+			if (is_array($user["permissions"]["gbp"])) {
+				foreach ($user["permissions"]["gbp"] as $module => $groups) {
+					foreach ($groups as $group => $permission) {
+						if ($permission == "p") {
+							$search[] = "`module` = '$module'";
+						} 
+					}
+				}
+			}
+			
+			$q = sqlquery("SELECT * FROM bigtree_pending_changes WHERE ".implode(" OR ",$search)." ORDER BY date DESC");
+			
+			while ($f = sqlfetch($q)) {
+				$ok = false;
+				
+				// If they're an admin, they've got it.
+				if ($this->Level > 0) {
+					$ok = true;						
+				// Check permissions on a page if it's a page.
+				} elseif ($f["table"] == "bigtree_pages") {
+					if (!$f["item_id"]) {
+						$id = "p".$f["id"];
+					} else {
+						$id = $f["item_id"];
+					}
+					$r = $this->getPageAccessLevelByUser($f["item_id"],$admin->ID);
+					// If we're a publisher, this is ours!
+					if ($r == "p") {
+						$ok = true;
+					}
+				} else {
+					// Check our list of modules.
+					if ($user["permissions"]["module"][$f["module"]] == "p") {
+						$ok = true;
+					} else {
+						// Check our group based permissions
+					}
+				}
+				
+				// We're a publisher, get the info about the change and put it in the change list.
+				if ($ok) {
+					$mod = $this->getModule($f["module"]);
+					$user = $this->getUser($f["user"]);
+					$comments = unserialize($f["comments"]);
+					if (!is_array($comments)) {
+						$comments = array();
+					}
+					
+					$f["mod"] = $mod;
+					$f["user"] = $user;
+					$f["comments"] = $comments;
+					$changes[] = $f;
+				}
+			}
+			
+			return $changes;
+		}
+		
 		function getUser($id) {
 			$id = mysql_real_escape_string($id);
 			$item = sqlfetch(sqlquery("SELECT * FROM bigtree_users WHERE id = '$id'"));
@@ -1415,7 +1496,7 @@
 				$permissions = array();
 				$q = sqlquery("SELECT * FROM bigtree_modules");
 				while ($f = sqlfetch($q)) {
-					$permissions[$f["id"]] = "p";
+					$permissions["module"][$f["id"]] = "p";
 				}
 				$item["permissions"] = $permissions;
 			} else {
@@ -2055,10 +2136,10 @@
 		}
 
 		function getPageAccessLevel($page) {
-			return $this->getPageAccessLevelByUserId($page,$this->ID);
+			return $this->getPageAccessLevelByUser($page,$this->ID);
 		}
 
-		function getPageAccessLevelByUserId($page,$user) {
+		function getPageAccessLevelByUser($page,$user) {
 			$u = $this->getUser($user);
 			if ($u["level"] > 0) {
 				return "p";
@@ -2070,7 +2151,7 @@
 					return "p";
 				}
 				$pdata = json_decode($f["changes"],true);
-				return $this->getPageAccessLevelByUserId($pdata["parent"],$admin->ID);
+				return $this->getPageAccessLevelByUser($pdata["parent"],$admin->ID);
 			}
 			
 			$pp = $this->Permissions["page"][$page];

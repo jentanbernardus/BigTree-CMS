@@ -6,7 +6,7 @@
 	// This section needs to be revamped to check permissions for modules
 	$item = sqlfetch(sqlquery("SELECT * FROM bigtree_resources WHERE id = '$id'"));
 	$entry = $item["entry"];
-	$r = $admin->getPageAccessLevelByUserId($id,$admin->ID);
+	$r = $admin->getPageAccessLevelByUser($id,$admin->ID);
 	if ($r == "p") {
 		unlink($config["server_root"]."site/files/resources/".$item["file"]);
 		sqlquery("DELETE FROM bigtree_resources WHERE id = '$id'");

@@ -20,13 +20,13 @@
 		
 		if (is_image($file)) {
 			$data = '<li class="image"><img src="'.$aroot.'images/icon_drag.gif" class="left" alt="" /><h4>Drag Image to Content</h4>';
-			$r = $admin->getPageAccessLevelByUserId($id,$admin->ID);
+			$r = $admin->getPageAccessLevelByUser($id,$admin->ID);
 			$data .= '<div class="list_image_holder"><img src="'.$config["resource_root"]."files/resources/".$file.'" alt="" /></div></li>';
 			$images[] = $data;
 			$inames[] = strtolower($name);
 		} else {
 			$data = '<li class="link">';
-			$r = $admin->getPageAccessLevelByUserId($id,$admin->ID);
+			$r = $admin->getPageAccessLevelByUser($id,$admin->ID);
 			$data .= '<a href="'.$config["resource_root"]."files/resources/".$file.'">'.$file.'</a></li>';
 			$files[] = $data;
 			$fnames[] = strtolower($name);

@@ -3,9 +3,9 @@
 	
 	$pdata = $admin->getPendingPage($page);
 	if ($page[0] == "p") {
-		$r = $admin->getPageAccessLevelByUserId($pdata["parent"],$admin->ID);
+		$r = $admin->getPageAccessLevelByUser($pdata["parent"],$admin->ID);
 	} else {
-		$r = $admin->getPageAccessLevelByUserId($page,$admin->ID);
+		$r = $admin->getPageAccessLevelByUser($page,$admin->ID);
 		if ($pdata["changed_applied"]) {
 			$show_revert = true;
 		}

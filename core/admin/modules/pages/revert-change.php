@@ -1,6 +1,6 @@
 <?
 	$page = end($path);
-	$r = $admin->getPageAccessLevelByUserId($page,$admin->ID);
+	$r = $admin->getPageAccessLevelByUser($page,$admin->ID);
 	if ($r) {
 		sqlquery("DELETE FROM bigtree_pending_changes WHERE `table` = 'bigtree_pages' AND item_id = '$page'");
 	}

@@ -16,9 +16,9 @@
 		$perm = $admin->getAccessLevel($module,$changes,$table);
 	} else {
 		if ($type == "EDIT" || $type == "DELETE") {
-			$perm = $admin->getPageAccessLevelByUserId($id,$admin->ID);
+			$perm = $admin->getPageAccessLevelByUser($id,$admin->ID);
 		} else {
-			$perm = $admin->getPageAccessLevelByUserId($changes["parent"],$admin->ID);
+			$perm = $admin->getPageAccessLevelByUser($changes["parent"],$admin->ID);
 		}
 	}
 	

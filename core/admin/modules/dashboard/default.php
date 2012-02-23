@@ -22,6 +22,9 @@
 		}
 	}
 	
+	// Get pending changes.
+	$changes = $admin->getPendingChanges();
+	
 	// Get Google Analytics Traffic
 	$ga_cache = $cms->getSetting("bigtree-internal-google-analytics-cache");
 	// Only show this thing if they have Google Analytics setup already
@@ -32,7 +35,13 @@
 		$bar_height = 70;
 ?>
 <div class="table">
-	<summary><h2 class="full"><span class="world"></span>Recent Traffic <small>Visits</small><a href="analytics/" class="more">View Analytics</a></h2></summary>
+	<summary>
+		<h2 class="full">
+			<span class="world"></span>
+			Recent Traffic <small>Visits In The Past Two Weeks</small>
+			<a href="analytics/" class="more">View Analytics</a>
+		</h2>
+	</summary>
 	<section>
 		<div class="graph">
 			<?
@@ -63,7 +72,22 @@
 ?>
 
 <div class="table">
-	<summary><h2 class="full"><span class="pending"></span>Pending Changes <small>Awaiting Your Approval</small><a href="pending/" class="more">View All Pending Changes</a></h2></summary>
+	<summary>
+		<h2 class="full">
+			<span class="pending"></span>
+			Pending Changes <small>Recent Changes Awaiting Your Approval</small>
+			<a href="pending/" class="more">View All Pending Changes</a>
+		</h2>
+	</summary>
+	<header>
+		<span class="changes_name">Change</span>
+		<span class="changes_author">Author</span>
+		<span class="changes_date">Date</span>
+		<span class="changes_action">Preview</a></span>
+		<span class="changes_action">Edit</a></span>
+		<span class="changes_action">Approve</span>
+		<span class="changes_action">Deny</span>
+	</header>
 	<ul>
 		<?
 			if (count($changes) == 0) {
@@ -71,8 +95,22 @@
 		<li><section class="no_content"><p>You have no changes awaiting your approval.</p></section></li>
 		<?	
 			} else {
+				$changes = array_slice($changes,0,10);
 				foreach ($changes as $item) {
-				
+					if (!$item["title"]) {
+						$item["title"] = $item["mod"]["name"];
+					}
+		?>
+		<li>
+			<section class="changes_name"><?=$item["title"]?></section>
+			<section class="changes_author"><?=$item["user"]["name"]?></section>
+			<section class="changes_date"><?=date("n/j/y",strtotime($item["date"]))?></section>
+			<section class="changes_action"><a href="#" class="icon_preview"></a></section>
+			<section class="changes_action"><a href="#" class="icon_edit"></a></section>
+			<section class="changes_action"><a href="#" class="icon_approve icon_approve_on"></a></section>
+			<section class="changes_action"><a href="#" class="icon_deny"></a></section>
+		</li>
+		<?		
 				}
 			}
 		?>
@@ -80,7 +118,20 @@
 </div>
 
 <div class="table">
-	<summary><h2 class="full"><span class="unread"></span>Unread Messages<a href="messages/" class="more">View All Messages</a></h2></summary>
+	<summary>
+		<h2 class="full">
+			<span class="unread"></span>
+			Unread Messages
+			<a href="messages/" class="more">View All Messages</a>
+		</h2>
+	</summary>
+	<header>
+		<span class="messages_from_to">From</span>
+		<span class="messages_subject">Subject</span>
+		<span class="messages_date_time">Date</a></span>
+		<span class="messages_date_time">Time</a></span>
+		<span class="messages_view">View</span>
+	</header>
 	<ul>
 		<?
 			if (count($unread) == 0) {

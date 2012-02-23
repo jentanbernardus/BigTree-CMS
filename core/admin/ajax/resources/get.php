@@ -35,7 +35,7 @@
 		if (is_image($file) && $type != "files") {
 			$data = '<li class="image"><img src="'.$aroot.'images/icon_drag.gif" class="left" alt="" /><h4>Drag Image to Content</h4>';
 			// This needs to be changed to take module access into account instead... and wtf is $id?
-			$r = $admin->getPageAccessLevelByUserId($id,$admin->ID);
+			$r = $admin->getPageAccessLevelByUser($id,$admin->ID);
 			if ($r == "p")
 				$data .= '<a class="right delete_resource" href="#'.$f["id"].'"><img src="'.$aroot.'images/icon_delete.gif" alt="" /></a>';
 			$data .= '<img src="'.$config["resource_root"]."files/resources/".$file.'" alt="" /></li>';
@@ -45,7 +45,7 @@
 		if (!is_image($file) && $type != "images") {
 			$data = '<li class="link">';
 			// This needs to be changed to take module access into account instead... and wtf is $id?
-			$r = $admin->getPageAccessLevelByUserId($id,$admin->ID);
+			$r = $admin->getPageAccessLevelByUser($id,$admin->ID);
 			if ($r == "p")
 				$data .= '<img class="delete_resource" href="#'.$f["id"].'" src="'.$aroot.'images/icon_delete.gif"  alt="" />';
 			$data .= '<a href="'.$config["resource_root"]."files/resources/".$file.'">'.$file.'</a></li>';

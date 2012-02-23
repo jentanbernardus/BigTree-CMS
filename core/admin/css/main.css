@@ -484,6 +484,11 @@
 	.table .messages_subject { padding: 0 0 0 20px; text-align: left; width: 453px; }
 	.table .messages_date_time { padding: 0 20px 0 0; text-align: right; width: 65px; }
 	.table .messages_view { padding: 0 20px 0 0; text-align: center; width: 45px; }
+	
+	.table .changes_name { padding: 0 0 0 20px; text-align: left; width: 420px; }
+	.table .changes_author { padding: 0 0 0 20px; text-align: left; width: 183px; }
+	.table .changes_date { padding: 0 30px 0 0; text-align: right; width: 65px; }
+	.table .changes_action { padding: 0 20px 0 0; text-align: center; width: 35px; }
 
 	.form_container .save_and_preview span { background: url(../images/icon-preview-small.png) no-repeat 0px center; float: left; height: 35px; margin: 0; width: 22px; }
 
@@ -876,6 +881,7 @@
 	.icon_draft { background: url(../images/icons.png) no-repeat -356px 5px; display: inline-block; height: 35px; width: 22px; }
 	.icon_email { background: url(../images/icons.png) no-repeat -377px 9px; display: inline-block; height: 35px; width: 24px; }
 	.icon_message { background: url(../images/icons.png) no-repeat -401px 6px; display: inline-block; height: 35px; width: 20px; }
+	.icon_deny { background: url(../images/icons.png) no-repeat -454px 5px; display: inline-block; height: 35px; width: 21px; }
 
 	.icon_edit_small { background: url(../images/icons-smaller.png) no-repeat -53px 0; display: inline-block; height: 17px; width: 16px; }
 	.icon_delete_small { background: url(../images/icons-smaller.png) no-repeat -28px 3px; display: inline-block; height: 17px; width: 12px; }

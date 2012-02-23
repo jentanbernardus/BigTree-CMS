@@ -1,5 +1,5 @@
 <?
-	$r = $admin->getPageAccessLevelByUserId($_GET["id"],$admin->ID);
+	$r = $admin->getPageAccessLevelByUser($_GET["id"],$admin->ID);
 	if ($r == "p") {
 		parse_str($_GET["sort"]);
 		
