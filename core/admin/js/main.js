@@ -206,7 +206,7 @@ var BigTreeSelect = Class.extend({
 	init: function(element) {
 		this.Element = $(element);
 		
-		$(element).css({ position: "absolute", left: "-10000px" });
+		$(element).css({ position: "absolute", left: "-1000000px" });
 		div = $("<div>").addClass("select");
 		tester = $("<div>").css({ position: "absolute", top: "-1000px", left: "-1000px", "font-size": "16px", "white-space": "nowrap" });
 		$("body").append(tester);
@@ -278,13 +278,15 @@ var BigTreeSelect = Class.extend({
 		// Up arrow
 		if (ev.keyCode == 38) {
 			index--;
-			if (index < 0)
+			if (index < 0) {
 				index = 0;
+			}
 		// Down arrow
 		} else if (ev.keyCode == 40) {
 			index++;
-			if (index == this.Element.get(0).options.length)
+			if (index == this.Element.get(0).options.length) {
 				index--;
+			}
 		} else if (ev.keyCode > 64 && ev.keyCode < 91) {
 			spot = ev.keyCode - 65;
 			letters = "abcdefghijklmnopqrstuvwxyz";
@@ -310,10 +312,16 @@ var BigTreeSelect = Class.extend({
 				}
 			}
 		}
-		
+				
 		if (index != oindex) {
+			console.log("Index is different - old was " + oindex + " new is " + index);
 			this.Container.find("span").html(this.Element.get(0).options[index].text);
+			this.Element.get(0).selectedIndex = index;
 			this.Element.trigger("select:changed");
+		}
+
+		if (ev.keyCode != 9) {
+			return false;
 		}
 	},
 	
