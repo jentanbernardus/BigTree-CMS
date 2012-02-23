@@ -1764,14 +1764,16 @@
 			$h1_field = "";
 			$body_fields = array();
 			
-			foreach ($template["resources"] as $item) {
-				if ($item["seo_body"]) {
-					$body_fields[] = $item["id"];
+			if (is_array($template)) {
+				foreach ($template["resources"] as $item) {
+					if ($item["seo_body"]) {
+						$body_fields[] = $item["id"];
+					}
+					if ($item["seo_h1"]) {
+						$h1_field = $item["id"];
+					}
+					$tsources[$item["id"]] = $item;
 				}
-				if ($item["seo_h1"]) {
-					$h1_field = $item["id"];
-				}
-				$tsources[$item["id"]] = $item;
 			}
 			
 			if (!$h1_field && $tsources["page_header"]) {
