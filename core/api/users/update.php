@@ -24,7 +24,7 @@
 	$success = $admin->updateUser($_POST["id"],$_POST);
 	
 	if ($success)
-		echo bigtree_api_encode(array("success" => true,"user" => $admin->getUserById($success)));
+		echo bigtree_api_encode(array("success" => true,"user" => $admin->getUser($success)));
 	else
 		echo bigtree_api_encode(array("success" => false,"error" => "You may not update a user with a higher permission level."));
 ?>

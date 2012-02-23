@@ -1,5 +1,5 @@
 <?
-	$user = $admin->getUserById($f["user"]);
+	$user = $admin->getUser($f["user"]);
 ?>
 <div class="form_container">
 	<header><h2><strong>Warning:</strong> This entry is currently locked.</h2></header>

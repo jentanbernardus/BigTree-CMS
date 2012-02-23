@@ -21,5 +21,5 @@
 	$admin->requireAPILevel(1);
 	
 	$id = $admin->createUser($_POST);
-	echo bigtree_api_encode(array("success" => true,"user" => $admin->getUserById($id)));
+	echo bigtree_api_encode(array("success" => true,"user" => $admin->getUser($id)));
 ?>

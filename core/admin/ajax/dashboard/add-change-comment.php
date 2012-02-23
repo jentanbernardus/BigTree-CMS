@@ -5,7 +5,7 @@
 	
 	if ($_GET["comment"]) {
 	
-		$user = $admin->getUserById($_SESSION["bigtree"]["id"]);
+		$user = $admin->getUser($_SESSION["bigtree"]["id"]);
 	
 		$comments[] = array(
 			"user" => $user["name"],

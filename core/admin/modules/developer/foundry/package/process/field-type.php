@@ -3,7 +3,7 @@
 	$type = $admin->getFieldType(end($commands));
 	
 	// Let's upload it to Foundry.
-	$user = $admin->getUserById($admin->ID);
+	$user = $admin->getUser($admin->ID);
 	
 	$author = json_decode($user["foundry_author"],true);
 	

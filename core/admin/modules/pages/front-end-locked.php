@@ -1,5 +1,5 @@
 <?
-	$user = $admin->getUserById($f["user"]);
+	$user = $admin->getUser($f["user"]);
 ?>
 <html>
 	<head>

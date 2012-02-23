@@ -313,7 +313,7 @@
 						"comment" => "A new revision has been made."
 					);
 				} else {
-					$user = $admin->getUserById($admin->ID);
+					$user = $admin->getUser($admin->ID);
 					$comments[] = array(
 						"user" => "BigTree",
 						"date" => date("F j, Y @ g:ia"),

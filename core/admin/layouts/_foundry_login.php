@@ -1,5 +1,5 @@
 <?
-	$user = $admin->getUserById($admin->ID);
+	$user = $admin->getUser($admin->ID);
 	if ($user["foundry_author"]) {
 		// Let's check to see if the credentials in their saved information are still valid.
 		$verify = bigtree_curl("http://developer.bigtreecms.com/ajax/foundry/verify-author/",json_decode($user["foundry_author"],true));
