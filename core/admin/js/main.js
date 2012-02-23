@@ -272,28 +272,34 @@ var BigTreeSelect = Class.extend({
 	},
 	
 	keydown: function(ev) {
-		index = this.Element.get(0).selectedIndex;
+		// The original select element that's hidden off screen.
+		el = this.Element.get(0);
+		
+		// Get the original index and save it so we know when it changes.
+		index = el.selectedIndex;
 		oindex = index;
 		
-		// Up arrow
+		// Up arrow pressed
 		if (ev.keyCode == 38) {
 			index--;
 			if (index < 0) {
 				index = 0;
 			}
-		// Down arrow
+		// Down arrow pressed
 		} else if (ev.keyCode == 40) {
 			index++;
-			if (index == this.Element.get(0).options.length) {
+			if (index == el.options.length) {
 				index--;
 			}
+		// A letter key was pressed
 		} else if (ev.keyCode > 64 && ev.keyCode < 91) {
 			spot = ev.keyCode - 65;
 			letters = "abcdefghijklmnopqrstuvwxyz";
 			letter = letters[spot];
 			
-			for (i = index + 1; i < this.Element.get(0).options.length; i++) {
-				text = this.Element.get(0).options[i].text;
+			// Go through all the options in the select to see if any of them start with the letter that was pressed.
+			for (i = index + 1; i < el.options.length; i++) {
+				text = el.options[i].text;
 				first_letter = text[0].toLowerCase();
 				if (first_letter == letter) {
 					index = i;
@@ -301,9 +307,10 @@ var BigTreeSelect = Class.extend({
 				}
 			}
 			
+			// If we were already on that letter, find the next one with that same letter.
 			if (index == oindex) {
 				for (i = 0; i < oindex; i++) {
-					text = this.Element.get(0).options[i].text;
+					text = el.options[i].text;
 					first_letter = text[0].toLowerCase();
 					if (first_letter == letter) {
 						index = i;
@@ -312,14 +319,18 @@ var BigTreeSelect = Class.extend({
 				}
 			}
 		}
-				
+		
+		// We found a new element, fire an event saying the select changed and update the description in the styled dropdown.
 		if (index != oindex) {
-			console.log("Index is different - old was " + oindex + " new is " + index);
-			this.Container.find("span").html(this.Element.get(0).options[index].text);
-			this.Element.get(0).selectedIndex = index;
-			this.Element.trigger("select:changed");
+			// For some reason Firefox doesn't care that we stop the event and still changes the index of the hidden select area, so we're not going to update it if we're in Firefox.
+			if (navigator.userAgent.indexOf("Firefox") == -1) {
+				el.selectedIndex = index;
+			}
+			this.Container.find("span").html(el.options[index].text);
+			this.Element.trigger("select:changed", { value: el.options[index].value, text: el.options[index].text });
 		}
 
+		// If they didn't hit tab, don't let the event go messing with the original select… except that Firefox ignores it anyway.
 		if (ev.keyCode != 9) {
 			return false;
 		}
@@ -374,7 +385,7 @@ var BigTreeSelect = Class.extend({
 		this.Container.find("span").html(el.innerHTML);
 		$("body").unbind("click",this.BoundWindowClick);
 		this.close();
-		this.Element.trigger("select:changed");
+		this.Element.trigger("select:changed", { value: el.getAttribute("value"), text: el.innerHTML });
 	}
 });
 

@@ -1,6 +1,6 @@
 <script type="text/javascript">
-	$("#view_table").bind("select:changed",function() {
-		$("#field_area").load("<?=$aroot?>ajax/developer/load-view-fields/?table=" + $(this).val());
+	$("#view_table").bind("select:changed",function(event,data) {
+		$("#field_area").load("<?=$aroot?>ajax/developer/load-view-fields/?table=" + data.value);
 	});
 	
 	$(".options").click(function() {
@@ -13,8 +13,8 @@
 		return false;
 	});
 	
-	$("#view_type").bind("select:changed",function() {
-		if ($(this).val() == "images" || $(this).val() == "images-grouped") {
+	$("#view_type").bind("select:changed",function(event,data) {
+		if (data.value == "images" || data.value == "images-grouped") {
 			$("#fields").hide();
 		} else {
 			$("#fields").show();

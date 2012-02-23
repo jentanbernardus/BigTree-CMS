@@ -7,9 +7,10 @@
 	$unused = array();
 	
 	$tblfields = array();
-	$q = sqlquery("describe $table");
-	while ($f = sqlfetch($q))
+	$q = sqlquery("DESCRIBE $table");
+	while ($f = sqlfetch($q)) {
 		$tblfields[] = $f["Field"];
+	}
 	
 	if (isset($fields)) {
 		foreach ($fields as $key => $field) {

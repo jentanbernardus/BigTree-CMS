@@ -27,7 +27,7 @@
 <script type="text/javascript">
 	BigTreeCustomControls();
 	
-	$("#callout_type select").bind("select:changed",function() {
-		$("#callout_resources").load("<?=$GLOBALS["www_root"]?>admin/ajax/pages/callout-resources/", { type: $(this).val(), count: <?=$count?>, resources: "<?=$_POST["data"]?>" });
+	$("#callout_type select").bind("select:changed",function(event,data) {
+		$("#callout_resources").load("<?=$GLOBALS["www_root"]?>admin/ajax/pages/callout-resources/", { type: data.value, count: <?=$count?>, resources: "<?=$_POST["data"]?>" });
 	});
 </script>

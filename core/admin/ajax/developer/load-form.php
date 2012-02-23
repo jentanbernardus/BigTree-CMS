@@ -17,10 +17,12 @@
 			if (!in_array($f["Field"],$reserved) && !in_array($f["Field"],$used)) {
 				$unused[$f["Field"]] = ucwords(str_replace("_"," ",$f["Field"]));
 			}
-			if ($f["Field"] == "position")
+			if ($f["Field"] == "position") {
 				$positioned = true;
+			}
 		}
 	} else {
+		$fields = array();
 		$q = sqlquery("DESCRIBE $table");
 		while ($f = sqlfetch($q)) {
 			if (!in_array($f["Field"],$reserved)) {
@@ -103,19 +105,27 @@
 				<input type="text" name="subtitles[<?=$key?>]" <? if ($field["type"] == "geocoding") { ?>disabled="disabled" value="Geocoding"<? } else { ?>value="<?=$field["subtitle"]?>"<? } ?> />
 			</section>
 			<section class="developer_resource_type">
-				<? if ($field["type"] == "geocoding") { ?>
+				<?
+					if ($field["type"] == "geocoding") {
+				?>
 				<input type="hidden" name="type[geocoding]" value="geocoding" id="type_geocoding" />
-				<? } elseif ($field["type"] == "many_to_many") { ?>
-				<? $mtm_count++; ?>
+				<?
+					} elseif ($field["type"] == "many_to_many") {
+						$mtm_count++;
+				?>
 				Many to Many
 				<input type="hidden" name="type[mtm_<?=$mtm_count?>]" value="many_to_many" id="type_mtm_<?=$mtm_count?>" />
-				<? } else { ?>
+				<?
+					} else {
+				?>
 				<select name="type[<?=$key?>]" id="type_<?=$key?>">
 					<? foreach ($types as $k => $v) { ?>
 					<option value="<?=$k?>"<? if ($k == $field["type"]) { ?> selected="selected"<? } ?>><?=htmlspecialchars($v)?></option>
 					<? } ?>
 				</select>
-				<? } ?>
+				<?
+					}
+				?>
 			</section>
 			<section class="developer_resource_action">
 				<a href="#" class="options icon_edit" name="<?=$key?>"></a>

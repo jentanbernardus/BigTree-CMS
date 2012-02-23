@@ -10,9 +10,9 @@
 	
 	$(".table_select").live("select:changed",tablePop);
 	
-	function tablePop() {
+	function tablePop(event,data) {
 		goingToPop = $(this).parent().siblings("fieldset");
-		goingToPop.children("div").load("<?=$aroot?>ajax/developer/load-table-columns/?table=" + $(this).val() + "&field=" + goingToPop.attr("name"), function() {
+		goingToPop.children("div").load("<?=$aroot?>ajax/developer/load-table-columns/?table=" + data.value + "&field=" + goingToPop.attr("name"), function() {
 			new BigTreeSelect(goingToPop.find("select").get(0));
 		});
 	}

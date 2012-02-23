@@ -80,8 +80,8 @@
 </div>
 
 <script type="text/javascript">
-	$("#form_table").bind("select:changed",function() {
-		$("#field_area").load("<?=$aroot?>ajax/developer/load-form/", { table: $("#form_table").val() });
+	$("#form_table").bind("select:changed",function(event,data) {
+		$("#field_area").load("<?=$aroot?>ajax/developer/load-form/", { table: data.value });
 		$("#create").show();
 	});
 </script>	

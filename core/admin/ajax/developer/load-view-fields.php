@@ -9,9 +9,10 @@
 	$unused = array();
 	
 	$tblfields = array();
-	$q = sqlquery("describe $table");
-	while ($f = sqlfetch($q))
+	$q = sqlquery("DESCRIBE $table");
+	while ($f = sqlfetch($q)) {
 		$tblfields[] = $f["Field"];
+	}
 	
 	if (isset($fields)) {
 		foreach ($fields as $key => $field) {
@@ -65,8 +66,9 @@
 					}			
 				// Otherwise we're loading a new data set based on a table.
 				} else {
-					if (!isset($table))
+					if (!isset($table)) {
 						$table = $_POST["table"];
+					}
 					$q = sqlquery("describe ".$table);
 					while ($f = sqlfetch($q)) {
 						if (!in_array($f["Field"],$reserved)) {
@@ -107,8 +109,9 @@
 			foreach ($admin->ViewActions as $key => $action) {
 				if (in_array($action["key"],$tblfields) || $allow_all_actions) {
 					$checked = false;
-					if ($actions[$key] || (!isset($actions) && !$allow_all_actions) || ($allow_all_actions && ($key == "edit" || $key == "delete")))
+					if ($actions[$key] || (!isset($actions) && !$allow_all_actions) || ($allow_all_actions && ($key == "edit" || $key == "delete"))) {
 						$checked = true;
+					}
 		?>
 		<li>
 			<input class="custom_control" type="checkbox" name="actions[<?=$key?>]" value="on" <? if ($checked) { ?>checked="checked" <? } ?>/>
