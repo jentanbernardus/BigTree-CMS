@@ -24,6 +24,7 @@
 		))
 	);
 	
+	$unread_messages = sqlrows(sqlquery("SELECT id FROM bigtree_messages WHERE recipients LIKE '%|".$admin->ID."|%' AND read_by NOT LIKE '%|".$admin->ID."|%'"));	
 	$site = $cms->getPage(0,false);
 ?>
 <!doctype html> 
@@ -53,7 +54,9 @@
 			<section>
 				<a href="<?=$aroot?>login/logout/" class="logout"><span></span>Logout</a>
 				<div></div>
-				<p><span></span>Welcome Back <a href="<?=$aroot?>users/settings/"><?=$admin->Name?></a></p>
+				<p class="messages"><span></span><a href="<?=$aroot?>dashboard/messages/"><?=$unread_messages?> Unread Messages</a></p>
+				<div></div>
+				<p class="welcome"><span></span>Welcome Back <a href="<?=$aroot?>users/settings/"><?=$admin->Name?></a></p>
 				<strong><?=$site["nav_title"]?> Admin</strong>
 				<a href="<?=$www_root?>" target="_blank" class="view_site">View Site</a>
 			</section>

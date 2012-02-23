@@ -214,7 +214,9 @@
 	header.main .logout span { background: url(../images/header-icons.png) -8px 0px; display: block; float: left; height: 10px; margin: 0 5px 0 0; width: 8px; }
 	header.main p { color: #FFF; float: right; font-size: 11px; height: 11px; line-height: 11px; margin: 22px 0; text-shadow: 0 1px 0 #000; }
 	header.main p span { background: url(../images/header-icons.png); display: block; float: left; height: 10px; margin: 0 5px 0 0; width: 8px; }
+	header.main p.messages span { background-position: -28px 0px; width: 12px; }
 	header.main p a { color: #72BFEE; }
+	header.main p.messages a { color: #FFF; }
 	header.main p a:hover { color: #93D7FF; }
 	header.main .view_site { background: #333; border-radius: 10px; box-shadow: 0 1px 0 #000; color: #CCC; float: left; font-size: 11px; height: 19px; line-height: 19px; margin: 18px 20px; padding: 0 15px; text-shadow: 0 -1px 0 #000; transition: background 0.2s; }
 	header.main .view_site:hover { background: #444; }

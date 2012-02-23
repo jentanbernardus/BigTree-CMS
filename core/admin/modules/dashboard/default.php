@@ -14,7 +14,7 @@
 			$sent[] = $f;
 		} else {
 			// If we've been marked read, put it in the read array.
-			if (strpos("|".$admin->ID."|",$f["read_by"]) !== false) {
+			if ($f["read_by"] && strpos("|".$admin->ID."|",$f["read_by"]) !== false) {
 				$read[] = $f;
 			} else {
 				$unread[] = $f;
@@ -32,7 +32,7 @@
 		$bar_height = 70;
 ?>
 <div class="table">
-	<summary><h2 class="full"><span class="world"></span>Recent Traffic <small>(In Visits)</small><a href="analytics/" class="more">View Analytics</a></h2></summary>
+	<summary><h2 class="full"><span class="world"></span>Recent Traffic <small>Visits</small><a href="analytics/" class="more">View Analytics</a></h2></summary>
 	<section>
 		<div class="graph">
 			<?

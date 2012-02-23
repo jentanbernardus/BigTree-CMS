@@ -14,7 +14,7 @@
 			$sent[] = $f;
 		} else {
 			// If we've been marked read, put it in the read array.
-			if (strpos("|".$admin->ID."|",$f["read_by"]) !== false) {
+			if ($f["read_by"] && strpos("|".$admin->ID."|",$f["read_by"]) !== false) {
 				$read[] = $f;
 			} else {
 				$unread[] = $f;
