@@ -4,6 +4,7 @@
 <script type="text/javascript">
   tinyMCE.init({
   		<? if ($content_css) { ?>content_css: "<?=$content_css?>",<? } ?>
+  		skin : "BigTree",
 		theme: "advanced",
 		mode: "exact",
 		elements: "<?=implode(",",$htmls)?>",
