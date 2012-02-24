@@ -9,9 +9,15 @@
 	<fieldset>
 		<label>Tags <img src="<?=$aroot?>images/tag.png" alt="" /></label>
 		<ul id="tag_list">
-			<? foreach ($pdata["tags"] as $tag) { ?>
+			<?
+				if (is_array($pdata["tags"])) {
+					foreach ($pdata["tags"] as $tag) {
+			?>
 			<li><input type="hidden" name="_tags[]" value="<?=$tag["id"]?>" /><a href="#"><?=$tag["tag"]?><span>x</span></a></li>
-			<? } ?>
+			<?
+					}
+				}
+			?>
 		</ul>
 		<input type="text" name="tag_entry" id="tag_entry" />
 		<ul id="tag_results" style="display: none;"></ul>
