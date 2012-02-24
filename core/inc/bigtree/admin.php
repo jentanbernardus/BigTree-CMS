@@ -631,7 +631,6 @@
 			}
 			
 			$tags = mysql_real_escape_string(json_encode($data["_tags"]));
-			$resources = mysql_real_escape_string(json_encode($data["_resources"]));
 			unset($data["_tags"]);
 			unset($data["_resources"]);
 			
@@ -642,7 +641,7 @@
 			$data["meta_description"] = htmlspecialchars($data["meta_description"]);
 
 			$data = mysql_real_escape_string(json_encode($data));
-			sqlquery("INSERT INTO bigtree_pending_changes (`user`,`date`,`title`,`table`,`changes`,`tags_changes`,`resources_changes`,`type`,`module`,`pending_page_parent`) VALUES ('".$this->ID."',NOW(),'New Page Created','bigtree_pages','$data','$tags','$resources','NEW','','".$data["parent"]."')");
+			sqlquery("INSERT INTO bigtree_pending_changes (`user`,`date`,`title`,`table`,`changes`,`tags_changes`,`type`,`module`,`pending_page_parent`) VALUES ('".$this->ID."',NOW(),'New Page Created','bigtree_pages','$data','$tags','NEW','','".$data["parent"]."')");
 			$id = sqlid();
 			
 			$this->track("bigtree_pages","p$id","created-pending");
