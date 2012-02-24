@@ -47,7 +47,7 @@
 			}
 			$pending_items = BigTreeAutoModule::getViewDataForGroup($view,$group,"id DESC","pending");
 	?>
-	<header><span style="padding: 0 0 0 20px;"><?=$title?></span></header>
+	<header class="group"><?=$title?></header>
 	<section>
 		<?
 			if (count($items)) {
