@@ -1011,7 +1011,7 @@
 			$external = htmlspecialchars($external);
 
 			// Update the database
-			sqlquery("UPDATE bigtree_pages SET `parent` = '$parent', `nav_title` = '$nav_title',`route` = '$route', `path` = '$path', `in_nav` = '$in_nav',`title` = '$title',`template` = '$template',`external` = '$external',`new_window` = '$new_window',`resources` = '$resources',`callouts` = '$callouts',`meta_keywords` = '$meta_keywords',`meta_description` = '$meta_description', `last_edited_by` = '".$this->ID."', publish_at = $publish_at, expire_at = $expire_at, max_age = '$max_age' WHERE id = '$page'");
+			sqlquery("UPDATE bigtree_pages SET `parent` = '$parent', `nav_title` = '$nav_title', `route` = '$route', `path` = '$path', `in_nav` = '$in_nav', `title` = '$title', `template` = '$template', `external` = '$external', `new_window` = '$new_window', `resources` = '$resources', `callouts` = '$callouts', `meta_keywords` = '$meta_keywords', `meta_description` = '$meta_description', `last_edited_by` = '".$this->ID."', publish_at = $publish_at, expire_at = $expire_at, max_age = '$max_age' WHERE id = '$page'");
 			
 			// Remove any pending drafts
 			sqlquery("DELETE FROM bigtree_pending_changes WHERE `table` = 'bigtree_pages' AND item_id = '$page'");
@@ -1537,6 +1537,46 @@
 				$pages = 1;
 			return $pages;
 		}
+		
+		/*
+			Function: updateProfile
+				Updates a user's name, company, digest setting, and (optionally) password.
+			
+			Parameters:
+				data - Array containing name / company / daily_digest / password.
+		*/
+		
+		function updateProfile($data) {
+			global $config;
+			
+			foreach ($data as $key => $val) {
+				if (substr($key,0,1) != "_" && !is_array($val)) {
+					$$key = mysql_real_escape_string($val);
+				}
+			}
+			
+			$id = mysql_real_escape_string($this->ID);
+			
+			if ($data["password"]) {
+				$phpass = new PasswordHash($config["password_depth"], TRUE);
+				$password = mysql_real_escape_string($phpass->HashPassword($data["password"]));
+				sqlquery("UPDATE bigtree_users SET `password` = '$password', `name` = '$name', `company` = '$company', `daily_digest` = '$daily_digest' WHERE id = '$id'");
+			} else {
+				sqlquery("UPDATE bigtree_users SET `name` = '$name', `company` = '$company', `daily_digest` = '$daily_digest' WHERE id = '$id'");
+			}
+		}
+		
+		/*
+			Function: updateUser
+				Updates a user.
+			
+			Parameters:
+				id - The user's "id"
+				data - A key/value array containing email, name, company, level, permissions, alerts, daily_digest, and (optionally) password.
+			
+			Returns:
+				True if successful.  False if the logged in user doesn't have permission to change the user or there was an email collision.
+		*/
 
 		function updateUser($id,$data) {
 			global $config;
@@ -1555,6 +1595,7 @@
 				return false;
 			}
 			
+			// If we didn't pass in a level because we're editing ourselves, use the current one.
 			if (!$level || $this->ID == $current["id"]) {
 				$level = $current["level"];
 			}
@@ -1571,9 +1612,9 @@
 			if ($data["password"]) {
 				$phpass = new PasswordHash($config["password_depth"], TRUE);
 				$password = mysql_real_escape_string($phpass->HashPassword($data["password"]));
-				sqlquery("UPDATE bigtree_users SET `email` = '$email',`password` = '$password',`name` = '$name',`company` = '$company',`level` = '$level',`permissions` = '$permissions', `alerts` = '$alerts' WHERE id = '$id'");
+				sqlquery("UPDATE bigtree_users SET `email` = '$email', `password` = '$password', `name` = '$name', `company` = '$company', `level` = '$level', `permissions` = '$permissions', `alerts` = '$alerts', `daily_digest` = '$daily_digest' WHERE id = '$id'");
 			} else {
-				sqlquery("UPDATE bigtree_users SET `email` = '$email',`name` = '$name',`company` = '$company',`level` = '$level',`permissions` = '$permissions', `alerts` = '$alerts' WHERE id = '$id'");
+				sqlquery("UPDATE bigtree_users SET `email` = '$email', `name` = '$name', `company` = '$company', `level` = '$level', `permissions` = '$permissions', `alerts` = '$alerts', `daily_digest` = '$daily_digest' WHERE id = '$id'");
 			}
 			
 			$this->track("bigtree_users",$id,"updated");

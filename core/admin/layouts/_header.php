@@ -56,7 +56,7 @@
 				<div></div>
 				<p class="messages"><span></span><a href="<?=$aroot?>dashboard/messages/"><?=$unread_messages?> Unread Messages</a></p>
 				<div></div>
-				<p class="welcome"><span></span>Welcome Back <a href="<?=$aroot?>users/settings/"><?=$admin->Name?></a></p>
+				<p class="welcome"><span></span>Welcome Back <a href="<?=$aroot?>users/profile/"><?=$admin->Name?></a></p>
 				<strong><?=$site["nav_title"]?> Admin</strong>
 				<a href="<?=$www_root?>" target="_blank" class="view_site">View Site</a>
 			</section>

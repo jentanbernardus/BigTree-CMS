@@ -90,6 +90,13 @@
 					<label>Company</label>
 					<input type="text" name="company" value="<?=$company?>" tabindex="4" />
 				</fieldset>
+				
+				<br /><br />
+				
+				<fieldset>
+					<input type="checkbox" name="daily_digest" tabindex="4" <? if ($daily_digest) { ?> checked="checked"<? } ?> />
+					<label class="for_checkbox">Daily Digest Email</label>
+				</fieldset>
 			</div>			
 		</section>
 		<section class="sub" id="permission_section"<? if ($user["level"] > 0) { ?> style="display: none;"<? } ?>>
