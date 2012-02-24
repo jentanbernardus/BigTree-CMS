@@ -1555,6 +1555,10 @@
 			if ($current["level"] > $this->Level) {
 				return false;
 			}
+			
+			if (!$level || $this->ID == $current["id"]) {
+				$level = $current["level"];
+			}
 
 			foreach ($data as $key => $val) {
 				if (substr($key,0,1) != "_" && !is_array($val)) {

@@ -90,6 +90,17 @@ $(document).ready(function() {
 		$(".property_block").toggle().next().toggle();
 		return false;
 	});
+	
+	$(".has_tooltip").each(function() {
+		width = BigTree.WindowWidth();
+		offset = $(this).offset();
+		if (offset.left > (width / 2)) {
+			position = "left";
+		} else {
+			position = "right";
+		}
+		new BigTreeToolTip($(this),$(this).attr("data-tooltip"),position,false,true);
+	});
 });
 
 function BigTreeCustomControls() {
@@ -1369,14 +1380,17 @@ var BigTreeFormValidator = Class.extend({
 
 // !BigTreeToolTip
 var BigTreeToolTip = Class.extend({
-	container: false,	
+	container: false,
+	position: false,
+	selector: false,
+	
 	init: function(selector,content,position,icon,auto_close) {
 		// If you don't specify an icon, just use the alert one.
 		if (!icon) {
 			icon = "alert";
 		}
 		// Create the container, add the tip to the container.
-		container = $('<div class="tooltip">');
+		container = $('<div class="tooltip" style="display: none;">');
 		// The arrow is below the tip if the position is above.
 		if (position != "above") {
 			container.append($('<span class="arrow">'));
@@ -1389,58 +1403,60 @@ var BigTreeToolTip = Class.extend({
 			tip.find(".close").click($.proxy(this.close,this));
 		}
 		container.append(tip);
-		
-		// Figure out where the target is in the DOM, add the container to the DOM so we can get its width/height for some positions.
-		offset = $(selector).offset();
-		w = $(selector).width();
-		h = $(selector).height();
+		container.addClass("tooltip_" + position);
+		if (position == "above") {
+			container.append($('<span class="arrow">'));
+		}
 		$("body").append(container);
 		
-		// The tip is below the target.
-		if (position == "below") {
-			container.addClass("tooltip_below");
-			l = offset.left - 28 + Math.round(w / 2);
-			t = offset.top + h + 5;
-		}
-		
-		// The tip is to the right of the target.
-		if (position == "right") {
-			container.addClass("tooltip_right");
-			l = offset.left + w + 5;
-			t = offset.top - 28 + Math.round(h / 2);
-		}
-		
-		// The tip is to the left of the target.
-		if (position == "left") {
-			container.addClass("tooltip_left");
-			l = offset.left - container.width() - 5;
-			t = offset.top - 28 + Math.round(h / 2);
-		}
-		
-		// The tip is above of the target.
-		if (position == "above") {
-			container.addClass("tooltip_above").append($('<span class="arrow">'));
-			l = offset.left - 28 + Math.round(w / 2);
-			t = offset.top - container.height() - 5;
-		}
-		
-		container.css({ left: l + "px", top: t + "px" }).hide();
+		this.position = position;
 		this.container = container;
+		this.selector = selector;
 		
 		if (auto_close) {
-			$(selector).mouseenter($.proxy(function() { this.container.fadeIn(300); },this));
+			$(selector).mouseenter($.proxy(this.showTip,this));
 			$(selector).mouseleave($.proxy(function() { this.container.fadeOut(300); },this));
 		} else {
-			$(selector).click($.proxy(function() {
-				this.container.fadeIn(300);
-				return false;
-			},this));
+			$(selector).click($.proxy(this.showTip,this));
 		}
 	},
 	
 	close: function() {
 		this.container.fadeOut(300);
 		return false;
+	},
+	
+	showTip: function() {
+		// Figure out where the target is in the DOM, add the container to the DOM so we can get its width/height for some positions.
+		offset = $(this.selector).offset();
+		w = $(this.selector).width();
+		h = $(this.selector).height();
+		
+		// The tip is below the target.
+		if (this.position == "below") {
+			l = offset.left - 28 + Math.round(w / 2);
+			t = offset.top + h + 5;
+		}
+		
+		// The tip is to the right of the target.
+		if (this.position == "right") {
+			l = offset.left + w + 5;
+			t = offset.top - 28 + Math.round(h / 2);
+		}
+		
+		// The tip is to the left of the target.
+		if (this.position == "left") {
+			l = offset.left - container.width() - 5;
+			t = offset.top - 28 + Math.round(h / 2);
+		}
+		
+		// The tip is above of the target.
+		if (this.position == "above") {
+			l = offset.left - 28 + Math.round(w / 2);
+			t = offset.top - container.height() - 5;
+		}
+		
+		this.container.css({ left: l + "px", top: t + "px" }).fadeIn(300);
 	}
 });
 

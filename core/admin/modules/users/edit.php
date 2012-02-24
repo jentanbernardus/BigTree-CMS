@@ -69,15 +69,16 @@
 					<label>Password <small>(leave blank to remain unchanged)</small></label>
 					<input type="password" name="password" value="" tabindex="3" />
 				</fieldset>
-				
+				<? if ($user["id"] != $admin->ID) { ?>
 				<fieldset>
 					<label class="required">User Level</label>
-					<select name="level" tabindex="5">
+					<select name="level" tabindex="5" id="user_level">
 						<option value="0"<? if ($user["level"] == "0") { ?> selected="selected"<? } ?>>Normal User</option>
 						<option value="1"<? if ($user["level"] == "1") { ?> selected="selected"<? } ?>>Administrator</option>
 						<? if ($admin->Level > 1) { ?><option value="2"<? if ($user["level"] == "2") { ?> selected="selected"<? } ?>>Developer</option><? } ?>
 					</select>
 				</fieldset>
+				<? } ?>
 			</div>
 			<div class="right">
 				<fieldset>
@@ -91,7 +92,7 @@
 				</fieldset>
 			</div>			
 		</section>
-		<section class="sub">
+		<section class="sub" id="permission_section"<? if ($user["level"] > 0) { ?> style="display: none;"<? } ?>>
 			<fieldset>
 				<label>Permissions <small>(for module sub-permissions "No Access" inherits from the main permission level)</small></label>
 			
@@ -233,6 +234,14 @@
 				$(this).attr("checked",false).attr("disabled",false);
 				this.customControl.Link.removeClass("checked").removeClass("disabled");
 			});
+		}
+	});
+	
+	$("#user_level").on("select:changed",function(event,data) {
+		if (data.value  > 0) {
+			$("#permission_section").hide();
+		} else {
+			$("#permission_section").show();
 		}
 	});
 </script>
