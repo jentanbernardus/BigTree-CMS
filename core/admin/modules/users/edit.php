@@ -73,7 +73,6 @@
 				<fieldset>
 					<label class="required">User Level</label>
 					<select name="level" tabindex="5">
-						<? if ($admin->Level > 1) { ?><option value="-1"<? if ($user["level"] == "-1") { ?> selected="selected"<? } ?>>Content Gatherer</option><? } ?>
 						<option value="0"<? if ($user["level"] == "0") { ?> selected="selected"<? } ?>>Normal User</option>
 						<option value="1"<? if ($user["level"] == "1") { ?> selected="selected"<? } ?>>Administrator</option>
 						<? if ($admin->Level > 1) { ?><option value="2"<? if ($user["level"] == "2") { ?> selected="selected"<? } ?>>Developer</option><? } ?>
