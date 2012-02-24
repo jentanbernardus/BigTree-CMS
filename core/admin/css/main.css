@@ -335,8 +335,8 @@
 	.form_table:last-child { margin: 0; }
 	.form_table header { height: 35px; }
 	.form_table header nav { padding: 8px 0 0 15px; width: auto; }
-	.form_table header nav a, .form_table header nav a:hover { background: #D4D4D4; border-radius: 3px 3px 0 0; border: 1px solid #D4D4D4; border-top-color: #B9B9B9; border-width: 1px 1px 0 1px; color: #666; display: block; float: left; height: 26px; line-height: 26px; margin: 0 5px 0 0; padding: 0 15px; text-shadow: 0px 1px 0 rgba(255, 255, 255, 0.5); }
-	.form_table header nav a:hover { background: #C7C7C7; color: #333; }
+	.form_table header nav a, .form_table header nav a:hover { background: #D4D4D4; border-radius: 3px 3px 0 0; border: 1px solid #D4D4D4; border-top-color: #B9B9B9; border-width: 1px 1px 0 1px; color: #666; display: block; float: left; height: 26px; line-height: 26px; margin: 0 5px 0 0; padding: 0 15px; text-shadow: 0px 1px 0 rgba(255, 255, 255, 0.5); transition: background-color 0.2s, color 0.2s; }
+	.form_table header nav a:hover { background: #DCDCDC; color: #333; }
 	.form_table header nav a.active { background: #AFAFAF; border-color: #AFAFAF; color: #fff; padding: 0 15px; text-shadow: 0px -1px 0 rgba(0, 0, 0, 0.3); }
 	
 	.form_table .labels { background-gradient: #9A9A9A #AFAFAF; color: #FFF; height: 20px; line-height: 20px; overflow: hidden; text-shadow: 0px -1px 0 #666; text-transform: uppercase; }
@@ -361,7 +361,6 @@
 	
 	.sticky_controls.stuck nav { overflow: hidden; padding: 6px 0 5px 15px; width: 928px; }
 	.sticky_controls.stuck nav a { border-width: 1px; border-radius: 3px; line-height: 31px }
-	
 
 	.move_page .labels .page_label { padding: 0 0 0 20px; text-align: left; width: 596px; }
 	.move_page section { padding: 0; }
@@ -625,6 +624,7 @@
 
 	.user_permissions .labels .permission_label { padding: 0 0 0 20px; text-align: left; text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.5); width: 466px; }
 	.user_permissions .labels .permission_label_wider { width: 666px; }
+	.user_permissions .labels .folder_label { width: 596px; }
 	.user_permissions .labels .permission_level { width: 70px; }
 	.user_permissions .labels .permission_alerts { width: 130px; }
 	.user_permissions section ul { float: left; }
@@ -633,6 +633,7 @@
 	.user_permissions section ul li:hover { background: #F9F9F9; }
 	.user_permissions section ul li .permission_label { background: url(../images/blue-arrow-sprite.png) no-repeat 17px 0px; color: #333; display: block; float: left; font-size: 15px; height: 32px; line-height: 32px; padding: 0 0 0 40px; width: 446px; }
 	.user_permissions section ul li .permission_label_wider { width: 646px; }
+	.user_permissions section ul li .folder_label { width: 576px; }
 	.user_permissions section ul li .permission_label.expanded { background: url(../images/blue-arrow-sprite.png) no-repeat 17px -64px; }
 	.user_permissions section ul li .permission_label.disabled { background: url(../images/blue-arrow-sprite.png) no-repeat 17px -32px; }
 	.user_permissions section ul li .permission_label.disabled.expanded { background: url(../images/blue-arrow-sprite.png) no-repeat 17px -96px; }
@@ -659,6 +660,16 @@
 	.user_permissions section ul.depth_9 li .permission_label { width: 366px; }
 	.user_permissions section ul.depth_10 li .depth { width: 90px; }
 	.user_permissions section ul.depth_10 li .permission_label { width: 356px; }
+
+	.user_permissions section ul.depth_2 li .folder_label { width: 566px; }
+	.user_permissions section ul.depth_3 li .folder_label { width: 556px; }
+	.user_permissions section ul.depth_4 li .folder_label { width: 546px; }
+	.user_permissions section ul.depth_5 li .folder_label { width: 536px; }
+	.user_permissions section ul.depth_6 li .folder_label { width: 526px; }
+	.user_permissions section ul.depth_7 li .folder_label { width: 516px; }
+	.user_permissions section ul.depth_8 li .folder_label { width: 506px; }
+	.user_permissions section ul.depth_9 li .folder_label { width: 496px; }
+	.user_permissions section ul.depth_10 li .folder_label { width: 486px; }
 	
 /* Settings Stuff */
 	.table .settings_name { padding: 0 20px; text-align: left; width: 250px; }
@@ -824,10 +835,17 @@
 ---------------------------*/
 	#file_browser { background: #FFF; border-radius: 5px; box-shadow: 0 0 10px #444; height: 500px; overflow: hidden; position: fixed; width: 820px; z-index: 400001; }
 	#file_browser header { background: url(../images/top-gradient.png) repeat-x; border-radius: 5px 5px 0 0; height: 37px; line-height: 37px; padding: 0 10px; }
-	#file_browser header input { float: right; margin: 5px 0 0 0; }
+	#file_browser header input { float: right; margin: 5px 0 0 3px; }
 	#file_browser header h2 { float: left; margin: 0 0 0 10px; padding: 3px 0 0 0; }
 	#file_browser header span { float: left; }
-	#file_browser_contents { float: left; height: 377px; overflow: auto; width: 609px; }
+	#file_browser header a { border-radius: 3px; font-size: 11px; height: 21px; margin: 7px 5px 0 0; line-height: 21px; float: right; background-color: #DDD; padding: 0; width: 85px; text-align: center; }
+	#file_browser header a:hover { background-color: #EEE; }
+	#file_browser_breadcrumb { float: left; width: 820px; height: 25px; background-gradient: #F6F6F6 #FFFFFF; border-bottom: 1px solid #E5E5E5; }
+	#file_browser_breadcrumb li { float: left; }
+	#file_browser_breadcrumb a { display: block; padding: 0px 13px 0px 7px; height: 25px; background: url(../images/file-browser-divider.png) no-repeat top right; color: #333; line-height: 25px; font-size: 12px; }
+	#file_browser_breadcrumb li:last-child a { background: transparent; }
+	#file_browser_breadcrumb li:first-child a { padding-left: 13px; }
+	#file_browser_contents { float: left; height: 371px; overflow: auto; width: 609px; }
 	#file_browser_contents .file_browser_images { overflow: hidden; padding: 0px 10px 10px 10px; }
 	#file_browser_contents a.image { background: #CCCCCC; display: block; float: left; height: 100px; margin: 10px 0 0 10px; text-align: center; width: 100px; }
 	#file_browser_contents a.image:hover { box-shadow: 0 0 5px #AAA; }
@@ -835,17 +853,12 @@
 	#file_browser_contents a.image.disabled:hover { box-shadow: none; }
 	#file_browser_contents a.selected { background: #315264; }
 	#file_browser_contents a.file { background: #FFF; color: #333; display: block; font-size: 13px; line-height: 16px; overflow: hidden; padding: 5px 20px; }
-	#file_browser_contents a.file:nth-child(odd) { background: #F5F5F5; }
-	#file_browser_contents a.file:hover { background: #E0EAF0; }
-	#file_browser_contents a.file.selected { background: #315264; color: #FFF; }
-	#file_browser_info_pane { background: #EFEFEF; border-left: 1px solid #E5E5E5; float: left; height: 377px; width: 210px; }
+	#file_browser_contents a.file:nth-child(even) { background: #F5F5F5; }
+	#file_browser_contents a.file:hover { background-gradient: #436D86 #578FB1; color: #FFF; }
+	#file_browser_contents a.file.selected { background-gradient: #385B6F #447491; color: #FFF; }
+	#file_browser_info_pane { background: #EFEFEF; border-left: 1px solid #E5E5E5; float: left; height: 371px; width: 210px; }
 	#file_browser footer { background: #F5F5F5; border-top: 1px solid #E5E5E5; clear: both; padding: 15px 20px; }
 	#file_browser footer input { margin: 0 10px 0 0; }
-	#file_browser_upload { background-gradient: #9A9A9A #AFAFAF; color: #FFF; color: #FFF; display: block; font-size: 10px; height: 20px; line-height: 20px; padding: 0 0 0 15px; text-shadow: 0px -1px 1px #666; text-transform: uppercase; }
-	#file_browser_upload_window { background-gradient: #EEEEEE #FFFFFF; border-bottom: 1px solid #CCC; overflow: hidden; position: absolute; width: 820px; z-index: 2; }
-	#file_browser_upload_window form { padding: 10px 15px; }
-	#file_browser_upload_window spinner { background: url(../images/spinner.gif) no-repeat; float: right; height: 16px; margin: 15px; width: 16px; }
-	#file_browser_upload_frame { border: 0; float: right; height: 28px; margin: 10px 15px; overflow: hidden; width: 250px; }
 	#file_browser_size_pane { background: #FFF; border-left: 1px solid #E5E5E5; height: 357px; padding: 10px; position: absolute; width: 589px; z-index: 2; }
 	#file_browser_size_pane a { margin: 0 10px 10px 0; }
 	#file_browser_size_pane h3 { background: #3E667D url(../images/button-bg-dark.png) repeat-x 0px -1px; border-bottom: 1px solid #333; color: #FFF; font-size: 14px; height: 20px; line-height: 22px; margin: -10px -10px 10px -10px; padding: 5px 10px; }

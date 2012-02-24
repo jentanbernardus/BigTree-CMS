@@ -43,6 +43,36 @@
 		}
 	}
 	
+	function _local_userDrawFolderLevel($parent,$depth) {
+		global $permissions,$alerts;
+		$q = sqlquery("SELECT * FROM bigtree_resource_folders WHERE parent = '$parent' ORDER BY name ASC");
+		$r = sqlrows($q);
+		if ($r) {
+?>
+<ul class="depth_<?=$depth?>"<? if ($depth > 2) { ?> style="display: none;"<? } ?>>
+	<?
+		$x = 0;
+		while ($f = sqlfetch($q)) {
+			$x++;
+			$r = sqlrows(sqlquery("SELECT id FROM bigtree_resource_folders WHERE parent = '".$f["id"]."'"));
+	?>
+	<li>
+		<span class="depth"></span>
+		<a class="permission_label folder_label<? if (!$r) { ?> disabled<? } ?>" href="#"><?=$f["name"]?></a>
+		<span class="permission_level"><input type="radio" name="permissions[resources][<?=$f["id"]?>]" value="p" <? if ($permissions["resources"][$f["id"]] == "p") { ?>checked="checked" <? } ?>/></span>
+		<span class="permission_level"><input type="radio" name="permissions[resources][<?=$f["id"]?>]" value="e" <? if ($permissions["resources"][$f["id"]] == "e") { ?>checked="checked" <? } ?>/></span>
+		<span class="permission_level"><input type="radio" name="permissions[resources][<?=$f["id"]?>]" value="n" <? if ($permissions["resources"][$f["id"]] == "n") { ?>checked="checked" <? } ?>/></span>
+		<span class="permission_level"><input type="radio" name="permissions[resources][<?=$f["id"]?>]" value="i" <? if (!$permissions["resources"][$f["id"]] || $permissions["resources"][$f["id"]] == "i") { ?>checked="checked" <? } ?>/></span>
+		<? _local_userDrawFolderLevel($f["id"],$depth + 1) ?>
+	</li>
+	<?
+		}
+	?>
+</ul>
+<?
+		}
+	}
+	
 	$e = false;
 
 	if (isset($_SESSION["bigtree"]["update_user"])) {
@@ -109,6 +139,7 @@
 							<ul>
 								<li><a href="#page_permissions" class="active">Pages</a></li>
 								<li><a href="#module_permissions">Modules</a></li>
+								<li><a href="#resource_permissions">Resources</a></li>
 							</ul>
 						</nav>
 					</header>
@@ -189,6 +220,30 @@
 							</ul>
 						</section>
 					</div>
+					
+					<div id="resource_permissions" style="display: none;">
+						<div class="labels">
+							<span class="permission_label folder_label">Folder</span>
+							<span class="permission_level">Creator</span>
+							<span class="permission_level">Consumer</span>
+							<span class="permission_level">No Access</span>
+							<span class="permission_level">Inherit</span>
+						</div>
+						<section>
+							<ul class="depth_1">
+								<li class="top">
+									<span class="depth"></span>
+									<a class="permission_label folder_label expanded" href="#">Home Folder</a>
+									<span class="permission_level"><input type="radio" name="permissions[resources][<?=$f["id"]?>]" value="p" <? if ($permissions["resources"][0] == "p") { ?>checked="checked" <? } ?>/></span>
+									<span class="permission_level"><input type="radio" name="permissions[resources][<?=$f["id"]?>]" value="e" <? if ($permissions["resources"][0] == "e") { ?>checked="checked" <? } ?>/></span>
+									<span class="permission_level"><input type="radio" name="permissions[resources][<?=$f["id"]?>]" value="n" <? if ($permissions["resources"][0] == "n" || !$permissions["resources"][0]) { ?>checked="checked" <? } ?>/></span>
+									<span class="permission_level">&nbsp;</span>
+									<? _local_userDrawFolderLevel(0,2) ?>
+								</li>
+							</ul>
+						</section>
+					</div>
+					
 				</div>
 			</fieldset>
 		</section>

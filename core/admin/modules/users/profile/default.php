@@ -26,7 +26,9 @@
 					<label>Company</label>
 					<input type="text" name="company" value="<?=$company?>" tabindex="2" />
 				</fieldset>
+				
 				<br /><br />
+				
 				<fieldset>
 					<input type="checkbox" name="daily_digest" tabindex="4" <? if ($daily_digest) { ?> checked="checked"<? } ?> />
 					<label class="for_checkbox">Daily Digest Email</label>

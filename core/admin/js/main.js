@@ -897,10 +897,12 @@ var BigTreeFileManager = {
 		this.browser.html('\
 <header>\
 	<input class="form_search" id="file_browser_search" placeholder="Search" />\
+	<a href="#" class="button add_file">Upload File</a>\
+	<a href="#" class="button add_folder">New Folder</a>\
 	<span id="file_browser_type_icon"></span>\
 	<h2 id="file_browser_type"></h2>\
 </header>\
-<a id="file_browser_upload" href="#">Upload New File</a>\
+<ul id="file_browser_breadcrumb"><li><a href="#">Home</a></li><li><a href="#">Test Folder</a></li><li><a href="#">Another Folder</a></li></ul>\
 <section id="file_browser_upload_window" style="display: none;">\
 	<spinner style="display: none;" id="file_browser_spinner"></spinner>\
 	<iframe name="resource_frame" id="file_browser_upload_frame" style="display: none;" src="www_root/admin/ajax/file-browser/busy/"></iframe>\
@@ -959,7 +961,7 @@ var BigTreeFileManager = {
 		$("#file_browser_selected_file").val("");
 		$("#file_browser_info_pane").html("");
 		$("#file_browser_type_icon").addClass("icon_images");
-		$("#file_browser_type").html("Image Library <small>Grayed out images are too small for use here</small>");
+		$("#file_browser_type").html("Image Library");
 		$("#file_browser_contents").load("www_root/admin/ajax/file-browser/get-images/", { minWidth: this.minWidth, minHeight: this.minHeight },$.proxy(this.imageBrowserPopulated,this));
 	},
 	
