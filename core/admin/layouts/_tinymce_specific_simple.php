@@ -5,12 +5,13 @@
   tinyMCE.init({
   		<? if ($content_css) { ?>content_css: "<?=$content_css?>",<? } ?>
   		skin : "BigTree",
+  		inlinepopups_skin: "BigTreeModal",
 		theme: "advanced",
 		mode: "exact",
 		elements: "<?=implode(",",$simplehtmls)?>",
 		file_browser_callback: "BigTreeFileManager.tinyMCEOpen",
-		plugins: "advlink,inlinepopups,paste",
-		theme_advanced_buttons1: "link,unlink,bold,italic,underline,paste,pasteword",
+		plugins: "inlinepopups,paste",
+		theme_advanced_buttons1: "link,unlink,bold,italic,underline,paste,pasteword,code",
 		theme_advanced_buttons2: '',
 		theme_advanced_buttons3: '',
 		theme_advanced_disable: 'cleanup,charmap',

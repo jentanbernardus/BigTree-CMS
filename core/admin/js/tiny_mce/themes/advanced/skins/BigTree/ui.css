@@ -41,8 +41,7 @@
 .BigTreeSkin .mceStatusbar a.mceResize {display:block; float:right; background:url(img/icons.png) -802px -2px; margin: 0 2px 0 0; width:18px; height:20px; cursor:se-resize; outline:0}
 .BigTreeSkin .mceStatusbar a:hover {text-decoration:underline}
 .BigTreeSkin table.mceToolbar {margin: 2px 4px;}
-.BigTreeSkin table.mceToolbarRow1 { margin-bottom: 0; }
-.BigTreeSkin table.mceToolbarRow2 { margin-top: 0; }
+.BigTreeSkin table.mceToolbarRow2 { margin-top: -2px; }
 .BigTreeSkin .mceToolbar .mceToolbarStart span {display:block; background:url(img/button_bg.png) -22px 0; width:1px; height:22px; margin-left:3px;}
 .BigTreeSkin .mceToolbar td.mceFirst span {margin:0}
 .BigTreeSkin .mceToolbar .mceToolbarEnd span {display:block; background:url(img/button_bg.png) -23px 0; width:1px; height:22px}
