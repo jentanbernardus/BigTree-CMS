@@ -833,7 +833,7 @@
 /*---------------------------
 	BigTree File Browser
 ---------------------------*/
-	#file_browser { background: #FFF; border-radius: 5px; box-shadow: 0 0 10px #444; height: 500px; overflow: hidden; position: fixed; width: 820px; z-index: 400001; }
+	#file_browser { background: #FFF; border: 1px solid #999; border-radius: 5px; box-shadow: 0 0 10px #444; height: 500px; overflow: hidden; position: fixed; width: 820px; z-index: 400001; }
 	#file_browser header { background: url(../images/top-gradient.png) repeat-x; border-radius: 5px 5px 0 0; height: 37px; line-height: 37px; padding: 0 10px; }
 	#file_browser header input { float: right; margin: 5px 0 0 3px; }
 	#file_browser header h2 { float: left; margin: 0 0 0 10px; padding: 3px 0 0 0; }

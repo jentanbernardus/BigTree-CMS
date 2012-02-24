@@ -5,13 +5,14 @@
   tinyMCE.init({
   		<? if ($content_css) { ?>content_css: "<?=$content_css?>",<? } ?>
   		skin : "BigTree",
+  		inlinepopups_skin: "BigTreeModal",
 		theme: "advanced",
 		mode: "exact",
 		elements: "<?=implode(",",$htmls)?>",
 		file_browser_callback: "BigTreeFileManager.tinyMCEOpen",
-		plugins: "advimage,advlink,paste,table,inlinepopups,spellchecker",
+		plugins: "advimage,paste,table,inlinepopups,spellchecker",
 		theme_advanced_blockformats: "p,h2,h3,h4",
-		theme_advanced_buttons1: "undo,redo,separator,blockquote,bold,italic,underline,strikethrough,separator,formatselect,justifyleft,justifycenter,justifyright,justifyfull,bullist,numlist,separator,code,spellchecker",
+		theme_advanced_buttons1: "undo,redo,separator,blockquote,bold,italic,underline,strikethrough,separator,formatselect,justifyleft,justifycenter,justifyright,justifyfull,bullist,numlist,separator,spellchecker,code",
 		theme_advanced_buttons2: 'link,unlink,anchor,image,separator,hr,removeformat,visualaid,separator,table,tablecontrols,separator,paste,pasteword',
 		theme_advanced_buttons3: '',
 		theme_advanced_disable: 'cleanup,charmap',
