@@ -185,7 +185,7 @@
 		}
 		
 		// Draw Archived Pages
-		if (count($nav)) {
+		if (count($nav_archived)) {
 		    local_drawPageTree($nav_archived,"Archived","Not Accessible By Users","archived",false);
 		}
 	} else {

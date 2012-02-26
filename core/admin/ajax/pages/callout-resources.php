@@ -27,16 +27,18 @@
 	
 	$tabindex = 1000;
 	
-	foreach ($fields as $options) {
-		$key = "callouts[$count][".$options["id"]."]";
-		$type = $options["type"];
-		$title = $options["name"];
-		$subtitle = $options["subtitle"];
-		$options["directory"] = "files/pages/";
-		$value = $resources[$options["id"]];
-		$currently_key = "callouts[$bigtree_sidelet_count][currently_".$options["id"]."]";
-		include bigtree_path("admin/form-field-types/draw/$type.php");
-		$tabindex++;
+	if (count($fields) > 0) {
+		foreach ($fields as $options) {
+			$key = "callouts[$count][".$options["id"]."]";
+			$type = $options["type"];
+			$title = $options["name"];
+			$subtitle = $options["subtitle"];
+			$options["directory"] = "files/pages/";
+			$value = $resources[$options["id"]];
+			$currently_key = "callouts[$bigtree_sidelet_count][currently_".$options["id"]."]";
+			include bigtree_path("admin/form-field-types/draw/$type.php");
+			$tabindex++;
+		}
 	}
 ?>
 
