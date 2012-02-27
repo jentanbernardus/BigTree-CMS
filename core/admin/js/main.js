@@ -902,7 +902,7 @@ var BigTreeFileManager = {
 	<span id="file_browser_type_icon"></span>\
 	<h2 id="file_browser_type"></h2>\
 </header>\
-<ul id="file_browser_breadcrumb"><li><a href="#">Home</a></li><li><a href="#">Test Folder</a></li><li><a href="#">Another Folder</a></li></ul>\
+<ul id="file_browser_breadcrumb"><li><a href="#0">Home</a></li></ul>\
 <section id="file_browser_upload_window" style="display: none;">\
 	<spinner style="display: none;" id="file_browser_spinner"></spinner>\
 	<iframe name="resource_frame" id="file_browser_upload_frame" style="display: none;" src="www_root/admin/ajax/file-browser/busy/"></iframe>\
