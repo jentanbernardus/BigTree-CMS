@@ -11,7 +11,8 @@
 		elements: "<?=implode(",",$small_htmls)?>",
 		file_browser_callback: "BigTreeFileManager.tinyMCEOpen",
 		plugins: "inlinepopups",
-		theme_advanced_buttons1: "link,unlink,bold,italic,underline,help,code,paste,pasteword,code",
+/* 		theme_advanced_buttons1: "link,unlink,bold,italic,underline,help,code,paste,pasteword,code", */
+		theme_advanced_buttons1: "link,unlink,bold,italic,underline,help,code,pasteword,code",
 		theme_advanced_buttons2: '',
 		theme_advanced_buttons3: '',
 		theme_advanced_disable: 'cleanup,charmap',

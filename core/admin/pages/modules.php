@@ -30,7 +30,7 @@
 	if (count($misc)) {
 ?>
 <div class="table">
-	<summary><h2>Ungrouped Modules</h2></summary>
+	<summary><h2>Ungrouped</h2></summary>
 	<section class="modules">
 		<? foreach ($misc as $module) { ?>
 		<p class="module">
@@ -42,6 +42,18 @@
 		<? } ?>
 	</section>
 </div>
+<?
+	}
+	
+	if(!count($groups) && !count($misc))
+	{
+?>
+	<div class="table">
+		<summary><h2>Ungrouped</h2></summary>
+		<ul>
+			<li class="no_content">No modules available</li>
+		</ul>
+	</div>
 <?
 	}
 ?>

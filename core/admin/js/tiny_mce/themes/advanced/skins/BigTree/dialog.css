@@ -114,7 +114,8 @@ h3 {font-size: 15px;}
 .title {font-size: 13px; color:#666; text-transform: uppercase;}
 
 /* Dialog specific */
-#source .panel_wrapper, #link .panel_wrapper, #link div.current {/* height:125px; */ border: none; padding: 10px 0; }
+#source .panel_wrapper, #link .panel_wrapper {  padding: 25px 10px; }
+#source .panel_wrapper, #link .panel_wrapper, #link div.current {/* height:125px; */ border: none; }
 #image .panel_wrapper, #image div.current {/* height:200px; */}
 #plugintable thead {font-weight:bold; background:#DDD;}
 #plugintable, #about #plugintable td {border:1px solid #919B9C;}

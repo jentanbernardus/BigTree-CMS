@@ -43,7 +43,6 @@
 	</head>
 	<body class="install">
 		<div class="install_wrapper">
-			<h1>Install BigTree</h1>
 <?php
 
 	foreach ($_POST as $key => $val) {
@@ -57,16 +56,15 @@
 	} elseif (!is_writable(".")) {
 		$error = "Please make the current working directory writable.";
 	} elseif (count($_POST)) {
-		if ($write_host) {
-			$con = mysql_connect($write_host,$write_user,$write_password);
+		if ($write_host && $write_user && $write_password) {
+			$con = mysql_connect($write_host,$write_user,$write_password,$db);
 		} else {
 			$con = mysql_connect($host,$user,$password);
 		}
-		
 		if (!$con) {
 			$error = "Could not connect to database.";
 		} else {
-			$select = mysql_select_db($db);
+			$select = mysql_select_db($db, $con);
 			if (!$select)
 				$error = "Could not select database &ldquo;$db&rdquo;.";
 		}
@@ -109,7 +107,7 @@
 			$resource_root,
 			$cms_user,
 			$settings_key,
-			$force_secure_login
+			(isset($force_secure_login)) ? "true" : "false"
 		);
 		
 		$sql_queries = explode("\n",file_get_contents("bigtree.sql"));
@@ -187,10 +185,49 @@
 		
 		dtouch("templates/config.php",str_replace($find,$replace,file_get_contents("core/config.example.php")));
 		
-		// Create the main site .htaccess and index.php and the .htaccess that lets you do things without moving the root.
+		
+		// Create site/index.php, site/.htaccess, and .htaccess (masks the 'site' directory)
+		file_put_contents("site/index.php",'<?
+	if (!isset($_GET["bigtree_htaccess_url"])) {
+		$_GET["bigtree_htaccess_url"] = "";
+	}
+	$path = explode("/",rtrim($_GET["bigtree_htaccess_url"],"/"));
+	
+	$debug = false;
+	$config = array();
+	include str_replace("site/index.php","templates/config.php",__FILE__);	
+	
+	// Let admin bootstrap itself.
+	if ($path[0] == "admin") {
+		include "../core/admin/router.php";
+		die();
+	}
+	
+	// See if this thing is cached
+	if ($config["cache"] && $path[0] != "_preview" && $path[0] != "_preview-pending") {
+		$curl = $_GET["bigtree_htaccess_url"];
+		if (!$curl) {
+			$curl = "home";
+		}
+		$file = "../cache/".base64_encode($curl);
+		// If the file is at least 5 minutes fresh, serve it up.
+		if (file_exists($file) && filemtime($file) > (time()-300)) {
+			if ($config["xsendfile"]) {
+				header("X-Sendfile: ".$server_root."cache/".base64_encode($curl));
+				header("Content-Type: text/html");
+				die();
+			} else {
+				die(file_get_contents("../cache/".base64_encode($curl)));
+			}
+		}
+	}
+
+	// Bootstrap BigTree 4.0
+	include "../core/bootstrap.php";
+	include "../core/router.php";
+?>');
+		
 		file_put_contents("site/.htaccess",'<IfModule mod_deflate.c>
-
-
 # force deflate for mangled headers developer.yahoo.com/blogs/ydn/posts/2010/12/pushing-beyond-gzipping/
 <IfModule mod_setenvif.c>
   <IfModule mod_headers.c>
@@ -230,12 +267,7 @@ RewriteRule ^(.*)$ index.php?bigtree_htaccess_url=$1 [QSA,L]
 php_flag short_open_tag On
 php_flag magic_quotes_gpc Off');
 
-		
-		rename("core/index.php","site/index.php");
-
 		file_put_contents(".htaccess",'<IfModule mod_deflate.c>
-
-
 # force deflate for mangled headers developer.yahoo.com/blogs/ydn/posts/2010/12/pushing-beyond-gzipping/
 <IfModule mod_setenvif.c>
   <IfModule mod_headers.c>
@@ -271,18 +303,23 @@ php_flag magic_quotes_gpc Off');
 	RewriteRule    (.*) site/$1    [L]
 </IfModule>');
 ?>
-				<h1>BigTree CMS Installed</h1>
-				<p>Thanks for using BigTree CMS.  Your install was successful.  Ready to hit the admin? <a href="admin/">CLICK HERE</a>.</p>
-			</section>
+			<h1>BigTree Installed</h1>
+			<form method="post" action="" class="module">
+				<fieldset class="clear">
+					<p>Thanks for using BigTree CMS. The installation was successful. <a href="admin/">Ready to hit the admin?</a></p><br /><br />
+				</fieldset>
+			</form>
 <?
 	} else {
 		if (!$host)
 			$host = "localhost";
 ?>
+			<h1>Install BigTree</h1>
 			<form method="post" action="" class="module">
 				<h2 class="getting_started"><span></span>Getting Started</h2>
 				<fieldset class="clear">
 					<p>Welcome to the BigTree installer. If you have not done so already, please make the current working directory writable and create a MySQL database for your new BigTree powered site.</p>
+					<br />
 				</fieldset>
 				<? if (count($warnings)) { ?>
 				<br />
@@ -302,24 +339,24 @@ php_flag magic_quotes_gpc Off');
 				</fieldset>
 				<fieldset class="left<? if (count($_POST) && !$host) { ?> form_error<? } ?>">
 					<label>Hostname</label>
-					<input class="text" type="text" id="db_host" name="host" value="<?=htmlspecialchars($host)?>" tabindex="0" />
+					<input class="text" type="text" id="db_host" name="host" value="<?=htmlspecialchars($host)?>" tabindex="1" />
 				</fieldset>
 				<fieldset class="right<? if (count($_POST) && !$db) { ?> form_error<? } ?>">
 					<label>Database</label>
-					<input class="text" type="text" id="db_name" name="db" value="<?=htmlspecialchars($db)?>" tabindex="1" />
+					<input class="text" type="text" id="db_name" name="db" value="<?=htmlspecialchars($db)?>" tabindex="2" />
 				</fieldset>
 				<br class="clear" /><br />
 				<fieldset class="left<? if (count($_POST) && !$user) { ?> form_error<? } ?>">
 					<label>Username</label>
-					<input class="text" type="text" id="db_user" name="user" value="<?=htmlspecialchars($user)?>" tabindex="2" />
+					<input class="text" type="text" id="db_user" name="user" value="<?=htmlspecialchars($user)?>" tabindex="3" />
 				</fieldset>
 				<fieldset class="right<? if (count($_POST) && !$password) { ?> form_error<? } ?>">
 					<label>Password</label>
-					<input class="text" type="text" id="db_pass" name="password" value="<?=htmlspecialchars($password)?>" tabindex="3" />
+					<input class="text" type="password" id="db_pass" name="password" value="<?=htmlspecialchars($password)?>" tabindex="4" />
 				</fieldset>
 				<fieldset>
 					<br />
-					<input type="checkbox" class="checkbox" name="loadbalanced" id="loadbalanced"<? if ($loadbalanced) { ?> checked="checked"<? } ?> />
+					<input type="checkbox" class="checkbox" name="loadbalanced" id="loadbalanced"<? if ($loadbalanced) { ?> checked="checked"<? } ?> tabindex="5" />
 					<label class="for_checkbox">Load Balanced MySQL</label>
 				</fieldset>
 				
@@ -334,20 +371,20 @@ php_flag magic_quotes_gpc Off');
 					</fieldset>
 					<fieldset class="left<? if (count($_POST) && !$write_host) { ?> form_error<? } ?>">
 						<label>Hostname</label>
-						<input class="text" type="text" id="db_write_host" name="write_host" value="<?=htmlspecialchars($host)?>" tabindex="0" />
+						<input class="text" type="text" id="db_write_host" name="write_host" value="<?=htmlspecialchars($host)?>" tabindex="6" />
 					</fieldset>
 					<fieldset class="right<? if (count($_POST) && !$write_db) { ?> form_error<? } ?>">
 						<label>Database</label>
-						<input class="text" type="text" id="db_write_name" name="write_db" value="<?=htmlspecialchars($db)?>" tabindex="1" />
+						<input class="text" type="text" id="db_write_name" name="write_db" value="<?=htmlspecialchars($db)?>" tabindex="7" />
 					</fieldset>
 					<br class="clear" /><br />
 					<fieldset class="left<? if (count($_POST) && !$write_user) { ?> form_error<? } ?>">
 						<label>Username</label>
-						<input class="text" type="text" id="db_write_user" name="write_user" value="<?=htmlspecialchars($user)?>" tabindex="2" />
+						<input class="text" type="text" id="db_write_user" name="write_user" value="<?=htmlspecialchars($user)?>" tabindex="8" />
 					</fieldset>
 					<fieldset class="right<? if (count($_POST) && !$write_password) { ?> form_error<? } ?>">
 						<label>Password</label>
-						<input class="text" type="text" id="db_write_pass" name="write_password" value="<?=htmlspecialchars($password)?>" tabindex="3" />
+						<input class="text" type="password" id="db_write_pass" name="write_password" value="<?=htmlspecialchars($password)?>" tabindex="9" />
 					</fieldset>
 					<br class="clear" />
 				</div>
@@ -362,11 +399,11 @@ php_flag magic_quotes_gpc Off');
 				</fieldset>
 				<fieldset class="left<? if (count($_POST) && !$settings_key) { ?> form_error<? } ?>">
 					<label>Settings Encryption Key</label>
-					<input class="text" type="text" name="settings_key" id="settings_key" value="<?=htmlspecialchars($settings_key)?>" tabindex="11" />
+					<input class="text" type="text" name="settings_key" id="settings_key" value="<?=htmlspecialchars($settings_key)?>" tabindex="10" />
 				</fieldset>
 				<fieldset class="clear">
 					<br />
-					<input type="checkbox" class="checkbox" name="force_secure_login" id="force_secure_login"<? if ($force_secure_login) { ?> checked="checked"<? } ?> />
+					<input type="checkbox" class="checkbox" name="force_secure_login" id="force_secure_login"<? if ($force_secure_login) { ?> checked="checked"<? } ?> tabindex="11" />
 					<label class="for_checkbox">Force HTTPS Logins</label>
 				</fieldset>
 				
@@ -380,11 +417,11 @@ php_flag magic_quotes_gpc Off');
 				</fieldset>
 				<fieldset class="left<? if (count($_POST) && !$cms_user) { ?> form_error<? } ?>">
 					<label>Email Address</label>
-					<input class="text" type="text" id="cms_user" name="cms_user" value="<?=htmlspecialchars($cms_user)?>" tabindex="9" />
+					<input class="text" type="text" id="cms_user" name="cms_user" value="<?=htmlspecialchars($cms_user)?>" tabindex="12" />
 				</fieldset>
 				<fieldset class="right<? if (count($_POST) && !$cms_pass) { ?> form_error<? } ?>">
 					<label>Password</label>
-					<input class="text" type="text" id="cms_pass" name="cms_pass" value="<?=htmlspecialchars($cms_pass)?>" tabindex="10" />
+					<input class="text" type="password" id="cms_pass" name="cms_pass" value="<?=htmlspecialchars($cms_pass)?>" tabindex="13" />
 				</fieldset>
 				
 				<br class="clear" />
@@ -397,14 +434,14 @@ php_flag magic_quotes_gpc Off');
 				</fieldset>
 				<fieldset class="clear">
 					<br />
-					<input type="checkbox" class="checkbox" name="install_example_site" id="install_example_site"<? if ($install_example_site) { ?> checked="checked"<? } ?> />
+					<input type="checkbox" class="checkbox" name="install_example_site" id="install_example_site"<? if ($install_example_site) { ?> checked="checked"<? } ?> tabindex="14" />
 					<label class="for_checkbox">Install Example Site</label>
 				</fieldset>
 				
 				<br class="clear" />
 				
 				<fieldset class="lower">
-					<input type="submit" class="button blue" value="Install Now" />
+					<input type="submit" class="button blue" value="Install Now" tabindex="15" />
 				</fieldset>
 			</form>
 <?php

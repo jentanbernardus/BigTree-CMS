@@ -75,7 +75,7 @@
 	<summary>
 		<h2 class="full">
 			<span class="pending"></span>
-			Pending Changes <small>Recent Changes Awaiting Your Approval</small>
+			Pending Changes <small>Recent Changes Awaiting Approval</small>
 			<a href="<?=$aroot?>dashboard/pending-changes/" class="more">View All Pending Changes</a>
 		</h2>
 	</summary>
@@ -92,7 +92,7 @@
 		<?
 			if (count($changes) == 0) {
 		?>
-		<li><section class="no_content"><p>You have no changes awaiting your approval.</p></section></li>
+		<li><section class="no_content"><p>No changes awaiting approval</p></section></li>
 		<?	
 			} else {
 				$changes = array_slice($changes,0,10);
@@ -136,7 +136,7 @@
 		<?
 			if (count($unread) == 0) {
 		?>
-		<li><section class="no_content"><p>You have no unread messages.</p></section></li>
+		<li><section class="no_content"><p>No unread messages</p></section></li>
 		<?
 			} else {
 				foreach ($unread as $item) {

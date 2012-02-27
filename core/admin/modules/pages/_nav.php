@@ -1,7 +1,7 @@
 <?
 	$access = $admin->getPageAccessLevelByUser(end($path),$admin->ID);
 	$available_actions = array(
-		array("route" => "view-tree", "name" => "View Child Pages", "icon" => "list")
+		array("route" => "view-tree", "name" => "View Subpages", "icon" => "list")
 	);
 	
 	if ($access) {
