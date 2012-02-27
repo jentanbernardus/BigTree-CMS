@@ -25,15 +25,18 @@
 		<input type="text" name="title" id="page_title" tabindex="2" value="<?=$pdata["title"]?>" class="required" />
 	</fieldset>
 </div>
-<div class="triplets">
+<!-- <div class="triplets"> -->
+<div class="left date_pickers">
 	<fieldset>
-		<label>Publish Date <small>(leave blank to publish immediately)</small></label>
+		<label>Publish Date <small>(blank = immediately)</small></label>
 		<input type="text" class="date" id="publish_at" name="publish_at" tabindex="3" value="<? if ($pdata["publish_at"]) { echo date("Y-m-d",strtotime($pdata["publish_at"])); } ?>" />
 	</fieldset>
-	<fieldset>
-		<label>Expiration Date <small>(leave blank to never expire)</small></label>
+	<fieldset class="right">
+		<label>Expiration Date <small>(blank = never)</small></label>
 		<input type="text" class="date" id="expire_at" name="expire_at" tabindex="4" value="<? if ($pdata["expire_at"]) { echo date("Y-m-d",strtotime($pdata["expire_at"])); } ?>" />
 	</fieldset>
+</div>
+<div class="right">
 	<fieldset>
 		<label>Content Max Age <small>(before alerts)</small></label>
 		<select name="max_age" tabindex="5">
@@ -46,7 +49,7 @@
 <script type="text/javascript">
 	$("#publish_at, #expire_at").datepicker({ durration: 200, showAnim: "slideDown" });
 </script>
-<fieldset>
+<fieldset class="visible clear">
 	<? if ($parent_to_check > 0 || $admin->Level > 1) { ?>
 	<input type="checkbox" name="in_nav" <? if (!$pdata || $pdata["in_nav"]) { ?>checked="checked" <? } ?>class="checkbox" tabindex="6" /> <label class="for_checkbox">Visible In Navigation</label>
 	<? } else { ?>
