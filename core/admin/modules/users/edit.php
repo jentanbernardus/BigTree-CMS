@@ -235,8 +235,8 @@
 									<span class="depth"></span>
 									<a class="permission_label folder_label expanded" href="#">Home Folder</a>
 									<span class="permission_level"><input type="radio" name="permissions[resources][<?=$f["id"]?>]" value="p" <? if ($permissions["resources"][0] == "p") { ?>checked="checked" <? } ?>/></span>
-									<span class="permission_level"><input type="radio" name="permissions[resources][<?=$f["id"]?>]" value="e" <? if ($permissions["resources"][0] == "e") { ?>checked="checked" <? } ?>/></span>
-									<span class="permission_level"><input type="radio" name="permissions[resources][<?=$f["id"]?>]" value="n" <? if ($permissions["resources"][0] == "n" || !$permissions["resources"][0]) { ?>checked="checked" <? } ?>/></span>
+									<span class="permission_level"><input type="radio" name="permissions[resources][<?=$f["id"]?>]" value="e" <? if ($permissions["resources"][0] == "e" || !$permissions["resources"][0]) { ?>checked="checked" <? } ?>/></span>
+									<span class="permission_level"><input type="radio" name="permissions[resources][<?=$f["id"]?>]" value="n" <? if ($permissions["resources"][0] == "n") { ?>checked="checked" <? } ?>/></span>
 									<span class="permission_level">&nbsp;</span>
 									<? _local_userDrawFolderLevel(0,2) ?>
 								</li>

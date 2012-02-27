@@ -2436,30 +2436,87 @@
 			return true;
 		}
 		
-		//!Foundry Methods
-		function getFoundryFieldTypes() {
-			if (!file_exists($GLOBALS["server_root"]."cache/foundry-field-types.json") || (time() - filemtime($GLOBALS["server_root"]."cache/foundry-field-types.json") > 300)) {
-				// We're going to pass in the author information in case we need private types.
-				$user = $this->getUser($this->ID);
-				$author = json_decode($user["foundry_author"],true);
-				$types = bigtree_curl("http://developer.bigtreecms.com/ajax/foundry/get-types/",array("email" => $author["email"],"password" => $author["password"]));
-				file_put_contents($GLOBALS["server_root"]."cache/foundry-field-types.json",$types);
-				return json_decode($types,true);
-			} else {
-				return json_decode(file_get_contents($GLOBALS["server_root"]."cache/foundry-field-types.json"),true);
+		/*
+			Function: getContentsOfResourceFolder
+				Returns a list of resources and subfolders in a folder (based on user permissions).
+			
+			Parameters:
+				folder - The ID of a folder or a folder entry.
+				sort - The column to sort the folder's files on (default: date DESC).
+			
+			Returns:
+				An array of two arrays - folders and resources.
+		*/
+		
+		function getContentsOfResourceFolder($folder, $sort = "date DESC") {
+			if (is_array($folder)) {
+				$folder = $folder["id"];
 			}
+			$folder = mysql_real_escape_string($folder);
+			
+			$folders = array();
+			$resources = array();
+			
+			$q = sqlquery("SELECT * FROM bigtree_resource_folders WHERE parent = '$folder' ORDER BY name");
+			while ($f = sqlfetch($q)) {
+				if ($this->Level > 0 || $this->getResourceFolderPermission($f["id"]) != "n") {
+					$folders[] = $f;
+				}
+			}
+			
+			$q = sqlquery("SELECT * FROM bigtree_resources WHERE folder = '$folder' ORDER BY $sort");
+			while ($f = sqlfetch($q)) {
+				$resources[] = $f;
+			}
+			
+			return array("folders" => $folders, "resources" => $resources);
 		}
 		
-		function getFoundryModules() {
-			if (!file_exists($GLOBALS["server_root"]."cache/foundry-modules.json") || (time() - filemtime($GLOBALS["server_root"]."cache/foundry-modules.json") > 300)) {
-				// We're going to pass in the author information in case we need private modules.
-				$user = $this->getUser($this->ID);
-				$author = json_decode($user["foundry_author"],true);
-				$modules = bigtree_curl("http://developer.bigtreecms.com/ajax/foundry/get-modules/",array("email" => $author["email"],"password" => $author["password"]));
-				file_put_contents($GLOBALS["server_root"]."cache/foundry-modules.json",$modules);
-				return json_decode($modules,true);
+		/*
+			Function: getResourceFolderPermission
+				Returns the permission level of the current user for the folder.
+			
+			Parameters:
+				folder - The ID of a folder or a folder entry.
+			
+			Returns:
+				"p" if a user can create folders and upload files, "e" if the user can see/use files, "n" if a user can't access this folder.
+		*/
+		
+		function getResourceFolderPermission($folder) {
+			// User is an admin or developer
+			if ($this->Level > 0) {
+				return "p";
+			}
+			
+			// We're going to save the folder entry in case we need its parent later.
+			if (is_array($folder)) {
+				$id = $folder["id"];
 			} else {
-				return json_decode(file_get_contents($GLOBALS["server_root"]."cache/foundry-modules.json"),true);
+				$id = $folder;
+			}
+			
+			$p = $this->Permissions["resources"][$folder];
+			// If p is already no, creator, or consumer we can just return it.
+			if ($p && $p != "i") {
+				return $p;
+			} else {
+				// If folder is 0, we're already at home and can't check a higher folder for permissions.
+				if (!$folder) {
+					return "e";
+				}
+				
+				// If a folder entry wasn't passed in, we need it to find its parent.
+				if (!is_array($folder)) {
+					$folder = sqlfetch(sqlquery("SELECT parent FROM bigtree_resource_folders WHERE id = '".mysql_real_escape_string($id)."'"));
+				}
+				// If we couldn't find the folder anymore, just say they can consume.
+				if (!$folder) {
+					return "e";
+				}
+				
+				// Return the parent's permissions
+				return $this->getResourceFolderPermission($folder["parent"]);
 			}
 		}
 	}
