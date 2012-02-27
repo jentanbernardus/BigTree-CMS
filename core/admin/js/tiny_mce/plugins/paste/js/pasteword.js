@@ -43,7 +43,7 @@ var PasteWordDialog = {
 
 		if (el) {
 			el.style.width  = (vp.w - 50) + 'px';
-			el.style.height = (vp.h - 160) + 'px';
+			el.style.height = (vp.h - 150) + 'px';
 		}
 	}
 };

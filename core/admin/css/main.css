@@ -103,13 +103,21 @@
 
 	input[type=text], input[type=password], input[type=email], input[type=url] { background: #FFF; border: 1px solid #CCC; border-radius: 2px; color: #333; display: block; font-family: "Helvetica", Arial; font-size: 13px; height: 30px; margin: 0; padding: 0 10px; transition: border-color 0.2s; width: 876px; }
 	input[type=checkbox] { border: 1px solid #CCC; height: 16px; width: 16px; }
-	input.date { background: #FFF url(../images/icon-calendar.png) no-repeat 195px center; width: 201px !important; }
+	input.date { background: #FFF url(../images/icon-calendar.png) no-repeat 176px center; width: 180px !important; }
 	input.date:focus { border-radius: 2px 2px 0 0; }
+	#properties_tab fieldset { margin-bottom: 20px; }
+	#properties_tab fieldset.visible { margin-bottom: 0; }
+	#properties_tab .date_pickers fieldset { float: left; width: 205px; }
+	#properties_tab .date_pickers fieldset.right { float: right; }
 	input[type=text]:focus, input[type=password]:focus { border-color: #AAA; }
 	input[disabled] { background: #F6F6F6; }
 	input::-webkit-input-placeholder { color: #999; }
 	input:-moz-placeholder { color: #999; }
 	.form_error input[type=text], .form_error input[type=password], .form_error input[type=email], .form_error input[type=url] { background: #FCE8E8; border-color: #990000; }
+	input.date_picker { background: #FFF url(../images/icon-calendar.png) no-repeat 174px center; width: 180px; }
+	input.date_picker:focus { border-radius: 2px 2px 0 0; }
+	input.time_picker { background: #FFF url(../images/icon-clock.png) no-repeat 175px center; width: 180px; }
+	input.time_picker:focus { border-radius: 2px 2px 0 0; }
 
 	textarea { border: 1px solid #CCC; border-radius: 2px; color: #333; display: block; font-family: Helvetica,sans-serif; font-size: 12px; height: 150px; line-height: 16px; margin: 0; padding: 5px 10px; transition: border-color 0.2s; width: 875px; }
 	textarea:focus { border-color: #AAA; }
@@ -972,7 +980,7 @@
 	.jcrop-dark .jcrop-handle { background-color: white; border-color: black; border-radius: 3px; }
 
 /* jQuery Date Picker */
-	.ui-datepicker { background: #FFF; box-shadow: 0 2px 3px rgba(0, 0, 0, 0.25); display: none; width: 223px; }
+	.ui-datepicker { background: #FFF; box-shadow: 0 2px 3px rgba(0, 0, 0, 0.25); display: none; width: 202px; }
 	.ui-datepicker .ui-datepicker-header { background: #3E667D url(../images/button-bg-dark.png) repeat-x 0px -1px; color: #FFF; padding: 3px 0; position: relative; }
 	.ui-datepicker .ui-datepicker-prev, .ui-datepicker .ui-datepicker-next { display: block; font-size: 11px; height: 1.8em; line-height: 22px; position: absolute; top: 3px; width: auto; }
 	.ui-datepicker .ui-datepicker-prev { color: #FFF; left: 8px; }
@@ -984,8 +992,8 @@
 	.ui-datepicker select.ui-datepicker-month, .ui-datepicker select.ui-datepicker-year { width: 49%; }
 	.ui-datepicker table { border: 1px solid #AAA; border-collapse: collapse; font-size: 10px; margin: 0; width: 100%; }
 	.ui-datepicker th { background-gradient: #DDDDDD #FFFFFF; border: 0; font-weight: bold; padding: .7em .3em; text-align: center; }
-	.ui-datepicker td { border: 0; padding: 1px; }
-	.ui-datepicker td span, .ui-datepicker td a { display: block; padding: 5px 2px; text-align: center; text-decoration: none; }
+	.ui-datepicker td { border: 0; padding: 1px; line-height: 1.3; }
+	.ui-datepicker td span, .ui-datepicker td a { display: block; padding: 5px 2px 3px; text-align: center; text-decoration: none; }
 	.ui-datepicker td a:hover { background: #EEE; }
 	.ui-datepicker td a.ui-state-highlight { background: #DDD; color: #2B4757; }
 	.ui-datepicker td a.ui-state-active { background: #2B4757; color: #FFF; }
@@ -1021,6 +1029,30 @@
 	.ui-datepicker-rtl .ui-datepicker-group { float: right; }
 	.ui-datepicker-rtl .ui-datepicker-group-last .ui-datepicker-header { border-left-width: 1px; border-right-width: 0; }
 	.ui-datepicker-rtl .ui-datepicker-group-middle .ui-datepicker-header { border-left-width: 1px; border-right-width: 0; }
+	
+/* TIMPICKER */
+	.ui-timepicker-div { margin-top: -1px; }
+	.ui-timepicker-div .ui-widget-header { background: #3E667D url("../images/button-bg-dark.png"); color: #fff; height: 22px; line-height: 1.2; padding: 3px 0; text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.8);  }
+	.ui-timepicker-div dl { border: 1px solid #AAA; border-width: 1px 1px 0; text-align: left; padding: 10px 15px 0 10px; overflow: hidden; }
+	.ui-timepicker-div dl dt { clear: both; float: left; height: 25px; width: 29%; }
+	.ui-timepicker-div dl dd { float: left; width: 70%; }
+	.ui-timepicker-div td { font-size: 90%; }
+	.ui-timepicker-div .ui_tpicker_time { font-weight: bold; text-transform: uppercase; }
+	.ui-tpicker-grid-label { background: none; border: none; margin: 0; padding: 0; }
+	.ui-datepicker .ui-datepicker-buttonpane { clear: both; border: 1px solid #AAA; border-width: 0 1px 1px; margin-top: 0; overflow: hidden; padding: 0 5px 5px; }
+	
+	.ui-datepicker .ui-datepicker-buttonpane button { background: #BBBBBB url("../images/button-bg.png") repeat-x 0 0; border: 1px solid #ddd; border-radius: 2px; text-shadow: 0 1px 0 rgba(255, 255, 255, 1); }
+	.ui-datepicker .ui-timepicker-div table { border: none; color: #ccc; text-transform: uppercase; margin: 4px 0 5px; }
+	
+/* SLIDER */
+	.ui-slider { position: relative; text-align: left; }
+	.ui-slider .ui-slider-handle { position: absolute; z-index: 2; width: 1.2em; height: 1.2em; cursor: default; }
+	.ui-slider .ui-slider-range { position: absolute; z-index: 1; font-size: .7em; display: block; border: 0; background-position: 0 0; }
+	.ui-slider-horizontal { background: #BBBBBB url("../images/button-bg.png") repeat-x; border: 1px solid #ddd; height: .7em; border-radius: 2px; }
+	.ui-slider-horizontal .ui-slider-handle { background: #3E667D url("../images/button-bg-dark.png") repeat-x 0 0; border: 1px solid #243D4C; border-radius: 2px; top: -.3em; margin-left: -.6em; cursor: ew-resize; }
+	.ui-slider-horizontal .ui-slider-range { top: 0; height: 100%; }
+	.ui-slider-horizontal .ui-slider-range-min { left: 0; }
+	.ui-slider-horizontal .ui-slider-range-max { right: 0; }
 	
 /* Array of Items / Many to Many Widget */
 	.multi_widget { border: 1px solid #CCC; border-radius: 2px; padding: 0; }
