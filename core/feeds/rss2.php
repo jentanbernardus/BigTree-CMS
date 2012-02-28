@@ -9,28 +9,35 @@
 			$limit = $feed["options"]["limit"] ? $feed["options"]["limit"] : "15";
 
 			$q = sqlquery("SELECT * FROM ".$feed["table"]." ORDER BY $sort LIMIT $limit");
-			while ($f = sqlfetch($q)) {
-				$f = BigTreeModule::get($f);
+			while ($item = sqlfetch($q)) {
+				foreach ($item as $key => $val) {
+					if (is_array(json_decode($val,true))) {
+						$item[$key] = bigtree_untranslate_array(json_decode($val,true));
+					} else {
+						$item[$key] = $cms->replaceInternalPageLinks($val);
+					}
+				}
+				
 				if ($feed["options"]["link_gen"]) {
 					$link = $feed["options"]["link_gen"];
-					foreach ($f as $key => $val) {
+					foreach ($item as $key => $val) {
 						$link = str_replace("{".$key."}",$val,$link);
 					}
 				} else {
-					$link = $f[$feed["options"]["link"]];
+					$link = $item[$feed["options"]["link"]];
 				}
 				
-				$content = $f[$feed["options"]["description"]];
+				$content = $item[$feed["options"]["description"]];
 				$limit = $feed["options"]["content_limit"] ? $feed["options"]["content_limit"] : 500;
 				$blurb = smarter_trim($content,$limit);
-				$time = strtotime($f[$feed["options"]["date"]]);
+				$time = strtotime($item[$feed["options"]["date"]]);
 		?>
 		<item>
 			<guid><?=$www_root?>feeds/<?=$feed["route"]?>/<?=$f["id"]?></guid>
-			<title><![CDATA[<?=strip_tags($f[$feed["options"]["title"]])?>]]></title>
+			<title><![CDATA[<?=strip_tags($item[$feed["options"]["title"]])?>]]></title>
 			<description><![CDATA[<?=$blurb?><? if ($blurb != $content) { ?><p><a href="<?=$link?>">Read More</a></p><? } ?>]]></description>
 			<link><?=$link?></link>
-			<dc:creator><?=$f[$feed["options"]["creator"]]?></dc:creator>
+			<dc:creator><?=$item[$feed["options"]["creator"]]?></dc:creator>
 			<dc:date><?=date("Y-m-d",$time)."T".date("H:i:sP",$time)?></dc:date>
 		</item>
 		<?
