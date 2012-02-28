@@ -915,7 +915,11 @@
 	.icon_delete_small { background: url(../images/icons-smaller.png) no-repeat -28px 3px; display: inline-block; height: 17px; width: 12px; }
 
 	.icon_dialog_caption { background: url(../images/popup-icons.png) no-repeat 0px 0px; display: inline-block; height: 23px; width: 24px; }
-	.icon_dialog_delete { background: url(../images/popup-icons.png) no-repeat -55px 0px; display: inline-block; height: 23px; width: 16px; }
+	.icon_dialog_add { background: url(../images/popup-icons.png) no-repeat -24px 0px; display: inline-block; height: 23px; width: 14px; }
+	.icon_dialog_callout { background: url(../images/popup-icons.png) no-repeat -38px 0px; display: inline-block; height: 23px; width: 19px; }
+	.icon_dialog_delete { background: url(../images/popup-icons.png) no-repeat -57px 0px; display: inline-block; height: 23px; width: 16px; }
+	.icon_dialog_folder { background: url(../images/popup-icons.png) no-repeat -74px 0px; display: inline-block; height: 23px; width: 22px; }
+	.icon_dialog_upload { background: url(../images/popup-icons.png) no-repeat -97px 0px; display: inline-block; height: 23px; width: 18px; }
 	
 	.disabled_icon { cursor: default; opacity: 0.3; }
 

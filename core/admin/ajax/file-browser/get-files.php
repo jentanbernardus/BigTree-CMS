@@ -2,7 +2,7 @@
 	if ($_POST["query"]) {
 		$items = $admin->getResourceSearchResults($_POST["query"]);
 		$perm = "e";
-		$bc = array("name" => "Search Results","id" => "");
+		$bc = array(array("name" => "Search Results","id" => ""));
 	} else {
 		$perm = $admin->getResourceFolderPermission($_POST["folder"]);
 		$items = $admin->getContentsOfResourceFolder($_POST["folder"]);
