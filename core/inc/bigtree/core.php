@@ -612,7 +612,13 @@
 			if ($f["encrypted"]) {
 				$f = sqlfetch(sqlquery("SELECT AES_DECRYPT(`value`,'".mysql_real_escape_string($config["settings_key"])."') AS `value` FROM bigtree_settings WHERE id = '$id'"));
 			}
-			return json_decode($f["value"],true);
+			
+			$value = json_deocde($f["value"],true);
+			if (is_array($value)) {
+				return $this->replaceInternalPageLinks($value);
+			} else {
+				return bigtree_untranslate_array($value);
+			}
 		}
 		
 		/*

@@ -11,9 +11,9 @@
 	
 	$items = array();
 	if ($view["options"]["draggable"]) {
-		$order = "`$table`.position DESC, `$table`.id ASC";
+		$order = "position DESC, id ASC";
 	} else {
-		$order = "`$table`.id DESC";
+		$order = "id DESC";
 	}
 	
 	$items = BigTreeAutoModule::getViewData($view,$order,"active");
@@ -30,6 +30,7 @@
 		<ul id="image_list" class="image_list">
 			<?
 				foreach ($items as $item) {
+					$item["column1"] = str_replace("{wwwroot}",$www_root,$item["column1"]);
 					if ($options["preview_prefix"]) {
 						$preview_image = file_prefix($item["column1"],$options["preview_prefix"]);
 					} else {

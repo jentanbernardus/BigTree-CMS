@@ -1016,11 +1016,9 @@ var BigTreeFileManager = {
 	},
 	
 	imageBrowser: function() {
-		$("#file_browser_selected_file").val("");
-		$("#file_browser_info_pane").html("");
 		$("#file_browser_type_icon").addClass("icon_images");
 		$("#file_browser_type").html("Image Library");
-		$("#file_browser_contents").load("www_root/admin/ajax/file-browser/get-images/", { minWidth: this.minWidth, minHeight: this.minHeight },$.proxy(this.imageBrowserPopulated,this));
+		this.openImageFolder(0);
 	},
 	
 	imageBrowserPopulated: function() {
@@ -1031,6 +1029,12 @@ var BigTreeFileManager = {
 		if ($(this).hasClass("disabled")) {
 			return false;
 		}
+		
+		if ($(this).hasClass("folder")) {
+			BigTreeFileManager.openImageFolder($(this).attr("href").substr(1));
+			return false;
+		}
+		
 		$("#file_browser_contents a").removeClass("selected");
 		$(this).addClass("selected");
 		
@@ -1138,6 +1142,13 @@ var BigTreeFileManager = {
 		$("#file_browser_selected_file").val("");
 		$("#file_browser_info_pane").html("");
 		$("#file_browser_contents").load("www_root/admin/ajax/file-browser/get-files/", { folder: folder }, $.proxy(this.fileBrowserPopulated,this));
+	},
+	
+	openImageFolder: function(folder) {
+		this.currentFolder = folder;
+		$("#file_browser_selected_file").val("");
+		$("#file_browser_info_pane").html("");
+		$("#file_browser_contents").load("www_root/admin/ajax/file-browser/get-images/", { minWidth: this.minWidth, minHeight: this.minHeight, folder: folder }, $.proxy(this.imageBrowserPopulated,this));
 	},
 	
 	saveFileTitle: function() {

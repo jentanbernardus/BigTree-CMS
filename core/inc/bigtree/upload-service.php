@@ -18,9 +18,17 @@
 		function __construct() {
 			global $cms;
 			$ups = $cms->getSetting("bigtree-internal-upload-service");
-			$this->Service = $ups["service"];
-			$this->optipng = $ups["optipng"];
-			$this->jpegtran = $ups["jpegtran"];
+			// If for some reason the setting doesn't exist, make one.
+			if (!is_array($ups) || !$ups["service"]) {
+				$this->Service = "local";
+				$this->optipng = false;
+				$this->jpegtran = false;
+				sqlquery("INSERT INTO bigtree_settings (`id`,`system`) VALUES ('bigtree-internal-upload-service','on')");
+			} else {
+				$this->Service = $ups["service"];
+				$this->optipng = $ups["optipng"];
+				$this->jpegtran = $ups["jpegtran"];
+			}
 		}
 		
 		/*
