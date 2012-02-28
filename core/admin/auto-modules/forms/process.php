@@ -60,7 +60,6 @@
 		
 		// Sanitize the form data so it fits properly in the database (convert dates to MySQL-friendly format and such)
 		$formParser = new BigTreeForms($form["table"]);
-		$formParser->verifyStructure();
 		$item = $formParser->sanitizeFormDataForDB($item);
 		$tags = $_POST["_tags"];
 		$resources = $_POST["_resources"];

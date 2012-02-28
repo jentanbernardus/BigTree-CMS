@@ -27,7 +27,25 @@
 	} else {
 		$query .= " ORDER BY group_field";
 	}
-	
+?>
+<header>
+	<?
+			$x = 0;
+			foreach ($fields as $key => $field) {
+				$x++;
+	?>
+	<span class="view_column" style="width: <?=$field["width"]?>px;"><?=$field["title"]?></span>
+	<?
+			}
+			
+			foreach ($actions as $action => $status) {
+	?>
+	<span class="view_action"><?=$action?></span>
+	<?
+			}
+	?>
+</header>
+<?	
 	$q = sqlquery($query);
 	$gc = 0;
 	while ($f = sqlfetch($q)) {
@@ -48,23 +66,6 @@
 			$gc++;
 ?>
 <header class="group"><?=$title?></header>
-<header>
-	<?
-			$x = 0;
-			foreach ($fields as $key => $field) {
-				$x++;
-	?>
-	<span class="view_column" style="width: <?=$field["width"]?>px;"><?=$field["title"]?></span>
-	<?
-			}
-			
-			foreach ($actions as $action => $status) {
-	?>
-	<span class="view_action"><?=$action?></span>
-	<?
-			}
-	?>
-</header>
 <ul id="sort_table_<?=$gc?>">
 	<? foreach ($r["results"] as $item) { ?>
 	<li id="row_<?=$item["id"]?>"<? if ($item["bigtree_pending"]) { ?> class="pending"<? } ?><? if ($item["bigtree_changes"]) { ?> class="changes"<? } ?>>

@@ -134,10 +134,10 @@
 		
 		/*
 			Function: fetch
-				Private function used by other table querying functions.
+				Protected function used by other table querying functions.
 		*/
 		
-		private function fetch($sortby = false,$limit = false,$where = false) {
+		protected function fetch($sortby = false,$limit = false,$where = false) {
 			$query = "SELECT * FROM `".$this->Table."`";
 
 			if ($where) {

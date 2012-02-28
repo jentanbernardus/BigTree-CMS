@@ -100,7 +100,14 @@
 		if (is_array($dates)) {
 			foreach ($dates as $id) {
 	?>
-	$("#<?=$id?>").datepicker();
+	$("#<?=$id?>").datepicker({ durration: 200, showAnim: "slideDown" });
+	<?
+			}
+		}
+		if (is_array($times)) {
+			foreach ($times as $id) {
+	?>
+	$("#<?=$id?>").timepicker({ durration: 200, showAnim: "slideDown", ampm: true, hourGrid: 6,	minuteGrid: 10 });
 	<?
 			}
 		}

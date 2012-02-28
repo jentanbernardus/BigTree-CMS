@@ -1011,7 +1011,7 @@
 			$external = htmlspecialchars($external);
 
 			// Update the database
-			sqlquery("UPDATE bigtree_pages SET `parent` = '$parent', `nav_title` = '$nav_title',`route` = '$route', `path` = '$path', `in_nav` = '$in_nav',`title` = '$title',`template` = '$template',`external` = '$external',`new_window` = '$new_window',`resources` = '$resources',`callouts` = '$callouts',`meta_keywords` = '$meta_keywords',`meta_description` = '$meta_description', `last_edited_by` = '".$this->ID."', publish_at = $publish_at, expire_at = $expire_at, max_age = '$max_age' WHERE id = '$page'");
+			sqlquery("UPDATE bigtree_pages SET `parent` = '$parent', `nav_title` = '$nav_title', `route` = '$route', `path` = '$path', `in_nav` = '$in_nav', `title` = '$title', `template` = '$template', `external` = '$external', `new_window` = '$new_window', `resources` = '$resources', `callouts` = '$callouts', `meta_keywords` = '$meta_keywords', `meta_description` = '$meta_description', `last_edited_by` = '".$this->ID."', publish_at = $publish_at, expire_at = $expire_at, max_age = '$max_age' WHERE id = '$page'");
 			
 			// Remove any pending drafts
 			sqlquery("DELETE FROM bigtree_pending_changes WHERE `table` = 'bigtree_pages' AND item_id = '$page'");
@@ -1537,6 +1537,46 @@
 				$pages = 1;
 			return $pages;
 		}
+		
+		/*
+			Function: updateProfile
+				Updates a user's name, company, digest setting, and (optionally) password.
+			
+			Parameters:
+				data - Array containing name / company / daily_digest / password.
+		*/
+		
+		function updateProfile($data) {
+			global $config;
+			
+			foreach ($data as $key => $val) {
+				if (substr($key,0,1) != "_" && !is_array($val)) {
+					$$key = mysql_real_escape_string($val);
+				}
+			}
+			
+			$id = mysql_real_escape_string($this->ID);
+			
+			if ($data["password"]) {
+				$phpass = new PasswordHash($config["password_depth"], TRUE);
+				$password = mysql_real_escape_string($phpass->HashPassword($data["password"]));
+				sqlquery("UPDATE bigtree_users SET `password` = '$password', `name` = '$name', `company` = '$company', `daily_digest` = '$daily_digest' WHERE id = '$id'");
+			} else {
+				sqlquery("UPDATE bigtree_users SET `name` = '$name', `company` = '$company', `daily_digest` = '$daily_digest' WHERE id = '$id'");
+			}
+		}
+		
+		/*
+			Function: updateUser
+				Updates a user.
+			
+			Parameters:
+				id - The user's "id"
+				data - A key/value array containing email, name, company, level, permissions, alerts, daily_digest, and (optionally) password.
+			
+			Returns:
+				True if successful.  False if the logged in user doesn't have permission to change the user or there was an email collision.
+		*/
 
 		function updateUser($id,$data) {
 			global $config;
@@ -1555,6 +1595,7 @@
 				return false;
 			}
 			
+			// If we didn't pass in a level because we're editing ourselves, use the current one.
 			if (!$level || $this->ID == $current["id"]) {
 				$level = $current["level"];
 			}
@@ -1571,9 +1612,9 @@
 			if ($data["password"]) {
 				$phpass = new PasswordHash($config["password_depth"], TRUE);
 				$password = mysql_real_escape_string($phpass->HashPassword($data["password"]));
-				sqlquery("UPDATE bigtree_users SET `email` = '$email',`password` = '$password',`name` = '$name',`company` = '$company',`level` = '$level',`permissions` = '$permissions', `alerts` = '$alerts' WHERE id = '$id'");
+				sqlquery("UPDATE bigtree_users SET `email` = '$email', `password` = '$password', `name` = '$name', `company` = '$company', `level` = '$level', `permissions` = '$permissions', `alerts` = '$alerts', `daily_digest` = '$daily_digest' WHERE id = '$id'");
 			} else {
-				sqlquery("UPDATE bigtree_users SET `email` = '$email',`name` = '$name',`company` = '$company',`level` = '$level',`permissions` = '$permissions', `alerts` = '$alerts' WHERE id = '$id'");
+				sqlquery("UPDATE bigtree_users SET `email` = '$email', `name` = '$name', `company` = '$company', `level` = '$level', `permissions` = '$permissions', `alerts` = '$alerts', `daily_digest` = '$daily_digest' WHERE id = '$id'");
 			}
 			
 			$this->track("bigtree_users",$id,"updated");
@@ -2395,31 +2436,159 @@
 			return true;
 		}
 		
-		//!Foundry Methods
-		function getFoundryFieldTypes() {
-			if (!file_exists($GLOBALS["server_root"]."cache/foundry-field-types.json") || (time() - filemtime($GLOBALS["server_root"]."cache/foundry-field-types.json") > 300)) {
-				// We're going to pass in the author information in case we need private types.
-				$user = $this->getUser($this->ID);
-				$author = json_decode($user["foundry_author"],true);
-				$types = bigtree_curl("http://developer.bigtreecms.com/ajax/foundry/get-types/",array("email" => $author["email"],"password" => $author["password"]));
-				file_put_contents($GLOBALS["server_root"]."cache/foundry-field-types.json",$types);
-				return json_decode($types,true);
+		/*
+			Function: getContentsOfResourceFolder
+				Returns a list of resources and subfolders in a folder (based on user permissions).
+			
+			Parameters:
+				folder - The id of a folder or a folder entry.
+				sort - The column to sort the folder's files on (default: date DESC).
+			
+			Returns:
+				An array of two arrays - folders and resources - that a user has access to.
+		*/
+		
+		function getContentsOfResourceFolder($folder, $sort = "date DESC") {
+			if (is_array($folder)) {
+				$folder = $folder["id"];
+			}
+			$folder = mysql_real_escape_string($folder);
+			
+			$folders = array();
+			$resources = array();
+			
+			$q = sqlquery("SELECT * FROM bigtree_resource_folders WHERE parent = '$folder' ORDER BY name");
+			while ($f = sqlfetch($q)) {
+				if ($this->Level > 0 || $this->getResourceFolderPermission($f["id"]) != "n") {
+					$folders[] = $f;
+				}
+			}
+			
+			$q = sqlquery("SELECT * FROM bigtree_resources WHERE folder = '$folder' ORDER BY $sort");
+			while ($f = sqlfetch($q)) {
+				$resources[] = $f;
+			}
+			
+			return array("folders" => $folders, "resources" => $resources);
+		}
+		
+		/*
+			Function: getResourceFolderBreadcrumb
+				Returns a breadcrumb of the given folder.
+			
+			Parameters:
+				folder - The id of a folder or a folder entry.
+		
+			Returns:
+				An array of arrays containing the name and id of folders above.
+		*/
+		
+		function getResourceFolderBreadcrumb($folder,$crumb = array()) {
+			if (!is_array($folder)) {
+				$folder = sqlfetch(sqlquery("SELECT * FROM bigtree_resource_folders WHERE id = '".mysql_real_escape_string($folder)."'"));
+			}
+			
+			if ($folder) {
+				$crumb[] = array("id" => $folder["id"], "name" => $folder["name"]);
+			}
+			
+			if ($folder["parent"]) {
+				return $this->getResourceFolderBreadcrumb($folder["parent"],$crumb);
 			} else {
-				return json_decode(file_get_contents($GLOBALS["server_root"]."cache/foundry-field-types.json"),true);
+				$crumb[] = array("id" => 0, "name" => "Home");
+				return array_reverse($crumb);
 			}
 		}
 		
-		function getFoundryModules() {
-			if (!file_exists($GLOBALS["server_root"]."cache/foundry-modules.json") || (time() - filemtime($GLOBALS["server_root"]."cache/foundry-modules.json") > 300)) {
-				// We're going to pass in the author information in case we need private modules.
-				$user = $this->getUser($this->ID);
-				$author = json_decode($user["foundry_author"],true);
-				$modules = bigtree_curl("http://developer.bigtreecms.com/ajax/foundry/get-modules/",array("email" => $author["email"],"password" => $author["password"]));
-				file_put_contents($GLOBALS["server_root"]."cache/foundry-modules.json",$modules);
-				return json_decode($modules,true);
-			} else {
-				return json_decode(file_get_contents($GLOBALS["server_root"]."cache/foundry-modules.json"),true);
+		/*
+			Function: getResourceFolderPermission
+				Returns the permission level of the current user for the folder.
+			
+			Parameters:
+				folder - The id of a folder or a folder entry.
+			
+			Returns:
+				"p" if a user can create folders and upload files, "e" if the user can see/use files, "n" if a user can't access this folder.
+		*/
+		
+		function getResourceFolderPermission($folder) {
+			// User is an admin or developer
+			if ($this->Level > 0) {
+				return "p";
 			}
+			
+			// We're going to save the folder entry in case we need its parent later.
+			if (is_array($folder)) {
+				$id = $folder["id"];
+			} else {
+				$id = $folder;
+			}
+			
+			$p = $this->Permissions["resources"][$id];
+			// If p is already no, creator, or consumer we can just return it.
+			if ($p && $p != "i") {
+				return $p;
+			} else {
+				// If folder is 0, we're already at home and can't check a higher folder for permissions.
+				if (!$folder) {
+					return "e";
+				}
+				
+				// If a folder entry wasn't passed in, we need it to find its parent.
+				if (!is_array($folder)) {
+					$folder = sqlfetch(sqlquery("SELECT parent FROM bigtree_resource_folders WHERE id = '".mysql_real_escape_string($id)."'"));
+				}
+				// If we couldn't find the folder anymore, just say they can consume.
+				if (!$folder) {
+					return "e";
+				}
+				
+				// Return the parent's permissions
+				return $this->getResourceFolderPermission($folder["parent"]);
+			}
+		}
+		
+		/*
+			Function: getResourceSearchResults
+				Returns a list of folders and files that match the given query string.
+			
+			Parameters:
+				query - A string of text to search folders' and files' names to.
+				sort - The column to sort the files on (default: date DESC).
+			
+			Returns:
+				An array of two arrays - folders and files - with permission levels.
+		*/
+		
+		function getResourceSearchResults($query, $sort = "date DESC") {
+			$query = mysql_real_escape_string($query);
+			$folders = array();
+			$resources = array();
+			$permission_cache = array();
+			
+			$q = sqlquery("SELECT * FROM bigtree_resource_folders WHERE name LIKE '%$query%' ORDER BY name");
+			while ($f = sqlfetch($q)) {
+				$f["permission"] = $this->getResourceFolderPermission($f);
+				// We're going to cache the folder permissions so we don't have to fetch them a bunch of times if many files have the same folder.
+				$permission_cache[$f["id"]] = $f["permission"];
+
+				$folders[] = $f;
+			}
+			
+			$q = sqlquery("SELECT * FROM bigtree_resources WHERE name LIKE '%$query%' ORDER BY $sort");
+			while ($f = sqlfetch($q)) {
+				// If we've already got the permission cahced, use it.  Otherwise, fetch it and cache it.
+				if ($permission_cache[$f["folder"]]) {
+					$f["permission"] = $permission_cache[$f["folder"]];
+				} else {
+					$f["permission"] = $this->getResourceFolderPermission($f["folder"]);
+					$permission_cache[$f["folder"]] = $f["permission"];
+				}
+				
+				$resources[] = $f;
+			}
+			
+			return array("folders" => $folders, "resources" => $resources);
 		}
 	}
 ?>

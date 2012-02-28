@@ -86,5 +86,7 @@
 		new BigTreeDialog("Delete Template",'<p class="confirm">Are you sure you want to delete this template?',$.proxy(function() {
 			document.location.href = $(this).attr("href");
 		},this),"delete",false,"OK");
+		
+		return false;
 	});
 </script>

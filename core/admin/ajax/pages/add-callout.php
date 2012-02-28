@@ -11,11 +11,15 @@
 <div id="callout_type">
 	<fieldset>
 		<label>Callout Type</label>
+		<? if (count($items) > 0) { ?>
 		<select name="callouts[<?=$count?>][type]">
 			<? foreach ($items as $item) { ?>
 			<option value="<?=htmlspecialchars($item["id"])?>"><?=htmlspecialchars($item["name"])?></option>
 			<? } ?>
 		</select>
+		<? } else { ?>
+		<p>(No callouts available)</p>
+		<? } ?>
 	</fieldset>
 </div>
 <div id="callout_resources">

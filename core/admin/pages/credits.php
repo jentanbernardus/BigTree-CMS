@@ -12,6 +12,15 @@
 	</section>
 	<hr style="margin: 0 0 -5px;" />
 	<section>
+		<h3 class="action_title">TinyMCE</h3>
+		<p class="clear">
+			Moxiecode Systems AB (LGPL)
+			<br />
+			BigTree skin based on o2k7; Heavy plugin edits.
+			<br />
+			<a href="http://www.tinymce.com/" target="_blank">http://www.tinymce.com/</a>
+		</p>
+		<br />
 		<h3 class="action_title">Fugue Icons</h3>
 		<p class="clear">
 			Yusuke Kamiyamane (CC 3.0)

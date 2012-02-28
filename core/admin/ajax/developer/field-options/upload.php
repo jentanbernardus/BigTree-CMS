@@ -24,7 +24,7 @@
 		<input type="text" name="preview_prefix" value="<?=htmlspecialchars($d["preview_prefix"])?>" />
 	</fieldset>
 	
-	<h4>Crops <a href="#" class="add_crop"><img src="<?=$icon_root?>add.png" alt="" /></a></h4>
+	<h4>Crops <a href="#" class="add_crop"><img src="<?=$aroot?>images/add.png" alt="" /></a></h4>
 	<fieldset>
 		<div class="image_attr" id="pop_crop_list">
 			<ul>

@@ -6,6 +6,7 @@
 	$delete_action = "unignore";
 ?>
 <h1><span class="page_404"></span>Ignored 404s</h1>
+<? include bigtree_path("admin/modules/dashboard/vitals-statistics/404/_nav.php") ?>
 <div class="table">
 	<summary class="taller">
 		<input type="search" class="form_search" placeholder="Search" id="404_search" />

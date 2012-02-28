@@ -167,23 +167,30 @@
 	include bigtree_path("admin/modules/pages/_nav.php");
 	include bigtree_path("admin/modules/pages/_properties.php");
 ?>
-<h3>Children</h3>
+<h3>Subpages</h3>
 <?
-	// Drag Visible Pages
-	$nav = array_merge($admin->getNaturalNavigationByParent($parent,1),$admin->getPendingNavigationByParent($parent));
-	if (count($nav)) {
-	    local_drawPageTree($nav,"Visible","","visible",true);
-	}
+	$nav_visible = array_merge($admin->getNaturalNavigationByParent($parent,1),$admin->getPendingNavigationByParent($parent));
+	$nav_hidden = array_merge($admin->getHiddenNavigationByParent($parent),$admin->getPendingNavigationByParent($parent,""));	
+	$nav_archived = $admin->getArchivedNavigationByParent($parent);
 	
-	// Draw Hidden Pages
-	$nav = array_merge($admin->getHiddenNavigationByParent($parent),$admin->getPendingNavigationByParent($parent,""));	
-	if (count($nav)) {
-	    local_drawPageTree($nav,"Hidden","Not Appearing In Navigation","hidden",false);
-	}
-	
-	// Draw Archived Pages
-	$nav = $admin->getArchivedNavigationByParent($parent);
-	if (count($nav)) {
-	    local_drawPageTree($nav,"Archived","Not Accessible By Users","archived",false);
+	if (count($nav_visible) || count($nav_hidden) || count($nav_archived)) {
+		// Drag Visible Pages
+		if (count($nav_visible)) {
+		    local_drawPageTree($nav_visible,"Visible","","visible",true);
+		}
+		
+		// Draw Hidden Pages
+		if (count($nav_hidden)) {
+		    local_drawPageTree($nav_hidden,"Hidden","Not Appearing In Navigation","hidden",false);
+		}
+		
+		// Draw Archived Pages
+		if (count($nav_archived)) {
+		    local_drawPageTree($nav_archived,"Archived","Not Accessible By Users","archived",false);
+		}
+	} else {
+?>
+	<p>Create new subpages by clicking the "Add Subpage" button above.</p>
+<?	
 	}
 ?>

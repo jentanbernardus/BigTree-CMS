@@ -5,17 +5,21 @@
 	<script type="text/javascript" src="js/pasteword.js"></script>
 </head>
 <body onresize="PasteWordDialog.resize();" style="display:none; overflow:hidden;">
-	<form name="source" onsubmit="return PasteWordDialog.insert();" action="#">
-		<div class="title">{#paste.paste_word_desc}</div>
-
-		<div>{#paste_dlg.word_title}</div>
-
-		<div id="iframecontainer"></div>
-
-		<div class="mceActionPanel">
-			<input type="submit" id="insert" name="insert" value="{#insert}" />
-			<input type="button" id="cancel" name="cancel" value="{#cancel}" onclick="tinyMCEPopup.close();" />
+	<div class="panel_wrapper" style=" border: none; padding: 25px 10px; ">
+		<div id="general_panel" class="panel current" style="border: none;">
+			<form name="source" onsubmit="return PasteWordDialog.insert();" action="#">
+				<!-- <div class="title">{#paste.paste_word_desc}</div> -->
+		
+				<div style="margin-bottom: 5px;">{#paste_dlg.word_title}</div>
+		
+				<div id="iframecontainer"></div>
+		
+				<div class="mceActionPanel">
+					<input type="button" id="cancel" name="cancel" value="{#cancel}" onclick="tinyMCEPopup.close();" />
+					<input type="submit" id="insert" name="insert" value="{#insert}" />
+				</div>
+			</form>
 		</div>
-	</form>
+	</div>
 </body>
 </html>

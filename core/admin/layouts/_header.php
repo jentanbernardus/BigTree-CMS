@@ -56,8 +56,8 @@
 				<div></div>
 				<p class="messages"><span></span><a href="<?=$aroot?>dashboard/messages/"><?=$unread_messages?> Unread Messages</a></p>
 				<div></div>
-				<p class="welcome"><span></span>Welcome Back <a href="<?=$aroot?>users/settings/"><?=$admin->Name?></a></p>
-				<strong><?=$site["nav_title"]?> Admin</strong>
+				<p class="welcome"><span></span>Welcome Back <a href="<?=$aroot?>users/profile/"><?=$admin->Name?></a></p>
+				<strong><?=$site["nav_title"]?></strong>
 				<a href="<?=$www_root?>" target="_blank" class="view_site">View Site</a>
 			</section>
 		</header>
@@ -68,7 +68,7 @@
 						foreach ($nav as $item) {
 							if ($admin->Level >= $item["level"]) {
 					?>
-					<li>
+					<li<? if ($path[1] == $item["link"] || ($item["link"] == "modules" && $in_module)) { ?> class="active"<? } ?>>
 						<a href="<?=$aroot?><?=$item["link"]?>/"<? if ($path[1] == $item["link"] || ($item["link"] == "modules" && $in_module)) { ?> class="active"<? } ?>><span class="<?=$cms->urlify($item["title"])?>"></span><?=$item["title"]?></a>
 						<? if (count($item["children"])) { ?>
 						<ul>

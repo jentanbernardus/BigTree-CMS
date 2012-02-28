@@ -384,7 +384,7 @@
 				if ($f) {
 					sqlquery("UPDATE bigtree_404s SET requests = (requests + 1) WHERE id = '".$f["id"]."'");
 				} else {
-					sqlquery("INSERT INTO bigtree_404s (`broken_url`,`requests`) VALUES ('".mysql_real_escape_string(rtrim($_GET["bigtree_htaccess_url"],"/"))."','1','".mysql_real_escape_string($requester)."','".mysql_real_escape_string($referer)."')");
+					sqlquery("INSERT INTO bigtree_404s (`broken_url`,`requests`) VALUES ('".mysql_real_escape_string(rtrim($_GET["bigtree_htaccess_url"],"/"))."','1')");
 				}
 				include "../templates/pages/_404.php";
 			}
