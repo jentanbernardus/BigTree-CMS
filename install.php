@@ -98,7 +98,7 @@
 			$db,
 			$user,
 			$password,
-			$write_host,
+			(isset($loadbalanced)) ? $write_host : "",
 			$write_db,
 			$write_user,
 			$write_password,
@@ -356,7 +356,7 @@ php_flag magic_quotes_gpc Off');
 				</fieldset>
 				<fieldset>
 					<br />
-					<input type="checkbox" class="checkbox" name="loadbalanced" id="loadbalanced"<? if ($loadbalanced) { ?> checked="checked"<? } ?> tabindex="5" />
+					<input type="checkbox" class="checkbox" name="loadbalanced" id="loadbalanced""<? if ($loadbalanced) { ?> checked="checked"<? } ?> tabindex="5" />
 					<label class="for_checkbox">Load Balanced MySQL</label>
 				</fieldset>
 				

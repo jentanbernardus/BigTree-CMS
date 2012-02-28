@@ -36,7 +36,7 @@
 	<head>
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-		<title><? if ($module_title) { ?><?=$module_title?> | <? } ?><?=$site["nav_title"]?> Admin</title>
+		<title><? if ($module_title) { ?><?=$module_title?> | <? } ?><?=$site["nav_title"]?></title>
 		<link rel="stylesheet" href="<?=$aroot?>css/main.css" type="text/css" media="screen" charset="utf-8" />
 		<link media="only screen and (max-device-width: 480px)" href="<?=$aroot?>css/mobile.css" type= "text/css" rel="stylesheet" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no;" />
