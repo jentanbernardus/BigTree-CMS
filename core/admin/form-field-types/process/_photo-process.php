@@ -99,7 +99,7 @@
  		if (!$value) {
 			$fails[] = array("field" => $options["title"], "error" => "Could not upload file.  The destination is not writable.");
 			unlink($temp_copy);
-			unlinke($first_copy);
+			unlink($first_copy);
 			$failed = true;
 		}
 	}
