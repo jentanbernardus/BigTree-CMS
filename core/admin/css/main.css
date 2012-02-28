@@ -865,6 +865,7 @@
 	#file_browser_contents a.file:nth-child(even) { background: #F5F5F5; }
 	#file_browser_contents a.file:hover { background-gradient: #436D86 #578FB1; color: #FFF; }
 	#file_browser_contents a.file.selected { background-gradient: #385B6F #447491; color: #FFF; }
+	#file_browser_contents a.disabled { opacity: 0.3; cursor: default; }
 	#file_browser_info_pane { background: #EFEFEF; border-left: 1px solid #E5E5E5; float: left; height: 371px; width: 210px; }
 	#file_browser footer { background: #F5F5F5; border-top: 1px solid #E5E5E5; clear: both; padding: 15px 20px; }
 	#file_browser footer input { margin: 0 10px 0 0; }
@@ -884,6 +885,7 @@
 
 	.file_type { background: url(../images/icons-files.png); float: left; height: 16px; margin: 0 5px 0 0; width: 16px; }
 	.file_type_image { background-position: -48px 0; }
+	.file_type_folder { background-position: -160px 0; }
 	
 /* Icons */
 	.icon_sort { background: url(../images/icons.png) no-repeat -421px 9px; cursor: move; display: block; float: left; height: 35px; margin: 0 5px 0 0; width: 12px; }

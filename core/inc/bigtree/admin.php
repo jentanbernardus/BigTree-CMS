@@ -2441,11 +2441,11 @@
 				Returns a list of resources and subfolders in a folder (based on user permissions).
 			
 			Parameters:
-				folder - The ID of a folder or a folder entry.
+				folder - The id of a folder or a folder entry.
 				sort - The column to sort the folder's files on (default: date DESC).
 			
 			Returns:
-				An array of two arrays - folders and resources.
+				An array of two arrays - folders and resources - that a user has access to.
 		*/
 		
 		function getContentsOfResourceFolder($folder, $sort = "date DESC") {
@@ -2473,11 +2473,39 @@
 		}
 		
 		/*
+			Function: getResourceFolderBreadcrumb
+				Returns a breadcrumb of the given folder.
+			
+			Parameters:
+				folder - The id of a folder or a folder entry.
+		
+			Returns:
+				An array of arrays containing the name and id of folders above.
+		*/
+		
+		function getResourceFolderBreadcrumb($folder,$crumb = array()) {
+			if (!is_array($folder)) {
+				$folder = sqlfetch(sqlquery("SELECT * FROM bigtree_resource_folders WHERE id = '".mysql_real_escape_string($folder)."'"));
+			}
+			
+			if ($folder) {
+				$crumb[] = array("id" => $folder["id"], "name" => $folder["name"]);
+			}
+			
+			if ($folder["parent"]) {
+				return $this->getResourceFolderBreadcrumb($folder["parent"],$crumb);
+			} else {
+				$crumb[] = array("id" => 0, "name" => "Home");
+				return array_reverse($crumb);
+			}
+		}
+		
+		/*
 			Function: getResourceFolderPermission
 				Returns the permission level of the current user for the folder.
 			
 			Parameters:
-				folder - The ID of a folder or a folder entry.
+				folder - The id of a folder or a folder entry.
 			
 			Returns:
 				"p" if a user can create folders and upload files, "e" if the user can see/use files, "n" if a user can't access this folder.
@@ -2496,7 +2524,7 @@
 				$id = $folder;
 			}
 			
-			$p = $this->Permissions["resources"][$folder];
+			$p = $this->Permissions["resources"][$id];
 			// If p is already no, creator, or consumer we can just return it.
 			if ($p && $p != "i") {
 				return $p;
@@ -2518,6 +2546,49 @@
 				// Return the parent's permissions
 				return $this->getResourceFolderPermission($folder["parent"]);
 			}
+		}
+		
+		/*
+			Function: getResourceSearchResults
+				Returns a list of folders and files that match the given query string.
+			
+			Parameters:
+				query - A string of text to search folders' and files' names to.
+				sort - The column to sort the files on (default: date DESC).
+			
+			Returns:
+				An array of two arrays - folders and files - with permission levels.
+		*/
+		
+		function getResourceSearchResults($query, $sort = "date DESC") {
+			$query = mysql_real_escape_string($query);
+			$folders = array();
+			$resources = array();
+			$permission_cache = array();
+			
+			$q = sqlquery("SELECT * FROM bigtree_resource_folders WHERE name LIKE '%$query%' ORDER BY name");
+			while ($f = sqlfetch($q)) {
+				$f["permission"] = $this->getResourceFolderPermission($f);
+				// We're going to cache the folder permissions so we don't have to fetch them a bunch of times if many files have the same folder.
+				$permission_cache[$f["id"]] = $f["permission"];
+
+				$folders[] = $f;
+			}
+			
+			$q = sqlquery("SELECT * FROM bigtree_resources WHERE name LIKE '%$query%' ORDER BY $sort");
+			while ($f = sqlfetch($q)) {
+				// If we've already got the permission cahced, use it.  Otherwise, fetch it and cache it.
+				if ($permission_cache[$f["folder"]]) {
+					$f["permission"] = $permission_cache[$f["folder"]];
+				} else {
+					$f["permission"] = $this->getResourceFolderPermission($f["folder"]);
+					$permission_cache[$f["folder"]] = $f["permission"];
+				}
+				
+				$resources[] = $f;
+			}
+			
+			return array("folders" => $folders, "resources" => $resources);
 		}
 	}
 ?>

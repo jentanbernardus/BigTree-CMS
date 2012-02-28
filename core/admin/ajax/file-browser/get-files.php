@@ -1,24 +1,51 @@
 <?
-	$upload_service = new BigTreeUploadService;
-	
-	$minWidth = $_POST["minWidth"];
-	$minHeight = $_POST["minHeight"];
-
-	$itype_exts = array(IMAGETYPE_PNG => ".png", IMAGETYPE_JPEG => ".jpg", IMAGETYPE_GIF => ".gif");
-	
 	if ($_POST["query"]) {
-		$q = sqlquery("SELECT * FROM bigtree_resources WHERE name LIKE '%".mysql_real_escape_string($_POST["query"])."%' ORDER BY id DESC");
+		$items = $admin->getResourceSearchResults($_POST["query"]);
+		$perm = "e";
+		$bc = array("name" => "Search Results","id" => "");
 	} else {
-		$q = sqlquery("SELECT * FROM bigtree_resources ORDER BY id DESC");
+		$perm = $admin->getResourceFolderPermission($_POST["folder"]);
+		$items = $admin->getContentsOfResourceFolder($_POST["folder"]);
+		$bc = $admin->getResourceFolderBreadcrumb($_POST["folder"]);
 	}
 	
-	while ($f = sqlfetch($q)) {
-		$file = str_replace("{wwwroot}",$site_root,$f["file"]);
-		if ($f["is_image"]) {
-			$f["type"] = "image";
-		}
+	if (!$_POST["query"] && $_POST["folder"] > 0) {
+		$folder = sqlfetch(sqlquery("SELECT * FROM bigtree_resource_folders WHERE id = '".mysql_real_escape_string($_POST["folder"])."'"));
 ?>
-<a href="<?=$f["file"]?>" class="file"><span class="file_type file_type_<?=$f["type"]?>"></span> <?=$f["name"]?></a>
-<?
+<a href="#<?=$folder["parent"]?>" class="file folder"><span class="file_type file_type_folder"></span> ..</a>
+<?	
 	}
+	
+	if ($perm != "n") {
+	
+		foreach ($items["folders"] as $folder) {
 ?>
+<a href="#<?=$folder["id"]?>" class="file folder<? if ($folder["permission"] == "n") { ?> disabled<? } ?>"><span class="file_type file_type_folder"></span> <?=$folder["name"]?></a>
+<?
+		}
+	
+		foreach ($items["resources"] as $resource) {
+			$file = str_replace("{wwwroot}",$site_root,$resource["file"]);
+			if ($resource["is_image"]) {
+				$resource["type"] = "image";
+			}
+?>
+<a href="<?=$resource["file"]?>" class="file"><span class="file_type file_type_<?=$resource["type"]?>"></span> <?=$resource["name"]?></a>
+<?
+		}
+	}
+	
+	$crumb_contents = "";
+	foreach ($bc as $crumb) {
+		$crumb_contents .= '<li><a href="#'.$crumb["id"].'">'.$crumb["name"].'</a></li>';
+	}
+?>	
+<script type="text/javascript">
+	<? if ($perm == "p") { ?>
+	BigTreeFileManager.enableCreate();
+	<? } else { ?>
+	BigTreeFileManager.disableCreate();
+	<? } ?>
+	
+	BigTreeFileManager.setBreadcrumb("<?=str_replace('"','\"',$crumb_contents)?>");
+</script>
