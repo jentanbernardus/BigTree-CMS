@@ -68,7 +68,7 @@
 						foreach ($nav as $item) {
 							if ($admin->Level >= $item["level"]) {
 					?>
-					<li>
+					<li<? if ($path[1] == $item["link"] || ($item["link"] == "modules" && $in_module)) { ?> class="active"<? } ?>>
 						<a href="<?=$aroot?><?=$item["link"]?>/"<? if ($path[1] == $item["link"] || ($item["link"] == "modules" && $in_module)) { ?> class="active"<? } ?>><span class="<?=$cms->urlify($item["title"])?>"></span><?=$item["title"]?></a>
 						<? if (count($item["children"])) { ?>
 						<ul>
