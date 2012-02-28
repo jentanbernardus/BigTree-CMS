@@ -1,4 +1,9 @@
 <?
+	$perm = $admin->getResourceFolderPermission($_POST["folder"]);
+	if ($perm != "p") {
+		die("You don't have permission to make a folder here.");
+	}
+	
 	$folder = mysql_real_escape_string($_POST["folder"]);
 	$name = mysql_real_escape_string(htmlspecialchars($_POST["name"]));
 	

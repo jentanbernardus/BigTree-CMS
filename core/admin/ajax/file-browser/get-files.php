@@ -39,7 +39,7 @@
 	foreach ($bc as $crumb) {
 		$crumb_contents .= '<li><a href="#'.$crumb["id"].'">'.$crumb["name"].'</a></li>';
 	}
-?>	
+?>
 <script type="text/javascript">
 	<? if ($perm == "p") { ?>
 	BigTreeFileManager.enableCreate();

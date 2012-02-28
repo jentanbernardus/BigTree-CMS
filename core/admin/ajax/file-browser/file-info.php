@@ -1,7 +1,11 @@
 <?
 	$file = sqlfetch(sqlquery("SELECT * FROM bigtree_resources WHERE file = '".mysql_real_escape_string($_POST["file"])."'"));
+	$file["file"] = str_replace("{wwwroot}",$www_root,$file["file"]);
 	$thumbs = json_decode($file["thumbs"],true);
 	$pinfo = safe_pathinfo($file["file"]);
+	foreach ($thumbs as &$thumb) {
+		$thumb = str_replace("{wwwroot}",$www_root,$thumb);
+	}
 ?>
 <? if ($file["is_image"]) { ?>
 <div class="file_browser_detail_thumb">
