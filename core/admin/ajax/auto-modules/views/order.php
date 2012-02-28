@@ -9,7 +9,7 @@
 		parse_str($_GET["sort"]);
 	
 		foreach ($row as $position => $id) {
-			BigTreeModule::setPosition($id,count($sort_table)-$position,$table);
+			sqlquery("UPDATE `$table` SET position = '".(count($sort_table)-$position)."' WHERE id = '".mysql_real_escape_string($id)."'");
 			BigTreeAutoModule::recacheItem($id,$table);
 		}
 	}
