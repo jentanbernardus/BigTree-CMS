@@ -197,7 +197,8 @@
 											$categories = array();
 											$ot = mysql_real_escape_string($gbp["other_table"]);
 											$tf = mysql_real_escape_string($gbp["title_field"]);
-											$q = sqlquery("SELECT id,`$tf` FROM `$ot` ORDER BY `$tf` ASC");
+											if ($tf && $ot) {
+												$q = sqlquery("SELECT id,`$tf` FROM `$ot` ORDER BY `$tf` ASC");
 									?>
 									<ul class="depth_2" style="display: none;">
 										<? while ($c = sqlfetch($q)) { ?>
@@ -211,6 +212,7 @@
 										<? } ?>
 									</ul>
 									<?
+											}
 										}
 									?>
 								</li>
