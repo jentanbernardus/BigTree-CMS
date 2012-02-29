@@ -1,5 +1,5 @@
 <?
-	$view = $admin->getModuleView(end($path));
+	$view = BigTreeAutoModule::getView(end($path));
 ?>
 <h1><span class="icon_developer_modules"></span>Tweak View Styles</h1>
 <?
@@ -64,14 +64,16 @@
 		growing = $(this);
 		gIndex = titles.index(this);
 		if (offset > obj_middle) {
-			if (!titles.eq(gIndex + 1).length)
+			if (!titles.eq(gIndex + 1).length) {
 				return;
+			}
 			shrinking = titles.eq(gIndex + 1);
 			movementDirection = "right";
 			$(this).css({ cursor: "e-resize" });
 		} else {
-			if (gIndex == 0)
+			if (gIndex == 0) {
 				return;
+			}
 			shrinking = titles.eq(gIndex - 1);
 			movementDirection = "left";
 			$(this).css({ cursor: "w-resize" });
@@ -92,12 +94,17 @@
 	});
 	
 	$(window).mousemove(function(ev) {
-		if (!dragging)
+		if (!dragging) {
 			return;
+		}
 		difference = ev.clientX - mouseStartX;
-		if (movementDirection == "left")
+		if (movementDirection == "left") {
 			difference = difference * -1;
-		shrinking.css({ width: (shrinkingStartWidth - difference) + "px" });
-		growing.css({ width: (growingStartWidth + difference) + "px" });
+		}
+		// The minimum width is 62 (20 pixels padding) because that's the size of an action column.  Figured it's a good minimum.
+		if (shrinkingStartWidth - difference > 41 && growingStartWidth + difference > 41) {
+			shrinking.css({ width: (shrinkingStartWidth - difference) + "px" });
+			growing.css({ width: (growingStartWidth + difference) + "px" });
+		}
 	});
 </script>
