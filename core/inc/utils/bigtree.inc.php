@@ -518,7 +518,7 @@
 	
 	// Get a file prefix for a full path.
 	function file_prefix($file,$prefix) {
-		$pinfo = safe_pathinfo($value);
+		$pinfo = safe_pathinfo($file);
 		return $pinfo["dirname"]."/".$prefix.$pinfo["basename"];
 	}
 	
