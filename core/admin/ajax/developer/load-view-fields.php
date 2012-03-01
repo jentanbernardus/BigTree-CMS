@@ -28,7 +28,8 @@
 	
 	$preview_field = $view["preview_field"] ? $view["preview_field"] : "id";
 
-	$types = $admin->ModuleFieldTypes;
+	$cached_types = $admin->getCachedFieldTypes();
+	$types = $cached_types["module"];
 ?>
 <fieldset id="fields">
 	<label>Fields</label>

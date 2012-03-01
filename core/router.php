@@ -197,7 +197,7 @@
 		$navid = $path[1];
 	}
 	
-	// So we don't lost this.
+	// So we don't lose this.
 	define("BIGTREE_PREVIEWING",$preview);
 	
 	// Sitemap setup

@@ -65,7 +65,8 @@
 		}
 	}
 	
-	$types = $admin->ModuleFieldTypes;
+	$cached_types = $admin->getCachedFieldTypes();
+	$types = $cached_types["module"];
 ?>
 
 

@@ -7,6 +7,9 @@
 		Resources Available:
 ';
 	
+	$cached_types = $admin->getCachedFieldTypes();
+	$types = $cached_types["callout"];
+	
 	$resources = array();
 	foreach ($_POST["resources"] as $resource) {
 		if ($resource["id"] && $resource["id"] != "type") {
@@ -16,7 +19,7 @@
 					$resource[$key] = $val;
 			}
 			
-			$file_contents .= '		$'.$resource["id"].' = '.$resource["name"].' - '.$admin->TemplateFieldTypes[$resource["type"]]."\n";
+			$file_contents .= '		$'.$resource["id"].' = '.$resource["name"].' - '.$types[$resource["type"]]."\n";
 			
 			$resource["id"] = htmlspecialchars($resource["id"]);
 			$resource["name"] = htmlspecialchars($resource["name"]);

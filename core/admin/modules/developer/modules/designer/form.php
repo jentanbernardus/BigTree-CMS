@@ -11,7 +11,8 @@
 		}
 	}
 	
-	$types = $admin->ModuleFieldTypes;
+	$cached_types = $admin->getCachedFieldTypes();
+	$types = $cached_types["module"];
 ?>
 <h1><span class="icon_developer_modules"></span>Module Designer</h1>
 <? include bigtree_path("admin/modules/developer/modules/_nav.php"); ?>
