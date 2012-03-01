@@ -7,19 +7,21 @@
 	$ungrouped_modules = $admin->getModulesByGroup(0);
 ?>
 <h1><span class="icon_developer_modules"></span>Modules</h1>
-<? include bigtree_path("admin/modules/developer/modules/_nav.php"); ?>
-<? foreach ($groups as $group) { ?>
+<?
+	include bigtree_path("admin/modules/developer/modules/_nav.php");
+	foreach ($groups as $g) {
+?>
 <div class="table">
 	<summary>
-		<h2><?=$group["name"]?></h2>
+		<h2><?=$g["name"]?></h2>
 	</summary>
 	<header>
 		<span class="developer_templates_name">Module Name</span>
 		<span class="view_action">Edit</span>
 		<span class="view_action">Delete</span>
 	</header>
-	<ul id="group_<?=$group["id"]?>">
-		<? foreach ($group["modules"] as $item) { ?>
+	<ul id="group_<?=$g["id"]?>">
+		<? foreach ($g["modules"] as $item) { ?>
 		<li id="row_<?=$item["id"]?>">
 			<section class="developer_templates_name">
 				<span class="icon_sort"></span>
@@ -37,11 +39,13 @@
 </div>
 
 <script type="text/javascript">
-	$("#group_<?=$group["id"]?>").sortable({ axis: "y", containment: "parent", handle: ".icon_sort", items: "li", placeholder: "ui-sortable-placeholder", tolerance: "pointer", update: function() {
-		$.ajax("<?=$aroot?>ajax/developer/order-modules/?sort=" + escape($("#group_<?=$group["id"]?>").sortable("serialize")));
+	$("#group_<?=$g["id"]?>").sortable({ axis: "y", containment: "parent", handle: ".icon_sort", items: "li", placeholder: "ui-sortable-placeholder", tolerance: "pointer", update: function() {
+		$.ajax("<?=$aroot?>ajax/developer/order-modules/?sort=" + escape($("#group_<?=$g["id"]?>").sortable("serialize")));
 	}});
 </script>
-<? } ?>
+<?
+	}
+?>
 
 <div class="table">
 	<summary>
