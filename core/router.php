@@ -26,6 +26,9 @@
 					$data = str_replace('$'.$key,$val,$data);
 				}
 			}
+			foreach ($config["js"]["vars"] as $key => $val) {
+				$data = str_replace('$'.$key,$val,$data);
+			}
 			$data = JSMin::minify($data);
 			file_put_contents($cfile,$data);
 			header("Content-type: text/javascript");
@@ -66,6 +69,9 @@
 			$data = "";
 			foreach ($config["css"][$css_file] as $style) {
 				$data .= file_get_contents($site_root."css/$style")."\n";
+			}
+			foreach ($config["css"]["vars"] as $key => $val) {
+				$data = str_replace('$'.$key,$val,$data);
 			}
 			// Replace CSS3 easymode and Minify
 			$data = bigtree_parse_css3($data);

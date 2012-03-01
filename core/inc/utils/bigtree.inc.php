@@ -93,6 +93,7 @@
 	function bigtree_parse_css3($css) {
 		$GLOBALS["browser"] = get_user_browser();
 		// Border Radius - border-radius: 0px 0px 0px 0px
+/*
 		$css = preg_replace_callback('/border-radius:([^\"]*);/iU',create_function('$data','
 			$radii = explode(" ",trim($data[1]));
 			if (count($radii) == 1) {
@@ -107,6 +108,7 @@
 				return "border-top-left-radius: $tl; border-top-right-radius: $tr; border-bottom-right-radius: $br; border-bottom-left-radius: $bl; -webkit-border-top-left-radius: $tl; -webkit-border-top-right-radius: $tr; -webkit-border-bottom-right-radius: $br; -webkit-border-bottom-left-radius: $bl; -moz-border-radius-topleft: $tl; -moz-border-radius-topright: $tr; -moz-border-radius-bottomright: $br; -moz-border-radius-bottomleft: $bl;";
 			}
 		'),$css);
+*/
 		
 		// Border Radius Top Left - border-radius-top-left: 0px
 		$css = preg_replace_callback('/border-radius-top-left:([^\"]*);/iU',create_function('$data','

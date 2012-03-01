@@ -1500,14 +1500,14 @@ var BigTreeToolTip = Class.extend({
 		
 		if (auto_close) {
 			$(selector).mouseenter($.proxy(this.showTip,this));
-			$(selector).mouseleave($.proxy(function() { this.container.fadeOut(300); },this));
+			$(selector).mouseleave($.proxy(function() { this.container.stop().fadeTo(200, 0); },this));
 		} else {
 			$(selector).click($.proxy(this.showTip,this));
 		}
 	},
 	
 	close: function() {
-		this.container.fadeOut(300);
+		this.container.stop().fadeTo(200, 0);
 		return false;
 	},
 	
@@ -1541,7 +1541,7 @@ var BigTreeToolTip = Class.extend({
 			t = offset.top - container.height() - 5;
 		}
 		
-		this.container.css({ left: l + "px", top: t + "px" }).fadeIn(300);
+		this.container.css({ left: l + "px", top: t + "px" }).stop().fadeTo(200, 1);
 	}
 });
 
