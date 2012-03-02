@@ -7,7 +7,7 @@
 		$js_file = str_replace(".js","",$path[1]);
 		$cfile = $server_root."cache/".$js_file.".js";
 		$last_modified = file_exists($cfile) ? filemtime($cfile) : 0;
-		if (count($config["js"][$js_file])) {
+		if (is_array($config["js"][$js_file])) {
 			foreach ($config["js"][$js_file] as $script) {
 				$m = file_exists($site_root."js/$script") ? filemtime($site_root."js/$script") : 0;
 				if ($m > $mtime) {
@@ -18,21 +18,21 @@
 		// If we have a newer Javascript file to include or we haven't cached yet, do it now.
 		if (!file_exists($cfile) || $mtime > $last_modified) {
 			$data = "";
-			if (count($config["js"][$js_file])) {
+			if (is_array($config["js"][$js_file])) {
 				foreach ($config["js"][$js_file] as $script) {
 					$data .= file_get_contents($site_root."js/$script")."\n";
 				}
 			}
 			// Replace www_root/ and Minify
 			$data = str_replace(array('$www_root',"www_root/"),$www_root,$data);
-			if (count($_GET)) {
+			if (is_array($_GET)) {
 				foreach ($_GET as $key => $val) {
 					if ($key != "bigtree_htaccess_url") {
 						$data = str_replace('$'.$key,$val,$data);
 					}
 				}
 			}
-			if (count($config["js"]["vars"])) {
+			if (is_array($config["js"]["vars"])) {
 				foreach ($config["js"]["vars"] as $key => $val) {
 					$data = str_replace('$'.$key,$val,$data);
 				}
@@ -66,7 +66,7 @@
 		$css_file = str_replace(".css","",$path[1]);
 		$cfile = $server_root."cache/".$css_file.".css";
 		$last_modified = file_exists($cfile) ? filemtime($cfile) : 0;
-		if (count($config["css"][$css_file])) {
+		if (is_array($config["css"][$css_file])) {
 			foreach ($config["css"][$css_file] as $style) {
 				$m = (file_exists($site_root."css/$style")) ? filemtime($site_root."css/$style") : 0;
 				if ($m > $mtime) {
@@ -77,12 +77,12 @@
 		// If we have a newer CSS file to include or we haven't cached yet, do it now.
 		if (!file_exists($cfile) || $mtime > $last_modified) {
 			$data = "";
-			if (count($config["css"][$css_file])) {
+			if (is_array($config["css"][$css_file])) {
 				foreach ($config["css"][$css_file] as $style) {
 					$data .= file_get_contents($site_root."css/$style")."\n";
 				}
 			}
-			if (count($config["css"]["vars"])) {
+			if (is_array($config["css"]["vars"])) {
 				foreach ($config["css"]["vars"] as $key => $val) {
 					$data = str_replace('$'.$key,$val,$data);
 				}
@@ -217,7 +217,7 @@
 		$navid = $path[1];
 	}
 	
-	// So we don't lost this.
+	// So we don't lose this.
 	define("BIGTREE_PREVIEWING",$preview);
 	
 	// Sitemap setup
