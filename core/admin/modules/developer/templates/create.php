@@ -2,7 +2,7 @@
 	bigtree_process_post_vars(array("htmlspecialchars","mysql_real_escape_string"));
 	
 	// Let's see if the ID has already been used.
-	if (sqlrows(sqlquery("SELECT * FROM bigtree_templates WHERE id = '$id'"))) {
+	if ($admin->ModuleFieldTypes[$id] || sqlrows(sqlquery("SELECT * FROM bigtree_field_types WHERE id = '$id'"))) {
 		$_SESSION["bigtree"]["admin_saved"] = $_POST;
 		$_SESSION["bigtree"]["admin_error"] = true;
 		header("Location: ../add/");
@@ -14,9 +14,6 @@
 	/*
 		Resources Available:
 ';
-
-	$cached_types = $admin->getCachedFieldTypes();
-	$types = $cached_types["template"];
 	
 	$resources = array();
 	foreach ($_POST["resources"] as $resource) {
@@ -27,7 +24,7 @@
 					$resource[$key] = $val;
 			}
 			
-			$file_contents .= '		$'.$resource["id"].' = '.$resource["name"].' - '.$types[$resource["type"]]."\n";
+			$file_contents .= '		$'.$resource["id"].' = '.$resource["name"].' - '.$admin->TemplateFieldTypes[$resource["type"]]."\n";
 			
 			$resource["id"] = htmlspecialchars($resource["id"]);
 			$resource["name"] = htmlspecialchars($resource["name"]);
@@ -53,7 +50,7 @@
 	$file_contents .= '	*/
 ?>';
 	
-	if ($is_module) {
+	if ($routed == "on") {
 		if (!file_exists($GLOBALS["server_root"]."templates/modules/".$id)) {
 			mkdir($GLOBALS["server_root"]."templates/modules/".$id);
 			chmod($GLOBALS["server_root"]."templates/modules/".$id,0777);
@@ -73,7 +70,7 @@
 	$name = mysql_real_escape_string(htmlspecialchars($_POST["name"]));
 	$description = mysql_real_escape_string(htmlspecialchars($_POST["description"]));
 	
-	sqlquery("INSERT INTO bigtree_templates (`id`,`name`,`module`,`resources`,`image`,`description`,`level`,`callouts_enabled`) VALUES ('$id','$name','$module','$resources','$image','$description','$level','$callouts_enabled')");
+	sqlquery("INSERT INTO bigtree_templates (`id`,`name`,`module`,`resources`,`image`,`description`,`level`,`callouts_enabled`,`routed`) VALUES ('$id','$name','$module','$resources','$image','$description','$level','$callouts_enabled','$routed')");
 	
 	$admin->growl("Developer","Created Template");
 	header("Location: ".$saroot."templates/view/");
