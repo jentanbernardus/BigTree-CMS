@@ -743,6 +743,13 @@
 		$parray[] = $pages;
 		return $parray;
 	}
+	
+	function bigtree_module_exists($class_name = false) {
+		if (in_array($class_name, array_keys($GLOBALS["module_list"]))) {
+			return true;
+		}
+		return false;
+	}
 
 	// Cleans up HTML to take out tags we don't want in a body, based on a modified version of Christian Stocker's lx_externalinput_clean Class
 	// Modified to allow embeds and iframes to still exist but to take out crazy scripting things.
