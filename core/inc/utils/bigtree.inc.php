@@ -751,7 +751,7 @@
 		return false;
 	}
 	
-	function bigtree_redirect($url = false, $type = "301") {
+	function bigtree_redirect($url = false, $type = "302") {
 		if (!$url) {
 			return false;
 		} else if ($type == "301") {
