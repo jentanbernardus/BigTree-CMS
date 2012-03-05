@@ -1203,6 +1203,11 @@
 			$name = mysql_real_escape_string($name);
 			return sqlfetch(sqlquery("SELECT * FROM bigtree_module_groups WHERE name = '$name'"));
 		}
+		
+		function getModuleGroupByRoute($route) {
+			$name = mysql_real_escape_string($route);
+			return sqlfetch(sqlquery("SELECT * FROM bigtree_module_groups WHERE route = '$route'"));
+		}
 
 		function getModuleGroups($sort = "position DESC, id ASC") {
 			$items = array();
