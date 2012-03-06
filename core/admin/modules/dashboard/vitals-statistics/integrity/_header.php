@@ -2,8 +2,9 @@
 	$admin->requireLevel(1);
 	
 	$breadcrumb = array(
-		array("link" => "dashboard/", "title" => "Pages"),
-		array("link" => "dashboard/integrity/", "title" => "Integrity Check")
+		array("link" => "dashboard/", "title" => "Dashboard"),
+		array("link" => "dashboard/vitals-statistics/", "title" => "Vitals &amp; Statistics"),
+		array("link" => "dashboard/vitals-statistics/integrity/", "title" => "Integrity Check")
 	);
 	
 	function _local_build_tree($id) {

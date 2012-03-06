@@ -125,7 +125,10 @@
 <?
 	}
 ?>
-<h1><span class="analytics"></span>Traffic Report</h1>
+<h1>
+	<span class="analytics"></span>Traffic Report
+	<? include bigtree_path("admin/modules/dashboard/vitals-statistics/_jump.php"); ?>
+</h1>
 <? include bigtree_path($relative_path."_nav.php"); ?>
 <div class="table">
 	<summary>

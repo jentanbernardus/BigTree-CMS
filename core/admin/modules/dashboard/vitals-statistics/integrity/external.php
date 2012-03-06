@@ -7,7 +7,10 @@
 	
 	$external = true;
 ?>
-<h1><span class="integrity"></span>Site Integrity Check</h1>
+<h1>
+	<span class="integrity"></span>Site Integrity Check
+	<? include bigtree_path("admin/modules/dashboard/vitals-statistics/_jump.php"); ?>
+</h1>
 <div class="table">
 	<summary>
 		<div class="integrity_progress"><span id="progress">0%</span></div>
