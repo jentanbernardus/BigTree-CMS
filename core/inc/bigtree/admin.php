@@ -295,6 +295,14 @@
 			}
 			return "ipl://".$navid."//".base64_encode(json_encode($commands));
 		}
+		
+		/*
+			Function: stop
+				Stops processing of the Admin area and shows a message in the default layout.
+			
+			Parameters:
+				message - Content to show (error, permission denied, etc)
+		*/
 
 		function stop($message = "") {
 			global $cms,$admin,$www_root,$aroot,$site,$breadcrumb;
@@ -303,6 +311,16 @@
 			include bigtree_path("admin/layouts/default.php");
 			die();
 		}
+		
+		/*
+			Function: track
+				Logs a user's actions to the audit trail table.
+			
+			Parameters:
+				table - The table affected by the user.
+				entry - The primary key of the entry affected by the user.
+				type - The action taken by the user (delete, edit, create, etc.)
+		*/
 
 		function track($table,$entry,$type) {
 			$table = mysql_real_escape_string($table);
@@ -310,13 +328,27 @@
 			$type = mysql_real_escape_string($type);
 			sqlquery("INSERT INTO bigtree_audit_trail VALUES (`table`,`user`,`entry`,`date`,`type`) VALUES ('$table','".$admin->ID."','$entry',NOW(),'$type')");
 		}
+		
+		/*
+			Function: urlExists
+				Attempts to connect to a URL using cURL.
+			
+			Parameters:
+				url - The URL to connect to.
+			
+			Returns:
+				true if it can connect, false if connection failed.
+		*/
 
 		function urlExists($url) {
 			$handle = curl_init($url);
-			if (false === $handle)
+			if ($handle === false) {
 				return false;
+			}
 			curl_setopt($handle, CURLOPT_HEADER, false);
 			curl_setopt($handle, CURLOPT_FAILONERROR, true);
+			// Request as Firefox so that servers don't reject us for not having headers.
+			curl_setopt($handle, CURLOPT_HTTPHEADER, Array("User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.15) Gecko/20080623 Firefox/2.0.0.15") );
 			curl_setopt($handle, CURLOPT_NOBODY, true);
 			curl_setopt($handle, CURLOPT_RETURNTRANSFER, false);
 			$connectable = curl_exec($handle);
