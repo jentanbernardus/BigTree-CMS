@@ -4,7 +4,7 @@
 	$GLOBALS["wiki"] = "http://wiki.bigtreecms.com/index.php/";
 	
 	// If they're requesting images, css, or js, just give it to them.
-	if ($path["1"] == "images") {
+	if ($path[1] == "images") {
 		$x = 2;
 		$ipath = "";
 		while ($x < count($path) - 1) {
@@ -108,12 +108,12 @@
 	} else {
 		include "../core/bootstrap.php";
 	}
+	$GLOBALS["admin_root"] = $config["admin_root"];
 	bigtree_setup_sql_connection();
 	ob_start();
 	session_start();
 	include bigtree_path("inc/bigtree/admin.php");
 	include bigtree_path("inc/bigtree/auto-modules.php");
-	$aroot = $GLOBALS["www_root"]."admin/";
 	
 	if (BIGTREE_CUSTOM_ADMIN_CLASS) {
 		eval('$admin = new '.BIGTREE_CUSTOM_ADMIN_CLASS.';');
@@ -129,12 +129,12 @@
 	$js = array();
 	$layout = "default";
 	if (!$admin->ID && $path[1] != "login") {
-		header("Location: ".$www_root."admin/login/");
+		header("Location: ".$admin_root."login/");
 		die();
 	} else {
 		// We're logged in, let's go somewhere.
 		if (!$path[1]) {
-			header("Location: ".$www_root."admin/dashboard/");
+			header("Location: ".$admin_root."dashboard/");
 			die();
 		// We're hitting an ajax page.
 		} elseif ($path[1] == "ajax") {

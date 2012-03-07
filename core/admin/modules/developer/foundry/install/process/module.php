@@ -172,6 +172,6 @@
 	sqlquery("INSERT INTO bigtree_module_packages (`foundry_id`,`author`,`name`,`primary_version`,`secondary_version`,`tertiary_version`,`description`,`release_notes`,`details`,`group_id`,`module_id`,`tables`,`files`,`downloaded`,`last_updated`) VALUES ('$id','".mysql_real_escape_string($author["name"])."','$name','$primary_version','$secondary_version','$tertiary_version','$description','$release_notes','".mysql_real_escape_string(json_encode($savedData))."','$group_id','$module_id','$package_tables','$package_files','on','$last_updated')");
 	
 	$admin->growl("Developer","Installed Module");
-	header("Location: ".$aroot."developer/foundry/modules/");
+	header("Location: ".$admin_root."developer/foundry/modules/");
 	die();
 ?>

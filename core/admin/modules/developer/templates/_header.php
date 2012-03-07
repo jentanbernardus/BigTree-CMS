@@ -1,4 +1,4 @@
 <?
 	$breadcrumb[] = array("title" => "Templates", "link" => "developer/templates/");
-	$sroot = $droot."templates/";
+	$section_root = $developer_root."templates/";
 ?>

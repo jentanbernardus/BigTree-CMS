@@ -19,7 +19,7 @@
 		$file = $f["file"];
 		
 		if (is_image($file)) {
-			$data = '<li class="image"><img src="'.$aroot.'images/icon_drag.gif" class="left" alt="" /><h4>Drag Image to Content</h4>';
+			$data = '<li class="image"><img src="'.$admin_root.'images/icon_drag.gif" class="left" alt="" /><h4>Drag Image to Content</h4>';
 			$r = $admin->getPageAccessLevelByUser($id,$admin->ID);
 			$data .= '<div class="list_image_holder"><img src="'.$config["resource_root"]."files/resources/".$file.'" alt="" /></div></li>';
 			$images[] = $data;
@@ -41,7 +41,7 @@
 	$(".delete_resource").click(function() {
 		id = $(this).attr("href").substr(1);
 		if (confirm("Are you sure you want to delete this file?")) {
-			$("#resources_content").load("<?=$aroot?>ajax/pages/get-resources/?page=" + $("#resources_page").val() + "&type=" + $("#resources_type").val() + "&delete=" + escape(id));
+			$("#resources_content").load("<?=$admin_root?>ajax/pages/get-resources/?page=" + $("#resources_page").val() + "&type=" + $("#resources_type").val() + "&delete=" + escape(id));
 		}
 		
 		return false;

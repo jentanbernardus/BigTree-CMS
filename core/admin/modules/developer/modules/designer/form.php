@@ -20,7 +20,7 @@
 	<header>
 		<p>Step 2: Creating Your Form</p>
 	</header>
-	<form method="post" action="<?=$saroot?>modules/designer/form-create/" class="module">
+	<form method="post" action="<?=$developer_root?>modules/designer/form-create/" class="module">
 		<input type="hidden" name="module" value="<?=$mod["id"]?>" />
 		<input type="hidden" name="table" value="<?=$table?>" />
 		<section>
@@ -69,9 +69,9 @@
 		key = $(this).attr("name");
 		current_editing_key = key;
 		
-		$.ajax("<?=$aroot?>ajax/developer/load-field-options/", { type: "POST", data: { type: $("#type_" + key).val(), data: $("#options_" + key).val() }, complete: function(response) {
+		$.ajax("<?=$admin_root?>ajax/developer/load-field-options/", { type: "POST", data: { type: $("#type_" + key).val(), data: $("#options_" + key).val() }, complete: function(response) {
 			new BigTreeDialog("Field Options",response.responseText,function(data) {
-				$.ajax("<?=$aroot?>ajax/developer/save-field-options/?key=" + current_editing_key, { type: "POST", data: data });
+				$.ajax("<?=$admin_root?>ajax/developer/save-field-options/?key=" + current_editing_key, { type: "POST", data: data });
 			});
 		}});
 		

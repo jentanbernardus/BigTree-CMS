@@ -25,6 +25,6 @@
 	unlink($GLOBALS["server_root"]."cache/module-class-list.btc");
 
 	$admin->growl("Developer","Updated Module");
-	header("Location: ".$saroot."modules/view/");
+	header("Location: ".$developer_root."modules/view/");
 	die();	
 ?>

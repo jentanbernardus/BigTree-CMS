@@ -3,15 +3,15 @@
 ?>
 <html>
 	<head>
-		<link rel="stylesheet" href="<?=$aroot?>css/main.css" type="text/css" media="screen" charset="utf-8" />
-		<script type="text/javascript" src="<?=$aroot?>js/lib.js"></script>
-		<script type="text/javascript" src="<?=$aroot?>js/main.js"></script>
-		<script type="text/javascript" src="<?=$aroot?>js/pages.js"></script>
+		<link rel="stylesheet" href="<?=$admin_root?>css/main.css" type="text/css" media="screen" charset="utf-8" />
+		<script type="text/javascript" src="<?=$admin_root?>js/lib.js"></script>
+		<script type="text/javascript" src="<?=$admin_root?>js/main.js"></script>
+		<script type="text/javascript" src="<?=$admin_root?>js/pages.js"></script>
 	</head>
 	<body>
 		<div id="bigtree_dialog_window" class="front_end_editor">
 			<h2><strong>Warning:</strong> This page is currently locked.</h2>
-			<form id="bigtree_dialog_form" method="post" action="<?=$aroot?>pages/front-end-update/<?=$page["id"]?>/" enctype="multipart/form-data">
+			<form id="bigtree_dialog_form" method="post" action="<?=$admin_root?>pages/front-end-update/<?=$page["id"]?>/" enctype="multipart/form-data">
 				<div class="overflow">
 					<p>
 						<strong><?=$user["name"]?></strong> currently has this page locked for editing.  It was last accessed by <strong><?=$user["name"]?></strong> on <strong><?=date("F j, Y @ g:ia",strtotime($f["last_accessed"]))?></strong>.<br />

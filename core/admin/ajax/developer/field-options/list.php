@@ -23,7 +23,7 @@
 </fieldset>
 
 <div class="list_type_options" id="static_list_options"<? if ($d["list_type"] && $d["list_type"] != "static") { ?> style="display: none;"<? } ?>>
-	<h4>Static List Options <a href="#" class="add_option"><img src="<?=$aroot?>images/add.png" alt="" /></a></h4>
+	<h4>Static List Options <a href="#" class="add_option"><img src="<?=$admin_root?>images/add.png" alt="" /></a></h4>
 	<fieldset>
 		<div class="list_attr" id="pop_option_list">
 			<ul>
@@ -41,7 +41,7 @@
 				<li>
 					<input type="text" name="list[<?=$x?>][description]" value="<?=htmlspecialchars($option["description"])?>" />
 				</li>
-				<li class="del"><a href="#"><img src="<?=$aroot?>images/currently-kill.png" alt="" /></a></li>
+				<li class="del"><a href="#"><img src="<?=$admin_root?>images/currently-kill.png" alt="" /></a></li>
 			</ul>
 			<?
 						$x++;
@@ -112,7 +112,7 @@
 		ul.append(li_description);
 		
 		li_del = new $('<li class="del">');
-		li_del.html('<a href="#"><img src="<?=$aroot?>images/currently-kill.png" alt="" /></a>');
+		li_del.html('<a href="#"><img src="<?=$admin_root?>images/currently-kill.png" alt="" /></a>');
 		li_del.find("a").click(function() {
 			$(this).parents("ul").remove();
 			return false;

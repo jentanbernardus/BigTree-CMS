@@ -8,6 +8,6 @@
 		<p>Complete!</p>
 	</header>
 	<section>
-		<p>Your module is created.  You may access it <a href="<?=$aroot.$module["route"]?>/">by clicking here</a>.</p>
+		<p>Your module is created.  You may access it <a href="<?=$admin_root.$module["route"]?>/">by clicking here</a>.</p>
 	</section>
 </div>

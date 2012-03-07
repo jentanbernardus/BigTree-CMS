@@ -53,9 +53,9 @@
 					$class = "image";
 				} else {
 					if (file_exists(bigtree_path("admin/images/file-types/$ext.png"))) {
-						$image = $aroot."images/file-types/$ext.png";
+						$image = $admin_root."images/file-types/$ext.png";
 					} else {
-						$image = $aroot."images/file-types/other.png";
+						$image = $admin_root."images/file-types/other.png";
 					}
 					$class = "file";
 				}
@@ -76,7 +76,7 @@
 <script type="text/javascript">
 	$(".navigation_pane a").click(function() {
 		directory = "<?=$postdirectory?>" + $(this).attr("href") + "/";
-		$("#bigtree_browser_form").load("<?=$aroot?>ajax/file-browser/load/", { directory: directory, lockInSite: <? if ($_POST["lockInSite"]) { echo '"on"'; } else { echo '""'; } ?> });
+		$("#bigtree_browser_form").load("<?=$admin_root?>ajax/file-browser/load/", { directory: directory, lockInSite: <? if ($_POST["lockInSite"]) { echo '"on"'; } else { echo '""'; } ?> });
 		
 		return false;
 	});

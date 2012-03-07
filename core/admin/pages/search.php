@@ -19,13 +19,13 @@
 		$bc = $cms->getBreadcrumbByPage($f);
 		$bc_parts = array();
 		foreach ($bc as $part) {
-			$bc_parts[] = '<a href="'.$aroot.'pages/view-tree/'.$part["id"].'/">'.$part["title"].'</a>';
+			$bc_parts[] = '<a href="'.$admin_root.'pages/view-tree/'.$part["id"].'/">'.$part["title"].'</a>';
 		}
 		$result = array(
 			"id" => $f["id"],
 			"title" => $f["nav_title"],
 			"description" => smarter_trim(strip_tags($res["page_content"]),450),
-			"link" => $aroot."pages/edit/".$f["id"]."/",
+			"link" => $admin_root."pages/edit/".$f["id"]."/",
 			"breadcrumb" => implode(" &rsaquo; ",$bc_parts)
 		);
 		$pages[] = $result;
@@ -66,9 +66,9 @@
 	}
 ?>
 <h1>Advanced Search</h1>
-<form class="adv_search" method="post" action="<?=$aroot?>search/">
+<form class="adv_search" method="post" action="<?=$admin_root?>search/">
 	<h3><?=number_format($total_results)?> Search results for &ldquo;<?=end($path)?>&rdquo;</h3>
-	<input type="image" src="<?=$aroot?>images/quick-search-icon.png" />
+	<input type="image" src="<?=$admin_root?>images/quick-search-icon.png" />
 	<input type="search" name="query" autocomplete="off" value="<?=htmlspecialchars(end($path))?>" />
 </form>
 
@@ -104,7 +104,7 @@
 			<ul class="adv_search_page_results">
 				<? foreach ($set as $item) { ?>
 				<li>
-					<strong><a href="<?=$aroot?>pages/edit/<?=$item["id"]?>/"><?=$item["title"]?></a></strong>
+					<strong><a href="<?=$admin_root?>pages/edit/<?=$item["id"]?>/"><?=$item["title"]?></a></strong>
 					<p><?=$item["description"]?></p>
 					<span><?=$item["breadcrumb"]?></span>
 				</li>

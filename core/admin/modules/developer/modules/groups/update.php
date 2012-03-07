@@ -13,6 +13,6 @@
 	sqlquery("UPDATE bigtree_module_groups SET name = '$name', route = '$route' WHERE id = '$id'");
 
 	$admin->growl("Developer","Updated Module Group");
-	header("Location: ".$saroot."modules/groups/view/");
+	header("Location: ".$developer_root."modules/groups/view/");
 	die();
 ?>

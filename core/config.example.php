@@ -21,10 +21,9 @@
 	// Resource root must be on a different domain than www_root.  Usually we just remove the www. from the domain.
 	$config["domain"] = "[domain]";
 	$config["www_root"] = "[wwwroot]";
-	$config["resource_root"] = "[resourceroot]";
+	$config["admin_root"] = "[wwwroot]admin/";
 	//$GLOBALS["secure_root"] = str_replace("http://","https://",$config["www_root"]);
-	$GLOBALS["secure_root"] = $config["www_root"];
-	
+	$GLOBALS["secure_root"] = $config["www_root"];	
 	
 	// Email used for default form mailers	
 	$config["contact_email"] = "[email]";

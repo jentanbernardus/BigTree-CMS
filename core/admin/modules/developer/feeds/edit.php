@@ -8,7 +8,7 @@
 <? include bigtree_path("admin/modules/developer/feeds/_nav.php") ?>
 
 <div class="form_container">
-	<form method="post" action="<?=$saroot?>feeds/update/<?=$id?>/" class="module">
+	<form method="post" action="<?=$developer_root?>feeds/update/<?=$id?>/" class="module">
 		<? include bigtree_path("admin/modules/developer/feeds/_form-content.php") ?>
 		<footer>
 			<input type="submit" class="button blue" value="Update" />

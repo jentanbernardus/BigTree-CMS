@@ -8,5 +8,5 @@
 	);
 
 	$breadcrumb[] = array("title" => "Settings", "link" => "developer/settings/");
-	$sroot = $droot."settings/";
+	$section_root = $developer_root."settings/";
 ?>

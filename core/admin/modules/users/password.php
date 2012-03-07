@@ -9,7 +9,7 @@
 			$password = mysql_real_escape_string($phpass->HashPassword($_POST["new_password"]));
 			sqlquery("UPDATE bigtree_users SET password = '$password' WHERE id = '".$admin->ID."'");
 			$admin->growl("Users","Updated Password");
-			header("Location: $aroot");
+			header("Location: $admin_root");
 			die();
 		}
 		$error = true;

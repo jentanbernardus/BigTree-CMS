@@ -13,7 +13,7 @@
 	<header>
 		<p>Step 3: Creating Your View</p>
 	</header>
-	<form method="post" action="<?=$saroot?>modules/designer/view-create/" class="module">
+	<form method="post" action="<?=$developer_root?>modules/designer/view-create/" class="module">
 		<input type="hidden" name="module" value="<?=$mod?>" />
 		<input type="hidden" name="table" value="<?=$table?>" />
 		<section>
@@ -59,9 +59,9 @@
 	new BigTreeFormValidator("form.module");
 	
 	$(".options").click(function() {
-		$.ajax("<?=$aroot?>ajax/developer/load-view-options/", { type: "POST", data: { table: "<?=$table?>", type: $("#view_type").val(), data: $("#view_options").val() }, complete: function(response) {
+		$.ajax("<?=$admin_root?>ajax/developer/load-view-options/", { type: "POST", data: { table: "<?=$table?>", type: $("#view_type").val(), data: $("#view_options").val() }, complete: function(response) {
 			new BigTreeDialog("View Options",response.responseText,function(data) {
-				$.ajax("<?=$aroot?>ajax/developer/save-view-options/", { type: "POST", data: data });
+				$.ajax("<?=$admin_root?>ajax/developer/save-view-options/", { type: "POST", data: data });
 			});
 		}});
 		

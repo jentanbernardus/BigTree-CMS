@@ -39,7 +39,7 @@
 		<h2 class="full">
 			<span class="world"></span>
 			Recent Traffic <small>Visits In The Past Two Weeks</small>
-			<a href="<?=$aroot?>dashboard/analytics/" class="more">View Analytics</a>
+			<a href="<?=$admin_root?>dashboard/analytics/" class="more">View Analytics</a>
 		</h2>
 	</summary>
 	<section>
@@ -86,7 +86,7 @@
 		<h2 class="full">
 			<span class="pending"></span>
 			Pending Changes <small>Recent Changes Awaiting Approval</small>
-			<a href="<?=$aroot?>dashboard/pending-changes/" class="more">View All Pending Changes</a>
+			<a href="<?=$admin_root?>dashboard/pending-changes/" class="more">View All Pending Changes</a>
 		</h2>
 	</summary>
 	<header>
@@ -132,7 +132,7 @@
 		<h2 class="full">
 			<span class="unread"></span>
 			Unread Messages
-			<a href="<?=$aroot?>dashboard/messages/" class="more">View All Messages</a>
+			<a href="<?=$admin_root?>dashboard/messages/" class="more">View All Messages</a>
 		</h2>
 	</summary>
 	<header>

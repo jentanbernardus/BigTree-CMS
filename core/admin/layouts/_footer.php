@@ -16,7 +16,7 @@
 					<p>
 						Version <?=$GLOBALS["bigtree"]["version"]?>&nbsp;&nbsp;&middot;&nbsp;&nbsp;&copy; <?=date("Y")?> Fastspot
 					</p>
-					<a href="<?=$aroot?>credits/">Credits</a>&nbsp;&nbsp;&middot;&nbsp;&nbsp;<a href="http://www.bigtreecms.com/" target="_blank">Support</a>&nbsp;&nbsp;&middot;&nbsp;&nbsp;<a href="http://www.fastspot.com/agency/contact/" target="_blank">Contact Us</a>
+					<a href="<?=$admin_root?>credits/">Credits</a>&nbsp;&nbsp;&middot;&nbsp;&nbsp;<a href="http://www.bigtreecms.com/" target="_blank">Support</a>&nbsp;&nbsp;&middot;&nbsp;&nbsp;<a href="http://www.fastspot.com/agency/contact/" target="_blank">Contact Us</a>
 				</article>
 			</section>
 		</footer>

@@ -1,6 +1,6 @@
 <?
 	$admin->updateProfile($_POST);
 	$admin->growl("Users","Updated Profile");
-	header("Location: ".$aroot."dashboard/");
+	header("Location: ".$admin_root."dashboard/");
 	die();
 ?>

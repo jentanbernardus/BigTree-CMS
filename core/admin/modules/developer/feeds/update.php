@@ -12,6 +12,6 @@
 	sqlquery("UPDATE bigtree_feeds SET name = '$name', description = '$description', `table` = '$table', type = '$type', fields = '$fields', options = '$options' WHERE id = '".mysql_real_escape_string(end($commands))."'");
 	
 	$admin->growl("Developer","Updated Feed");
-	header("Location: ".$saroot."feeds/view/");
+	header("Location: ".$developer_root."feeds/view/");
 	die();
 ?>

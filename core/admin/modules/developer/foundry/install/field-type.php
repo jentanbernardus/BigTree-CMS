@@ -66,7 +66,7 @@
 <?
 		} else {
 ?>
-<form method="post" action="<?=$aroot?>developer/foundry/install/process/field-type/<?=$details["id"]?>/" class="module">
+<form method="post" action="<?=$admin_root?>developer/foundry/install/process/field-type/<?=$details["id"]?>/" class="module">
 	<input type="hidden" name="details" value="<?=htmlspecialchars(json_encode($details))?>" />
 	<input type="submit" class="button white" value="Install Now" name="submit" />
 </form>

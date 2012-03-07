@@ -12,5 +12,5 @@
 	
 	$admin->deletePage($page);
 	
-	header("Location: ".$aroot."pages/view-tree/$parent/");
+	header("Location: ".$admin_root."pages/view-tree/$parent/");
 ?>

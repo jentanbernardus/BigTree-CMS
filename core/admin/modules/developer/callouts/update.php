@@ -22,6 +22,6 @@
 	sqlquery("UPDATE bigtree_callouts SET resources = '$resources', name = '$name', description = '$description', level = '$level' WHERE id = '$id'");
 
 	$admin->growl("Developer","Updated Callout");
-	header("Location: ".$saroot."callouts/view/");
+	header("Location: ".$developer_root."callouts/view/");
 	die();
 ?>

@@ -7,7 +7,7 @@
 <? include bigtree_path("admin/modules/developer/templates/_nav.php") ?>
 
 <div class="form_container">
-	<form method="post" action="<?=$sroot?>update/" enctype="multipart/form-data" class="module">
+	<form method="post" action="<?=$section_root?>update/" enctype="multipart/form-data" class="module">
 		<input type="hidden" name="id" value="<?=$template["id"]?>" />
 		<? include bigtree_path("admin/modules/developer/templates/_form-content.php") ?>
 		<footer>

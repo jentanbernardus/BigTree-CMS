@@ -20,10 +20,10 @@
 				<?=$item["name"]?>
 			</section>
 			<section class="view_action">
-				<a href="<?=$sroot?>edit/<?=$item["id"]?>/" class="icon_edit"></a>
+				<a href="<?=$section_root?>edit/<?=$item["id"]?>/" class="icon_edit"></a>
 			</section>
 			<section class="view_action">
-				<a href="<?=$sroot?>delete/<?=$item["id"]?>/" class="icon_delete"></a>
+				<a href="<?=$section_root?>delete/<?=$item["id"]?>/" class="icon_delete"></a>
 			</section>
 		</li>
 		<? } ?>
@@ -32,7 +32,7 @@
 
 <script type="text/javascript">
 	$("#groups").sortable({ axis: "y", containment: "parent", handle: ".icon_sort", items: "li", placeholder: "ui-sortable-placeholder", tolerance: "pointer", update: function() {
-		$.ajax("<?=$aroot?>ajax/developer/order-module-groups/?sort=" + escape($("#groups").sortable("serialize"))); 
+		$.ajax("<?=$admin_root?>ajax/developer/order-module-groups/?sort=" + escape($("#groups").sortable("serialize"))); 
 	}});
 
 	$(".icon_delete").click(function() {

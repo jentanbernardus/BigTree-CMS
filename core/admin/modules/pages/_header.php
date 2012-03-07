@@ -1,5 +1,5 @@
 <?
-	$proot = $aroot."pages/";
+	$proot = $admin_root."pages/";
 	
 	// Get the breadcrumb -- if the last command in the URL is numeric, we're doing something with a page, otherwise we'll let the other actions do it themselves.
 	if (is_numeric(end($commands)) || $_POST["page"]) {

@@ -8,7 +8,7 @@ $(document).ready(function() {
 	$('nav.main form input[type="search"]').keyup(function() {
 		v = $(this).val();
 		if (v) {
-			$("#quick_search_results").load("www_root/admin/ajax/quick-search-results/", { query: v }, function() {
+			$("#quick_search_results").load("admin_root/ajax/quick-search-results/", { query: v }, function() {
 				$("#quick_search_results").show();
 			});
 		} else {
@@ -22,7 +22,7 @@ $(document).ready(function() {
 		if (q == "") {
 			$("#link_finder_results").hide().html("");
 		} else {
-			$("#link_finder_results").load("www_root/admin/ajax/resources/links/", { query: q }, function() {
+			$("#link_finder_results").load("admin_root/ajax/resources/links/", { query: q }, function() {
 				$("#link_finder_results").show().children("a").click(function() { return false; });
 			});
 		}
@@ -628,7 +628,7 @@ var BigTreePhotoGallery = Class.extend({
 	},
 	
 	saveNewFile: function(data) {
-		li = $('<li>').html('<figure><img src="www_root/admin/images/pending-upload.jpg" alt="" style="margin: 11px 0 0 0;" /></figure><a href="#" class="icon_edit_small"></a><a href="#" class="icon_delete_small"></a>');
+		li = $('<li>').html('<figure><img src="admin_root/images/pending-upload.jpg" alt="" style="margin: 11px 0 0 0;" /></figure><a href="#" class="icon_edit_small"></a><a href="#" class="icon_delete_small"></a>');
 		li.append(this.fileInput.hide());
 		li.append($('<input type="hidden" name="' + this.key + '[' + this.counter + '][caption]" class="caption" />').val(data.caption));
 		this.container.find("ul").append(li);
@@ -741,7 +741,7 @@ var BigTreeTagAdder = {
 		if (tag != BigTreeTagAdder.lastsearch) {
 			BigTreeTagAdder.lastsearch = tag;
 			if (tag.length > 3) {
-				$("#tag_results").load("www_root/admin/ajax/tags/search/", { tag: tag }, BigTreeTagAdder.hookResults);
+				$("#tag_results").load("admin_root/ajax/tags/search/", { tag: tag }, BigTreeTagAdder.hookResults);
 			} else {
 				$("#tag_results").hide();
 			}
@@ -770,7 +770,7 @@ var BigTreeTagAdder = {
 		el = ev.target;
 		tag = el.innerHTML.replace("<span>","").replace("</span>","");
 		if (tag) {
-			$.ajax("www_root/admin/ajax/tags/create-tag/", { type: "POST", data: { module: BigTreeTagAdder.module, entry: BigTreeTagAdder.entry, tag: tag }, success: BigTreeTagAdder.addedTag });
+			$.ajax("admin_root/ajax/tags/create-tag/", { type: "POST", data: { module: BigTreeTagAdder.module, entry: BigTreeTagAdder.entry, tag: tag }, success: BigTreeTagAdder.addedTag });
 		}
 		return false;
 	},
@@ -778,7 +778,7 @@ var BigTreeTagAdder = {
 	addTag: function(ev) {
 		tag = $("#tag_entry").val();
 		if (tag) {
-			$.ajax("www_root/admin/ajax/tags/create-tag/", { type: "POST", data: { module: BigTreeTagAdder.module, entry: BigTreeTagAdder.entry, tag: tag }, success: BigTreeTagAdder.addedTag });
+			$.ajax("admin_root/ajax/tags/create-tag/", { type: "POST", data: { module: BigTreeTagAdder.module, entry: BigTreeTagAdder.entry, tag: tag }, success: BigTreeTagAdder.addedTag });
 		}
 	},
 	
@@ -938,16 +938,16 @@ var BigTreeFileManager = {
 	
 	createFile: function() {
 		$("body").append($('<iframe name="file_manager_upload_frame" style="display: none;" id="file_manager_upload_frame">'));
-		$("#bigtree_dialog_form").attr("action","www_root/admin/ajax/file-browser/upload/").attr("target","file_manager_upload_frame");
+		$("#bigtree_dialog_form").attr("action","admin_root/ajax/file-browser/upload/").attr("target","file_manager_upload_frame");
 		$("#bigtree_dialog_form footer *").hide();
-		$("#bigtree_dialog_form footer").append($('<p style="line-height: 16px; color: #333;"><img src="www_root/admin/images/spinner.gif" alt="" style="float: left; margin: 0 5px 0 0;" /> Uploading file. Please wait…</p>'));
+		$("#bigtree_dialog_form footer").append($('<p style="line-height: 16px; color: #333;"><img src="admin_root/images/spinner.gif" alt="" style="float: left; margin: 0 5px 0 0;" /> Uploading file. Please wait…</p>'));
 	},
 	
 	createFolder: function(data) {
 		$("body").append($('<iframe name="file_manager_upload_frame" style="display: none;" id="file_manager_upload_frame">'));
-		$("#bigtree_dialog_form").attr("action","www_root/admin/ajax/file-browser/create-folder/").attr("target","file_manager_upload_frame");
+		$("#bigtree_dialog_form").attr("action","admin_root/ajax/file-browser/create-folder/").attr("target","file_manager_upload_frame");
 		$("#bigtree_dialog_form footer *").hide();
-		$("#bigtree_dialog_form footer").append($('<p style="line-height: 16px; color: #333;"><img src="www_root/admin/images/spinner.gif" alt="" style="float: left; margin: 0 5px 0 0;" /> Creating folder. Please wait…</p>'));
+		$("#bigtree_dialog_form footer").append($('<p style="line-height: 16px; color: #333;"><img src="admin_root/images/spinner.gif" alt="" style="float: left; margin: 0 5px 0 0;" /> Creating folder. Please wait…</p>'));
 	},
 	
 	disableCreate: function() {
@@ -982,7 +982,7 @@ var BigTreeFileManager = {
 		$(this).addClass("selected");
 		$("#file_browser_selected_file").val($(this).attr("href"));
 		$("#file_browser_info_pane").html("<spinner></spinner>");
-		$("#file_browser_info_pane").load("www_root/admin/ajax/file-browser/file-info/",
+		$("#file_browser_info_pane").load("admin_root/ajax/file-browser/file-info/",
 			{ file: $(this).attr("href") },
 			function() {
 				$("#file_browser_detail_title_input").keyup(function() {
@@ -1043,7 +1043,7 @@ var BigTreeFileManager = {
 		$("#file_browser_selected_file").val(data.file);
 		
 		$("#file_browser_info_pane").html("<spinner></spinner>");
-		$("#file_browser_info_pane").load("www_root/admin/ajax/file-browser/file-info/",
+		$("#file_browser_info_pane").load("admin_root/ajax/file-browser/file-info/",
 			{ file: data.file },
 			function() {
 				$("#file_browser_detail_title_input").keyup(function() {
@@ -1082,8 +1082,8 @@ var BigTreeFileManager = {
 <ul id="file_browser_breadcrumb"><li><a href="#0">Home</a></li></ul>\
 <section id="file_browser_upload_window" style="display: none;">\
 	<spinner style="display: none;" id="file_browser_spinner"></spinner>\
-	<iframe name="resource_frame" id="file_browser_upload_frame" style="display: none;" src="www_root/admin/ajax/file-browser/busy/"></iframe>\
-	<form id="file_browser_upload_form" target="resource_frame" method="post" enctype="multipart/form-data" action="www_root/admin/ajax/file-browser/upload/">\
+	<iframe name="resource_frame" id="file_browser_upload_frame" style="display: none;" src="admin_root/ajax/file-browser/busy/"></iframe>\
+	<form id="file_browser_upload_form" target="resource_frame" method="post" enctype="multipart/form-data" action="admin_root/ajax/file-browser/upload/">\
 		<input type="hidden" name="MAX_FILE_SIZE" value="{max_file_size}" />\
 		<input type="file" name="file" id="file_browser_file_input" /> \
 		<input type="submit" class="shorter blue" value="Upload" />\
@@ -1141,21 +1141,21 @@ var BigTreeFileManager = {
 		this.currentFolder = folder;
 		$("#file_browser_selected_file").val("");
 		$("#file_browser_info_pane").html("");
-		$("#file_browser_contents").load("www_root/admin/ajax/file-browser/get-files/", { folder: folder }, $.proxy(this.fileBrowserPopulated,this));
+		$("#file_browser_contents").load("admin_root/ajax/file-browser/get-files/", { folder: folder }, $.proxy(this.fileBrowserPopulated,this));
 	},
 	
 	openImageFolder: function(folder) {
 		this.currentFolder = folder;
 		$("#file_browser_selected_file").val("");
 		$("#file_browser_info_pane").html("");
-		$("#file_browser_contents").load("www_root/admin/ajax/file-browser/get-images/", { minWidth: this.minWidth, minHeight: this.minHeight, folder: folder }, $.proxy(this.imageBrowserPopulated,this));
+		$("#file_browser_contents").load("admin_root/ajax/file-browser/get-images/", { minWidth: this.minWidth, minHeight: this.minHeight, folder: folder }, $.proxy(this.imageBrowserPopulated,this));
 	},
 	
 	saveFileTitle: function() {
 		title = $("#file_browser_detail_title_input").val();
 		file = $("#file_browser_selected_file").val();
 		
-		$.ajax("www_root/admin/ajax/file-browser/save-title/", { type: "POST", data: { file: file, title: title } });
+		$.ajax("admin_root/ajax/file-browser/save-title/", { type: "POST", data: { file: file, title: title } });
 	},
 	
 	search: function() {
@@ -1164,9 +1164,9 @@ var BigTreeFileManager = {
 		$("file_browser_selected_file").val("");
 		
 		if (BigTreeFileManager.type == "image") {
-			$("#file_browser_contents").load("www_root/admin/ajax/file-browser/get-images/", { minWidth: this.minWidth, minHeight: this.minHeight, query: query, folder: this.currentFolder }, $.proxy(this.imageBrowserPopulated,this));
+			$("#file_browser_contents").load("admin_root/ajax/file-browser/get-images/", { minWidth: this.minWidth, minHeight: this.minHeight, query: query, folder: this.currentFolder }, $.proxy(this.imageBrowserPopulated,this));
 		} else {
-			$("#file_browser_contents").load("www_root/admin/ajax/file-browser/get-files/", { query: query, folder: this.currentFolder }, $.proxy(this.fileBrowserPopulated,this));
+			$("#file_browser_contents").load("admin_root/ajax/file-browser/get-files/", { query: query, folder: this.currentFolder }, $.proxy(this.fileBrowserPopulated,this));
 		}
 	},
 	

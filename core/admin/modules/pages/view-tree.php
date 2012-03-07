@@ -16,7 +16,7 @@
 	}
 	
 	function local_drawPageTree($nav,$title,$subtitle,$class,$draggable = false) {
-		global $aroot,$proot,$admin,$cms,$www_root,$ga_on,$parent_access,$parent;
+		global $admin_root,$proot,$admin,$cms,$www_root,$ga_on,$parent_access,$parent;
 ?>
 <div class="table">
 	<summary>
@@ -141,7 +141,7 @@
 ?>
 <script type="text/javascript">
 	$("#pages_<?=$class?>").sortable({ axis: "y", containment: "parent",  handle: ".icon_sort", items: "li", placeholder: "ui-sortable-placeholder", tolerance: "pointer", update: function() {
-		$.ajax("<?=$aroot?>ajax/pages/order/?id=<?=$parent?>&sort=" + escape($("#pages_<?=$class?>").sortable("serialize")));
+		$.ajax("<?=$admin_root?>ajax/pages/order/?id=<?=$parent?>&sort=" + escape($("#pages_<?=$class?>").sortable("serialize")));
 	}});
 </script>
 <?

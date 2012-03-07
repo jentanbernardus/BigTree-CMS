@@ -18,6 +18,6 @@
 ?>
 <nav class="sub">
 	<? foreach ($available_actions as $action) { ?>
-	<a href="<?=$aroot?>pages/<?=$action["route"]?>/<?=end($path)?>/"<? if ($path[count($path)-2] == $action["route"]) { ?> class="active"<? } ?>><span class="icon_small icon_small_<?=$action["icon"]?>"></span><?=$action["name"]?></a>
+	<a href="<?=$admin_root?>pages/<?=$action["route"]?>/<?=end($path)?>/"<? if ($path[count($path)-2] == $action["route"]) { ?> class="active"<? } ?>><span class="icon_small icon_small_<?=$action["icon"]?>"></span><?=$action["name"]?></a>
 	<? } ?>
 </nav>

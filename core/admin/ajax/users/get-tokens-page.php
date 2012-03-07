@@ -16,7 +16,7 @@
 		/ <? if ($item["readonly"]) { ?>Read Only<? } else { ?>Full Access<? } ?>
 	</section>
 	<section class="users_api_token"><?=$item["token"]?></section>
-	<section class="view_action"><a href="<?=$aroot?>users/edit-token/<?=$item["id"]?>/" class="icon_edit"></a></section>
+	<section class="view_action"><a href="<?=$admin_root?>users/edit-token/<?=$item["id"]?>/" class="icon_edit"></a></section>
 	<section class="view_action"><a href="#<?=$item["id"]?>" class="icon_delete"></a></section>
 </li>
 <?

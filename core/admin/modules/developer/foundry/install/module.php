@@ -93,7 +93,7 @@
 </ul>
 <p><strong>ERRORS OCCURRED!</strong> &mdash; Please correct all errors.  You may not import this module while errors persist.</p>
 <? } else { ?>
-<form method="post" action="<?=$aroot?>developer/foundry/install/process/module/<?=$details["id"]?>/" class="module">
+<form method="post" action="<?=$admin_root?>developer/foundry/install/process/module/<?=$details["id"]?>/" class="module">
 	<input type="hidden" name="details" value="<?=htmlspecialchars(json_encode($details))?>" />
 	<input type="submit" class="button white" value="Install Now" name="submit" />
 </form>

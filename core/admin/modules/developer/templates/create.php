@@ -76,6 +76,6 @@
 	sqlquery("INSERT INTO bigtree_templates (`id`,`name`,`module`,`resources`,`image`,`description`,`level`,`callouts_enabled`,`routed`) VALUES ('$id','$name','$module','$resources','$image','$description','$level','$callouts_enabled','$routed')");
 	
 	$admin->growl("Developer","Created Template");
-	header("Location: ".$saroot."templates/view/");
+	header("Location: ".$developer_root."templates/view/");
 	die();
 ?>

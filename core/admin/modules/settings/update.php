@@ -18,6 +18,6 @@
 		
 		$admin->growl("Settings","Updated Setting");
 	}
-	header("Location: ".$aroot."settings/");
+	header("Location: ".$admin_root."settings/");
 	die();
 ?>

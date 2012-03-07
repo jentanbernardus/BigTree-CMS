@@ -59,7 +59,7 @@
 	sqlquery("DELETE FROM bigtree_locks WHERE `table` = 'bigtree_pages' AND item_id = '$page'");
 	
 	if (count($crops)) {
-		$retpage = $aroot."pages/view-tree/".$pdata["parent"]."/";
+		$retpage = $admin_root."pages/view-tree/".$pdata["parent"]."/";
 		include bigtree_path("admin/modules/pages/_crop.php");
 	} elseif (count($fails)) {
 		include bigtree_path("admin/modules/pages/_failed.php");
@@ -71,7 +71,7 @@
 			if ($pdata["parent"] == "-1") {
 				$pdata["parent"] = 0;
 			}
-			header("Location: ".$aroot."pages/view-tree/".$pdata["parent"]."/");
+			header("Location: ".$admin_root."pages/view-tree/".$pdata["parent"]."/");
 		}
 		die();
 	}

@@ -7,7 +7,7 @@
 		sqlquery("UPDATE bigtree_users SET password = '$password' WHERE id = '".$f["id"]."'");
 		
 		$admin->growl("Change Password","Password changed, ready to login!");
-		header("Location: $aroot");
+		header("Location: $admin_root");
 		die();
 	}
 	

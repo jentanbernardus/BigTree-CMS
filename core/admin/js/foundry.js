@@ -1,7 +1,7 @@
 Event.observe(window,"load",function(ev) {
 
 	$("#foundry_create").submit(function() {
-		$.ajax("www_root/admin/ajax/developer/foundry/create-account/", { type: "POST", data: $(this).serializeJSON(true), complete: function(r) {
+		$.ajax("admin_root/ajax/developer/foundry/create-account/", { type: "POST", data: $(this).serializeJSON(true), complete: function(r) {
 			j = r.responseJSON;
 			if (j.success) {
 				$("#foundry_create").slideUp(300);

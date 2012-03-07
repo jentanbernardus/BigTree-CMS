@@ -4,6 +4,6 @@
 	sqlquery("UPDATE bigtree_modules SET `group` = '0' WHERE `group` = '$id'");
 	
 	$admin->growl("Developer","Deleted Module Group");
-	header("Location: ".$saroot."modules/groups/view/");
+	header("Location: ".$developer_root."modules/groups/view/");
 	die();
 ?>

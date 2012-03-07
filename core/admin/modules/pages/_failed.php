@@ -16,5 +16,5 @@
 		<? } ?>
 	</ul>
 </div>
-<a href="<?=$aroot?>pages/edit/<?=$page?>/" class="button blue">Go Back</a>
-<a href="<?=$aroot?>pages/view-tree/<?=$_POST["parent"]?>/" class="button white">Ignore</a>
+<a href="<?=$admin_root?>pages/edit/<?=$page?>/" class="button blue">Go Back</a>
+<a href="<?=$admin_root?>pages/view-tree/<?=$_POST["parent"]?>/" class="button white">Ignore</a>

@@ -18,10 +18,10 @@
 			<section class="developer_settings_name"><?=$setting["name"]?></section>
 			<section class="developer_settings_id"><?=$setting["id"]?></section>
 			<section class="view_action">
-				<a href="<?=$sroot?>edit/<?=$setting["id"]?>/" class="icon_edit"></a>
+				<a href="<?=$section_root?>edit/<?=$setting["id"]?>/" class="icon_edit"></a>
 			</section>
 			<section class="view_action">
-				<a href="<?=$sroot?>delete/<?=$setting["id"]?>/" class="icon_delete"></a>
+				<a href="<?=$section_root?>delete/<?=$setting["id"]?>/" class="icon_delete"></a>
 			</section>
 		</li>
 		<? } ?>

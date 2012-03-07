@@ -15,7 +15,7 @@
 <? include bigtree_path("admin/modules/developer/modules/_nav.php"); ?>
 
 <div class="form_container">
-	<form method="post" action="<?=$saroot?>modules/forms/update/<?=$form["id"]?>/" class="module">
+	<form method="post" action="<?=$developer_root?>modules/forms/update/<?=$form["id"]?>/" class="module">
 		<section>
 			<div class="left">
 				<fieldset>
@@ -66,6 +66,6 @@
 
 <script type="text/javascript">
 	$("#form_table").bind("select:changed",function(event,data) {
-		$("#field_area").load("<?=$aroot?>ajax/developer/load-form/", { table: data.value });
+		$("#field_area").load("<?=$admin_root?>ajax/developer/load-form/", { table: data.value });
 	});
 </script>

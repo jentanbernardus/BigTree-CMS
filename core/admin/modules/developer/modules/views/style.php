@@ -35,11 +35,11 @@
 		?>
 	</header>
 </div>
-<form method="post" action="<?=$saroot?>modules/views/update-style/<?=$view["id"]?>/" class="module">
+<form method="post" action="<?=$developer_root?>modules/views/update-style/<?=$view["id"]?>/" class="module">
 	<? foreach ($fields as $key => $field) { ?>
 	<input type="hidden" name="<?=$key?>" id="data_<?=$key?>" value="<?=$field["width"]?>" />
 	<? } ?>
-	<a class="button" href="<?=$sroot?>clear-style/<?=$view["id"]?>/">Clear Existing Style</a>
+	<a class="button" href="<?=$section_root?>clear-style/<?=$view["id"]?>/">Clear Existing Style</a>
 	<input type="submit" class="button blue" value="Update" />
 </form>
 <?

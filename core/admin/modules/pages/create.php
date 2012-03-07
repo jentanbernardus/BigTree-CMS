@@ -30,12 +30,12 @@
 	}
 	
 	if (count($crops)) {
-		$retpage = $aroot."pages/view-tree/".$_POST["parent"]."/";
+		$retpage = $admin_root."pages/view-tree/".$_POST["parent"]."/";
 		include bigtree_path("admin/modules/pages/_crop.php");
 	} elseif (count($fails)) {
 		include bigtree_path("admin/modules/pages/_failed.php");
 	} else {
-		header("Location: ".$aroot."pages/view-tree/".$_POST["parent"]."/");
+		header("Location: ".$admin_root."pages/view-tree/".$_POST["parent"]."/");
 		die();
 	}
 ?>
