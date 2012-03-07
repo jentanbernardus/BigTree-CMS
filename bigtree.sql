@@ -58,6 +58,9 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `bigtree_pending_changes`;
 CREATE TABLE `bigtree_pending_changes` ( `id` int(11) NOT NULL AUTO_INCREMENT, `user` int(11) NOT NULL, `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, `title` varchar(255) NOT NULL, `comments` text NOT NULL, `table` varchar(255) NOT NULL, `changes` longtext NOT NULL, `mtm_changes` longtext NOT NULL, `tags_changes` longtext NOT NULL, `item_id` int(11) NOT NULL, `type` varchar(15) NOT NULL, `module` varchar(10) NOT NULL, `pending_page_parent` int(11) NOT NULL, PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
+DROP TABLE IF EXISTS `bigtree_resource_folders`;
+CREATE TABLE `bigtree_resource_folders` ( `id` int(11) unsigned NOT NULL AUTO_INCREMENT, `name` varchar(255) DEFAULT NULL, `parent` int(11) DEFAULT NULL, PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
 DROP TABLE IF EXISTS `bigtree_resources`;
 CREATE TABLE `bigtree_resources` ( `id` int(11) NOT NULL AUTO_INCREMENT, `file` varchar(255) NOT NULL, `date` datetime NOT NULL, `name` varchar(255) NOT NULL DEFAULT '', `type` varchar(255) NOT NULL DEFAULT '', `is_image` char(2) NOT NULL DEFAULT '', `height` int(11) NOT NULL DEFAULT '0', `width` int(11) NOT NULL DEFAULT '0', `crops` text NOT NULL, `thumbs` text NOT NULL, `list_thumb_margin` int(11) NOT NULL, PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
