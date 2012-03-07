@@ -356,15 +356,6 @@
 			return $connectable;
 		}
 
-		function urlify($title) {
-			$accent_match = array('Â', 'Ã', 'Ä', 'À', 'Á', 'Å', 'Æ', 'Ç', 'È', 'É', 'Ê', 'Ë', 'Ì', 'Í', 'Î', 'Ï', 'Ð', 'Ñ', 'Ò', 'Ó', 'Ô', 'Õ', 'Ö', 'Ø', 'Ù', 'Ú', 'Û', 'Ü', 'Ý', 'ß', 'à', 'á', 'â', 'ã', 'ä', 'å', 'æ', 'ç', 'è', 'é', 'ê', 'ë', 'ì', 'í', 'î', 'ï', 'ð', 'ñ', 'ò', 'ó', 'ô', 'õ', 'ö', 'ø', 'ù', 'ú', 'û', 'ü', 'ý', 'ÿ');
-			$accent_replace = array('A', 'A', 'A', 'A', 'A', 'A', 'AE', 'C', 'E', 'E', 'E', 'E', 'I', 'I', 'I', 'I', 'D', 'N', 'O', 'O', 'O', 'O', 'O', 'O', 'U', 'U', 'U', 'U', 'Y', 'B', 'a', 'a', 'a', 'a', 'a', 'a', 'ae', 'c', 'e', 'e', 'e', 'e', 'i', 'i', 'i', 'i', 'o', 'n', 'o', 'o', 'o', 'o', 'o', 'o', 'u', 'u', 'u', 'u', 'y', 'y');
-
-			$title = str_replace($accent_match, $accent_replace, $title);
-
-			return strtolower(preg_replace('/\s/', '-',preg_replace('/[^a-zA-Z0-9\s\-\_]+/', '',trim($title))));
-		}
-
 		// !Developer Functions
 
 		function getActionClass($action,$item) {
@@ -462,8 +453,10 @@
 		}
 
 		function getFullNavigationPath($child, $path = array()) {
+			global $cms;
+			
 			$f = sqlfetch(sqlquery("SELECT route,id,parent FROM bigtree_pages WHERE id = '$child'"));
-			$path[] = $this->urlify($f["route"]);
+			$path[] = $cms->urlify($f["route"]);
 			if ($f["parent"] != $GLOBALS["root_page"] && $f["parent"] != 0) {
 				return $this->getFullNavigationPath($f["parent"],$path);
 			}
@@ -598,9 +591,9 @@
 
 			$route = $d["route"];
 			if (!$route) {
-				$route = $this->urlify($d["nav_title"]);
+				$route = $cms->urlify($d["nav_title"]);
 			} else {
-				$route = $this->urlify($route);
+				$route = $cms->urlify($route);
 			}
 
 			$oroute = $route;
@@ -1004,9 +997,9 @@
 			// Create a route if we don't have one, otherwise, make sure the one they provided doesn't suck.
 			$route = $data["route"];
 			if (!$route) {
-				$route = $this->urlify($data["nav_title"]);
+				$route = $cms->urlify($data["nav_title"]);
 			} else {
-				$route = $this->urlify($route);
+				$route = $cms->urlify($route);
 			}
 
 			// Get a unique route
