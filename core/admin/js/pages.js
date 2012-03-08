@@ -156,7 +156,7 @@ $(document).ready(function() {
 				skipped_first = false;
 				$("#bigtree_dialog_form input, #bigtree_dialog_form textarea, #bigtree_dialog_form select").each(function() {
 					if ($(this).attr("type") != "submit") {
-						if ($(this).css("display") == "none") {
+						if ($(this).css("display") == "none" && $(this).attr("type") != "file" && $(this).attr("type") != "hidden") {
 							tinyMCE.get($(this).attr("id")).save();
 							tinyMCE.execCommand('mceRemoveControl',false,$(this).attr("id"));
 						}
