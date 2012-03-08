@@ -1625,7 +1625,11 @@ var BigTree = {
 		if (start_page < 0) {
 			start_page = 0;
 		}
-			
+		
+		if (end_page > pages) {
+			end_page = pages;
+		}
+		
 		content = '<li><a href="#' + prev_page + '">&laquo;</a></li>';
 		for (i = start_page; i < end_page; i++) {
 			content += '<li><a href="#' + i + '"';
