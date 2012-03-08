@@ -8,6 +8,6 @@
 <p>Please select all the files required for the Module &ldquo;<?=$module["name"]?>&rdquo;</p>
 <br />
 <h4>Package Information</h4>
-<form method="post" action="<?=$aroot?>developer/foundry/package/release-notes/module/" class="module">
+<form method="post" action="<?=$admin_root?>developer/foundry/package/release-notes/module/" class="module">
 	<input type="hidden" name="module" value="<?=$module["id"]?>" />
 	<? include bigtree_path("admin/modules/developer/foundry/package/choose-files/_file_chooser_footer.php") ?>

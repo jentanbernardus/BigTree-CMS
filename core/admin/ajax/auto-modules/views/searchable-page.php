@@ -17,7 +17,7 @@
 	$sort = $_GET["sort"] ? $_GET["sort"] : $sort;
 	$sort_direction = $_GET["sort_direction"] ? $_GET["sort_direction"] : $sort_direction;
 	
-	$mpage = $config["www_root"]."admin/".$module["route"]."/";
+	$mpage = $admin_root.$module["route"]."/";
 	
 	// Setup the preview action if we have a preview URL and field.
 	if ($view["preview_url"]) {

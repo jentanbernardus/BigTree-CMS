@@ -19,7 +19,7 @@
 	<? if ($item["encrypted"]) { ?>
 	<aside>This setting is encrypted.  The current value cannot be shown.</aside>
 	<? } ?>
-	<form class="module" action="<?=$aroot?>settings/update/" method="post">	
+	<form class="module" action="<?=$admin_root?>settings/update/" method="post">	
 		<input type="hidden" name="id" value="<?=htmlspecialchars(end($path))?>" />
 		<section>
 			<?

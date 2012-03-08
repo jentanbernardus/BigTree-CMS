@@ -84,6 +84,61 @@
 				}
 			}
 		}
+		
+		/*
+			Function: archivePage
+				Archives a page.
+			
+			Parameters:
+				page - Either a page id or page entry.
+		
+			Returns:
+				true if successful. false if the logged in user doesn't have permission.
+			
+			See Also:
+				<archivePageChildren>
+		*/
+
+		function archivePage($page) {
+			if (is_array($page)) {
+				$page = mysql_real_escape_string($page["id"]);
+			} else {
+				$page = mysql_real_escape_string($page);
+			}
+
+			$access = $this->getPageAccessLevel($page);
+			if ($access == "p") {
+				sqlquery("UPDATE bigtree_pages SET archived = 'on' WHERE id = '$page'");
+				$this->archivePageChildren($page);
+				$this->growl("Pages","Archived Page");
+				$this->track("bigtree_pages",$page,"archived");
+				return true;
+			}
+			return false;
+		}
+		
+		/*
+			Function: archivePageChildren
+				Archives a page's children and sets the archive status to inherited.
+			
+			Parameters:
+				page - A page id.
+			
+			See Also:
+				<archivePage>
+		*/
+
+		function archivePageChildren($page) {
+			$page = mysql_real_escape_string($page);
+			$q = sqlquery("SELECT * FROM bigtree_pages WHERE parent = '$page'");
+			while ($f = sqlfetch($q)) {
+				if (!$f["archived"]) {
+					sqlquery("UPDATE bigtree_pages SET archived = 'on', archived_inherited = 'on' WHERE id = '".$f["id"]."'");
+					$this->track("bigtree_pages",$f["id"],"archived");
+					$this->archivePageChildren($f["id"]);
+				}
+			}
+		}
 
 		/*
 			Function: autoIPL
@@ -196,6 +251,287 @@
 		}
 		
 		/*
+			Function: clearCache
+				Removes all files in the cache directory.
+		*/
+
+		function clearCache() {
+			$d = opendir($GLOBALS["server_root"]."cache/");
+			while ($f = readdir($d)) {
+				if ($f != "." && $f != ".." && !is_dir($GLOBALS["server_root"]."cache/".$f)) {
+					unlink($GLOBALS["server_root"]."cache/".$f);
+				}
+			}
+		}
+		
+		/*
+			Function: getActionClass
+				Returns the button class for the given action and item.
+			
+			Parameters:
+				action - The action for the item (edit, feature, approve, etc)
+				item - The entry to check the action for.
+			
+			Returns:
+				Class name for the <a> tag.
+				
+				For example, if the item is already featured, this returns "icon_featured icon_featured_on" for the "feature" action.
+				If the item isn't already featured, it would simply return "icon_featured" for the "feature" action.
+		*/
+
+		function getActionClass($action,$item) {
+			$class = "";
+			if ($item["bigtree_pending"] && $action != "edit" && $action != "delete") {
+				return "icon_disabled";
+			}
+			if ($action == "feature") {
+				$class = "icon_feature";
+				if ($item["featured"]) {
+					$class .= " icon_feature_on";
+				}
+			}
+			if ($action == "edit") {
+				$class = "icon_edit";
+			}
+			if ($action == "delete") {
+				$class = "icon_delete";
+			}
+			if ($action == "approve") {
+				$class = "icon_approve";
+				if ($item["approved"]) {
+					$class .= " icon_approve_on";
+				}
+			}
+			if ($action == "archive") {
+				$class = "icon_archive";
+				if ($item["archived"]) {
+					$class .= " icon_archive_on";
+				}
+			}
+			if ($action == "preview") {
+				$class = "icon_preview";
+			}
+			return $class;
+		}
+		
+		/*
+			Function: getArchivedNavigationByParent
+				Returns an alphabetic list of navigation that is archived under the given parent.
+			
+			Parameters:
+				parent - The ID of the parent page
+			
+			Returns:
+				An array of page entries.
+		*/
+
+		function getArchivedNavigationByParent($parent) {
+			$nav = array();
+			$q = sqlquery("SELECT id,nav_title as title,parent,external,new_window,template,publish_at,expire_at,path FROM bigtree_pages WHERE parent = '$parent' AND archived = 'on' ORDER BY nav_title asc");
+			while ($nav_item = sqlfetch($q)) {
+				$nav_item["external"] = str_replace("{wwwroot}",$GLOBALS["www_root"],$nav_item["external"]);
+				$nav[] = $nav_item;
+			}
+			return $nav;
+		}
+		
+		/*
+			Function: getAvailableModuleRoute
+				Returns a route for a module that won't collide with another module.
+			
+			Parameters:
+				route - The preferred route.
+			
+			Returns:
+				A safe route.
+		*/
+
+		function getAvailableModuleRoute($route) {
+			$existing = array();
+			$d = opendir($GLOBALS["server_root"]."core/admin/modules/");
+			while ($f = readdir($d)) {
+				if ($f != "." && $f != "..") {
+					$existing[] = $f;
+				}
+			}
+			$d = opendir($GLOBALS["server_root"]."core/admin/");
+			while ($f = readdir($d)) {
+				if ($f != "." && $f != "..") {
+					$existing[] = $f;
+				}
+			}
+			$q = sqlquery("SELECT * FROM bigtree_modules");
+			while ($f = sqlfetch($q)) {
+				$existing[] = $f["route"];
+			}
+
+			$x = 2;
+			$oroute = $route;
+			while (in_array($route,$existing)) {
+				$route = $oroute."-".$x;
+				$x++;
+			}
+			return $route;
+		}
+		
+		/*
+			Function: getBasicTemplates
+				Returns a list of non-routed templates ordered by position.	
+			
+			Returns:
+				An array of template entries.
+		*/
+
+		function getBasicTemplates() {
+			$q = sqlquery("SELECT * FROM bigtree_templates WHERE level <= '".$this->Level."' ORDER BY position desc");
+			$items = array();
+			while ($f = sqlfetch($q)) {
+				if (!$f["routed"]) {
+					$items[] = $f;
+				}
+			}
+			return $items;
+		}
+		
+		/*
+			Function: getFullNavigationPath
+				Calculates the full navigation path for a given page ID.
+			
+			Parameters:
+				id - The page ID to calculate the navigation path for.
+			
+			Returns:
+				The navigation path (normally found in the "path" column in bigtree_pages).
+		*/
+
+		function getFullNavigationPath($id, $path = array()) {
+			global $cms;
+			
+			// We can change $GLOBALS["root_page"] to drive multiple sites from different branches of the Pages tree.
+			$root_page = isset($GLOBALS["root_page"]) ? $_GLOBALS["root_page"] : 0;
+			
+			$f = sqlfetch(sqlquery("SELECT route,id,parent FROM bigtree_pages WHERE id = '$id'"));
+			$path[] = $cms->urlify($f["route"]);
+			if ($f["parent"] != $root_page && $f["parent"] != 0) {
+				return $this->getFullNavigationPath($f["parent"],$path);
+			}
+			$path = implode("/",array_reverse($path));
+			return $path;
+		}
+		
+		/*
+			Function: getHiddenNavigationByParent
+				Returns an alphabetic list of navigation that is hidden under the given parent.
+			
+			Parameters:
+				parent - The ID of the parent page
+			
+			Returns:
+				An array of page entries.
+		*/
+
+		function getHiddenNavigationByParent($parent) {
+			$nav = array();
+			$q = sqlquery("SELECT id,nav_title as title,parent,external,new_window,template,publish_at,expire_at,path FROM bigtree_pages WHERE parent = '$parent' AND in_nav = '' AND archived != 'on' ORDER BY nav_title asc");
+			while ($nav_item = sqlfetch($q)) {
+				$nav_item["external"] = str_replace("{wwwroot}",$GLOBALS["www_root"],$nav_item["external"]);
+				$nav[] = $nav_item;
+			}
+			return $nav;
+		}
+		
+		/*
+			Function: getHiddenNavigationByParent
+				Returns a list of positioned navigation that is in navigation under the given parent.
+				Does not return module navigation.
+			
+			Parameters:
+				parent - The ID of the parent page
+			
+			Returns:
+				An array of page entries.
+		*/
+
+		function getNaturalNavigationByParent($parent,$levels = 1) {
+			$nav = array();
+			$q = sqlquery("SELECT id,nav_title as title,parent,external,new_window,template,publish_at,expire_at,path FROM bigtree_pages WHERE parent = '$parent' AND in_nav = 'on' AND archived != 'on' ORDER BY position DESC, id ASC");
+			while ($nav_item = sqlfetch($q)) {
+				$nav_item["external"] = str_replace("{wwwroot}",$GLOBALS["www_root"],$nav_item["external"]);
+				if ($levels > 1) {
+					$nav_item["children"] = $this->getNaturalNavigationByParent($f["id"],$levels - 1);
+				}
+				$nav[] = $nav_item;
+			}
+			return $nav;
+		}
+		
+		/*
+			Function: getPendingNavigationByParent
+				Returns a list of pending pages under a given parent ordered by most recent.
+			
+			Parameters:
+				parent - The ID of the parent page
+				in_nav - "on" returns pages in navigation, "" returns hidden pages
+			
+			Returns:
+				An array of pending page titles/ids.
+		*/
+
+		function getPendingNavigationByParent($parent,$in_nav = "on") {
+			$nav = array();
+			$titles = array();
+			$q = sqlquery("SELECT * FROM bigtree_pending_changes WHERE pending_page_parent = '$parent' AND `table` = 'bigtree_pages' AND type = 'NEW' ORDER BY date DESC");
+			while ($f = sqlfetch($q)) {
+				$page = json_decode($f["changes"],true);
+				if ($page["in_nav"] == $in_nav) {
+					$titles[] = $page["nav_title"];
+					$page["bigtree_pending"] = true;
+					$page["title"] = $page["nav_title"];
+					$page["id"] = "p".$f["id"];
+					$nav[] = $page;
+				}
+			}
+			array_multisort($titles,$nav);
+			return $nav;
+		}
+		
+		/*
+			Function: getRoutedTemplates
+				Returns a list of routed templates ordered by position.
+			
+			Returns:
+				An array of template entries.
+		*/
+
+		function getRoutedTemplates() {
+			$q = sqlquery("SELECT * FROM bigtree_templates WHERE level <= '".$this->Level."' ORDER BY position desc");
+			$items = array();
+			while ($f = sqlfetch($q)) {
+				if ($f["routed"]) {
+					$items[] = $f;
+				}
+			}
+			return $items;
+		}
+		
+		/*
+			Function: getTemplates
+				Returns a list of templates ordered by position.
+			
+			Returns:
+				An array of template entries.
+		*/
+
+		function getTemplates() {
+			$items = array();
+			$q = sqlquery("SELECT * FROM bigtree_templates ORDER BY position DESC, id ASC");
+			while ($f = sqlfetch($q)) {
+				$items[] = $f;
+			}
+			return $items;
+		}
+		
+		/*
 			Function: growl
 				Sets up a growl session for the next page reload.
 			
@@ -207,15 +543,6 @@
 
 		function growl($title,$message,$type = "success") {
 			$_SESSION["bigtree"]["flash"] = array("message" => $message, "title" => $title, "type" => $type);
-		}
-		
-		/*
-			Function: ungrowl
-				Destroys the growl session.
-		*/
-
-		function ungrowl() {
-			unset($_SESSION["bigtree"]["flash"]);
 		}
 		
 		/*
@@ -295,14 +622,32 @@
 			}
 			return "ipl://".$navid."//".base64_encode(json_encode($commands));
 		}
+		
+		/*
+			Function: stop
+				Stops processing of the Admin area and shows a message in the default layout.
+			
+			Parameters:
+				message - Content to show (error, permission denied, etc)
+		*/
 
 		function stop($message = "") {
-			global $cms,$admin,$www_root,$aroot,$site,$breadcrumb;
+			global $cms,$admin,$www_root,$admin_root,$site,$breadcrumb;
 			echo $message;
 			$content = ob_get_clean();
 			include bigtree_path("admin/layouts/default.php");
 			die();
 		}
+		
+		/*
+			Function: track
+				Logs a user's actions to the audit trail table.
+			
+			Parameters:
+				table - The table affected by the user.
+				entry - The primary key of the entry affected by the user.
+				type - The action taken by the user (delete, edit, create, etc.)
+		*/
 
 		function track($table,$entry,$type) {
 			$table = mysql_real_escape_string($table);
@@ -310,244 +655,80 @@
 			$type = mysql_real_escape_string($type);
 			sqlquery("INSERT INTO bigtree_audit_trail VALUES (`table`,`user`,`entry`,`date`,`type`) VALUES ('$table','".$admin->ID."','$entry',NOW(),'$type')");
 		}
+		
+		/*
+			Function: ungrowl
+				Destroys the growl session.
+		*/
+
+		function ungrowl() {
+			unset($_SESSION["bigtree"]["flash"]);
+		}
+		
+		/*
+			Function: urlExists
+				Attempts to connect to a URL using cURL.
+			
+			Parameters:
+				url - The URL to connect to.
+			
+			Returns:
+				true if it can connect, false if connection failed.
+		*/
 
 		function urlExists($url) {
 			$handle = curl_init($url);
-			if (false === $handle)
+			if ($handle === false) {
 				return false;
+			}
 			curl_setopt($handle, CURLOPT_HEADER, false);
 			curl_setopt($handle, CURLOPT_FAILONERROR, true);
+			// Request as Firefox so that servers don't reject us for not having headers.
+			curl_setopt($handle, CURLOPT_HTTPHEADER, Array("User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.15) Gecko/20080623 Firefox/2.0.0.15") );
 			curl_setopt($handle, CURLOPT_NOBODY, true);
 			curl_setopt($handle, CURLOPT_RETURNTRANSFER, false);
 			$connectable = curl_exec($handle);
 			curl_close($handle);
 			return $connectable;
 		}
-
-		function urlify($title) {
-			$accent_match = array('Â', 'Ã', 'Ä', 'À', 'Á', 'Å', 'Æ', 'Ç', 'È', 'É', 'Ê', 'Ë', 'Ì', 'Í', 'Î', 'Ï', 'Ð', 'Ñ', 'Ò', 'Ó', 'Ô', 'Õ', 'Ö', 'Ø', 'Ù', 'Ú', 'Û', 'Ü', 'Ý', 'ß', 'à', 'á', 'â', 'ã', 'ä', 'å', 'æ', 'ç', 'è', 'é', 'ê', 'ë', 'ì', 'í', 'î', 'ï', 'ð', 'ñ', 'ò', 'ó', 'ô', 'õ', 'ö', 'ø', 'ù', 'ú', 'û', 'ü', 'ý', 'ÿ');
-			$accent_replace = array('A', 'A', 'A', 'A', 'A', 'A', 'AE', 'C', 'E', 'E', 'E', 'E', 'I', 'I', 'I', 'I', 'D', 'N', 'O', 'O', 'O', 'O', 'O', 'O', 'U', 'U', 'U', 'U', 'Y', 'B', 'a', 'a', 'a', 'a', 'a', 'a', 'ae', 'c', 'e', 'e', 'e', 'e', 'i', 'i', 'i', 'i', 'o', 'n', 'o', 'o', 'o', 'o', 'o', 'o', 'u', 'u', 'u', 'u', 'y', 'y');
-
-			$title = str_replace($accent_match, $accent_replace, $title);
-
-			return strtolower(preg_replace('/\s/', '-',preg_replace('/[^a-zA-Z0-9\s\-\_]+/', '',trim($title))));
-		}
-
-		// !Developer Functions
-
-		function getActionClass($action,$item) {
-			$class = "";
-			if ($item["bigtree_pending"] && $action != "edit" && $action != "delete") {
-				return "icon_disabled";
-			}
-			if ($action == "feature") {
-				$class = "icon_feature";
-				if ($item["featured"]) {
-					$class .= " icon_feature_on";
-				}
-			}
-			if ($action == "edit") {
-				$class = "icon_edit";
-			}
-			if ($action == "delete") {
-				$class = "icon_delete";
-			}
-			if ($action == "approve") {
-				$class = "icon_approve";
-				if ($item["approved"]) {
-					$class .= " icon_approve_on";
-				}
-			}
-			if ($action == "archive") {
-				$class = "icon_archive";
-				if ($item["archived"]) {
-					$class .= " icon_archive_on";
-				}
-			}
-			if ($action == "preview") {
-				$class = "icon_preview";
-			}
-			return $class;
-		}
-
-		function getAvailableModuleRoute($route) {
-			$existing = array();
-			$d = opendir($GLOBALS["server_root"]."core/admin/modules/");
-			while ($f = readdir($d)) {
-				if ($f != "." && $f != "..") {
-					$existing[] = $f;
-				}
-			}
-			$d = opendir($GLOBALS["server_root"]."core/admin/");
-			while ($f = readdir($d)) {
-				if ($f != "." && $f != "..") {
-					$existing[] = $f;
-				}
-			}
-			$q = sqlquery("SELECT * FROM bigtree_modules");
-			while ($f = sqlfetch($q)) {
-				$existing[] = $f["route"];
-			}
-
-			$x = 2;
-			$oroute = $route;
-			while (in_array($route,$existing)) {
-				$route = $oroute."-".$x;
-				$x++;
-			}
-			return $route;
-		}
-
-		// !Cache Functions
-
-		function clearCache() {
-			$d = opendir($GLOBALS["server_root"]."cache/");
-			while ($f = readdir($d)) {
-				if ($f != "." && $f != ".." && !is_dir($GLOBALS["server_root"]."cache/".$f)) {
-					unlink($GLOBALS["server_root"]."cache/".$f);
-				}
-			}
-		}
+		
+		/*
+			Function: unCache
+				Removes the cached copy of a given page.
+				
+			Parameters:
+				page - Either a page id or a page entry.
+		*/
 
 		function unCache($page) {
 			global $cms;
-			$file = $GLOBALS["server_root"]."cache/".base64_encode(str_replace($GLOBALS["www_root"],"",$cms->getLink($page)));
+			if (is_array($page)) {
+				$file = $GLOBALS["server_root"]."cache/".base64_encode($page["path"]."/");
+			} else {
+				$file = $GLOBALS["server_root"]."cache/".base64_encode(str_replace($GLOBALS["www_root"],"",$cms->getLink($page)));		
+			}
 			if (file_exists($file)) {
 				unlink($file);
 			}
 		}
+		
+		/*
+			Function: createPage
+				Creates a page.
+				Authority to create the page is not checked in this function so it should be done prior to it being called.
+			
+			Parameters:
+				data - An array of page information
+			
+			Returns:
+				The id of the newly created page.
+		*/
 
-		// !Navigation Functions
-
-		function getArchivedNavigationByParent($parent) {
-			$nav = array();
-			$q = sqlquery("SELECT id,nav_title as title,parent,external,new_window,template,publish_at,expire_at,path FROM bigtree_pages WHERE parent = '$parent' AND archived = 'on' ORDER BY nav_title asc");
-			while ($nav_item = sqlfetch($q)) {
-				$nav_item["external"] = str_replace("{wwwroot}",$GLOBALS["www_root"],$nav_item["external"]);
-				$nav[] = $nav_item;
-			}
-			return $nav;
-		}
-
-		function getFullNavigationPath($child, $path = array()) {
-			$f = sqlfetch(sqlquery("SELECT route,id,parent FROM bigtree_pages WHERE id = '$child'"));
-			$path[] = $this->urlify($f["route"]);
-			if ($f["parent"] != $GLOBALS["root_page"] && $f["parent"] != 0) {
-				return $this->getFullNavigationPath($f["parent"],$path);
-			}
-			$path = implode("/",array_reverse($path));
-			return $path;
-		}
-
-		function getHiddenNavigationByParent($parent) {
-			$nav = array();
-			$q = sqlquery("SELECT id,nav_title as title,parent,external,new_window,template,publish_at,expire_at,path FROM bigtree_pages WHERE parent = '$parent' AND in_nav = '' AND archived != 'on' ORDER BY nav_title asc");
-			while ($nav_item = sqlfetch($q)) {
-				$nav_item["external"] = str_replace("{wwwroot}",$GLOBALS["www_root"],$nav_item["external"]);
-				$nav[] = $nav_item;
-			}
-			return $nav;
-		}
-
-		function getNaturalNavigationByParent($parent,$levels = 1) {
-			$nav = array();
-			$q = sqlquery("SELECT id,nav_title as title,parent,external,new_window,template,publish_at,expire_at,path FROM bigtree_pages WHERE parent = '$parent' AND in_nav = 'on' AND archived != 'on' ORDER BY position DESC, id ASC");
-			while ($nav_item = sqlfetch($q)) {
-				$nav_item["external"] = str_replace("{wwwroot}",$GLOBALS["www_root"],$nav_item["external"]);
-				if ($levels > 1) {
-					$nav_item["children"] = $this->getNaturalNavigationByParent($f["id"],$levels - 1);
-				}
-				$nav[] = $nav_item;
-			}
-			return $nav;
-		}
-
-		function getPendingNavigationByParent($parent,$in_nav = "on") {
-			$nav = array();
-			$titles = array();
-			$q = sqlquery("SELECT * FROM bigtree_pending_changes WHERE pending_page_parent = '$parent' AND `table` = 'bigtree_pages' AND type = 'NEW'");
-			while ($f = sqlfetch($q)) {
-				$page = json_decode($f["changes"],true);
-				if ($page["in_nav"] == $in_nav) {
-					$titles[] = $page["nav_title"];
-					$page["bigtree_pending"] = true;
-					$page["title"] = $page["nav_title"];
-					$page["id"] = "p".$f["id"];
-					$nav[] = $page;
-				}
-			}
-			array_multisort($titles,$nav);
-			return $nav;
-		}
-
-		// !Template Functions
-
-		function getBasicTemplates() {
-			$q = sqlquery("SELECT * FROM bigtree_templates WHERE level <= '".$this->Level."' ORDER BY position desc");
-			$items = array();
-			while ($f = sqlfetch($q)) {
-				if (!$f["routed"]) {
-					$items[] = $f;
-				}
-			}
-			return $items;
-		}
-
-		function getPageTemplates() { return $this->getBasicTemplates(); }
-
-		function getModuleTemplates() { return $this->getRoutedTemplates(); }
-
-		function getRoutedTemplates() {
-			$q = sqlquery("SELECT * FROM bigtree_templates WHERE level <= '".$this->Level."' ORDER BY position desc");
-			$items = array();
-			while ($f = sqlfetch($q)) {
-				if ($f["routed"]) {
-					$items[] = $f;
-				}
-			}
-			return $items;
-		}
-
-		function getTemplates() {
-			$items = array();
-			$q = sqlquery("SELECT * FROM bigtree_templates ORDER BY position DESC, id ASC");
-			while ($f = sqlfetch($q)) {
-				$items[] = $f;
-			}
-			return $items;
-		}
-
-		// !Page Functions
-
-		function archivePage($page) {
-			$page = mysql_real_escape_string($page);
-
-			$access = $this->getPageAccessLevel($page);
-			if ($access == "p") {
-				sqlquery("UPDATE bigtree_pages SET archived = 'on' WHERE id = '$page'");
-				$this->archivePageChildren($page);
-				$this->growl("Pages","Archived Page");
-				$this->track("bigtree_pages",$page,"archived");
-				return true;
-			}
-			return false;
-		}
-
-		function archivePageChildren($id) {
-			$q = sqlquery("SELECT * FROM bigtree_pages WHERE parent = '$id'");
-			while ($f = sqlfetch($q)) {
-				if (!$f["archived"]) {
-					sqlquery("UPDATE bigtree_pages SET archived = 'on', archived_inherited = 'on' WHERE id = '".$f["id"]."'");
-					$this->track("bigtree_pages",$f["id"],"archived");
-					$this->archivePageChildren($f["id"]);
-				}
-			}
-		}
-
-		function createPage($d) {
+		function createPage($data) {
 			global $cms;
-
-			foreach ($d as $key => $val) {
+			
+			// Loop through the posted data, make sure no session hijacking is done.
+			foreach ($data as $key => $val) {
 				if (substr($key,0,1) != "_") {
 					if (is_array($val)) {
 						$$key = mysql_real_escape_string(json_encode($val));
@@ -556,21 +737,24 @@
 					}
 				}
 			}
-
+			
+			// If there's an external link, make sure it's a relative URL
 			if ($external) {
 				$external = $this->makeIPL($external);
 			}
-
-			$resources = mysql_real_escape_string(json_encode($d["resources"]));
-			$callouts = mysql_real_escape_string(json_encode($d["callouts"]));
-
-			$route = $d["route"];
+			
+			
+			// Who knows what they may have put in for a route, so we're not going to use the mysql_real_escape_string version.
+			$route = $data["route"];
 			if (!$route) {
-				$route = $this->urlify($d["nav_title"]);
+				// If they didn't specify a route use the navigation title
+				$route = $cms->urlify($data["nav_title"]);
 			} else {
-				$route = $this->urlify($route);
+				// Otherwise sanitize the one they did provide.
+				$route = $cms->urlify($route);
 			}
-
+			
+			// We need to figure out a unique route for the page.  Make sure it doesn't match a directory in /site/
 			$oroute = $route;
 			$x = 2;
 			// Reserved paths.
@@ -617,16 +801,16 @@
 			$id = sqlid();
 
 			// Handle tags
-			if (is_array($d["_tags"])) {
-				foreach ($d["_tags"] as $tag) {
+			if (is_array($data["_tags"])) {
+				foreach ($data["_tags"] as $tag) {
 					sqlquery("INSERT INTO bigtree_tags_rel (`module`,`entry`,`tag`) VALUES ('0','$id','$tag')");
 				}
 			}
 
 
 			// Handle resources
-			if (is_array($d["_resources"])) {
-				foreach ($d["_resources"] as $rid) {
+			if (is_array($data["_resources"])) {
+				foreach ($data["_resources"] as $rid) {
 					sqlquery("UPDATE bigtree_resources SET `table` = 'bigtree_pages', entry = '$id' WHERE id = '$rid'");
 				}
 			}
@@ -972,9 +1156,9 @@
 			// Create a route if we don't have one, otherwise, make sure the one they provided doesn't suck.
 			$route = $data["route"];
 			if (!$route) {
-				$route = $this->urlify($data["nav_title"]);
+				$route = $cms->urlify($data["nav_title"]);
 			} else {
-				$route = $this->urlify($route);
+				$route = $cms->urlify($route);
 			}
 
 			// Get a unique route
@@ -1083,11 +1267,11 @@
 			}
 
 			if ($change["table"] == "bigtree_pages" && $change["item_id"]) {
-				return $GLOBALS["www_root"]."admin/pages/edit/".$change["item_id"]."/";
+				return $GLOBALS["admin_root"]."pages/edit/".$change["item_id"]."/";
 			}
 
 			if ($change["table"] == "bigtree_pages") {
-				return $GLOBALS["www_root"]."admin/pages/edit/p".$change["id"]."/";
+				return $GLOBALS["admin_root"]."pages/edit/p".$change["id"]."/";
 			}
 
 			$modid = $change["module"];
@@ -1100,9 +1284,9 @@
 			}
 
 			if ($action) {
-				return $GLOBALS["www_root"]."admin/".$module["route"]."/".$action["route"]."/".$change["item_id"]."/";
+				return $GLOBALS["admin_root"].$module["route"]."/".$action["route"]."/".$change["item_id"]."/";
 			} else {
-				return $GLOBALS["www_root"]."admin/".$module["route"]."/edit/".$change["item_id"]."/";
+				return $GLOBALS["admin_root"].$module["route"]."/edit/".$change["item_id"]."/";
 			}
 		}
 
@@ -1333,7 +1517,7 @@
 			$password = mysql_real_escape_string($phpass->HashPassword($password));
 
 			sqlquery("UPDATE bigtree_users SET password = '$password', change_password_hash = '' WHERE id = '".$user["id"]."'");
-			header("Location: ".$GLOBALS["www_root"]."admin/login/reset-success/");
+			header("Location: ".$GLOBALS["admin_root"]."login/reset-success/");
 			die();
 		}
 
@@ -1407,8 +1591,8 @@
 			$hash = mysql_real_escape_string(md5(md5(md5(uniqid("bigtree-hash".microtime(true))))));
 			sqlquery("UPDATE bigtree_users SET change_password_hash = '$hash' WHERE id = '".$f["id"]."'");
 
-			mail($email,"Reset Your Password","A user with the IP address ".$_SERVER["REMOTE_ADDR"]." has requested to reset your password.\n\nIf this was you, please click the link below:\n".$GLOBALS["www_root"]."admin/login/reset-password/$hash/","From: no-reply@bigtreecms.com");
-			header("Location: ".$GLOBALS["www_root"]."admin/login/forgot-success/");
+			mail($email,"Reset Your Password","A user with the IP address ".$_SERVER["REMOTE_ADDR"]." has requested to reset your password.\n\nIf this was you, please click the link below:\n".$GLOBALS["admin_root"]."login/reset-password/$hash/","From: no-reply@bigtreecms.com");
+			header("Location: ".$GLOBALS["admin_root"]."login/forgot-success/");
 			die();
 		}
 
@@ -2320,7 +2504,7 @@
 				$_SESSION["bigtree"]["permissions"] = json_decode($f["permissions"],true);
 
 				if ($path[1] == "login") {
-					header("Location: ".$GLOBALS["www_root"]."admin/");
+					header("Location: ".$GLOBALS["admin_root"]);
 				} else {
 					header("Location: ".$GLOBALS["domain"].$_SERVER["REQUEST_URI"]);
 				}
@@ -2334,12 +2518,12 @@
 			setcookie("bigtree[email]","",time()-3600,str_replace($GLOBALS["domain"],"",$GLOBALS["www_root"]));
 			setcookie("bigtree[password]","",time()-3600,str_replace($GLOBALS["domain"],"",$GLOBALS["www_root"]));
 			unset($_SESSION["bigtree"]);
-			header("Location: ".$GLOBALS["www_root"]."admin/");
+			header("Location: ".$GLOBALS["admin_root"]);
 			die();
 		}
 
 		function requireAccess($module) {
-			global $cms,$aroot,$css,$js,$site;
+			global $cms,$admin_root,$css,$js,$site;
 			if ($this->Level > 0)
 				return "p";
 			if (!isset($this->Permissions[$module]) || $this->Permissions[$module] == "") {
@@ -2353,7 +2537,7 @@
 		}
 
 		function requireLevel($level) {
-			global $cms,$aroot,$css,$js,$site;
+			global $cms,$admin_root,$css,$js,$site;
 			if (!isset($this->Level) || $this->Level < $level) {
 				ob_start();
 				include bigtree_path("admin/pages/_denied.php");
@@ -2364,7 +2548,7 @@
 		}
 
 		function requirePublisher($module) {
-			global $cms,$aroot,$css,$js,$site;
+			global $cms,$admin_root,$css,$js,$site;
 			if ($this->Level > 0)
 				return true;
 			if ($this->Permissions[$module] != "p") {
@@ -2645,7 +2829,7 @@
 				// Start building the email
 				$body =  "BigTree Daily Digest\n";
 				$body .= "====================\n";
-				$body .= $GLOBALS["www_root"]."admin/\n\n";
+				$body .= $GLOBALS["admin_root"]."\n\n";
 				
 				if (is_array($alerts) && count($alerts)) {
 					$body .= "Content Age Alerts\n";
@@ -2654,7 +2838,7 @@
 					foreach ($alerts as $alert) {
 						$body .= $alert["nav_title"]." - ".$alert["current_age"]." Days Old\n";
 						$body .= $GLOBALS["www_root"].$alert["path"]."/\n";
-						$body .= $GLOBALS["www_root"]."admin/pages/edit/".$alert["id"]."/\n\n";
+						$body .= $GLOBALS["admin_root"]."pages/edit/".$alert["id"]."/\n\n";
 					}
 				}
 

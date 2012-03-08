@@ -15,6 +15,6 @@
 	$action = $admin->getModuleActionForView(end($path));
 
 	$admin->growl("Developer","Updated View Styles");
-	header("Location: ".$saroot."modules/edit/".$action["module"]."/");
+	header("Location: ".$developer_root."modules/edit/".$action["module"]."/");
 	die();
 ?>

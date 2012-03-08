@@ -201,7 +201,7 @@
 	bigtree_move($server_root."cache/package.tar.gz",$server_root."cache/packages/".$package.".tar.gz");
 ?>
 <h3 class="foundry">Package Module: Details</h3>
-<form method="post" action="<?=$aroot?>developer/foundry/package/submit/module/" class="module">
+<form method="post" action="<?=$admin_root?>developer/foundry/package/submit/module/" class="module">
 	<input type="hidden" name="id" value="<?=$package?>" />
 	<fieldset>
 		<label class="required">Name</label>

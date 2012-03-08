@@ -43,6 +43,6 @@
 
 	
 	$admin->growl("Developer","Created Callout");
-	header("Location: ".$saroot."callouts/view/");
+	header("Location: ".$developer_root."callouts/view/");
 	die();		
 ?>

@@ -108,7 +108,7 @@
 ?>
 <html>
 	<head>
-		<link rel="stylesheet" href="<?=$aroot?>css/main.css" />
+		<link rel="stylesheet" href="<?=$admin_root?>css/main.css" />
 	</head>
 	<body style="background: transparent;">
 		<p class="file_browser_response">Successfully Uploaded</p>

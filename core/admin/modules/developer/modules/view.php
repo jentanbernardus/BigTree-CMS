@@ -28,10 +28,10 @@
 				<?=$item["name"]?>
 			</section>
 			<section class="view_action">
-				<a href="<?=$sroot?>edit/<?=$item["id"]?>/" class="icon_edit"></a>
+				<a href="<?=$section_root?>edit/<?=$item["id"]?>/" class="icon_edit"></a>
 			</section>
 			<section class="view_action">
-				<a href="<?=$sroot?>delete/<?=$item["id"]?>/" class="icon_delete"></a>
+				<a href="<?=$section_root?>delete/<?=$item["id"]?>/" class="icon_delete"></a>
 			</section>
 		</li>
 		<? } ?>
@@ -40,7 +40,7 @@
 
 <script type="text/javascript">
 	$("#group_<?=$g["id"]?>").sortable({ axis: "y", containment: "parent", handle: ".icon_sort", items: "li", placeholder: "ui-sortable-placeholder", tolerance: "pointer", update: function() {
-		$.ajax("<?=$aroot?>ajax/developer/order-modules/?sort=" + escape($("#group_<?=$g["id"]?>").sortable("serialize")));
+		$.ajax("<?=$admin_root?>ajax/developer/order-modules/?sort=" + escape($("#group_<?=$g["id"]?>").sortable("serialize")));
 	}});
 </script>
 <?
@@ -64,10 +64,10 @@
 				<?=$item["name"]?>
 			</section>
 			<section class="view_action">
-				<a href="<?=$sroot?>edit/<?=$item["id"]?>/" class="icon_edit"></a>
+				<a href="<?=$section_root?>edit/<?=$item["id"]?>/" class="icon_edit"></a>
 			</section>
 			<section class="view_action">
-				<a href="<?=$sroot?>delete/<?=$item["id"]?>/" class="icon_delete"></a>
+				<a href="<?=$section_root?>delete/<?=$item["id"]?>/" class="icon_delete"></a>
 			</section>
 		</li>
 		<? } ?>
@@ -76,7 +76,7 @@
 
 <script type="text/javascript">
 	$("#group_0").sortable({ axis: "y", containment: "parent", handle: ".icon_sort", items: "li", placeholder: "ui-sortable-placeholder", tolerance: "pointer", update: function() {
-		$.ajax("<?=$aroot?>ajax/developer/order-modules/?sort=" + escape($("#group_0").sortable("serialize")));
+		$.ajax("<?=$admin_root?>ajax/developer/order-modules/?sort=" + escape($("#group_0").sortable("serialize")));
 	}});
 
 	$(".icon_delete").click(function() {

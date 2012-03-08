@@ -39,7 +39,7 @@
 		<p>Your form has been created. If you were creating a module from scratch, the process is now complete.</p>
 	</section>
 	<footer>
-		<a href="<?=$aroot?><?=$mod["route"]?>/" class="button white">View Module</a>
-		<a href="<?=$aroot?><?=$mod["route"]?>/<?=$addroute?>/" class="button blue">View Form</a>
+		<a href="<?=$admin_root?><?=$mod["route"]?>/" class="button white">View Module</a>
+		<a href="<?=$admin_root?><?=$mod["route"]?>/<?=$addroute?>/" class="button blue">View Form</a>
 	</footer>
 </div>

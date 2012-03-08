@@ -8,11 +8,11 @@
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 		<title><?=$site["nav_title"]?> Login</title>
-		<link rel="stylesheet" href="<?=$aroot?>css/main.css" type="text/css" media="screen" charset="utf-8" />
-		<link media="only screen and (max-device-width: 480px)" href="<?=$aroot?>css/mobile.css" type= "text/css" rel="stylesheet" />
+		<link rel="stylesheet" href="<?=$admin_root?>css/main.css" type="text/css" media="screen" charset="utf-8" />
+		<link media="only screen and (max-device-width: 480px)" href="<?=$admin_root?>css/mobile.css" type= "text/css" rel="stylesheet" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no;" />
-		<script type="text/javascript" src="<?=$aroot?>js/lib.js"></script>
-		<script type="text/javascript" src="<?=$aroot?>js/main.js"></script>
+		<script type="text/javascript" src="<?=$admin_root?>js/lib.js"></script>
+		<script type="text/javascript" src="<?=$admin_root?>js/main.js"></script>
 	</head>
 	<body class="login">
 		<div class="login_wrapper">

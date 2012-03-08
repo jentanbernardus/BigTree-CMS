@@ -28,6 +28,6 @@
 	BigTreeCustomControls();
 	
 	$("#callout_type select").bind("select:changed",function(event,data) {
-		$("#callout_resources").load("<?=$GLOBALS["www_root"]?>admin/ajax/pages/callout-resources/", { type: data.value, count: <?=$count?>, resources: "<?=$_POST["data"]?>" });
+		$("#callout_resources").load("<?=$admin_root?>ajax/pages/callout-resources/", { type: data.value, count: <?=$count?>, resources: "<?=$_POST["data"]?>" });
 	});
 </script>

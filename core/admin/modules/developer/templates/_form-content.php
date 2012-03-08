@@ -65,13 +65,13 @@
 						if ($file != "." && $file != "..") {
 							$all[] = $file;
 				?>
-				<li><a href="#<?=htmlspecialchars($file)?>"<? if ($image == $file) { ?> class="active" <? } ?>><img src="<?=$aroot?>images/templates/<?=$file?>" alt="" /></a></li>
+				<li><a href="#<?=htmlspecialchars($file)?>"<? if ($image == $file) { ?> class="active" <? } ?>><img src="<?=$admin_root?>images/templates/<?=$file?>" alt="" /></a></li>
 				<?
 						}
 					}
 					if ($image && !in_array($image,$all)) {
 				?>
-				<li><a href="#<?=htmlspecialchars($image)?>" class="active"><img src="<?=$aroot?>images/templates/<?=$image?>" alt="" /></a></li>
+				<li><a href="#<?=htmlspecialchars($image)?>" class="active"><img src="<?=$admin_root?>images/templates/<?=$image?>" alt="" /></a></li>
 				<?	
 					}
 				?>

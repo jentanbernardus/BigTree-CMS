@@ -29,12 +29,12 @@
 	});
 
 	function reSearch() {
-		$("#results").load("<?=$aroot?>ajax/users/get-page/?page=0&query=" + escape($("#query").val()));
+		$("#results").load("<?=$admin_root?>ajax/users/get-page/?page=0&query=" + escape($("#query").val()));
 	}
 	
 	$(".icon_delete").live("click",function() {
 		new BigTreeDialog("Delete Resource",'<p class="confirm">Are you sure you want to delete this resource?',$.proxy(function() {
-			$.ajax("<?=$aroot?>ajax/users/delete/", { type: "POST", data: { id: $(this).attr("href").substr(1) } });
+			$.ajax("<?=$admin_root?>ajax/users/delete/", { type: "POST", data: { id: $(this).attr("href").substr(1) } });
 		},this),"delete",false,"OK");
 		
 		return false;

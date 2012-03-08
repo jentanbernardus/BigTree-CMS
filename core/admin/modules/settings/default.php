@@ -26,6 +26,6 @@
 	});
 
 	function reSearch() {
-		$("#results").load("<?=$aroot?>ajax/settings/get-page/?page=0&query=" + escape($("#query").val()));
+		$("#results").load("<?=$admin_root?>ajax/settings/get-page/?page=0&query=" + escape($("#query").val()));
 	}
 </script>

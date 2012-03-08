@@ -1,4 +1,4 @@
 <?
 	$breadcrumb[] = array("title" => "Field Types", "link" => "developer/field-types/");
-	$sroot = $droot."field-types/";
+	$section_root = $developer_root."field-types/";
 ?>

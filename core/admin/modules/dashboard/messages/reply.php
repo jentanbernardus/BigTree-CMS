@@ -40,7 +40,7 @@
 <h1><span class="reply_message"></span>Reply To Message</h1>
 <? include "_nav.php" ?>
 <div class="form_container">
-	<form method="post" action="<?=$aroot?>dashboard/messages/create-reply/" id="message_form">
+	<form method="post" action="<?=$admin_root?>dashboard/messages/create-reply/" id="message_form">
 		<input type="hidden" name="response_to" value="<?=htmlspecialchars(end($path))?>" />
 		<section>
 			<p<? if (!$error) { ?> style="display: none;"<? } ?> class="error_message">Errors found! Please fix the highlighted fields before submitting.</p>

@@ -23,6 +23,6 @@
 	}
 	
 	$admin->growl("Developer","Updated Module Form");
-	header("Location: ".$saroot."modules/edit/".$action["module"]."/");
+	header("Location: ".$developer_root."modules/edit/".$action["module"]."/");
 	die();
 ?>

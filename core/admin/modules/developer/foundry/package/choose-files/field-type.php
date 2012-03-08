@@ -11,7 +11,7 @@
 ?>
 <h3 class="foundry">Package Field Type: Choose Files</h3>
 <p>Please select all the files required for the Field Type &ldquo;<?=$type["name"]?>&rdquo;</p>
-<form class="module" method="post" action="<?=$aroot?>developer/foundry/package/release-notes/field-type/">
+<form class="module" method="post" action="<?=$admin_root?>developer/foundry/package/release-notes/field-type/">
 	<input type="hidden" name="id" value="<?=htmlspecialchars($type["id"])?>" />
 	<div class="package_column">
 		<strong>Package Files</strong>

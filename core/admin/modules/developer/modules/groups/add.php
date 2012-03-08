@@ -4,7 +4,7 @@
 <h1><span class="icon_developer_modules"></span>Add Group</h1>
 <? include bigtree_path("admin/modules/developer/modules/_nav.php"); ?>
 <div class="form_container">
-	<form method="post" action="<?=$saroot?>modules/groups/create/" class="module">
+	<form method="post" action="<?=$developer_root?>modules/groups/create/" class="module">
 		<header><h2>Group Details</h2></header>
 		<section>
 			<div class="left">

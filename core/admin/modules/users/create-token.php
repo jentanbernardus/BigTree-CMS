@@ -14,6 +14,6 @@
 	
 	$admin->growl("Users","Added API Token");
 	
-	header("Location: ".$aroot."users/view-tokens/");
+	header("Location: ".$admin_root."users/view-tokens/");
 	die();
 ?>

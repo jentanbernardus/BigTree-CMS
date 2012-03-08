@@ -17,9 +17,9 @@
 	$tdata = $cms->getTemplate($template);
 
 	if (!$tdata["image"]) {
-		$image = $aroot."images/templates/page.png";
+		$image = $admin_root."images/templates/page.png";
 	} else {
-		$image = $aroot."images/templates/".$tdata["image"];
+		$image = $admin_root."images/templates/".$tdata["image"];
 	}
 		
 	$htmls = array();

@@ -6,7 +6,7 @@
 <h1><span class="icon_developer_modules"></span>Add Module</h1>
 <? include bigtree_path("admin/modules/developer/modules/_nav.php"); ?>
 <div class="form_container">
-	<form method="post" action="<?=$sroot?>create/" class="module">
+	<form method="post" action="<?=$section_root?>create/" class="module">
 		<section>
 			<p class="error_message" style="display: none;">Errors found! Please fix the highlighted fields before submitting.</p>
 			<div class="left">

@@ -1,6 +1,6 @@
 <?
 /*
-	header("Location: ".$aroot."dashboard/vitals-statistics/analytics/");
+	header("Location: ".$admin_root."dashboard/vitals-statistics/analytics/");
 	die();
 */
 ?>

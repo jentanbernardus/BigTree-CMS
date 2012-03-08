@@ -13,6 +13,6 @@
 	sqlquery("UPDATE bigtree_module_actions SET name = '$name', route = '$route', class = '$class', in_nav = '$in_nav' WHERE id = '".end($path)."'");
 
 	$admin->growl("Developer","Updated Action");
-	header("Location: ".$saroot."modules/edit/".$item["module"]."/");
+	header("Location: ".$developer_root."modules/edit/".$item["module"]."/");
 	die();
 ?>

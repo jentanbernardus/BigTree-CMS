@@ -27,10 +27,10 @@
 				<?=$template["name"]?>
 			</section>
 			<section class="view_action">
-				<a href="<?=$sroot?>edit/<?=$template["id"]?>/" class="icon_edit"></a>
+				<a href="<?=$section_root?>edit/<?=$template["id"]?>/" class="icon_edit"></a>
 			</section>
 			<section class="view_action">
-				<a href="<?=$sroot?>delete/<?=$template["id"]?>/" class="icon_delete"></a>
+				<a href="<?=$section_root?>delete/<?=$template["id"]?>/" class="icon_delete"></a>
 			</section>
 		</li>
 		<?
@@ -60,10 +60,10 @@
 				<?=$template["name"]?>
 			</section>
 			<section class="view_action">
-				<a href="<?=$sroot?>edit/<?=$template["id"]?>/" class="icon_edit"></a>
+				<a href="<?=$section_root?>edit/<?=$template["id"]?>/" class="icon_edit"></a>
 			</section>
 			<section class="view_action">
-				<a href="<?=$sroot?>delete/<?=$template["id"]?>/" class="icon_delete"></a>
+				<a href="<?=$section_root?>delete/<?=$template["id"]?>/" class="icon_delete"></a>
 			</section>
 		</li>
 		<?
@@ -75,11 +75,11 @@
 
 <script type="text/javascript">
 	$("#basic_templates").sortable({ axis: "y", containment: "parent", handle: ".icon_sort", items: "li", placeholder: "ui-sortable-placeholder", tolerance: "pointer", update: function() {
-		$.ajax("<?=$aroot?>ajax/developer/order-templates/?sort=" + escape($("#basic_templates").sortable("serialize")), { type: "POST", data: { rel: <?=json_encode($rel_table)?> } }); 
+		$.ajax("<?=$admin_root?>ajax/developer/order-templates/?sort=" + escape($("#basic_templates").sortable("serialize")), { type: "POST", data: { rel: <?=json_encode($rel_table)?> } }); 
 	}});
 	
 	$("#routed_templates").sortable({ axis: "y", containment: "parent", handle: ".icon_sort", items: "li", placeholder: "ui-sortable-placeholder", tolerance: "pointer", update: function() {
-		$.ajax("<?=$aroot?>ajax/developer/order-templates/?sort=" + escape($("#routed_templates").sortable("serialize")), { type: "POST", data: { rel: <?=json_encode($rel_table)?> } }); 
+		$.ajax("<?=$admin_root?>ajax/developer/order-templates/?sort=" + escape($("#routed_templates").sortable("serialize")), { type: "POST", data: { rel: <?=json_encode($rel_table)?> } }); 
 	}});
 	
 	$(".icon_delete").click(function() {

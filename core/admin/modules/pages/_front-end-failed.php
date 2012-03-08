@@ -1,9 +1,9 @@
 <html>
 	<head>
-		<link rel="stylesheet" href="<?=$aroot?>css/main.css" type="text/css" media="screen" charset="utf-8" />
-		<script type="text/javascript" src="<?=$aroot?>js/lib.js"></script>
-		<script type="text/javascript" src="<?=$aroot?>js/main.js"></script>
-		<script type="text/javascript" src="<?=$aroot?>js/jcrop.min.js"></script>
+		<link rel="stylesheet" href="<?=$admin_root?>css/main.css" type="text/css" media="screen" charset="utf-8" />
+		<script type="text/javascript" src="<?=$admin_root?>js/lib.js"></script>
+		<script type="text/javascript" src="<?=$admin_root?>js/main.js"></script>
+		<script type="text/javascript" src="<?=$admin_root?>js/jcrop.min.js"></script>
 	</head>
 	<body>
 		<div id="bigtree_dialog_window" class="front_end_editor">
@@ -29,8 +29,8 @@
 					</div>
 				</div>
 				<footer>
-					<a href="<?=$aroot?>pages/front-end-edit/<?=$page?>/" class="button blue">Go Back</a>
-					<a href="<?=$aroot?>pages/front-end-return/<?=base64_encode($refresh_link)?>/" class="button white">Ignore</a>				
+					<a href="<?=$admin_root?>pages/front-end-edit/<?=$page?>/" class="button blue">Go Back</a>
+					<a href="<?=$admin_root?>pages/front-end-return/<?=base64_encode($refresh_link)?>/" class="button white">Ignore</a>				
 				</footer>
 			</div>
 		</div>

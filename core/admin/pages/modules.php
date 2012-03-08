@@ -19,9 +19,9 @@
 			<? foreach ($modules as $module) { ?>
 			<p class="module">
 				<? if ($admin->moduleActionExists($module["id"],"add")) { ?>
-				<a href="<?=$aroot?><?=$module["route"]?>/add/" class="add"><span class="icon_small icon_small_add"></span></a>
+				<a href="<?=$admin_root?><?=$module["route"]?>/add/" class="add"><span class="icon_small icon_small_add"></span></a>
 				<? } ?>
-				<a class="module_name" href="<?=$aroot?><?=$module["route"]?>/"><?=$module["name"]?></a>
+				<a class="module_name" href="<?=$admin_root?><?=$module["route"]?>/"><?=$module["name"]?></a>
 			</p>
 			<? } ?>
 		</section>
@@ -45,9 +45,9 @@
 			<? foreach ($modules as $module) { ?>
 			<p class="module">
 				<? if ($admin->moduleActionExists($module["id"],"add")) { ?>
-				<a href="<?=$aroot?><?=$module["route"]?>/add/" class="add"><span class="icon_small icon_small_add"></span></a>
+				<a href="<?=$admin_root?><?=$module["route"]?>/add/" class="add"><span class="icon_small icon_small_add"></span></a>
 				<? } ?>
-				<a class="module_name" href="<?=$aroot?><?=$module["route"]?>/"><?=$module["name"]?></a>
+				<a class="module_name" href="<?=$admin_root?><?=$module["route"]?>/"><?=$module["name"]?></a>
 			</p>
 			<? } ?>
 		</section>
@@ -65,9 +65,9 @@
 			<? foreach ($misc as $module) { ?>
 			<p class="module">
 				<? if ($admin->moduleActionExists($module["id"],"add")) { ?>
-				<a href="<?=$aroot?><?=$module["route"]?>/add/" class="add"><span class="icon_small icon_small_add"></span></a>
+				<a href="<?=$admin_root?><?=$module["route"]?>/add/" class="add"><span class="icon_small icon_small_add"></span></a>
 				<? } ?>
-				<a class="module_name" href="<?=$aroot?><?=$module["route"]?>/"><?=$module["name"]?></a>
+				<a class="module_name" href="<?=$admin_root?><?=$module["route"]?>/"><?=$module["name"]?></a>
 			</p>
 			<? } ?>
 		</section>

@@ -12,6 +12,6 @@
 	sqlquery("INSERT INTO bigtree_module_groups (`name`, `route`) VALUES ('$name', '$route')");
 
 	$admin->growl("Developer","Created Module Group");
-	header("Location: ".$saroot."modules/groups/view/");
+	header("Location: ".$developer_root."modules/groups/view/");
 	die();
 ?>

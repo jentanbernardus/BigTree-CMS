@@ -1,6 +1,6 @@
 <?
 	$js[] = "foundry.js";
-	$mroot = $saroot."foundry/";
+	$mroot = $developer_root."foundry/";
 	$actions = array(
 		"view" => "View Installed",
 		"modules" => "Download Modules",

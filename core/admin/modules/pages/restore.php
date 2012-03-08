@@ -5,6 +5,6 @@
 
 	$admin->growl("Pages","Restored Page");
 	
-	header("Location: ".$aroot."pages/view-tree/".$page["parent"]."/");
+	header("Location: ".$admin_root."pages/view-tree/".$page["parent"]."/");
 	die();
 ?>

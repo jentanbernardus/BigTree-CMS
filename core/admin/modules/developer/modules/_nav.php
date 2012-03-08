@@ -15,7 +15,7 @@
 <nav class="sub">
 	<ul>
 		<? foreach ($subnav as $item) { ?>
-		<li><a href="<?=$droot?>modules/<?=$item["route"]?>/"<? if ($item["route"] == $current) { ?> class="active"<? } ?>><span class="icon_small icon_small_<?=$item["class"]?>"></span><?=$item["title"]?></a></li>
+		<li><a href="<?=$developer_root?>modules/<?=$item["route"]?>/"<? if ($item["route"] == $current) { ?> class="active"<? } ?>><span class="icon_small icon_small_<?=$item["class"]?>"></span><?=$item["title"]?></a></li>
 		<? } ?>
 	</ul>
 </nav>

@@ -9,7 +9,7 @@
 <h1><span class="users"></span>Edit Token</h1>
 <? include bigtree_path("admin/modules/users/_nav.php"); ?>
 <div class="form_container">
-	<form class="module" action="<?=$aroot?>users/update-token/<?=end($path)?>/" method="post">
+	<form class="module" action="<?=$admin_root?>users/update-token/<?=end($path)?>/" method="post">
 		<section>
 			<fieldset>
 				<label>Token</label>

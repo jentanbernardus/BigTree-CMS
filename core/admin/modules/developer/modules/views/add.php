@@ -13,11 +13,11 @@
 <? include bigtree_path("admin/modules/developer/modules/_nav.php") ?>
 <div class="form_container">
 
-	<form method="post" action="<?=$saroot?>modules/views/create/<?=$id?>/" class="module">
+	<form method="post" action="<?=$developer_root?>modules/views/create/<?=$id?>/" class="module">
 		<section>
 			<? if ($r > 0) { ?>
 			<div class="alert">
-				<img src="<?=$aroot?>images/alert.png" alt="" />
+				<img src="<?=$admin_root?>images/alert.png" alt="" />
 				<p><strong>Default View Taken:</strong> If this view is for a different edit action, please specify the suffix below (i.e. edit-group's suffix is "group").</p>
 			</div>
 			<fieldset>

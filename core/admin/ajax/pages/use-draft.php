@@ -39,6 +39,6 @@
 	}
 	
 	$admin->growl("Pages","Loaded Saved Revision");
-	header("Location: ".$aroot."pages/edit/".$version["page"]."/");
+	header("Location: ".$admin_root."pages/edit/".$version["page"]."/");
 	die();
 ?>

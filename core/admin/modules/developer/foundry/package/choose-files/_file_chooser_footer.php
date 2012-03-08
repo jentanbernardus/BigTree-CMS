@@ -1,4 +1,4 @@
-	<p><img src="<?=$icon_root?>drive_cd.png" alt="" /> = with data &nbsp; &nbsp; <img src="<?=$icon_root?>application_view_columns.png" alt="" /> = structure only &nbsp; &nbsp; <small>(click to switch)</small></p>
+	<p><img src="<?=$admin_root?>images/drive_cd.png" alt="" /> = with data &nbsp; &nbsp; <img src="<?=$admin_root?>images/application_view_columns.png" alt="" /> = structure only &nbsp; &nbsp; <small>(click to switch)</small></p>
 	<ul>
 		<li class="package_column">
 			<strong>Tables</strong>

@@ -10,7 +10,7 @@
 	var currentDownload = 0;
 	
 	function startUpdateDownload() {
-		$.ajax("<?=$aroot?>ajax/developer/foundry/download-bigtree-update/", { type: "POST", data: downloads[currentDownload], complete: function(r) {
+		$.ajax("<?=$admin_root?>ajax/developer/foundry/download-bigtree-update/", { type: "POST", data: downloads[currentDownload], complete: function(r) {
 			$("#update_messages").append(r.responseText);
 			currentDownload++;
 			if (currentDownload < downloads.length) {

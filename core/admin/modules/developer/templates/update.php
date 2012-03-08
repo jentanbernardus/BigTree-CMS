@@ -38,6 +38,6 @@
 	sqlquery("UPDATE bigtree_templates SET resources = '$resources', image = '$image', name = '$name', module = '$module', description = '$description', level = '$level', callouts_enabled = '$callouts_enabled' WHERE id = '$id'");
 	
 	$admin->growl("Developer","Updated Template");
-	header("Location: ".$saroot."templates/view/");
+	header("Location: ".$developer_root."templates/view/");
 	die();
 ?>

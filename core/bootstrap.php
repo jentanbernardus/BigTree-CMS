@@ -8,7 +8,6 @@
 	$GLOBALS["site_root"] = $GLOBALS["server_root"]."site/";
 	$GLOBALS["www_root"] = $config["www_root"];
 	$GLOBALS["resource_root"] = $config["resource_root"];
-	$GLOBALS["icon_root"] = $config["www_root"]."admin/images/icons/";
 	$GLOBALS["gmaps_key"] = $config["gmaps_key"];
 	$GLOBALS["admin_ajax_root"] = $GLOBALS["server_root"]."core/admin/ajax/";
 	if (isset($config["root_page"])) {

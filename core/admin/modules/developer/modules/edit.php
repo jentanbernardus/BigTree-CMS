@@ -30,7 +30,7 @@
 <h1><span class="icon_developer_modules"></span><?=$mod["name"]?></h1>
 <? include bigtree_path("admin/modules/developer/modules/_nav.php"); ?>
 <div class="form_container">
-	<form method="post" action="<?=$saroot?>modules/update/<?=end($path)?>/" enctype="multipart/form-data" class="module left">
+	<form method="post" action="<?=$developer_root?>modules/update/<?=end($path)?>/" enctype="multipart/form-data" class="module left">
 		<section>
 			<div class="left">
 				<fieldset>
@@ -119,7 +119,7 @@
 
 <div class="table">
 	<summary>
-		<a href="<?=$saroot?>modules/views/add/<?=$mod["id"]?>/" class="add">Add</a>
+		<a href="<?=$developer_root?>modules/views/add/<?=$mod["id"]?>/" class="add">Add</a>
 		<h2>Module Views <small><?=$mod["name"]?></small></h2>
 	
 	</summary>
@@ -133,9 +133,9 @@
 		<? foreach ($views as $view) { ?>
 		<li>
 			<section class="developer_view_name">View <?=$view["title"]?></section>
-			<section class="view_action"><a href="<?=$saroot?>modules/views/style/<?=$view["id"]?>/" class="icon_preview"></a></section>
-			<section class="view_action"><a href="<?=$saroot?>modules/views/edit/<?=$view["id"]?>/" class="icon_edit"></a></section>
-			<section class="view_action"><a href="<?=$saroot?>modules/views/delete/<?=$id?>/<?=$view["id"]?>/" class="icon_delete"></a></section>
+			<section class="view_action"><a href="<?=$developer_root?>modules/views/style/<?=$view["id"]?>/" class="icon_preview"></a></section>
+			<section class="view_action"><a href="<?=$developer_root?>modules/views/edit/<?=$view["id"]?>/" class="icon_edit"></a></section>
+			<section class="view_action"><a href="<?=$developer_root?>modules/views/delete/<?=$id?>/<?=$view["id"]?>/" class="icon_delete"></a></section>
 		</li>
 		<? } ?>
 	</ul>
@@ -143,7 +143,7 @@
 
 <div class="table">
 	<summary>
-		<a href="<?=$saroot?>modules/forms/add/<?=$mod["id"]?>/" class="add">Add</a>
+		<a href="<?=$developer_root?>modules/forms/add/<?=$mod["id"]?>/" class="add">Add</a>
 		<h2>Module Forms <small><?=$mod["name"]?></small></h2>
 	</summary>
 	<header>
@@ -155,8 +155,8 @@
 		<? foreach ($forms as $form) { ?>
 		<li>
 			<section class="developer_templates_name">Add/Edit <?=$form["title"]?></section>
-			<section class="view_action"><a href="<?=$saroot?>modules/forms/edit/<?=$form["id"]?>/" class="icon_edit"></a></section>
-			<section class="view_action"><a href="<?=$saroot?>modules/forms/delete/<?=$id?>/<?=$form["id"]?>/" class="icon_delete"></a></section>
+			<section class="view_action"><a href="<?=$developer_root?>modules/forms/edit/<?=$form["id"]?>/" class="icon_edit"></a></section>
+			<section class="view_action"><a href="<?=$developer_root?>modules/forms/delete/<?=$id?>/<?=$form["id"]?>/" class="icon_delete"></a></section>
 		</li>
 		<? } ?>
 	</ul>
@@ -164,7 +164,7 @@
 
 <div class="table">
 	<summary>
-		<a href="<?=$saroot?>modules/actions/add/<?=$mod["id"]?>/" class="add">Add</a>
+		<a href="<?=$developer_root?>modules/actions/add/<?=$mod["id"]?>/" class="add">Add</a>
 		<h2>Module Actions <small><?=$mod["name"]?></small></h2>
 	</summary>
 	<header>
@@ -176,8 +176,8 @@
 		<? foreach ($actions as $action) { ?>
 		<li id="row_<?=$action["id"]?>">
 			<section class="developer_templates_name"><span class="icon_sort"></span><?=$action["name"]?></section>
-			<section class="view_action"><a href="<?=$saroot?>modules/actions/edit/<?=$action["id"]?>/" class="icon_edit"></a></section>
-			<section class="view_action"><a href="<?=$saroot?>modules/actions/delete/<?=$id?>/<?=$action["id"]?>/" class="icon_delete"></a></section>
+			<section class="view_action"><a href="<?=$developer_root?>modules/actions/edit/<?=$action["id"]?>/" class="icon_edit"></a></section>
+			<section class="view_action"><a href="<?=$developer_root?>modules/actions/delete/<?=$id?>/<?=$action["id"]?>/" class="icon_delete"></a></section>
 		</li>
 		<? } ?>
 	</ul>
@@ -187,7 +187,7 @@
 
 <script type="text/javascript">
 	$("#actions").sortable({ axis: "y", containment: "parent", handle: ".icon_sort", items: "li", placeholder: "ui-sortable-placeholder", tolerance: "pointer", update: function() {
-		$.ajax("<?=$aroot?>ajax/developer/order-module-actions/?sort=" + escape($("#actions").sortable("serialize"))); 
+		$.ajax("<?=$admin_root?>ajax/developer/order-module-actions/?sort=" + escape($("#actions").sortable("serialize"))); 
 	}});
 
 	$(".table .icon_delete").click(function() {
