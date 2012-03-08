@@ -7,7 +7,7 @@
 		
 		if ($parent[0] == "p") {
 			// Pending page, get the parent instead.
-			$c = $admin->getChangeById(substr($parent,1));
+			$c = $admin->getChange(substr($parent,1));
 			$cc = json_decode($c["changes"],true);
 			$parent = $cc["parent"];
 		}

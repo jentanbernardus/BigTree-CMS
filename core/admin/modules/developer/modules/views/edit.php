@@ -1,7 +1,7 @@
 <?	
 	$view = $admin->getModuleView(end($path));
 	$action = $admin->getModuleActionForView(end($path));
-	$module = $admin->getModuleById($action["module"]);
+	$module = $admin->getModule($action["module"]);
 
 	$breadcrumb[] = array("title" => $module["name"], "link" => "developer/modules/edit/".$module["id"]."/");
 	$breadcrumb[] = array("title" => "Edit View", "link" => "#");

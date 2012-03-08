@@ -547,6 +547,39 @@
 		}
 		
 		/*
+			Function: getAutoModuleActions
+				Return a list of module forms and views.
+				Used by the API for reconstructing forms and views.
+			
+			Parameters:
+				module - The module id to pull forms/views for.
+			
+			Returns:
+				An array of module actions with "form" and "view" columns replaced with form and view data.
+			
+			See Also:
+				<BigTreeAutoModule.getForm>
+				<BigTreeAutoModule.getView>
+		*/
+		
+		function getAutoModuleActions($module) {
+			$items = array();
+			$id = mysql_real_escape_string($module);
+			$q = sqlquery("SELECT * FROM bigtree_module_actions WHERE module = '$id' AND (form != 0 OR view != 0) AND in_nav = 'on' ORDER BY position DESC, id ASC");
+			while ($f = sqlfetch($q)) {
+				if ($f["form"]) {
+					$f["form"] = BigTreeAutoModule::getForm($f["form"]);
+					$f["type"] = "form";
+				} elseif ($f["view"]) {
+					$f["view"] = BigTreeAutoModule::getView($f["view"]);
+					$f["type"] = "view";
+				}
+				$items[] = $f;
+			}
+			return $items;
+		}
+		
+		/*
 			Function: getAvailableModuleRoute
 				Returns a route for a module that won't collide with another module.
 			
@@ -605,6 +638,61 @@
 		}
 		
 		/*
+			Function: getChange
+				Get a pending change.
+			
+			Parameters:
+				id - The id of the pending change.
+			
+			Returns:
+				A pending change entry from the bigtree_pending_changes table.
+		*/
+
+		function getChange($id) {
+			return sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE id = '$id'"));
+		}
+
+		/*
+			Function: getChangeEditLink
+				Returns a link to where the item involved in the pending change can be edited.
+
+			Parameters:
+				change - The ID of the change or the change array from the database.
+
+			Returns:
+				A string containing a link to the admin.
+		*/
+
+		function getChangeEditLink($change) {
+			if (!is_array($change)) {
+				$change = sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE id = '$change'"));
+			}
+
+			if ($change["table"] == "bigtree_pages" && $change["item_id"]) {
+				return $GLOBALS["admin_root"]."pages/edit/".$change["item_id"]."/";
+			}
+
+			if ($change["table"] == "bigtree_pages") {
+				return $GLOBALS["admin_root"]."pages/edit/p".$change["id"]."/";
+			}
+
+			$modid = $change["module"];
+			$module = sqlfetch(sqlquery("SELECT * FROM bigtree_modules WHERE id = '$modid'"));
+			$form = sqlfetch(sqlquery("SELECT * FROM bigtree_module_forms WHERE `table` = '".$change["table"]."'"));
+			$action = sqlfetch(sqlquery("SELECT * FROM bigtree_module_actions WHERE `form` = '".$form["id"]."' AND in_nav = ''"));
+
+			if (!$change["item_id"]) {
+				$change["item_id"] = "p".$change["id"];
+			}
+
+			if ($action) {
+				return $GLOBALS["admin_root"].$module["route"]."/".$action["route"]."/".$change["item_id"]."/";
+			} else {
+				return $GLOBALS["admin_root"].$module["route"]."/edit/".$change["item_id"]."/";
+			}
+		}
+		
+		/*
 			Function: getFullNavigationPath
 				Calculates the full navigation path for a given page ID.
 			
@@ -649,6 +737,109 @@
 				$nav[] = $nav_item;
 			}
 			return $nav;
+		}
+		
+		/*
+			Function: getModule
+				Returns an entry from the bigtree_modules table.
+			
+			Parameters:
+				id - The id of the module.
+			
+			Returns:
+				A module entry with the "gbp" column decoded.
+		*/
+
+		function getModule($id) {
+			$id = mysql_real_escape_string($id);
+			$module = sqlfetch(sqlquery("SELECT * FROM bigtree_modules WHERE id = '$id'"));
+			if (!$module) {
+				return false;
+			}
+
+			$module["gbp"] = json_decode($module["gbp"],true);
+			return $module;
+		}
+		
+		/*
+			Function: getModuleAction
+				Returns an entry from the bigtree_module_actions table.
+			
+			Parameters:
+				id - The id of the action.
+			
+			Returns:
+				A module action entry.
+		*/
+
+		function getModuleAction($id) {
+			$id = mysql_real_escape_string($id);
+			return sqlfetch(sqlquery("SELECT * FROM bigtree_module_actions WHERE id = '$id'"));
+		}
+		
+		/*
+			Function: getModuleActionForForm
+				Returns the related module action for an auto module form.
+			
+			Parameters:
+				form - The id of a form or a form entry.
+			
+			Returns:
+				A module action entry.
+		*/
+
+		function getModuleActionForForm($form) {
+			if (is_array($form)) {
+				$form = mysql_real_escape_string($form["id"]);
+			} else {
+				$form = mysql_real_escape_string($form);
+			}
+			return sqlfetch(sqlquery("SELECT * FROM bigtree_module_actions WHERE form = '$form'"));
+		}
+		
+		/*
+			Function: getModuleActionForView
+				Returns the related module action for an auto module view.
+			
+			Parameters:
+				view - The id of a view or a view entry.
+			
+			Returns:
+				A module action entry.
+		*/
+
+		function getModuleActionForView($view) {
+			if (is_array($form)) {
+				$view = mysql_real_escape_string($view["id"]);
+			} else {
+				$view = mysql_real_escape_string($view);
+			}
+			return sqlfetch(sqlquery("SELECT * FROM bigtree_module_actions WHERE view = '$view'"));
+		}
+		
+		/*
+			Function: getModuleActions
+				Returns a list of module actions in positioned order.
+			
+			Parameters:
+				module - A module id or a module entry.
+			
+			Returns:
+				An array of module action entries.
+		*/
+
+		function getModuleActions($module) {
+			if (is_array($module)) {
+				$module = mysql_real_escape_string($module["id"]);
+			} else {
+				$module = mysql_real_escape_string($module);
+			}
+			$items = array();
+			$q = sqlquery("SELECT * FROM bigtree_module_actions WHERE module = '$module' ORDER BY position DESC, id ASC");
+			while ($f = sqlfetch($q)) {
+				$items[] = $f;
+			}
+			return $items;
 		}
 		
 		/*
@@ -1385,121 +1576,18 @@
 
 			return $page;
 		}
-
-		// !Editor/Publisher Functions
-
-		function getChangeById($id) {
-			return sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE id = '$id'"));
-		}
-
+		
 		/*
-			Function: getChangeEditLink
-				Returns a link to where the item involved in the pending change can be edited.
-
+			Function: getModuleByRoute
+				Returns a module entry for the given route.
+			
 			Parameters:
-				change - The ID of the change or the change array from the database.
-
+				route - A module route.
+			
 			Returns:
-				A string containing a link to the admin.
+				A module entry with the "gbp" column decoded or false if a module was not found.
 		*/
-
-		function getChangeEditLink($change) {
-			if (!is_array($change)) {
-				$change = sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE id = '$change'"));
-			}
-
-			if ($change["table"] == "bigtree_pages" && $change["item_id"]) {
-				return $GLOBALS["admin_root"]."pages/edit/".$change["item_id"]."/";
-			}
-
-			if ($change["table"] == "bigtree_pages") {
-				return $GLOBALS["admin_root"]."pages/edit/p".$change["id"]."/";
-			}
-
-			$modid = $change["module"];
-			$module = sqlfetch(sqlquery("SELECT * FROM bigtree_modules WHERE id = '$modid'"));
-			$form = sqlfetch(sqlquery("SELECT * FROM bigtree_module_forms WHERE `table` = '".$change["table"]."'"));
-			$action = sqlfetch(sqlquery("SELECT * FROM bigtree_module_actions WHERE `form` = '".$form["id"]."' AND in_nav = ''"));
-
-			if (!$change["item_id"]) {
-				$change["item_id"] = "p".$change["id"];
-			}
-
-			if ($action) {
-				return $GLOBALS["admin_root"].$module["route"]."/".$action["route"]."/".$change["item_id"]."/";
-			} else {
-				return $GLOBALS["admin_root"].$module["route"]."/edit/".$change["item_id"]."/";
-			}
-		}
-
-		// !Module Functions
-
-		function getActionId($module,$action) {
-			$f = sqlfetch(sqlquery("SELECT id FROM bigtree_module_actions WHERE route = '$action' AND module = '$module'"));
-			if (!$f) {
-				return false;
-			}
-			return $f["id"];
-		}
-
-		function getAutoModuleActions($module) {
-			$am = new BigTreeAutoModule;
-			$items = array();
-			$id = mysql_real_escape_string($module);
-			$q = sqlquery("SELECT * FROM bigtree_module_actions WHERE module = '$id' AND (form != 0 OR view != 0) AND in_nav = 'on' ORDER BY position DESC, id ASC");
-			while ($f = sqlfetch($q)) {
-				if ($f["form"]) {
-					$f["form"] = $am->getForm($f["form"]);
-					$f["type"] = "form";
-				} elseif ($f["view"]) {
-					$f["view"] = $am->getView($f["view"]);
-					$f["type"] = "view";
-				}
-				$items[] = $f;
-			}
-			return $items;
-		}
-
-		function getModule($id) {
-			$id = mysql_real_escape_string($id);
-			$module = sqlfetch(sqlquery("SELECT * FROM bigtree_modules WHERE id = '$id'"));
-			if (!$module) {
-				return false;
-			}
-
-			$module["gbp"] = json_decode($module["gbp"],true);
-			return $module;
-		}
-
-		function getModuleAction($id) {
-			$id = mysql_real_escape_string($id);
-			return sqlfetch(sqlquery("SELECT * FROM bigtree_module_actions WHERE id = '$id'"));
-		}
-
-		function getModuleActionForForm($id) {
-			$id = mysql_real_escape_string($id);
-			return sqlfetch(sqlquery("SELECT * FROM bigtree_module_actions WHERE form = '$id'"));
-		}
-
-		function getModuleActionForView($id) {
-			$id = mysql_real_escape_string($id);
-			return sqlfetch(sqlquery("SELECT * FROM bigtree_module_actions WHERE view = '$id'"));
-		}
-
-		function getModuleActions($module) {
-			$items = array();
-			$id = mysql_real_escape_string($module);
-			$q = sqlquery("SELECT * FROM bigtree_module_actions WHERE module = '$id' ORDER BY position DESC, id ASC");
-			while ($f = sqlfetch($q)) {
-				$items[] = $f;
-			}
-			return $items;
-		}
-
-		function getModuleActionById($id) { return $this->getModuleAction($id); }
-
-		function getModuleById($id) { return $this->getModule($id); }
-
+		
 		function getModuleByRoute($route) {
 			$route = mysql_real_escape_string($route);
 			$module = sqlfetch(sqlquery("SELECT * FROM bigtree_modules WHERE route = '$route'"));
@@ -1510,6 +1598,10 @@
 			$module["gbp"] = json_decode($module["gbp"],true);
 			return $module;
 		}
+		
+		/*
+			Function: getModuleForm
+		*/
 
 		function getModuleForm($id) {
 			$id = mysql_real_escape_string($id);

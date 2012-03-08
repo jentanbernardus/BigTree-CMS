@@ -1,5 +1,5 @@
 <?
-	$mod = $admin->getModuleById($commands[0]);
+	$mod = $admin->getModule($commands[0]);
 	$table = $commands[1];
 	
 	if (!$title) {

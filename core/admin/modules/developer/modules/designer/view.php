@@ -5,7 +5,7 @@
 		$title = (substr($commands[2],-1,1) != "s") ? $commands[2]."s" : $commands[2];
 	}
 	
-	$mdata = $admin->getModuleById($mod);
+	$mdata = $admin->getModule($mod);
 ?>
 <h1><span class="icon_developer_modules"></span>Module Designer</h1>
 <? include bigtree_path("admin/modules/developer/modules/_nav.php"); ?>

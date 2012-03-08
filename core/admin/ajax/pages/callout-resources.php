@@ -16,6 +16,8 @@
 		$bigtree_sidelet_count = $_POST["count"];
 	}
 	
+	$type = isset($_POST["type"]) ? $_POST["type"] : $type;
+	
 	$s = sqlfetch(sqlquery("SELECT * FROM bigtree_callouts WHERE id = '$type'"));
 	$fields = json_decode($s["resources"],true);
 	

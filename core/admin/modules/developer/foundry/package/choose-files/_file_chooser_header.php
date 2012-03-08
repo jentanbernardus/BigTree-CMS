@@ -1,7 +1,7 @@
 <?
 	function gatherModuleInformation($mid) {
 		global $admin,$cms,$autoModule,$tables,$templates,$settings,$feeds,$class_files,$required_files,$other_files,$server_root,$site_root;
-		$m = $admin->getModuleById($mid);
+		$m = $admin->getModule($mid);
 		$actions = $admin->getModuleActions($m["id"]);
 		
 		// Get all the tables of the module's actions.
