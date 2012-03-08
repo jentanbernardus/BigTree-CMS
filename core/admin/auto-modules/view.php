@@ -9,6 +9,7 @@
 ?>
 <h1>
 	<span class="modules"></span><?=$view["title"]?>
+	<? if (count($subnav)) { ?>
 	<div class="jump_group">
 		<span class="icon"></span>
 		<div class="dropdown">
@@ -18,6 +19,7 @@
 			<? } ?>
 		</div>
 	</div>
+	<? } ?>
 </h1>
 <?
 	include bigtree_path("admin/auto-modules/_nav.php");
