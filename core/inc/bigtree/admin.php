@@ -2088,6 +2088,9 @@
 					$$key = mysql_real_escape_string(htmlspecialchars($val));
 				}
 			}
+			
+			// We don't want this encoded since it's a WYSIWYG field.
+			$description = mysql_real_escape_string($data["description"]);
 
 			// See if there's already a setting with this ID
 			$r = sqlrows(sqlquery("SELECT id FROM bigtree_settings WHERE id = '$id'"));
@@ -2248,9 +2251,12 @@
 
 			foreach ($data as $key => $val) {
 				if (substr($key,0,1) != "_" && !is_array($val)) {
-					$$key = mysql_real_escape_string($val);
+					$$key = mysql_real_escape_string(htmlspecialchars($val));
 				}
 			}
+			
+			// We don't want this encoded since it's a WYSIWYG field.
+			$description = mysql_real_escape_string($data["description"]);
 
 			if ($old_id != $id) {
 				$r = sqlrows(sqlquery("SELECT id FROM bigtree_settings WHERE id = '$id'"));
