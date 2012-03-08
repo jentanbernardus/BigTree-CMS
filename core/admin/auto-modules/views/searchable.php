@@ -89,7 +89,9 @@
 	$("#view_paging a").live("click",function() {
 		mpage = BigTree.CleanHref($(this).attr("href"));
 		if ($(this).hasClass("active") || $(this).hasClass("disabled"))
-			return;
+			return false;
 		$("#results").load("<?=$admin_root?>ajax/auto-modules/views/searchable-page/?sort=" + escape(sort) + "&sort_direction=" + escape(sortdir) + "&view=<?=$view["id"]?>&module=<?=$module["route"]?>&search=" + search + "&page=" + mpage);
+
+		return false;
 	});
 </script>
