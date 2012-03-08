@@ -42,12 +42,18 @@
 			header("Content-type: text/javascript");
 			die($data);
 		} else {
-			$headers = apache_request_headers();
-			if (!$headers) {
+			// Added a line to .htaccess to hopefully give us IF_MODIFIED_SINCE when running as CGI
+			if (function_exists("apache_request_headers")) {
+				$headers = apache_request_headers();
+				$lms = $headers["If-Modified-Since"];
+			} else {
+				$lms = $_SERVER["HTTP_IF_MODIFIED_SINCE"];
+			}
+			
+			if (!$lms) {
 				header("Content-type: text/javascript");
 				die(file_get_contents($cfile));
-			}
-			if ($headers["If-Modified-Since"] && strtotime($headers["If-Modified-Since"]) == $last_modified) {
+			} elseif (strtotime($lms) == $last_modified) {
 				header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_modified).' GMT', true, 304);
 				die();
 			} else {
@@ -98,12 +104,18 @@
 			header("Content-type: text/css");
 			die($data);
 		} else {
-			$headers = apache_request_headers();
-			if (!$headers) {
+			// Added a line to .htaccess to hopefully give us IF_MODIFIED_SINCE when running as CGI
+			if (function_exists("apache_request_headers")) {
+				$headers = apache_request_headers();
+				$lms = $headers["If-Modified-Since"];
+			} else {
+				$lms = $_SERVER["HTTP_IF_MODIFIED_SINCE"];
+			}
+			
+			if (!$lms) {
 				header("Content-type: text/css");
 				die(file_get_contents($cfile));
-			}
-			if ($headers["If-Modified-Since"] && strtotime($headers["If-Modified-Since"]) == $last_modified) {
+			} elseif (strtotime($lms) == $last_modified) {
 				header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_modified).' GMT', true, 304);
 				die();
 			} else {

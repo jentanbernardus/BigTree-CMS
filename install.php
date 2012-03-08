@@ -273,6 +273,8 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^(.*)$ index.php?bigtree_htaccess_url=$1 [QSA,L]
 
+RewriteRule .* - [E=HTTP_IF_MODIFIED_SINCE:%{HTTP:If-Modified-Since}]
+
 php_flag short_open_tag On
 php_flag magic_quotes_gpc Off');
 
