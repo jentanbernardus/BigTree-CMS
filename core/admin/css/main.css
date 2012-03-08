@@ -535,7 +535,6 @@
 
 	#callout_type { background-gradient: #F6F6F6 #FFFFFF; border-bottom: 1px solid #E5E5E5; margin: -20px -20px 20px -20px; padding: 20px; }
 	#callout_resources { height: 250px; margin: -20px; overflow: auto; padding: 20px; width: 450px; }
-	#bigtree_dialog_form #callout_resources fieldset:last-child { margin: 0 0 20px 0; }
 
 	.page_url { float: right; padding: 8px 10px 0 0; }
 	.page_url a { color: #333; }
@@ -810,7 +809,6 @@
 	#bigtree_dialog_form h4:first-child { margin-top: -10px; }
 	#bigtree_dialog_form h4 a { display: block; float: right; margin-right: 2px; }
 	#bigtree_dialog_form fieldset { display: block; margin: 0 0 15px 0; }
-	#bigtree_dialog_form fieldset:last-of-type { margin: 0; }
 	#bigtree_dialog_form select { display: block; margin: 0 0 5px 0; }
 	#bigtree_dialog_form input[type=text] { display: block; width: 418px; }
 	#bigtree_dialog_form input[type=checkbox] { margin-left: 0px; }
@@ -841,6 +839,7 @@
 	#bigtree_dialog_window.front_end_editor .overflow { height: 457px; max-height: none; width: 778px; }
 	#bigtree_dialog_window.front_end_editor input[type=text] { width: 760px; }
 	#bigtree_dialog_window.front_end_editor input[type=submit] { margin-left: 10px; }
+	#bigtree_dialog_window #image_uploader_options { margin: 0 0 15px 0; }
 	
 /*---------------------------
 	BigTree File Browser
