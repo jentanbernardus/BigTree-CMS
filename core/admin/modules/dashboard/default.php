@@ -28,10 +28,10 @@
 	// Get Google Analytics Traffic
 	$ga_cache = $cms->getSetting("bigtree-internal-google-analytics-cache");
 	// Only show this thing if they have Google Analytics setup already
-	if (count($ga_cache["two_week"])) {
+	if ($ga_cache && count($ga_cache["two_week"])) {
 		$visits = $ga_cache["two_week"];
-		$min = min($visits);
-		$max = max($visits) - $min;
+		$min = min((is_array($visits)) ? $visits : array($visits));
+		$max = max((is_array($visits)) ? $visits : array($visits)) - $min;
 		$bar_height = 70;
 ?>
 <div class="table">
@@ -43,6 +43,9 @@
 		</h2>
 	</summary>
 	<section>
+		<?
+			if($visits) {
+		?>
 		<div class="graph">
 			<?
 				$x = 0;
@@ -54,17 +57,24 @@
 			    <?=$count?>
 			</section>
 			<?
-			    }
-			    
-			    $x = 0;
-			    foreach ($visits as $date => $count) {
-			    	$x++;
+				}
+			   	
+			   	$x = 0;
+			   	foreach ($visits as $date => $count) {
+			   		$x++;
 			?>
 			<section class="date<? if ($x == 14) { ?> last<? } elseif ($x == 1) { ?> first<? } ?>"><?=date("n/j/y",strtotime($date))?></section>
 			<?
-			    }
+				}
 			?>
 		</div>
+		<?
+			} else {
+		?>
+		<p>No recent traffic</p>
+		<?
+			}
+		?>
 	</section>
 </div>
 <?

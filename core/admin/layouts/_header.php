@@ -1,4 +1,10 @@
 <?
+	$mgroups = array();
+	$modulegroups = $admin->getModuleGroups();
+	foreach ($modulegroups as $mg) {
+		$mgroups[] = array("link" => $mg["route"], "title" => $mg["name"], "access" => 0);
+	}
+	
 	$nav = array(
 		array("link" => "dashboard", "title" => "Dashboard", "access" => 0, "children" => array(
 			array("link" => "overview", "title" => "Overview", "access" => 0),
@@ -7,10 +13,12 @@
 			array("link" => "vitals-statistics", "title" => "Vitals &amp; Statistics", "access" => 1)
 		)),
 		array("link" => "pages", "title" => "Pages", "access" => 0),
-		array("link" => "modules", "title" => "Modules", "access" => 0),
+		array("link" => "modules", "title" => "Modules", "access" => 0, "children" => $mgroups),
 		array("link" => "users", "title" => "Users", "access" => 1, "children" => array(
+/*
 			array("link" => "view", "title" => "View Users", "access" => 1),
 			array("link" => "tokens", "title" => "View API Tokens", "access" => 1)
+*/
 		)),
 		array("link" => "settings", "title" => "Settings", "access" => 1),
 		array("link" => "developer", "title" => "Developer", "access" => 2, "children" => array(

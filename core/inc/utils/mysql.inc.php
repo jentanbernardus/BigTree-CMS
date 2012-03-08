@@ -24,7 +24,7 @@
 	}
 
 	// If we're splitting writes off, make a different sqlquery function.  We're doing two functions so that the normal one doesn't need to figure out which connection to use and just uses the default.
-	if ($config["db_write"]["host"]) {
+	if (isset($config["db_write"]) && $config["db_write"]["host"]) {
 		function sqlquery($query,$connection = false,$type = "read") {
 			global $sqlerrors;
 			

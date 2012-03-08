@@ -2,7 +2,7 @@
 	$breadcrumb[] = array("title" => "Edit Group", "link" => "developer/modules/groups/edit/$id/");
 
 	$id = end($path);
-	$item = $admin->getModuleGroup($id);
+	$group = $admin->getModuleGroup($id);
 ?>
 <h1><span class="icon_developer_modules"></span>Edit Group</h1>
 <? include bigtree_path("admin/modules/developer/modules/_nav.php"); ?>
@@ -14,7 +14,7 @@
 			<div class="left">
 				<fieldset>
 					<label class="required">Name</label>
-					<input type="text" name="name" value="<?=htmlspecialchars($item["name"])?>" class="required" />
+					<input type="text" name="name" value="<?=htmlspecialchars_decode($group["name"])?>" class="required" />
 				</fieldset>
 			</div>
 		</section>

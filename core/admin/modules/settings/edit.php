@@ -11,7 +11,7 @@
 	}
 ?>
 <h1><span class="settings"></span>Edit Setting</h1>
-
+<? include bigtree_path("admin/layouts/_tinymce.php"); ?>
 <div class="form_container">
 	<header>
 		<h2><?=$item["name"]?></h2>
@@ -30,6 +30,19 @@
 				$value = $item["value"];
 				$key = $item["id"];
 				include bigtree_path("admin/form-field-types/draw/".$t.".php");
+				
+				$mce_width = 898;
+				$mce_height = 365;
+				
+				if (count($htmls)) {
+					include bigtree_path("admin/layouts/_tinymce_specific.php");
+				}
+				if (count($small_htmls)) {
+					include bigtree_path("admin/layouts/_tinymce_block_small.php");
+				}
+				if (count($simplehtmls)) {
+					include bigtree_path("admin/layouts/_tinymce_specific_simple.php");
+				}
 			?>
 		</section>
 		<footer>

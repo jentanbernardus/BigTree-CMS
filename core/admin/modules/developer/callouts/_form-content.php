@@ -1,3 +1,7 @@
+<?
+	$cached_types = $admin->getCachedFieldTypes();
+	$types = $cached_types["callout"];
+?>
 <section>
 	<div class="left">
 		<? if (!$callout) { ?>
@@ -59,7 +63,7 @@
 				</section>
 				<section class="developer_resource_type">
 					<select name="resources[<?=$x?>][type]" id="type_<?=$x?>">
-						<? foreach ($admin->CalloutFieldTypes as $k => $v) { ?>
+						<? foreach ($types as $k => $v) { ?>
 						<option value="<?=$k?>"<? if ($k == $resource["type"]) { ?> selected="selected"<? } ?>><?=htmlspecialchars($v)?></option>
 						<? } ?>
 					</select>

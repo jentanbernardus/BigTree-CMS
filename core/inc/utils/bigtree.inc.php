@@ -93,6 +93,7 @@
 	function bigtree_parse_css3($css) {
 		$GLOBALS["browser"] = get_user_browser();
 		// Border Radius - border-radius: 0px 0px 0px 0px
+/*
 		$css = preg_replace_callback('/border-radius:([^\"]*);/iU',create_function('$data','
 			$radii = explode(" ",trim($data[1]));
 			if (count($radii) == 1) {
@@ -107,6 +108,7 @@
 				return "border-top-left-radius: $tl; border-top-right-radius: $tr; border-bottom-right-radius: $br; border-bottom-left-radius: $bl; -webkit-border-top-left-radius: $tl; -webkit-border-top-right-radius: $tr; -webkit-border-bottom-right-radius: $br; -webkit-border-bottom-left-radius: $bl; -moz-border-radius-topleft: $tl; -moz-border-radius-topright: $tr; -moz-border-radius-bottomright: $br; -moz-border-radius-bottomleft: $bl;";
 			}
 		'),$css);
+*/
 		
 		// Border Radius Top Left - border-radius-top-left: 0px
 		$css = preg_replace_callback('/border-radius-top-left:([^\"]*);/iU',create_function('$data','
@@ -518,7 +520,7 @@
 	
 	// Get a file prefix for a full path.
 	function file_prefix($file,$prefix) {
-		$pinfo = safe_pathinfo($value);
+		$pinfo = safe_pathinfo($file);
 		return $pinfo["dirname"]."/".$prefix.$pinfo["basename"];
 	}
 	
@@ -740,6 +742,25 @@
 		$parray[] = "...";
 		$parray[] = $pages;
 		return $parray;
+	}
+	
+	function bigtree_module_exists($class_name = false) {
+		if (in_array($class_name, array_keys($GLOBALS["module_list"]))) {
+			return true;
+		}
+		return false;
+	}
+	
+	function bigtree_redirect($url = false, $type = "302") {
+		if (!$url) {
+			return false;
+		} else if ($type == "301") {
+			header ('HTTP/1.1 301 Moved Permanently');
+		} else if ($type == "404") {
+			header('HTTP/1.0 404 Not Found');
+		}
+		header("Location: " . $url);
+		die();
 	}
 
 	// Cleans up HTML to take out tags we don't want in a body, based on a modified version of Christian Stocker's lx_externalinput_clean Class

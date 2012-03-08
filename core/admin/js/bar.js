@@ -36,6 +36,8 @@ function bigtree_show_bar() {
 	bigtree_bar_body_padding = parseInt(bigtree_bar_get_style(bigtree_bar_body,"padding-top"));
 	bigtree_bar_body.style.paddingTop = (bigtree_bar_body_padding + 40) + "px";
 	
+	document.getElementsByTagName('body')[0].className += ' bigtree_bar_open';
+	
 	// Add the bar
 	bigtree_bar = document.createElement("div");
 	bigtree_bar.setAttribute("id","bigtree_bar");
@@ -57,6 +59,9 @@ function bigtree_show_bar() {
 		}
 		bigtree_bar_body.removeChild(document.getElementById("bigtree_bar"));
 		bigtree_bar_body.style.paddingTop = bigtree_bar_body_padding + "px";
+		
+		var bodyClass = document.getElementsByTagName('body')[0].className.replace("bigtree_bar_open", "").trim();
+		document.getElementsByTagName('body')[0].className = bodyClass;
 		
 		bigtree_bar_create_cookie("hide_bigtree_bar","on",365);
 		

@@ -24,10 +24,10 @@
 	define("SITE_ROOT",$GLOBALS["site_root"]);
 	
 	// Include required utility functions
-	if (file_exists("../custom/inc/utils/bigtree.inc.php")) {
-		include "../custom/inc/utils/bigtree.inc.php";
+	if (file_exists($server_root."custom/inc/utils/bigtree.inc.php")) {
+		include $server_root."custom/inc/utils/bigtree.inc.php";
 	} else {
-		include "inc/utils/bigtree.inc.php";
+		include $server_root."core/inc/utils/bigtree.inc.php";
 	}
 	
 	// Connect to MySQL and include the shorterner functions

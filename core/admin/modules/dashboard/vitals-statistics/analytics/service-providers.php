@@ -4,7 +4,10 @@
 	
 	$cache = $cms->getSetting("bigtree-internal-google-analytics-cache"); 
 ?>
-<h1><span class="analytics"></span>Service Providers</h1>
+<h1>
+	<span class="analytics"></span>Service Providers
+	<? include bigtree_path("admin/modules/dashboard/vitals-statistics/_jump.php"); ?>
+</h1>
 <? include bigtree_path($relative_path."_nav.php") ?>
 <div class="table">
 	<summary>
