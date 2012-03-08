@@ -712,8 +712,9 @@
 	.table .developer_feeds_name { padding: 0 0 0 15px; text-align: left; width: 220px; }
 	.table .developer_feeds_url { padding: 0 0 0 15px; text-align: left; width: 420px; }
 	.table .developer_feeds_type { padding: 0 0 0 15px; text-align: left; width: 149px; }
-	.table .developer_settings_name { padding: 0 0 0 15px; text-align: left; width: 505px; }
-	.table .developer_settings_id { padding: 0 0 0 15px; text-align: left; width: 299px; }
+	.table .developer_settings_name { padding: 0 0 0 15px; text-align: left; width: 385px; }
+	.table .developer_settings_id { padding: 0 0 0 15px; text-align: left; width: 259px; }
+	.table .developer_settings_type { padding: 0 0 0 15px; text-align: left; width: 145px; }
 
 	.template_image_list li { float: left; margin: 0 5px 5px 0; }
 	.template_image_list a { border: 1px solid #CCC; border-radius: 3px; display: block; height: 32px; padding: 5px; text-align: center; transition: background 0.2s, border-color 0.2s; width: 32px; }
