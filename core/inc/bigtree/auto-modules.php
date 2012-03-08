@@ -123,7 +123,7 @@
 			
 			$cache = true;
 			if ($view["options"]["filter"]) {
-				eval('$cache = '.$view["options"]["filter"].'($cache);');
+				eval('$cache = '.$view["options"]["filter"].'($item);');
 			}
 			
 			if ($cache) {
