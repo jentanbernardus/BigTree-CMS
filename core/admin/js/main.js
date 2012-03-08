@@ -459,6 +459,12 @@ var BigTreeFileInput = Class.extend({
 
 		var x = e.pageX - ox;
 		var y = e.pageY - oy;
+		
+		if (this.Element.parents("#bigtree_dialog_window").length) {
+			x -= $("#bigtree_dialog_form").offset().left;
+			y -= $("#bigtree_dialog_form").offset().top - 30;
+		}
+		
 		var w = this.Element.get(0).offsetWidth;
 		var h = this.Element.get(0).offsetHeight;
 
