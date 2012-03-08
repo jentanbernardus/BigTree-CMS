@@ -1604,9 +1604,13 @@ var BigTree = {
 			next_page = current_page + 1;
 		}
 		
-		if (pages > 10) {
-			start_page = current_page - 5;
-			end_page = current_page + 5;
+		if (current_page < 3) {
+			diff = 5 - current_page;
+			start_page = 0;
+			end_page = current_page + diff;
+		} else if (pages > 10) {
+			start_page = current_page - 2;
+			end_page = current_page + 3;
 		} else {
 			start_page = 0;
 			end_page = pages;
