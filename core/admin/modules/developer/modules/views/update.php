@@ -69,7 +69,7 @@
 		$action = $admin->getModuleActionForView(end($path));
 		
 		$admin->growl("Developer","Updated View");
-		header("Location: ".$saroot."modules/edit/".$action["module"]."/");
+		header("Location: ".$developer_root."modules/edit/".$action["module"]."/");
 		BigTreeAutoModule::clearCache($view);
 		die();
 	}

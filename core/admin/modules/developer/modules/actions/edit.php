@@ -9,7 +9,7 @@
 <h1><span class="icon_developer_modules"></span>Edit Action</h1>
 <? include bigtree_path("admin/modules/developer/modules/_nav.php"); ?>
 <div class="form_container">
-	<form method="post" action="<?=$saroot?>modules/actions/update/<?=$item["id"]?>/" class="module">
+	<form method="post" action="<?=$developer_root?>modules/actions/update/<?=$item["id"]?>/" class="module">
 		<section>
 			<fieldset>
 				<label class="required">Name</label>

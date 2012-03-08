@@ -8,7 +8,6 @@
 	$GLOBALS["site_root"] = $GLOBALS["server_root"]."site/";
 	$GLOBALS["www_root"] = $config["www_root"];
 	$GLOBALS["resource_root"] = $config["resource_root"];
-	$GLOBALS["icon_root"] = $config["www_root"]."admin/images/icons/";
 	$GLOBALS["gmaps_key"] = $config["gmaps_key"];
 	$GLOBALS["admin_ajax_root"] = $GLOBALS["server_root"]."core/admin/ajax/";
 	if (isset($config["root_page"])) {
@@ -24,10 +23,10 @@
 	define("SITE_ROOT",$GLOBALS["site_root"]);
 	
 	// Include required utility functions
-	if (file_exists("../custom/inc/utils/bigtree.inc.php")) {
-		include "../custom/inc/utils/bigtree.inc.php";
+	if (file_exists($server_root."custom/inc/utils/bigtree.inc.php")) {
+		include $server_root."custom/inc/utils/bigtree.inc.php";
 	} else {
-		include "inc/utils/bigtree.inc.php";
+		include $server_root."core/inc/utils/bigtree.inc.php";
 	}
 	
 	// Connect to MySQL and include the shorterner functions

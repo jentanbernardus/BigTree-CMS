@@ -9,7 +9,7 @@
 <div id="page">
 	<div id="breadcrumb">
 		<ul>
-			<li><a href="<?=$aroot?>">Developer</a></li> 
+			<li><a href="<?=$admin_root?>">Developer</a></li> 
 			<li>&raquo;</li>
 			<? if ($path[2]) { ?>
 			<li><a class="active" href="#"><?=ucwords(str_replace("-"," ",$path[2]))?></a></li>
@@ -22,15 +22,15 @@
 	<div>
 		<h2>Developer</h2>
 		<div class="add_level">
-			<a href="<?=$aroot?>developer/" class="home">Home</a>
-			<a href="<?=$aroot?>developer/templates/view/" class="templates">Templates</a>
-			<a href="<?=$aroot?>developer/modules/view/" class="modules">Modules</a>
-			<a href="<?=$aroot?>developer/modules/groups/view/" class="groups">Module Groups</a>
-			<a href="<?=$aroot?>developer/field-types/view/" class="page">Field Types</a>
-			<a href="<?=$aroot?>developer/callouts/view/" class="callouts">Callouts</a>
-			<a href="<?=$aroot?>developer/settings/view/" class="settings">Settings</a>
-			<a href="<?=$aroot?>developer/feeds/view/" class="rss">Feeds</a>
-			<a href="<?=$aroot?>developer/foundry/view/" class="foundry">Foundry</a>
+			<a href="<?=$admin_root?>developer/" class="home">Home</a>
+			<a href="<?=$admin_root?>developer/templates/view/" class="templates">Templates</a>
+			<a href="<?=$admin_root?>developer/modules/view/" class="modules">Modules</a>
+			<a href="<?=$admin_root?>developer/modules/groups/view/" class="groups">Module Groups</a>
+			<a href="<?=$admin_root?>developer/field-types/view/" class="page">Field Types</a>
+			<a href="<?=$admin_root?>developer/callouts/view/" class="callouts">Callouts</a>
+			<a href="<?=$admin_root?>developer/settings/view/" class="settings">Settings</a>
+			<a href="<?=$admin_root?>developer/feeds/view/" class="rss">Feeds</a>
+			<a href="<?=$admin_root?>developer/foundry/view/" class="foundry">Foundry</a>
 		</div>
 		<?=$content?>
 	</div>

@@ -1,10 +1,10 @@
-<script src="<?=$aroot?>js/jcrop.min.js" type="text/javascript"></script>
+<script src="<?=$admin_root?>js/jcrop.min.js" type="text/javascript"></script>
 <h1><span class="crop"></span>Crop Images</h1>
 <div class="form_container">
 	<header>
 		<p>You have <?=count($crops)?> image<? if (count($crops) > 1) { ?>s<? } ?> that need<? if (count($crops) == 1) { ?>s<? } ?> to be cropped.</p>
 	</header>
-	<form method="post" action="<?=$aroot?>pages/process-crops/" id="crop_form" class="module">
+	<form method="post" action="<?=$admin_root?>pages/process-crops/" id="crop_form" class="module">
 		<input type="hidden" name="retpage" value="<?=htmlspecialchars($retpage)?>" />
 		<input type="hidden" name="crop_info" value="<?=htmlspecialchars(json_encode($crops))?>" />
 		<section class="cropper">

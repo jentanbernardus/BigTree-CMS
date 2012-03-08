@@ -1,5 +1,5 @@
 <?
-	$items = $admin->getPageTemplates();
+	$items = $admin->getBasicTemplates();
 	if ($pdata) {
 		if ($pdata["template"] && $pdata["template"] != "!") {
 			$td = $cms->getTemplate($pdata["template"]);
@@ -22,9 +22,9 @@
 			$x++;
 			
 			if (!$item["image"]) {
-				$image = $aroot."images/templates/page.png";
+				$image = $admin_root."images/templates/page.png";
 			} else {
-				$image = $aroot."images/templates/".$item["image"];
+				$image = $admin_root."images/templates/".$item["image"];
 			}
 	?>
 	<a href="#<?=$item["id"]?>" class="box_select<? if ($item["id"] == $default_template) { ?> active<? } ?>">
@@ -42,12 +42,12 @@
 <fieldset>
 	<label>Special Templates</label>
 	<?
-		$items = $admin->getModuleTemplates();
+		$items = $admin->getRoutedTemplates();
 		foreach ($items as $item) {
 			if (!$item["image"]) {
-				$image = $aroot."images/templates/page-module.png";
+				$image = $admin_root."images/templates/page-module.png";
 			} else {
-				$image = $aroot."images/templates/".$item["image"];
+				$image = $admin_root."images/templates/".$item["image"];
 			}
 	?>
 	<a href="#<?=$item["id"]?>" class="box_select<? if ($item["id"] == $default_template) { ?> active<? } ?>">

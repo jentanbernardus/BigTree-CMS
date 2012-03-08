@@ -6,6 +6,6 @@
 	sqlquery("DELETE FROM bigtree_module_actions WHERE form = '$id'");
 	
 	$admin->growl("Developer","Deleted Form");
-	header("Location: ".$saroot."modules/edit/$module/");
+	header("Location: ".$developer_root."modules/edit/$module/");
 	die();
 ?>

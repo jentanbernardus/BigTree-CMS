@@ -109,9 +109,9 @@
 		// Get the redirect location.
 		$pieces = explode("-",$action["route"]);
 		if (count($pieces) == 2) {
-			$redirect_url = $aroot.$module["route"]."/view-".$pieces[1]."/";
+			$redirect_url = $admin_root.$module["route"]."/view-".$pieces[1]."/";
 		} else {
-			$redirect_url = $aroot.$module["route"]."/";
+			$redirect_url = $admin_root.$module["route"]."/";
 		}
 		
 		if (end($path) == "preview") {
@@ -135,7 +135,7 @@
 		if (count($crops) == 0) {
 			if (count($fails)) {
 				$suffix = $view["suffix"] ? "-".$view["suffix"] : "";
-				$edit_link = $aroot.$module["route"]."/edit$suffix/$edit_id/";
+				$edit_link = $admin_root.$module["route"]."/edit$suffix/$edit_id/";
 ?>
 <h1>Errors Occurred</h1>
 <div class="table">
@@ -158,7 +158,7 @@
 <a href="<?=$redirect_url?>" class="button blue">Continue</a> &nbsp; <a href="<?=$edit_link?>" class="button">Edit Entry</a> &nbsp; <a href="#" class="delete button red">Delete Entry</a>
 <script type="text/javascript">
 	$(".delete").click(function() {
-		$.ajax("<?=$aroot?>ajax/auto-modules/views/delete/?view=<?=$view["id"]?>&id=<?=$edit_id?>", {
+		$.ajax("<?=$admin_root?>ajax/auto-modules/views/delete/?view=<?=$view["id"]?>&id=<?=$edit_id?>", {
 			complete: function() {
 				document.location = '<?=$redirect_url?>';
 			}

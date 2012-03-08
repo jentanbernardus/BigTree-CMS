@@ -1,3 +1,7 @@
+<?
+	$cached_types = $admin->getCachedFieldTypes();
+	$types = $cached_types["template"];
+?>
 <section>
 	<p class="error_message"<? if (!count($e)) { ?> style="display: none;"<? } ?>>Errors found! Please fix the highlighted fields before submitting.</p>
 	
@@ -61,13 +65,13 @@
 						if ($file != "." && $file != "..") {
 							$all[] = $file;
 				?>
-				<li><a href="#<?=htmlspecialchars($file)?>"<? if ($image == $file) { ?> class="active" <? } ?>><img src="<?=$aroot?>images/templates/<?=$file?>" alt="" /></a></li>
+				<li><a href="#<?=htmlspecialchars($file)?>"<? if ($image == $file) { ?> class="active" <? } ?>><img src="<?=$admin_root?>images/templates/<?=$file?>" alt="" /></a></li>
 				<?
 						}
 					}
 					if ($image && !in_array($image,$all)) {
 				?>
-				<li><a href="#<?=htmlspecialchars($image)?>" class="active"><img src="<?=$aroot?>images/templates/<?=$image?>" alt="" /></a></li>
+				<li><a href="#<?=htmlspecialchars($image)?>" class="active"><img src="<?=$admin_root?>images/templates/<?=$image?>" alt="" /></a></li>
 				<?	
 					}
 				?>
@@ -108,7 +112,7 @@
 				</section>
 				<section class="developer_resource_type">
 					<select name="resources[<?=$x?>][type]" id="type_<?=$x?>">
-						<? foreach ($admin->TemplateFieldTypes as $k => $v) { ?>
+						<? foreach ($types as $k => $v) { ?>
 						<option value="<?=$k?>"<? if ($k == $resource["type"]) { ?> selected="selected"<? } ?>><?=htmlspecialchars($v)?></option>
 						<? } ?>
 					</select>

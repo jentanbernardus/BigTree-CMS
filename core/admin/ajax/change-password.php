@@ -10,7 +10,7 @@
 	
 	sqlquery("UPDATE bigtree_users SET change_password_hash = '$hash' WHERE id = '".$f["id"]."'");
 	
-	$change_link = $aroot."change-password/$hash/";
+	$change_link = $admin_root."change-password/$hash/";
 	
 	mail($f["email"],$site["title"]." Password Change Request","Hello ".$f["name"].",\n\nTo change your password for the ".$site["title"]." Admin, please click the link below.\n\n".$change_link."\n\n-- BigTree CMS --","From: no-reply@".str_replace(array("http://","www."),"",$config["domain"]));
 ?>

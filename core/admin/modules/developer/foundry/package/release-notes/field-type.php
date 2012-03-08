@@ -32,7 +32,7 @@
 	bigtree_clean_globalize_array($type,array("htmlspecialchars"));
 ?>
 <h3 class="foundry">Package Field Type: Details</h3>
-<form method="post" action="<?=$aroot?>developer/foundry/package/submit/field-type/" class="module">
+<form method="post" action="<?=$admin_root?>developer/foundry/package/submit/field-type/" class="module">
 	<input type="hidden" name="id" value="<?=$type["id"]?>" />
 	<fieldset>
 		<label class="required">Name</label>

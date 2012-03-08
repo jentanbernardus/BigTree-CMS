@@ -20,6 +20,6 @@
 	sqlquery("INSERT INTO bigtree_field_types (`id`,`foundry_id`,`author`,`name`,`primary_version`,`secondary_version`,`tertiary_version`,`description`,`release_notes`,`files`,`pages`,`modules`,`callouts`,`downloaded`,`last_updated`) VALUES ('$field_type_id','$id','".mysql_real_escape_string($details["author"]["name"])."','$name','$primary_version','$secondary_version','$tertiary_version','$description','$release_notes','$files','$pages','$modules','$callouts','on',NOW())");
 	
 	$admin->growl("Developer","Installed Field Type");
-	header("Location: ".$aroot."developer/foundry/field-types/");
+	header("Location: ".$admin_root."developer/foundry/field-types/");
 	die();
 ?>

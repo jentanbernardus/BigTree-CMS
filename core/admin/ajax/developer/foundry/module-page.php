@@ -102,7 +102,7 @@
 				<? if ($f["primary_version"] < $item["primary_version"] || ($f["primary_version"] == $item["primary_version"] && $f["secondary_version"] < $item["secondary_version"]) || ($f["primary_version"] == $item["primary_version"] && $f["secondary_version"] == $item["secondary_version"] && $f["tertiary_version"] < $item["tertiary_version"])) { ?>
 				<a href="#<?=$item["id"]?>" class="button_update" title="Update"></a>
 				<? } else { ?>
-				<img src="<?=$aroot?>images/icon_approve.gif" alt="Installed" title="Installed" />
+				<img src="<?=$admin_root?>images/icon_approve.gif" alt="Installed" title="Installed" />
 				<? } ?>
 				<? } else { ?>
 				<a href="#<?=$item["id"]?>" class="button_download" title="Download"></a>				

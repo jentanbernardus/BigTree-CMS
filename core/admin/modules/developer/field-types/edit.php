@@ -9,7 +9,7 @@
 <? include bigtree_path("admin/modules/developer/field-types/_nav.php") ?>
 
 <div class="form_container">
-	<form method="post" action="<?=$saroot?>field-types/update/" enctype="multipart/form-data" class="module">
+	<form method="post" action="<?=$developer_root?>field-types/update/" enctype="multipart/form-data" class="module">
 		<input type="hidden" name="id" value="<?=$id?>" />
 		<section>
 			<fieldset>

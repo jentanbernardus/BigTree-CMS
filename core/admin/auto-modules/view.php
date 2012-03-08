@@ -7,7 +7,20 @@
 		$view["actions"]["preview"] = "on";
 	}
 ?>
-<h1><span class="modules"></span><?=$view["title"]?></h1>
+<h1>
+	<span class="modules"></span><?=$view["title"]?>
+	<? if (count($subnav)) { ?>
+	<div class="jump_group">
+		<span class="icon"></span>
+		<div class="dropdown">
+			<strong><?=$mgroup["name"]?></strong>
+			<? foreach ($subnav as $link) { ?>
+			<a href="<?=$admin_root?><?=$link["link"]?>"><?=$link["title"]?></a>
+			<? } ?>
+		</div>
+	</div>
+	<? } ?>
+</h1>
 <?
 	include bigtree_path("admin/auto-modules/_nav.php");
 

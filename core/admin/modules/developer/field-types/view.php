@@ -20,10 +20,10 @@
 			<section class="developer_field_types_version"><?=$type["primary_version"]?>.<?=$type["secondary_version"]?>.<?=$type["tertiary_version"]?></section>
 			<section class="developer_field_types_author"><?=$type["author"]?></section>
 			<section class="view_action">
-				<a href="<?=$sroot?>edit/<?=$type["id"]?>/" class="icon_edit"></a>
+				<a href="<?=$section_root?>edit/<?=$type["id"]?>/" class="icon_edit"></a>
 			</section>
 			<section class="view_action">
-				<a href="<?=$sroot?>delete/<?=$type["id"]?>/" class="icon_delete"></a>
+				<a href="<?=$section_root?>delete/<?=$type["id"]?>/" class="icon_delete"></a>
 			</section>
 		</li>
 		<? } ?>

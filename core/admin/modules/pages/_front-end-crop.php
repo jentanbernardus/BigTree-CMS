@@ -1,17 +1,17 @@
 <html>
 	<head>
-		<link rel="stylesheet" href="<?=$aroot?>css/main.css" type="text/css" media="screen" charset="utf-8" />
-		<script type="text/javascript" src="<?=$aroot?>js/lib.js"></script>
-		<script type="text/javascript" src="<?=$aroot?>js/main.js"></script>
-		<script type="text/javascript" src="<?=$aroot?>js/jcrop.min.js"></script>
+		<link rel="stylesheet" href="<?=$admin_root?>css/main.css" type="text/css" media="screen" charset="utf-8" />
+		<script type="text/javascript" src="<?=$admin_root?>js/lib.js"></script>
+		<script type="text/javascript" src="<?=$admin_root?>js/main.js"></script>
+		<script type="text/javascript" src="<?=$admin_root?>js/jcrop.min.js"></script>
 	</head>
 	<body>
 		<div id="bigtree_dialog_window" class="front_end_editor">
 			<h2>Crop Images</h2>
-			<form id="bigtree_dialog_form" method="post" action="<?=$aroot?>pages/process-crops/">
+			<form id="bigtree_dialog_form" method="post" action="<?=$admin_root?>pages/process-crops/">
 				<div class="overflow">
 					<p>You have <?=count($crops)?> image<? if (count($crops) > 1) { ?>s<? } ?> that need<? if (count($crops) == 1) { ?>s<? } ?> to be cropped.</p>
-					<input type="hidden" name="retpage" value="<?=$aroot?>pages/front-end-return/<?=base64_encode($refresh_link)?>/" />
+					<input type="hidden" name="retpage" value="<?=$admin_root?>pages/front-end-return/<?=base64_encode($refresh_link)?>/" />
 					<input type="hidden" name="crop_info" value="<?=htmlspecialchars(json_encode($crops))?>" />
 					<section class="cropper">
 						<ul id="cropper">

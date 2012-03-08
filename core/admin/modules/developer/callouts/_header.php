@@ -1,4 +1,4 @@
 <?
 	$breadcrumb[] = array("title" => "Callouts", "link" => "developer/callouts/");
-	$sroot = $droot."callouts/";
+	$section_root = $developer_root."callouts/";
 ?>

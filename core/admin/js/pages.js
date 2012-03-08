@@ -93,7 +93,7 @@ $(document).ready(function() {
 	$(".save_and_preview").click(function() {
 		sform = $(this).parents("form");
 		sform.attr("target","_blank");
-		sform.attr("action","www_root/admin/pages/update/preview/");
+		sform.attr("action","admin_root/pages/update/preview/");
 		sform.submit();
 		
 		return false;
@@ -109,7 +109,7 @@ $(document).ready(function() {
 	
 	// Callouts
 	$("#bigtree_callouts .add_callout").click(function() {
-		$.ajax("www_root/admin/ajax/pages/add-callout/", { type: "POST", data: { count: callout_count }, complete: function(response) {
+		$.ajax("admin_root/ajax/pages/add-callout/", { type: "POST", data: { count: callout_count }, complete: function(response) {
 			new BigTreeDialog("Add Callout",response.responseText,function() {
 				li = $('<li>');
 				li.html('<h4></h4><p>' + $("#callout_type select").get(0).options[$("#callout_type select").get(0).selectedIndex].text + '</p><div class="bottom"><a href="#" class="icon_delete_small"></a></div>');
@@ -147,7 +147,7 @@ $(document).ready(function() {
 	$("#bigtree_callouts").on("click",".icon_edit_small",function() {
 		active_callout_edit = $(this).parents("li");
 		
-		$.ajax("www_root/admin/ajax/pages/edit-callout/", { type: "POST", data: { count: callout_count, data: active_callout_edit.find(".callout_data").val() }, complete: function(response) {
+		$.ajax("admin_root/ajax/pages/edit-callout/", { type: "POST", data: { count: callout_count, data: active_callout_edit.find(".callout_data").val() }, complete: function(response) {
 			new BigTreeDialog("Edit Callout",response.responseText,function() {
 				li = $('<li>');
 				li.html('<h4></h4><p>' + $("#callout_type select").get(0).options[$("#callout_type select").get(0).selectedIndex].text + '</p><div class="bottom"><a href="#" class="icon_delete_small"></a></div>');
@@ -212,7 +212,7 @@ function updateSEOScore() {
 	}
 	if (new_data) {
 		last_seo_data = data;
-		new Ajax.Updater("seo_recommendations","www_root/admin/ajax/pages/get-seo-score/", { parameters: data, evalScripts: true });
+		new Ajax.Updater("seo_recommendations","admin_root/ajax/pages/get-seo-score/", { parameters: data, evalScripts: true });
 	}
 } */
 
@@ -221,7 +221,7 @@ function checkTemplate() {
 	if (tval.length) {
 		if (template != tval.val()) {
 			template = tval.val();
-			$("#template_type").load("www_root/admin/ajax/pages/get-template-form/", { page: page, template: template });
+			$("#template_type").load("admin_root/ajax/pages/get-template-form/", { page: page, template: template });
 		}
 	}
 }

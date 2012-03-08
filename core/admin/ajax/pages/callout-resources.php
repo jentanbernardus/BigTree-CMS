@@ -16,6 +16,8 @@
 		$bigtree_sidelet_count = $_POST["count"];
 	}
 	
+	$type = isset($_POST["type"]) ? $_POST["type"] : $type;
+	
 	$s = sqlfetch(sqlquery("SELECT * FROM bigtree_callouts WHERE id = '$type'"));
 	$fields = json_decode($s["resources"],true);
 	
@@ -47,7 +49,7 @@
 	
 	if (!tinyMCE) {
 		tiny = new Element("script");
-		tiny.src = "<?=$aroot?>js/tiny_mce/tiny_mce.js";
+		tiny.src = "<?=$admin_root?>js/tiny_mce/tiny_mce.js";
 		$("body").append(tiny);
 	}
 </script>

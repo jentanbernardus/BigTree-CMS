@@ -63,15 +63,15 @@
 ?>
 <html>
 	<head>
-		<link rel="stylesheet" href="<?=$aroot?>css/main.css" type="text/css" media="screen" charset="utf-8" />
-		<script type="text/javascript" src="<?=$aroot?>js/lib.js"></script>
-		<script type="text/javascript" src="<?=$aroot?>js/main.js"></script>
-		<script type="text/javascript" src="<?=$aroot?>js/pages.js"></script>
+		<link rel="stylesheet" href="<?=$admin_root?>css/main.css" type="text/css" media="screen" charset="utf-8" />
+		<script type="text/javascript" src="<?=$admin_root?>js/lib.js"></script>
+		<script type="text/javascript" src="<?=$admin_root?>js/main.js"></script>
+		<script type="text/javascript" src="<?=$admin_root?>js/pages.js"></script>
 	</head>
 	<body>
 		<div id="bigtree_dialog_window" class="front_end_editor">
 			<h2>Edit Page Content</h2>
-			<form id="bigtree_dialog_form" method="post" action="<?=$aroot?>pages/front-end-update/<?=$page["id"]?>/" enctype="multipart/form-data">
+			<form id="bigtree_dialog_form" method="post" action="<?=$admin_root?>pages/front-end-update/<?=$page["id"]?>/" enctype="multipart/form-data">
 				<div class="overflow">
 					<p class="error_message" style="display: none;">Errors found! Please fix the highlighted fields before submitting.</p>
 					<?
@@ -152,7 +152,7 @@
 			});
 			
 			var page = "<?=$pdata["id"]?>";
-			lockTimer = setInterval("$.ajax('<?=$aroot?>ajax/pages/refresh-lock/', { type: 'POST', data: { id: '<?=$lockid?>' } });",60000);
+			lockTimer = setInterval("$.ajax('<?=$admin_root?>ajax/pages/refresh-lock/', { type: 'POST', data: { id: '<?=$lockid?>' } });",60000);
 		</script>
 	</body>
 </html>

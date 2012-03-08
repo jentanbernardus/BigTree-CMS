@@ -21,6 +21,6 @@
 	sqlquery("DELETE FROM bigtree_module_actions WHERE module = '$id'");
 	
 	$admin->growl("Developer","Deleted Module");
-	header("Location: ".$saroot."modules/view/");
+	header("Location: ".$developer_root."modules/view/");
 	die();
 ?>

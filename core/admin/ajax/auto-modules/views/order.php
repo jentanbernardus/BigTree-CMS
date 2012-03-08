@@ -1,7 +1,7 @@
 <?
 	// Grab View Data
 	$view = BigTreeAutoModule::getView($_GET["view"]);
-	$module = $admin->getModuleById(BigTreeAutoModule::getModuleForView($_GET["view"]));
+	$module = $admin->getModule(BigTreeAutoModule::getModuleForView($_GET["view"]));
 	$perm = $admin->getAccessLevel($module);
 	$table = $view["table"];
 	

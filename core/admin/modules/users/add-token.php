@@ -7,7 +7,7 @@
 <h1><span class="users"></span>Add Token</h1>
 <? include bigtree_path("admin/modules/users/_nav.php"); ?>
 <div class="form_container">
-	<form class="module" action="<?=$aroot?>users/create-token/" method="post">
+	<form class="module" action="<?=$admin_root?>users/create-token/" method="post">
 		<section>
 			<div class="left">
 				<fieldset>

@@ -48,7 +48,7 @@
 		</script>
 	</header>
 	<? include bigtree_path("admin/layouts/_tinymce.php"); ?>
-	<form method="post" class="module" action="<?=$aroot?>pages/<?=$action?>/" enctype="multipart/form-data" id="page_form">
+	<form method="post" class="module" action="<?=$admin_root?>pages/<?=$action?>/" enctype="multipart/form-data" id="page_form">
 		<input type="hidden" name="MAX_FILE_SIZE" value="<?=upload_max_filesize()?>" />
 		
 		<? if ($pdata) { ?>
@@ -110,10 +110,10 @@
 	<? } else { ?>
 	var page = "<?=$pdata["id"]?>";
 	var page_updated_at = "<?=$pdata["updated_at"]?>";
-	lockTimer = setInterval("$.ajax('<?=$aroot?>ajax/pages/refresh-lock/', { type: 'POST', data: { id: '<?=$lockid?>' } });",60000);
+	lockTimer = setInterval("$.ajax('<?=$admin_root?>ajax/pages/refresh-lock/', { type: 'POST', data: { id: '<?=$lockid?>' } });",60000);
 	//seoTimer = setInterval("updateSEOScore();",5000);
 	<? } ?>
 	
 	new BigTreeFormValidator("#page_form");
 </script>
-<script type="text/javascript" src="<?=$aroot?>js/pages.js"></script>
+<script type="text/javascript" src="<?=$admin_root?>js/pages.js"></script>

@@ -28,7 +28,8 @@
 	
 	$preview_field = $view["preview_field"] ? $view["preview_field"] : "id";
 
-	$types = $admin->ModuleFieldTypes;
+	$cached_types = $admin->getCachedFieldTypes();
+	$types = $cached_types["module"];
 ?>
 <fieldset id="fields">
 	<label>Fields</label>
@@ -190,7 +191,7 @@
 	$(".add_action").click(function() {
 		new BigTreeDialog("Add Custom Action",'<fieldset><label>Action Name</label><input type="text" name="name" /></fieldset><fieldset><label>Action Image Class <small>(i.e. button_edit)</small></label><input type="text" name="class" /></fieldset><fieldset><label>Action Route</label><input type="text" name="route" /></fieldset><fieldset><label>Link Function <small>(if you need more than simply /route/id/)</small></label><input type="text" name="function" /></fieldset>',function(data) {
 			li = $('<li>');
-			li.load("<?=$aroot?>ajax/developer/add-view-action/", data);
+			li.load("<?=$admin_root?>ajax/developer/add-view-action/", data);
 			$(".developer_action_list li:first-child").before(li);
 		});
 		

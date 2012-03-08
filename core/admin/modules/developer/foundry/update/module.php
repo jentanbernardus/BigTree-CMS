@@ -101,7 +101,7 @@
 </ul>
 <p><strong>ERRORS OCCURRED!</strong> &mdash; Please correct all errors.  You may not import this module while errors persist.</p>
 <? } else { ?>
-<form method="post" action="<?=$saroot?>foundry/update/process/module/<?=$details["id"]?>/" class="module">
+<form method="post" action="<?=$developer_root?>foundry/update/process/module/<?=$details["id"]?>/" class="module">
 	<input type="hidden" name="details" value="<?=htmlspecialchars(json_encode($details))?>" />
 	<input type="submit" class="button white" value="Update Now" name="submit" />
 </form>

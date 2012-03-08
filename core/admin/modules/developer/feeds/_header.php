@@ -6,5 +6,5 @@
 	);
 
 	$breadcrumb[] = array("title" => "Feeds", "link" => "developer/feeds/");
-	$sroot = $droot."feeds/";
+	$section_root = $developer_root."feeds/";
 ?>

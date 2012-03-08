@@ -20,6 +20,6 @@
 	sqlquery("UPDATE bigtree_field_types SET id = '$field_type_id', author = '".mysql_real_escape_string($details["author"]["name"])."', name = '$name', primary_version = '$primary_version', secondary_version = '$secondary_version', tertiary_version = '$tertiary_version', description = '$description', release_notes = '$release_notes', files = '$files', pages = '$pages', modules = '$modules', callouts = '$callouts', downloaded = 'on', last_updated = NOW() WHERE foundry_id = '$id'");
 	
 	$admin->growl("Developer","Updated Field Type");
-	header("Location: ".$aroot."developer/foundry/field-types/");
+	header("Location: ".$admin_root."developer/foundry/field-types/");
 	die();
 ?>

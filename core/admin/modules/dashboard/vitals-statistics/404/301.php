@@ -2,10 +2,13 @@
 	$total = sqlfetch(sqlquery("SELECT COUNT(id) AS `total` FROM bigtree_404s WHERE ignored = '' AND redirect_url != ''"));
 	$total = $total["total"];
 	$type = "301";
-	$breadcrumb[] = array("link" => "dashboard/404/301/", "title" => "301 Redirects");
+	$breadcrumb[] = array("link" => "dashboard/vitals-statistics/404/301/", "title" => "301 Redirects");
 	$delete_action = "ignore";
 ?>
-<h1><span class="page_404"></span>301 Redirects</h1>
+<h1>
+	<span class="page_404"></span>301 Redirects
+	<? include bigtree_path("admin/modules/dashboard/vitals-statistics/_jump.php"); ?>
+</h1>
 <? include bigtree_path("admin/modules/dashboard/vitals-statistics/404/_nav.php") ?>
 <div class="table">
 	<summary class="taller">

@@ -1,6 +1,6 @@
 <?
 	$module_title = "Developer";
-	$saroot = $aroot."developer/";
+	$developer_root = $admin_root."developer/";
 	$admin->requireLevel(2);
 	$autoModule = new BigTreeAutoModule;
 	
@@ -18,7 +18,5 @@
 	$breadcrumb = array(
 		array("title" => "Developer", "link" => "developer/")
 	);
-	
-	$droot = $aroot."developer/";
 ?>
 <div class="developer">

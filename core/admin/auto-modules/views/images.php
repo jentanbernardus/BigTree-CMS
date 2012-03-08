@@ -1,5 +1,5 @@
 <?
-	$mpage = $aroot.$module["route"]."/";
+	$mpage = $admin_root.$module["route"]."/";
 	
 	bigtree_clean_globalize_array($view);
 	
@@ -139,7 +139,7 @@
 <script type="text/javascript">
 	<? if ($perm == "p" && $view["options"]["draggable"]) { ?>
 	$("#image_list").sortable({ axis: "y", containment: "parent", handle: ".icon_sort", items: "li", placeholder: "ui-sortable-placeholder", tolerance: "pointer", update: function() {
-		$.ajax("<?=$aroot?>ajax/auto-modules/views/order/?view=<?=$view["id"]?>&table_name=image_list&sort=" + escape($("#image_list").sortable("serialize")));
+		$.ajax("<?=$admin_root?>ajax/auto-modules/views/order/?view=<?=$view["id"]?>&table_name=image_list&sort=" + escape($("#image_list").sortable("serialize")));
 	}});
 	<? } ?>
 	 

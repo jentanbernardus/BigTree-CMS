@@ -1,3 +1,7 @@
+<?
+	$cached_types = $admin->getCachedFieldTypes();
+	$types = $cached_types["callout"];
+?>
 <script type="text/javascript">
 	new BigTreeFormValidator("form.module");
 	
@@ -16,9 +20,9 @@
 		key = $(this).attr("name");
 		current_editing_key = key;
 		
-		$.ajax("<?=$aroot?>ajax/developer/load-field-options/", { type: "POST", data: { template: "true", type: $("#type_" + key).val(), data: $("#options_" + key).val() }, onComplete: function(response) {
+		$.ajax("<?=$admin_root?>ajax/developer/load-field-options/", { type: "POST", data: { template: "true", type: $("#type_" + key).val(), data: $("#options_" + key).val() }, complete: function(response) {
 			new BigTreeDialog("Field Options",response.responseText,function(data) {
-				$.ajax("<?=$aroot?>ajax/developer/save-field-options/?key=" + current_editing_key, { type: "POST", data: data });
+				$.ajax("<?=$admin_root?>ajax/developer/save-field-options/?key=" + current_editing_key, { type: "POST", data: data });
 			});
 		}});
 		
@@ -37,7 +41,7 @@
 		resource_count++;
 		
 		li = $('<li id="row_' + resource_count + '">');
-		li.html('<section class="developer_resource_id"><span class="icon_sort"></span><input type="text" name="resources[' + resource_count + '][id]" value="" /></section><section class="developer_resource_title"><input type="text" name="resources[' + resource_count + '][name]" value="" /></section><section class="developer_resource_subtitle"><input type="text" name="resources[' + resource_count + '][subtitle]" value="" /></section><section class="developer_resource_type"><select name="resources[' + resource_count + '][type]" id="type_' + resource_count + '"><? foreach ($admin->CalloutFieldTypes as $k => $v) { ?><option value="<?=$k?>"><?=htmlspecialchars($v)?></option><? } ?></select></section><section class="developer_resource_action"><a href="#" tabindex="-1" class="icon_edit" name="' + resource_count + '"></a><input type="hidden" name="resources[' + resource_count + '][options]" value="" id="options_' + resource_count + '" /></section><section class="developer_resource_action"><a href="#" tabindex="-1" class="icon_delete"></a></section>');
+		li.html('<section class="developer_resource_id"><span class="icon_sort"></span><input type="text" name="resources[' + resource_count + '][id]" value="" /></section><section class="developer_resource_title"><input type="text" name="resources[' + resource_count + '][name]" value="" /></section><section class="developer_resource_subtitle"><input type="text" name="resources[' + resource_count + '][subtitle]" value="" /></section><section class="developer_resource_type"><select name="resources[' + resource_count + '][type]" id="type_' + resource_count + '"><? foreach ($types as $k => $v) { ?><option value="<?=$k?>"><?=htmlspecialchars($v)?></option><? } ?></select></section><section class="developer_resource_action"><a href="#" tabindex="-1" class="icon_edit" name="' + resource_count + '"></a><input type="hidden" name="resources[' + resource_count + '][options]" value="" id="options_' + resource_count + '" /></section><section class="developer_resource_action"><a href="#" tabindex="-1" class="icon_delete"></a></section>');
 
 		$("#resource_table").append(li);
 		li.find("select").get(0).customControl = new BigTreeSelect(li.find("select").get(0));

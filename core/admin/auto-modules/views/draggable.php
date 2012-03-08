@@ -34,14 +34,14 @@
 <? include bigtree_path("admin/auto-modules/views/_common-js.php") ?>
 <script type="text/javascript">
 	function reSearch() {
-		$("#sort_table").load("<?=$aroot?>ajax/auto-modules/views/draggable/", { view: <?=$view["id"]?>, search: $("#search").val() }, _local_createSortable);
+		$("#sort_table").load("<?=$admin_root?>ajax/auto-modules/views/draggable/", { view: <?=$view["id"]?>, search: $("#search").val() }, _local_createSortable);
 	}
 	
 	function _local_createSortable() {
 		<? if ($perm == "p") { ?>
 		if ($("#search").val() == "") {
 			$("#sort_table").sortable({ axis: "y", containment: "parent", handle: ".icon_sort", items: "li", placeholder: "ui-sortable-placeholder", tolerance: "pointer", update: function() {
-				$.ajax("<?=$aroot?>ajax/auto-modules/views/order/?view=<?=$view["id"]?>&sort=" + escape($("#sort_table").sortable("serialize")));
+				$.ajax("<?=$admin_root?>ajax/auto-modules/views/order/?view=<?=$view["id"]?>&sort=" + escape($("#sort_table").sortable("serialize")));
 			}});
 		}
 		<? } ?>

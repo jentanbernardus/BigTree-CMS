@@ -179,7 +179,7 @@
 		dtouch("templates/pages/_sitemap.php");
 		dtouch("templates/pages/content.php",'<h1><?=$page_header?></h1>
 <?=$page_content?>');
-		dwrite("templates/sidelets/");
+		dwrite("templates/callouts/");
 		dwrite("templates/objects/");
 		dwrite("templates/objects/containers/");
 		
@@ -195,10 +195,23 @@
 	
 	$debug = false;
 	$config = array();
-	include str_replace("site/index.php","templates/config.php",__FILE__);	
+	include str_replace("site/index.php","templates/config.php",__FILE__);
 	
-	// Let admin bootstrap itself.
-	if ($path[0] == "admin") {
+	// Let admin bootstrap itself.  New setup here so the admin can live at any path you choose for obscurity.
+	$parts_of_admin = explode("/",trim(str_replace($config["www_root"],"",$config["admin_root"]),"/"));
+	$in_admin = true;
+	$x = 0;
+	foreach ($parts_of_admin as $part) {
+		if ($part != $path[$x])	{
+			$in_admin = false;
+		}
+		$x++;
+	}
+	if ($in_admin) {
+		// Cut off additional routes from the path, some parts of the admin assume path[0] is "admin" and path[1] begins the routing.
+		if ($x > 1) {
+			$path = array_slice($path,$x - 1);
+		}
 		include "../core/admin/router.php";
 		die();
 	}

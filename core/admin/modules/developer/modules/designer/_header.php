@@ -1,7 +1,7 @@
 <?
 	$breadcrumb[] = array("title" => "Modules", "link" => "developer/modules/");
 	$breadcrumb[] = array("title" => "Designer", "link" => "developer/modules/designer/");
-	$sroot = $droot."modules/";
+	$section_root = $developer_root."modules/";
 	
 	if (is_array($_SESSION["developer"]["saved_module"])) {
 		foreach ($_SESSION["developer"]["saved_module"] as $key => $val) {

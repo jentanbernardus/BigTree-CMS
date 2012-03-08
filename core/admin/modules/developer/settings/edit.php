@@ -17,7 +17,7 @@
 <? include bigtree_path("admin/modules/developer/settings/_nav.php") ?>
 
 <div class="form_container">
-	<form class="module" method="post" action="<?=$sroot?>update/<?=$item["id"]?>/">
+	<form class="module" method="post" action="<?=$section_root?>update/<?=$item["id"]?>/">
 		<? include bigtree_path("admin/modules/developer/settings/_form-content.php") ?>
 		<footer>
 			<input type="submit" class="button blue" value="Update" />

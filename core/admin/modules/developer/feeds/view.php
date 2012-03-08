@@ -20,10 +20,10 @@
 			<section class="developer_feeds_url"><a href="<?=$www_root?>feeds/<?=$feed["route"]?>/" target="_blank"><?=$www_root?>feeds/<?=$feed["route"]?>/</a></section>
 			<section class="developer_feeds_type"><? if ($feed["type"]) { echo $feed_types[$feed["type"]]; } else { echo "Custom"; } ?></section>
 			<section class="view_action">
-				<a href="<?=$sroot?>edit/<?=$feed["id"]?>/" class="icon_edit"></a>
+				<a href="<?=$section_root?>edit/<?=$feed["id"]?>/" class="icon_edit"></a>
 			</section>
 			<section class="view_action">
-				<a href="<?=$sroot?>delete/<?=$feed["id"]?>/" class="icon_delete"></a>
+				<a href="<?=$section_root?>delete/<?=$feed["id"]?>/" class="icon_delete"></a>
 			</section>
 		</li>
 		<? } ?>

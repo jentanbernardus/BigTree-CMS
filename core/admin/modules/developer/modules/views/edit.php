@@ -1,7 +1,7 @@
 <?	
 	$view = $admin->getModuleView(end($path));
 	$action = $admin->getModuleActionForView(end($path));
-	$module = $admin->getModuleById($action["module"]);
+	$module = $admin->getModule($action["module"]);
 
 	$breadcrumb[] = array("title" => $module["name"], "link" => "developer/modules/edit/".$module["id"]."/");
 	$breadcrumb[] = array("title" => "Edit View", "link" => "#");
@@ -11,11 +11,11 @@
 
 <div class="form_container">
 	
-	<form method="post" action="<?=$saroot?>modules/views/update/<?=end($path)?>/" class="module">
+	<form method="post" action="<?=$developer_root?>modules/views/update/<?=end($path)?>/" class="module">
 		<section>
 			<? if ($action["route"]) { ?>
 			<div class="alert">
-				<img src="<?=$aroot?>images/alert.png" alt="" />
+				<img src="<?=$admin_root?>images/alert.png" alt="" />
 				<p><strong>This is not the default view:</strong>  You may specify an action suffix below.</p>
 			</div>
 			<fieldset>

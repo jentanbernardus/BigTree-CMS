@@ -235,6 +235,6 @@
 	sqlquery("UPDATE bigtree_module_packages SET author = '".mysql_real_escape_string($author["name"])."', name = '$name', primary_version = '$primary_version', secondary_version = '$secondary_version', tertiary_version = '$tertiary_version', description = '$description', release_notes = '$release_notes', details = '".mysql_real_escape_string(json_encode($savedData))."', `tables` = '$package_tables', `files` = '$package_files', downloaded = 'on', last_updated = NOW() WHERE foundry_id = '$id'");
 	
 	$admin->growl("Developer","Updated Module");
-	header("Location: ".$aroot."developer/foundry/modules/");
+	header("Location: ".$admin_root."developer/foundry/modules/");
 	die();
 ?>

@@ -2,10 +2,13 @@
 	$total = sqlfetch(sqlquery("SELECT COUNT(id) AS `total` FROM bigtree_404s WHERE ignored != ''"));
 	$total = $total["total"];
 	$type = "ignored";
-	$breadcrumb[] = array("link" => "dashboard/404/ignored/", "title" => "Ignored 404s");
+	$breadcrumb[] = array("link" => "dashboard/vitals-statistics/404/ignored/", "title" => "Ignored 404s");
 	$delete_action = "unignore";
 ?>
-<h1><span class="page_404"></span>Ignored 404s</h1>
+<h1>
+	<span class="page_404"></span>Ignored 404s
+	<? include bigtree_path("admin/modules/dashboard/vitals-statistics/_jump.php"); ?>
+</h1>
 <? include bigtree_path("admin/modules/dashboard/vitals-statistics/404/_nav.php") ?>
 <div class="table">
 	<summary class="taller">

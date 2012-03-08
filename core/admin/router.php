@@ -4,7 +4,7 @@
 	$GLOBALS["wiki"] = "http://wiki.bigtreecms.com/index.php/";
 	
 	// If they're requesting images, css, or js, just give it to them.
-	if ($path["1"] == "images") {
+	if ($path[1] == "images") {
 		$x = 2;
 		$ipath = "";
 		while ($x < count($path) - 1) {
@@ -97,7 +97,7 @@
 		}
 		header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_modified).' GMT', true, 200);
 		
-		echo str_replace(array("{max_file_size}","www_root/"),array($max_file_size,$config["www_root"]),file_get_contents($ifile));
+		echo str_replace(array("{max_file_size}","www_root/","admin_root/"),array($max_file_size,$config["www_root"],$config["admin_root"]),file_get_contents($ifile));
 		die();
 	}
 	
@@ -108,12 +108,12 @@
 	} else {
 		include "../core/bootstrap.php";
 	}
+	$GLOBALS["admin_root"] = $config["admin_root"];
 	bigtree_setup_sql_connection();
 	ob_start();
 	session_start();
 	include bigtree_path("inc/bigtree/admin.php");
 	include bigtree_path("inc/bigtree/auto-modules.php");
-	$aroot = $GLOBALS["www_root"]."admin/";
 	
 	if (BIGTREE_CUSTOM_ADMIN_CLASS) {
 		eval('$admin = new '.BIGTREE_CUSTOM_ADMIN_CLASS.';');
@@ -129,12 +129,12 @@
 	$js = array();
 	$layout = "default";
 	if (!$admin->ID && $path[1] != "login") {
-		header("Location: ".$www_root."admin/login/");
+		header("Location: ".$admin_root."login/");
 		die();
 	} else {
 		// We're logged in, let's go somewhere.
 		if (!$path[1]) {
-			header("Location: ".$www_root."admin/dashboard/");
+			header("Location: ".$admin_root."dashboard/");
 			die();
 		// We're hitting an ajax page.
 		} elseif ($path[1] == "ajax") {
@@ -286,4 +286,26 @@
 	$content = ob_get_clean();
 	
 	include bigtree_path("admin/layouts/".$layout.".php");
+	
+	// Execute cron tab functions if they haven't been run in 24 hours
+	if (!$admin->settingExists("bigtree-internal-cron-last-run")) {
+		$admin->createSetting(array(
+			"id" => "bigtree-internal-cron-last-run",
+			"system" => "on"
+		));
+	}
+	
+	$last_check = strtotime($cms->getSetting("bigtree-internal-cron-last-run"));
+	// It's been more than 24 hours since we last ran cron.
+	if ((time() - $last_check) < (24 * 60 * 60)) {
+		// Email the daily digest
+		$admin->emailDailyDigest();
+		// Cache google analytics
+		$ga = new BigTreeGoogleAnalytics;
+		if ($ga->AuthToken) {
+			$ga->cacheInformation();
+		}
+		// Update the setting.
+		$admin->updateSettingValue("bigtree-internal-cron-last-run",time());	
+	}
 ?>

@@ -16,12 +16,12 @@
 	
 	function swapSearch() {
 		search = escape($("#query").val());
-		$("#results").load("<?=$aroot?>ajax/developer/foundry/field-type-page/?sort=" + escape(sort) + "&sort_direction=" + escape(sortdir) + "&page=0&search=" + search);
+		$("#results").load("<?=$admin_root?>ajax/developer/foundry/field-type-page/?sort=" + escape(sort) + "&sort_direction=" + escape(sortdir) + "&page=0&search=" + search);
 	}
 	
 	function swapPage(page) {
 		mpage = page;
-		$("#results").load("<?=$aroot?>ajax/developer/foundry/field-type-page/?sort=" + escape(sort) + "&sort_direction=" + escape(sortdir) + "&search=" + escape(search) + "&page=" + mpage);
+		$("#results").load("<?=$admin_root?>ajax/developer/foundry/field-type-page/?sort=" + escape(sort) + "&sort_direction=" + escape(sortdir) + "&search=" + escape(search) + "&page=" + mpage);
 	}
 	
 	$(".page_numbers a").click(function() {
@@ -31,20 +31,20 @@
 			return;
 		}
 		
-		$("#results").load("<?=$aroot?>ajax/developer/foundry/field-type-page/?sort=" + escape(sort) + "&sort_direction=" + escape(sortdir) + "&search=" + escape(search) + "&page=" + mpage);
+		$("#results").load("<?=$admin_root?>ajax/developer/foundry/field-type-page/?sort=" + escape(sort) + "&sort_direction=" + escape(sortdir) + "&search=" + escape(search) + "&page=" + mpage);
 	});
 	
 	$(".sort_column").click(function() {
 		sortdir = BigTree.CleanHref($(this).attr("href"));
 		sort = $(this).attr("name");
 		mpage = 0;
-		$("#results").load("<?=$aroot?>ajax/developer/foundry/field-type-page/?sort=" + escape(sort) + "&sort_direction=" + escape(sortdir) + "&search=" + escape(search) + "&page=" + mpage);
+		$("#results").load("<?=$admin_root?>ajax/developer/foundry/field-type-page/?sort=" + escape(sort) + "&sort_direction=" + escape(sortdir) + "&search=" + escape(search) + "&page=" + mpage);
 		
 		return false;
 	});
 	
 	$(".button_view").click(function() {
-		$.ajax("<?=$aroot?>ajax/developer/foundry/get-field-type-details/?id=" + BigTree.CleanHref($(this).attr("href")), { complete: function(r) {
+		$.ajax("<?=$admin_root?>ajax/developer/foundry/get-field-type-details/?id=" + BigTree.CleanHref($(this).attr("href")), { complete: function(r) {
 			new BigTreeDialog("Field Type Details",r.responseText, function() { },false,true);
 		}});
 		
@@ -52,13 +52,13 @@
 	});
 	
 	$(".button_update").click(function() {
-		document.location.href = "<?=$aroot?>developer/foundry/update/field-type/" + BigTree.CleanHref($(this).attr("href")) + "/";
+		document.location.href = "<?=$admin_root?>developer/foundry/update/field-type/" + BigTree.CleanHref($(this).attr("href")) + "/";
 		
 		return false;
 	});
 	
 	$(".button_download").click(function() {
-		document.location.href = "<?=$aroot?>developer/foundry/install/field-type/" + BigTree.CleanHref($(this).attr("href")) + "/";
+		document.location.href = "<?=$admin_root?>developer/foundry/install/field-type/" + BigTree.CleanHref($(this).attr("href")) + "/";
 		
 		return false;
 	});

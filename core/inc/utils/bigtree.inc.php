@@ -743,6 +743,25 @@
 		$parray[] = $pages;
 		return $parray;
 	}
+	
+	function bigtree_module_exists($class_name = false) {
+		if (in_array($class_name, array_keys($GLOBALS["module_list"]))) {
+			return true;
+		}
+		return false;
+	}
+	
+	function bigtree_redirect($url = false, $type = "302") {
+		if (!$url) {
+			return false;
+		} else if ($type == "301") {
+			header ('HTTP/1.1 301 Moved Permanently');
+		} else if ($type == "404") {
+			header('HTTP/1.0 404 Not Found');
+		}
+		header("Location: " . $url);
+		die();
+	}
 
 	// Cleans up HTML to take out tags we don't want in a body, based on a modified version of Christian Stocker's lx_externalinput_clean Class
 	// Modified to allow embeds and iframes to still exist but to take out crazy scripting things.

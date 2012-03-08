@@ -43,11 +43,11 @@
 	}
 	
 	// Search all content for links to the admin.
-	$q = sqlquery("SELECT * FROM bigtree_pages WHERE resources LIKE '%".$www_root."admin/%' OR resources LIKE '%{wwwroot}admin/%'");
+	$q = sqlquery("SELECT * FROM bigtree_pages WHERE resources LIKE '%".$admin_root."%' OR resources LIKE '%".str_replace($www_root,"{wwwroot}",$admin_root)."%'");
 	while ($f = sqlfetch($q)) {
 		$warnings[] = array(
 			"parameter" => "Bad Admin Links",
-			"rec" => 'Remove links to Admin on <a href="'.$aroot.'pages/edit/'.$f["id"].'/">'.$f["nav_title"].'</a>',
+			"rec" => 'Remove links to Admin on <a href="'.$admin_root.'pages/edit/'.$f["id"].'/">'.$f["nav_title"].'</a>',
 			"status" => "ok"
 		);
 	}

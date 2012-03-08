@@ -12,7 +12,7 @@
 <h1><span class="users"></span>Add User</h3>
 <? include bigtree_path("admin/modules/users/_nav.php"); ?>
 <div class="form_container">
-	<form class="module" action="<?=$aroot?>users/create/" method="post">	
+	<form class="module" action="<?=$admin_root?>users/create/" method="post">	
 		<section>
 			<p class="error_message"<? if (!$e) { ?> style="display: none;"<? } ?>>Errors found! Please fix the highlighted fields before submitting.</p>
 			<div class="left">

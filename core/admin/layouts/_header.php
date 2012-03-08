@@ -1,4 +1,10 @@
 <?
+	$mgroups = array();
+	$modulegroups = $admin->getModuleGroups();
+	foreach ($modulegroups as $mg) {
+		$mgroups[] = array("link" => $mg["route"], "title" => $mg["name"], "access" => 0);
+	}
+	
 	$nav = array(
 		array("link" => "dashboard", "title" => "Dashboard", "access" => 0, "children" => array(
 			array("link" => "overview", "title" => "Overview", "access" => 0),
@@ -7,10 +13,12 @@
 			array("link" => "vitals-statistics", "title" => "Vitals &amp; Statistics", "access" => 1)
 		)),
 		array("link" => "pages", "title" => "Pages", "access" => 0),
-		array("link" => "modules", "title" => "Modules", "access" => 0),
+		array("link" => "modules", "title" => "Modules", "access" => 0, "children" => $mgroups),
 		array("link" => "users", "title" => "Users", "access" => 1, "children" => array(
+/*
 			array("link" => "view", "title" => "View Users", "access" => 1),
 			array("link" => "tokens", "title" => "View API Tokens", "access" => 1)
+*/
 		)),
 		array("link" => "settings", "title" => "Settings", "access" => 1),
 		array("link" => "developer", "title" => "Developer", "access" => 2, "children" => array(
@@ -37,26 +45,26 @@
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 		<title><? if ($module_title) { ?><?=$module_title?> | <? } ?><?=$site["nav_title"]?> Admin</title>
-		<link rel="stylesheet" href="<?=$aroot?>css/main.css" type="text/css" media="screen" charset="utf-8" />
-		<link media="only screen and (max-device-width: 480px)" href="<?=$aroot?>css/mobile.css" type= "text/css" rel="stylesheet" />
+		<link rel="stylesheet" href="<?=$admin_root?>css/main.css" type="text/css" media="screen" charset="utf-8" />
+		<link media="only screen and (max-device-width: 480px)" href="<?=$admin_root?>css/mobile.css" type= "text/css" rel="stylesheet" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no;" />
 		<? if (is_array($css)) { foreach ($css as $style) { ?>
-		<link rel="stylesheet" href="<?=$aroot?>css/<?=$style?>" type="text/css" media="screen" charset="utf-8" />
+		<link rel="stylesheet" href="<?=$admin_root?>css/<?=$style?>" type="text/css" media="screen" charset="utf-8" />
 		<? } } ?>
-		<script type="text/javascript" src="<?=$aroot?>js/lib.js"></script>
-		<script type="text/javascript" src="<?=$aroot?>js/main.js"></script>
+		<script type="text/javascript" src="<?=$admin_root?>js/lib.js"></script>
+		<script type="text/javascript" src="<?=$admin_root?>js/main.js"></script>
 		<? if (is_array($js)) { foreach ($js as $script) { ?>
-		<script type="text/javascript" src="<?=$aroot?>js/<?=$script?>"></script>
+		<script type="text/javascript" src="<?=$admin_root?>js/<?=$script?>"></script>
 		<? } } ?>
 	</head>
 	<body class="bigtree">
 		<header class="main">
 			<section>
-				<a href="<?=$aroot?>login/logout/" class="logout"><span></span>Logout</a>
+				<a href="<?=$admin_root?>login/logout/" class="logout"><span></span>Logout</a>
 				<div></div>
-				<p class="messages"><span></span><a href="<?=$aroot?>dashboard/messages/"><?=$unread_messages?> Unread Messages</a></p>
+				<p class="messages"><span></span><a href="<?=$admin_root?>dashboard/messages/"><?=$unread_messages?> Unread Messages</a></p>
 				<div></div>
-				<p class="welcome"><span></span>Welcome Back <a href="<?=$aroot?>users/profile/"><?=$admin->Name?></a></p>
+				<p class="welcome"><span></span>Welcome Back <a href="<?=$admin_root?>users/profile/"><?=$admin->Name?></a></p>
 				<strong><?=$site["nav_title"]?></strong>
 				<a href="<?=$www_root?>" target="_blank" class="view_site">View Site</a>
 			</section>
@@ -69,14 +77,14 @@
 							if ($admin->Level >= $item["level"]) {
 					?>
 					<li<? if ($path[1] == $item["link"] || ($item["link"] == "modules" && $in_module)) { ?> class="active"<? } ?>>
-						<a href="<?=$aroot?><?=$item["link"]?>/"<? if ($path[1] == $item["link"] || ($item["link"] == "modules" && $in_module)) { ?> class="active"<? } ?>><span class="<?=$cms->urlify($item["title"])?>"></span><?=$item["title"]?></a>
+						<a href="<?=$admin_root?><?=$item["link"]?>/"<? if ($path[1] == $item["link"] || ($item["link"] == "modules" && $in_module)) { ?> class="active"<? } ?>><span class="<?=$cms->urlify($item["title"])?>"></span><?=$item["title"]?></a>
 						<? if (count($item["children"])) { ?>
 						<ul>
 							<?
 								foreach ($item["children"] as $child) {
 									if ($admin->Level >= $child["level"]) {
 							?>
-							<li><a href="<?=$aroot?><?=$item["link"]?>/<?=$child["link"]?>/"><?=$child["title"]?></a></li>
+							<li><a href="<?=$admin_root?><?=$item["link"]?>/<?=$child["link"]?>/"><?=$child["title"]?></a></li>
 							<?
 									}
 								}
@@ -89,8 +97,8 @@
 						}
 					?>
 				</ul>
-				<form method="post" action="<?=$aroot?>search/">
-					<input type="image" src="<?=$aroot?>images/quick-search-icon.png" />
+				<form method="post" action="<?=$admin_root?>search/">
+					<input type="image" src="<?=$admin_root?>images/quick-search-icon.png" />
 					<input type="search" name="query" autocomplete="off" placeholder="Quick Search" />
 					<div id="quick_search_results" style="display: none;"></div>
 				</form>
@@ -108,7 +116,7 @@
 							$x++;
 							
 					?>
-					<li<? if ($x == 1) { ?> class="first"<? } ?>><a href="<? if ($item["link"] == "#") { ?>#<? } else { ?><?=$aroot?><?=$item["link"]?><? } ?>"<? if ($x == count($breadcrumb)) { ?> class="last"<? } ?>><?=$item["title"]?></a></li>
+					<li<? if ($x == 1) { ?> class="first"<? } ?>><a href="<? if ($item["link"] == "#") { ?>#<? } else { ?><?=$admin_root?><?=$item["link"]?><? } ?>"<? if ($x == count($breadcrumb)) { ?> class="last"<? } ?>><?=$item["title"]?></a></li>
 					<?
 							if ($x != count($breadcrumb)) {
 					?>

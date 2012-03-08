@@ -43,6 +43,6 @@
 	$admin->updateSettingValue("bigtree-internal-upload-service",json_encode($ups));	
 	
 	$admin->growl("Developer","Updated Amazon S3 Keys");
-	header("Location: $saroot");
+	header("Location: $developer_root");
 	die();
 ?>

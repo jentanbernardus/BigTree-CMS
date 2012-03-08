@@ -1,5 +1,5 @@
 <?
-	$proot = $aroot."pages/";
+	$proot = $admin_root."pages/";
 	
 	// Get the breadcrumb -- if the last command in the URL is numeric, we're doing something with a page, otherwise we'll let the other actions do it themselves.
 	if (is_numeric(end($commands)) || $_POST["page"]) {
@@ -7,7 +7,7 @@
 		
 		if ($parent[0] == "p") {
 			// Pending page, get the parent instead.
-			$c = $admin->getChangeById(substr($parent,1));
+			$c = $admin->getChange(substr($parent,1));
 			$cc = json_decode($c["changes"],true);
 			$parent = $cc["parent"];
 		}

@@ -1,5 +1,5 @@
 <?
-	$mpage = $aroot.$module["route"]."/";
+	$mpage = $admin_root.$module["route"]."/";
 	bigtree_clean_globalize_array($view);
 
 	$options = json_decode($options,true);
@@ -70,7 +70,7 @@
 	
 	$("#image_list_<?=$view["id"]?> .icon_delete").click(function() {
 		new BigTreeDialog("Delete Item",'<p class="confirm">Are you sure you want to delete this item?',$.proxy(function() {
-			$.ajax("<?=$aroot?>ajax/auto-modules/views/delete/?view=<?=$view["id"]?>&id=" + $(this).attr("href").substr(1));
+			$.ajax("<?=$admin_root?>ajax/auto-modules/views/delete/?view=<?=$view["id"]?>&id=" + $(this).attr("href").substr(1));
 			$(this).parents("li").remove();
 		},this),"delete",false,"OK");
 		
@@ -78,19 +78,19 @@
 	});
 	
 	$("#image_list_<?=$view["id"]?> .icon_approve").click(function() {
-		$.ajax("<?=$aroot?>ajax/auto-modules/views/approve/?view=<?=$view["id"]?>&id=" + $(this).attr("href").substr(1));
+		$.ajax("<?=$admin_root?>ajax/auto-modules/views/approve/?view=<?=$view["id"]?>&id=" + $(this).attr("href").substr(1));
 		$(this).toggleClass("icon_approve_on");
 		return false;
 	});
 	
 	$("#image_list_<?=$view["id"]?> .icon_feature").click(function() {
-		$.ajax("<?=$aroot?>ajax/auto-modules/views/feature/?view=<?=$view["id"]?>&id=" + $(this).attr("href").substr(1));
+		$.ajax("<?=$admin_root?>ajax/auto-modules/views/feature/?view=<?=$view["id"]?>&id=" + $(this).attr("href").substr(1));
 		$(this).toggleClass("icon_feature_on");
 		return false;
 	});
 	
 	$("#image_list_<?=$view["id"]?> .icon_archive").click(function() {
-		$.ajax("<?=$aroot?>ajax/auto-modules/views/archive/?view=<?=$view["id"]?>&id=" + $(this).attr("href").substr(1));
+		$.ajax("<?=$admin_root?>ajax/auto-modules/views/archive/?view=<?=$view["id"]?>&id=" + $(this).attr("href").substr(1));
 		$(this).toggleClass("icon_archive_on");
 		return false;
 	});

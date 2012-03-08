@@ -86,7 +86,7 @@
 <h1><span class="users"></span>Edit User</h1>
 <? include bigtree_path("admin/modules/users/_nav.php"); ?>
 <div class="form_container">
-	<form class="module" action="<?=$aroot?>users/update/<?=$path[3]?>/" method="post">
+	<form class="module" action="<?=$admin_root?>users/update/<?=$path[3]?>/" method="post">
 		<section>
 			<p class="error_message"<? if (!$e) { ?> style="display: none;"<? } ?>>Errors found! Please fix the highlighted fields before submitting.</p>
 			<div class="left">
@@ -129,9 +129,12 @@
 				</fieldset>
 			</div>			
 		</section>
-		<section class="sub" id="permission_section"<? if ($user["level"] > 0) { ?> style="display: none;"<? } ?>>
+		<section class="sub" id="permission_section">
 			<fieldset>
-				<label>Permissions <small>(for module sub-permissions "No Access" inherits from the main permission level)</small></label>
+				<label>Permissions
+					<small id="admin_user_message"<? if ($user["level"] < 1) { ?> style="display: none;"<? } ?>>(this user is an <strong>administrator</strong> and is a publisher of the entire site &mdash; permissions below are ignored)</small>
+					<small id="regular_user_message"<? if ($user["level"] > 0) { ?> style="display: none;"<? } ?>>(for module sub-permissions "No Access" inherits from the main permission level)</small>
+				</label>
 			
 				<div class="user_permissions form_table">
 					<header>
@@ -303,9 +306,11 @@
 	
 	$("#user_level").on("select:changed",function(event,data) {
 		if (data.value  > 0) {
-			$("#permission_section").hide();
+			$("#regular_user_message").hide();
+			$("#admin_user_message").show();
 		} else {
-			$("#permission_section").show();
+			$("#regular_user_message").show();
+			$("#admin_user_message").hide();
 		}
 	});
 </script>

@@ -5,9 +5,9 @@
 	// Calculate the redirect location.
 	$pieces = explode("-",$action["route"]);
 	if (count($pieces) == 2) {
-		$redloc = $aroot.$module["route"]."/view-".$pieces[1]."/";
+		$redloc = $admin_root.$module["route"]."/view-".$pieces[1]."/";
 	} else {
-		$redloc = $aroot.$module["route"]."/";
+		$redloc = $admin_root.$module["route"]."/";
 	}
 	
 	$crops = json_decode($_POST["crop_info"],true);

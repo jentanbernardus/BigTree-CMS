@@ -48,7 +48,7 @@
 		<option></option>
 		<? } ?>
 		<? foreach ($options["list"] as $option) { ?>
-		<option value="<?=$option["value"]?>"<? if ($value == $option["value"]) { ?> selected="selected"<? } ?>><?=$option["description"]?></option>
+		<option value="<?=$option["value"]?>"<? if ($value == $option["value"]) { ?> selected="selected"<? } ?>><?=smarter_trim($option["description"], 100)?></option>
 		<? } ?>
 	</select>
 </fieldset>
