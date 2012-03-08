@@ -179,7 +179,7 @@
 		dtouch("templates/pages/_sitemap.php");
 		dtouch("templates/pages/content.php",'<h1><?=$page_header?></h1>
 <?=$page_content?>');
-		dwrite("templates/sidelets/");
+		dwrite("templates/callouts/");
 		dwrite("templates/objects/");
 		dwrite("templates/objects/containers/");
 		
