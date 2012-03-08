@@ -97,7 +97,7 @@
 		}
 		header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_modified).' GMT', true, 200);
 		
-		echo str_replace(array("{max_file_size}","www_root/"),array($max_file_size,$config["www_root"]),file_get_contents($ifile));
+		echo str_replace(array("{max_file_size}","www_root/","admin_root/"),array($max_file_size,$config["www_root"],$config["admin_root"]),file_get_contents($ifile));
 		die();
 	}
 	

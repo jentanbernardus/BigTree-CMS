@@ -6,7 +6,7 @@
 	// Grab View Data
 	$view = BigTreeAutoModule::getView($_GET["view"]);
 	$table = $view["table"];
-	$module = $admin->getModuleById(BigTreeAutoModule::getModuleForView($_GET["view"]));
+	$module = $admin->getModule(BigTreeAutoModule::getModuleForView($_GET["view"]));
 	$perm = $admin->getAccessLevel($module,$item,$table);
 	$item = sqlfetch(sqlquery("SELECT * FROM `$table` WHERE id = '$id'"));
 

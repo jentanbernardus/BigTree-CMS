@@ -265,6 +265,217 @@
 		}
 		
 		/*
+			Function: createPage
+				Creates a page.
+				Does not check permissions.
+			
+			Parameters:
+				data - An array of page information.
+			
+			Returns:
+				The id of the newly created page.
+		*/
+
+		function createPage($data) {
+			global $cms;
+			
+			// Loop through the posted data, make sure no session hijacking is done.
+			foreach ($data as $key => $val) {
+				if (substr($key,0,1) != "_") {
+					if (is_array($val)) {
+						$$key = mysql_real_escape_string(json_encode($val));
+					} else {
+						$$key = mysql_real_escape_string($val);
+					}
+				}
+			}
+			
+			// If there's an external link, make sure it's a relative URL
+			if ($external) {
+				$external = $this->makeIPL($external);
+			}
+			
+			
+			// Who knows what they may have put in for a route, so we're not going to use the mysql_real_escape_string version.
+			$route = $data["route"];
+			if (!$route) {
+				// If they didn't specify a route use the navigation title
+				$route = $cms->urlify($data["nav_title"]);
+			} else {
+				// Otherwise sanitize the one they did provide.
+				$route = $cms->urlify($route);
+			}
+			
+			// We need to figure out a unique route for the page.  Make sure it doesn't match a directory in /site/
+			$original_route = $route;
+			$x = 2;
+			// Reserved paths.
+			if ($parent == 0) {
+				while (file_exists($GLOBALS["server_root"]."site/".$route."/")) {
+					$route = $original_route."-".$x;
+					$x++;
+				}
+			}
+			
+			// Make sure it doesn't have the same route as any of its siblings.
+			$f = sqlfetch(sqlquery("SELECT * FROM bigtree_pages WHERE `route` = '$route' AND parent = '$parent'"));
+			while ($f) {
+				$route = $original_route."-".$x;
+				$f = sqlfetch(sqlquery("SELECT * FROM bigtree_pages WHERE `route` = '$route' AND parent = '$parent'"));
+				$x++;
+			}
+			
+			// If we have a parent, get the full navigation path, otherwise, just use this route as the path since it's top level.
+			if ($parent) {
+				$path = $this->getFullNavigationPath($parent)."/".$route;
+			} else {
+				$path = $route;
+			}
+			
+			// If we set a publish at date, make it the proper MySQL format.
+			if ($publish_at) {
+				$publish_at = "'".date("Y-m-d",strtotime($publish_at))."'";
+			} else {
+				$publish_at = "NULL";
+			}
+
+			// If we set an expiration date, make it the proper MySQL format.
+			if ($expire_at) {
+				$expire_at = "'".date("Y-m-d",strtotime($expire_at))."'";
+			} else {
+				$expire_at = "NULL";
+			}
+			
+			// Make the title, navigation title, description, keywords, and external link htmlspecialchar'd -- these are all things we'll be echoing in the HTML so we might as well make them valid now instead of at display time.
+			
+			$title = htmlspecialchars($title);
+			$nav_title = htmlspecialchars($nav_title);
+			$meta_description = htmlspecialchars($meta_description);
+			$meta_keywords = htmlspecialchars($meta_keywords);
+			$external = htmlspecialchars($external);
+
+			// Make the page!
+			sqlquery("INSERT INTO bigtree_pages (`parent`,`nav_title`,`route`,`path`,`in_nav`,`title`,`template`,`external`,`new_window`,`resources`,`callouts`,`meta_keywords`,`meta_description`,`last_edited_by`,`created_at`,`updated_at`,`publish_at`,`expire_at`,`max_age`) VALUES ('$parent','$nav_title','$route','$path','$in_nav','$title','$template','$external','$new_window','$resources','$callouts','$meta_keywords','$meta_description','".$this->ID."',NOW(),NOW(),$publish_at,$expire_at,'$max_age')");
+
+			$id = sqlid();
+
+			// Handle tags
+			if (is_array($data["_tags"])) {
+				foreach ($data["_tags"] as $tag) {
+					sqlquery("INSERT INTO bigtree_tags_rel (`module`,`entry`,`tag`) VALUES ('0','$id','$tag')");
+				}
+			}
+
+			// If there was an old page that had previously used this path, dump its history so we can take over the path.
+			sqlquery("DELETE FROM bigtree_route_history WHERE old_route = '$path'");
+			
+			// Dump the cache, we don't really know how many pages may be showing this now in their nav.
+			$this->clearCache();
+			// Let search engines know this page now exists.
+			$this->pingSearchEngines();
+			// Audit trail.
+			$this->track("bigtree_pages",$id,"created");
+
+			return $id;
+		}
+		
+		/*
+			Function: createPendingPage
+				Creates a pending page entry in bigtree_pending_changes
+			
+			Parameters:
+				data - An array of page information.
+		
+			Returns:
+				The id of the pending change.
+		*/
+
+		function createPendingPage($data) {
+			global $cms;
+			
+			// Make a relative URL for external links.
+			if ($data["external"]) {
+				$data["external"] = $this->makeIPL($data["external"]);
+			}
+			
+			// Save the tags, then dump them from the saved changes array.
+			$tags = mysql_real_escape_string(json_encode($data["_tags"]));
+			unset($data["_tags"]);
+			
+			// Make the nav title, title, external link, keywords, and description htmlspecialchar'd for displaying on the front end / the form again.
+			$data["nav_title"] = htmlspecialchars($data["nav_title"]);
+			$data["title"] = htmlspecialchars($data["title"]);
+			$data["external"] = htmlspecialchars($data["external"]);
+			$data["meta_keywords"] = htmlspecialchars($data["meta_keywords"]);
+			$data["meta_description"] = htmlspecialchars($data["meta_description"]);
+			
+			// JSON encode the changes and stick them in the database.
+			$data = mysql_real_escape_string(json_encode($data));
+			sqlquery("INSERT INTO bigtree_pending_changes (`user`,`date`,`title`,`table`,`changes`,`tags_changes`,`type`,`module`,`pending_page_parent`) VALUES ('".$this->ID."',NOW(),'New Page Created','bigtree_pages','$data','$tags','NEW','','".mysql_real_escape_string($data["parent"])."')");
+			$id = sqlid();
+			
+			// Audit trail
+			$this->track("bigtree_pages","p$id","created-pending");
+
+			return $id;
+		}
+		
+		/*
+			Function: deletePage
+				Deletes a page or a pending page.
+				Checks permissions.
+			
+			Parameters:
+				page - A page id or a pending page id prefixed with a "p"
+			
+			Returns:
+				true if successful. Stops page execution if permission issues occur.
+		*/		
+
+		function deletePage($page) {
+			global $cms;
+
+			$page = mysql_real_escape_string($page);
+
+			$r = $this->getPageAccessLevelByUser($page,$this->ID);
+			if ($r == "p") {
+				// If the page isn't numeric it's most likely prefixed by the "p" so it's pending.
+				if (!is_numeric($page)) {
+					sqlquery("DELETE FROM bigtree_pending_changes WHERE id = '".mysql_real_escape_string(substr($page,1))."'");
+					$this->growl("Pages","Deleted Page");
+					$this->track("bigtree_pages","p$page","deleted-pending");
+				} else {
+					sqlquery("DELETE FROM bigtree_pages WHERE id = '$page'");
+					// Delete the children as well.
+					$this->deletePageChildren($page);
+					$this->growl("Pages","Deleted Page");
+					$this->track("bigtree_pages",$page,"deleted");
+				}
+
+				return true;
+			}
+			$this->stop("You do not have permission to delete this page.");
+		}
+		
+		/*
+			Function: deletePageChildren
+				Deletes the children of a page and recurses downward.
+				Does not check permissions.
+			
+			Parameters:
+				id - The parent id to delete children for.
+		*/
+
+		function deletePageChildren($id) {
+			$q = sqlquery("SELECT * FROM bigtree_pages WHERE parent = '$id'");
+			while ($f = sqlfetch($q)) {
+				$this->deletePageChildren($f["id"]);
+			}
+			sqlquery("DELETE FROM bigtree_pages WHERE parent = '$id'");
+			$this->track("bigtree_pages",$id,"deleted");
+		}
+		
+		/*
 			Function: getActionClass
 				Returns the button class for the given action and item.
 			
@@ -336,6 +547,39 @@
 		}
 		
 		/*
+			Function: getAutoModuleActions
+				Return a list of module forms and views.
+				Used by the API for reconstructing forms and views.
+			
+			Parameters:
+				module - The module id to pull forms/views for.
+			
+			Returns:
+				An array of module actions with "form" and "view" columns replaced with form and view data.
+			
+			See Also:
+				<BigTreeAutoModule.getForm>
+				<BigTreeAutoModule.getView>
+		*/
+		
+		function getAutoModuleActions($module) {
+			$items = array();
+			$id = mysql_real_escape_string($module);
+			$q = sqlquery("SELECT * FROM bigtree_module_actions WHERE module = '$id' AND (form != 0 OR view != 0) AND in_nav = 'on' ORDER BY position DESC, id ASC");
+			while ($f = sqlfetch($q)) {
+				if ($f["form"]) {
+					$f["form"] = BigTreeAutoModule::getForm($f["form"]);
+					$f["type"] = "form";
+				} elseif ($f["view"]) {
+					$f["view"] = BigTreeAutoModule::getView($f["view"]);
+					$f["type"] = "view";
+				}
+				$items[] = $f;
+			}
+			return $items;
+		}
+		
+		/*
 			Function: getAvailableModuleRoute
 				Returns a route for a module that won't collide with another module.
 			
@@ -394,6 +638,61 @@
 		}
 		
 		/*
+			Function: getChange
+				Get a pending change.
+			
+			Parameters:
+				id - The id of the pending change.
+			
+			Returns:
+				A pending change entry from the bigtree_pending_changes table.
+		*/
+
+		function getChange($id) {
+			return sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE id = '$id'"));
+		}
+
+		/*
+			Function: getChangeEditLink
+				Returns a link to where the item involved in the pending change can be edited.
+
+			Parameters:
+				change - The ID of the change or the change array from the database.
+
+			Returns:
+				A string containing a link to the admin.
+		*/
+
+		function getChangeEditLink($change) {
+			if (!is_array($change)) {
+				$change = sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE id = '$change'"));
+			}
+
+			if ($change["table"] == "bigtree_pages" && $change["item_id"]) {
+				return $GLOBALS["admin_root"]."pages/edit/".$change["item_id"]."/";
+			}
+
+			if ($change["table"] == "bigtree_pages") {
+				return $GLOBALS["admin_root"]."pages/edit/p".$change["id"]."/";
+			}
+
+			$modid = $change["module"];
+			$module = sqlfetch(sqlquery("SELECT * FROM bigtree_modules WHERE id = '$modid'"));
+			$form = sqlfetch(sqlquery("SELECT * FROM bigtree_module_forms WHERE `table` = '".$change["table"]."'"));
+			$action = sqlfetch(sqlquery("SELECT * FROM bigtree_module_actions WHERE `form` = '".$form["id"]."' AND in_nav = ''"));
+
+			if (!$change["item_id"]) {
+				$change["item_id"] = "p".$change["id"];
+			}
+
+			if ($action) {
+				return $GLOBALS["admin_root"].$module["route"]."/".$action["route"]."/".$change["item_id"]."/";
+			} else {
+				return $GLOBALS["admin_root"].$module["route"]."/edit/".$change["item_id"]."/";
+			}
+		}
+		
+		/*
 			Function: getFullNavigationPath
 				Calculates the full navigation path for a given page ID.
 			
@@ -441,6 +740,109 @@
 		}
 		
 		/*
+			Function: getModule
+				Returns an entry from the bigtree_modules table.
+			
+			Parameters:
+				id - The id of the module.
+			
+			Returns:
+				A module entry with the "gbp" column decoded.
+		*/
+
+		function getModule($id) {
+			$id = mysql_real_escape_string($id);
+			$module = sqlfetch(sqlquery("SELECT * FROM bigtree_modules WHERE id = '$id'"));
+			if (!$module) {
+				return false;
+			}
+
+			$module["gbp"] = json_decode($module["gbp"],true);
+			return $module;
+		}
+		
+		/*
+			Function: getModuleAction
+				Returns an entry from the bigtree_module_actions table.
+			
+			Parameters:
+				id - The id of the action.
+			
+			Returns:
+				A module action entry.
+		*/
+
+		function getModuleAction($id) {
+			$id = mysql_real_escape_string($id);
+			return sqlfetch(sqlquery("SELECT * FROM bigtree_module_actions WHERE id = '$id'"));
+		}
+		
+		/*
+			Function: getModuleActionForForm
+				Returns the related module action for an auto module form.
+			
+			Parameters:
+				form - The id of a form or a form entry.
+			
+			Returns:
+				A module action entry.
+		*/
+
+		function getModuleActionForForm($form) {
+			if (is_array($form)) {
+				$form = mysql_real_escape_string($form["id"]);
+			} else {
+				$form = mysql_real_escape_string($form);
+			}
+			return sqlfetch(sqlquery("SELECT * FROM bigtree_module_actions WHERE form = '$form'"));
+		}
+		
+		/*
+			Function: getModuleActionForView
+				Returns the related module action for an auto module view.
+			
+			Parameters:
+				view - The id of a view or a view entry.
+			
+			Returns:
+				A module action entry.
+		*/
+
+		function getModuleActionForView($view) {
+			if (is_array($form)) {
+				$view = mysql_real_escape_string($view["id"]);
+			} else {
+				$view = mysql_real_escape_string($view);
+			}
+			return sqlfetch(sqlquery("SELECT * FROM bigtree_module_actions WHERE view = '$view'"));
+		}
+		
+		/*
+			Function: getModuleActions
+				Returns a list of module actions in positioned order.
+			
+			Parameters:
+				module - A module id or a module entry.
+			
+			Returns:
+				An array of module action entries.
+		*/
+
+		function getModuleActions($module) {
+			if (is_array($module)) {
+				$module = mysql_real_escape_string($module["id"]);
+			} else {
+				$module = mysql_real_escape_string($module);
+			}
+			$items = array();
+			$q = sqlquery("SELECT * FROM bigtree_module_actions WHERE module = '$module' ORDER BY position DESC, id ASC");
+			while ($f = sqlfetch($q)) {
+				$items[] = $f;
+			}
+			return $items;
+		}
+		
+		/*
 			Function: getHiddenNavigationByParent
 				Returns a list of positioned navigation that is in navigation under the given parent.
 				Does not return module navigation.
@@ -463,6 +865,44 @@
 				$nav[] = $nav_item;
 			}
 			return $nav;
+		}
+		
+		/*
+			Function: getPageVersion
+				Returns a version of a page from the bigtree_page_versions table.
+			
+			Parameters:
+				id - The id of the page version.
+			
+			Returns:
+				A page version entry from the table.
+		*/
+
+		function getPageVersion($id) {
+			$id = mysql_real_escape_string($id);
+			$item = sqlfetch(sqlquery("SELECT * FROM bigtree_page_versions WHERE id = '$id'"));
+			return $item;
+		}
+		
+		/*
+			Function: getPendingChange
+				Returns a pending change from the bigtree_pending_changes table.
+			
+			Parameters:
+				id - The id of the change.
+			
+			Returns:
+				A entry from the table with the "changes" column decoded.
+		*/
+
+		function getPendingChange($id) {
+			$id = mysql_real_escape_string($id);
+			$item = sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE id = '$id'"));
+			if (!$item) {
+				return false;
+			}
+			$item["changes"] = json_decode($item["changes"],true);
+			return $item;
 		}
 		
 		/*
@@ -494,6 +934,67 @@
 			array_multisort($titles,$nav);
 			return $nav;
 		}
+
+		/*
+			Function: getPendingPage
+				Returns a page from the database with all its pending changes applied.
+
+			Parameters:
+				id - The ID of the live page or the ID of a pending page with "p" preceding the ID.
+
+			Returns:
+				A decoded page array with pending changes applied and related tags.
+
+			See Also:
+				<BigTreeCMS.getPage>
+		*/
+
+		function getPendingPage($id) {
+			// Get the live page.
+			if (is_numeric($id)) {
+				global $cms;
+				$page = $cms->getPage($id);
+				if (!$page) {
+					return false;
+				}
+				$page["tags"] = $this->getTagsForPage($id);
+				// Get pending changes for this page.
+				$f = sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE `table` = 'bigtree_pages' AND item_id = '".$page["id"]."'"));
+			} else {
+				$page = array();
+				// Get the page.
+				$f = sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE `id` = '".mysql_real_escape_string(substr($id,1))."'"));
+				if ($f) {
+					$f["id"] = $id;
+				} else {
+					return false;
+				}
+			}
+
+			// Sweep through pending changes and apply them to the page
+			if ($f) {
+				$page["updated_at"] = $f["date"];
+				$changes = json_decode($f["changes"],true);
+				foreach ($changes as $key => $val) {
+					if ($key == "external") {
+						$val = $cms->getInternalPageLink($val);
+					}
+					$page[$key] = $val;
+				}
+				// Decode the tag changes, apply them back.
+				$tags = array();
+				$temp_tags = json_decode($f["tags_changes"],true);
+				if (is_array($temp_tags)) {
+					foreach ($temp_tags as $tag) {
+						$tags[] = sqlfetch(sqlquery("SELECT * FROM bigtree_tags WHERE id = '$tag'"));
+					}
+				}
+				$page["tags"] = $tags;
+				// Say that changes exist
+				$page["changes_applied"] = true;
+			}
+			return $page;
+		}
 		
 		/*
 			Function: getRoutedTemplates
@@ -512,6 +1013,32 @@
 				}
 			}
 			return $items;
+		}
+		
+		/*
+			Function: getTagsForPage
+				Returns a list of tags a page is tagged with.
+			
+			Parameters:
+				page - Either a page id or a page entry.
+			
+			Returns:
+				An array of tags.
+		*/
+
+		function getTagsForPage($page) {
+			if (is_array($page)) {
+				$page = mysql_real_escape_string($page["id"]);
+			} else {
+				$page = mysql_real_escape_string($page);
+			}
+			
+			$tags = array();
+			$q = sqlquery("SELECT bigtree_tags.* FROM bigtree_tags JOIN bigtree_tags_rel WHERE bigtree_tags_rel.tag = bigtree_tags.id AND bigtree_tags_rel.entry = '$page' AND bigtree_tags_rel.module = '0' ORDER BY bigtree_tags.tag");
+			while ($f = sqlfetch($q)) {
+				$tags[] = $f;
+			}
+			return $tags;
 		}
 		
 		/*
@@ -624,6 +1151,21 @@
 		}
 		
 		/*
+			Function: pingSearchEngines
+				Sends the latest sitemap.xml out to search engine ping services if enabled in settings.	
+		*/
+
+		function pingSearchEngines() {
+			global $cms;
+			if ($cms->getSetting("ping-search-engines") == "on") {
+				$google = file_get_contents("http://www.google.com/webmasters/tools/ping?sitemap=".urlencode($GLOBALS["www_root"]."sitemap.xml"));
+				$ask = file_get_contents("http://submissions.ask.com/ping?sitemap=".urlencode($GLOBALS["www_root"]."sitemap.xml"));
+				$yahoo = file_get_contents("http://search.yahooapis.com/SiteExplorerService/V1/ping?sitemap=".urlencode($GLOBALS["www_root"]."sitemap.xml"));
+				$bing = file_get_contents("http://www.bing.com/webmaster/ping.aspx?siteMap=".urlencode($GLOBALS["www_root"]."sitemap.xml"));
+			}
+		}
+		
+		/*
 			Function: stop
 				Stops processing of the Admin area and shows a message in the default layout.
 			
@@ -637,6 +1179,114 @@
 			$content = ob_get_clean();
 			include bigtree_path("admin/layouts/default.php");
 			die();
+		}
+		
+		/*
+			Function: submitPageChange
+				Adds a pending change to the bigtree_pending_changes table for the page.
+				Determines what has changed and only stores the changed fields.
+				Does not check permissions.
+			
+			Parameters:
+				page - The page id or pending page id
+				changes - An array of changes
+		*/
+
+		function submitPageChange($page,$changes) {
+			global $cms;
+			if ($page[0] == "p") {
+				// It's still pending...
+				$existing_page = array();
+				$pending = true;
+				$type = "NEW";
+			} else {
+				// It's an existing page
+				$pending = false;
+				$existing_page = $cms->getPage($page);
+				$type = "EDIT";
+			}
+
+			$template = $existing_page["template"];
+			if (!$pending) {
+				$existing_pending_change = sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE `table` = 'bigtree_pages' AND item_id = '$page'"));
+			} else {
+				$existing_pending_change = sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE id = '".substr($page,1)."'"));
+			}
+			
+			// Save tags separately
+			$tags = mysql_real_escape_string(json_encode($changes["_tags"]));
+			unset($changes["_tags"]);
+
+			// If there's already a change in the queue, update it with this latest info.
+			if ($existing_pending_change) {
+				$comments = json_decode($f["comments"],true);
+				if ($existing_pending_change["user"] == $this->ID) {
+					$comments[] = array(
+						"user" => "BigTree",
+						"date" => date("F j, Y @ g:ia"),
+						"comment" => "A new revision has been made."
+					);
+				} else {
+					$user = $this->getUser($this->ID);
+					$comments[] = array(
+						"user" => "BigTree",
+						"date" => date("F j, Y @ g:ia"),
+						"comment" => "A new revision has been made.  Owner switched to ".$user["name"]."."
+					);
+				}
+				
+				// If this is a pending change, just replace all the changes
+				if ($pending) {
+					$changes = mysql_real_escape_string(json_encode($changes));
+				// Otherwise, we need to check what's changed.
+				} else {
+					$original_changes = json_decode($existing_pending_change["changes"],true);
+					if (isset($original_changes["template"])) {
+						$template = $original_changes["template"];
+					}
+					if (isset($changes["external"])) {
+						$changes["external"] = $this->makeIPL($changes["external"]);
+					}
+
+					foreach ($changes as $key => $val) {
+						if ($val != $existing_page[$key] && isset($existing_page[$key])) {
+							$original_changes[$key] = $val;
+						}
+					}
+
+					$changes = mysql_real_escape_string(json_encode($original_changes));
+				}
+
+				$comments = mysql_real_escape_string(json_encode($comments));
+				sqlquery("UPDATE bigtree_pending_changes SET comments = '$comments', changes = '$changes', tags_changes = '$tags', date = NOW(), user = '".$this->ID."', type = '$type' WHERE id = '".$f["id"]."'");
+				
+				$this->track("bigtree_pages",$page,"updated-draft");
+
+			// We're submitting a change to a presently published page with no pending changes.
+			} else {
+				$original_changes = array();
+
+				foreach ($changes as $key => $val) {
+					if ($key == "external") {
+						$val = $this->makeIPL($val);
+					}
+
+					if (isset($existing_page[$key]) && $val != $existing_page[$key]) {
+						$original_changes[$key] = $val;
+					}
+				}
+
+				$changes = mysql_real_escape_string(json_encode($original_changes));
+				if ($type == "DELETE") {
+					sqlquery("INSERT INTO bigtree_pending_changes (`user`,`date`,`table`,`item_id`,`changes`,`type`,`title`) VALUES ('".$this->ID."',NOW(),'bigtree_pages','$page','$changes','DELETE','Page Deletion Pending')");
+				} else {
+					sqlquery("INSERT INTO bigtree_pending_changes (`user`,`date`,`table`,`item_id`,`changes`,`tags_changes`,`type`,`title`) VALUES ('".$this->ID."',NOW(),'bigtree_pages','$page','$changes','$tags','EDIT','Page Change Pending')");
+				}
+
+				$this->track("bigtree_pages",$page,"saved-draft");
+			}
+
+			return sqlid();
 		}
 		
 		/*
@@ -654,6 +1304,54 @@
 			$entry = mysql_real_escape_string($entry);
 			$type = mysql_real_escape_string($type);
 			sqlquery("INSERT INTO bigtree_audit_trail VALUES (`table`,`user`,`entry`,`date`,`type`) VALUES ('$table','".$admin->ID."','$entry',NOW(),'$type')");
+		}
+		
+		/*
+			Function: unarchivePage
+				Unarchives a page and all its children that inherited archived status.
+				Checks permissions.
+			
+			Parameters:
+				page - The page id or page entry.
+			
+			Returns:
+				true if successful. false if permission was denied.
+		*/
+
+		function unarchivePage($page) {
+			if (is_array($page)) {
+				$page = mysql_real_escape_string($page["id"]);
+			} else {
+				$page = mysql_real_escape_string($page);
+			}
+			$access = $this->getPageAccessLevel($page);
+			if ($access == "p") {
+				sqlquery("UPDATE bigtree_pages SET archived = '' WHERE id = '$page'");
+				$this->track("bigtree_pages",$page,"unarchived");
+				$this->unarchivePageChildren($page);
+				return true;
+			}
+			return false;
+		}
+		
+		/*
+			Function: unarchivePageChildren
+				Unarchives a page's children that have the archived_inherited status.
+				Does not checks permissions.
+			
+			Parameters:
+				id - The parent page id.
+		*/
+
+		function unarchivePageChildren($id) {
+			$q = sqlquery("SELECT * FROM bigtree_pages WHERE parent = '$id'");
+			while ($f = sqlfetch($q)) {
+				if ($f["archived_inherited"]) {
+					sqlquery("UPDATE bigtree_pages SET archived = '', archived_inherited = '' WHERE id = '".$f["id"]."'");
+					$this->track("bigtree_pages",$f["id"],"unarchived");
+					$this->archivePageChildren($f["id"]);
+				}
+			}
 		}
 		
 		/*
@@ -713,394 +1411,18 @@
 		}
 		
 		/*
-			Function: createPage
-				Creates a page.
-				Authority to create the page is not checked in this function so it should be done prior to it being called.
+			Function: updateChildPagePaths
+				Updates the paths for pages who are descendants of a given page to reflect the page's new route.
+				Also sets route history if the page has changed paths.
 			
 			Parameters:
-				data - An array of page information
-			
-			Returns:
-				The id of the newly created page.
+				page - The page id.
 		*/
 
-		function createPage($data) {
+		function updateChildPagePaths($page) {
 			global $cms;
 			
-			// Loop through the posted data, make sure no session hijacking is done.
-			foreach ($data as $key => $val) {
-				if (substr($key,0,1) != "_") {
-					if (is_array($val)) {
-						$$key = mysql_real_escape_string(json_encode($val));
-					} else {
-						$$key = mysql_real_escape_string($val);
-					}
-				}
-			}
-			
-			// If there's an external link, make sure it's a relative URL
-			if ($external) {
-				$external = $this->makeIPL($external);
-			}
-			
-			
-			// Who knows what they may have put in for a route, so we're not going to use the mysql_real_escape_string version.
-			$route = $data["route"];
-			if (!$route) {
-				// If they didn't specify a route use the navigation title
-				$route = $cms->urlify($data["nav_title"]);
-			} else {
-				// Otherwise sanitize the one they did provide.
-				$route = $cms->urlify($route);
-			}
-			
-			// We need to figure out a unique route for the page.  Make sure it doesn't match a directory in /site/
-			$oroute = $route;
-			$x = 2;
-			// Reserved paths.
-			if ($parent == 0) {
-				while (file_exists($GLOBALS["server_root"]."core/".$route."/") || file_exists($GLOBALS["server_root"]."site/".$route."/")) {
-					$route = $oroute."-".$x;
-					$x++;
-				}
-			}
-
-			$f = sqlfetch(sqlquery("SELECT * FROM bigtree_pages WHERE `route` = '$route' AND parent = '$parent'"));
-			while ($f) {
-				$route = $oroute."-".$x;
-				$f = sqlfetch(sqlquery("SELECT * FROM bigtree_pages WHERE `route` = '$route' AND parent = '$parent'"));
-				$x++;
-			}
-
-			if ($parent) {
-				$path = $this->getFullNavigationPath($parent)."/".$route;
-			} else {
-				$path = $route;
-			}
-
-			if ($publish_at) {
-				$publish_at = "'".date("Y-m-d",strtotime($publish_at))."'";
-			} else {
-				$publish_at = "NULL";
-			}
-
-			if ($expire_at) {
-				$expire_at = "'".date("Y-m-d",strtotime($expire_at))."'";
-			} else {
-				$expire_at = "NULL";
-			}
-
-			$title = htmlspecialchars($title);
-			$nav_title = htmlspecialchars($nav_title);
-			$meta_description = htmlspecialchars($meta_description);
-			$meta_keywords = htmlspecialchars($meta_keywords);
-			$external = htmlspecialchars($external);
-
-			sqlquery("INSERT INTO bigtree_pages (`parent`,`nav_title`,`route`,`path`,`in_nav`,`title`,`template`,`external`,`new_window`,`resources`,`callouts`,`meta_keywords`,`meta_description`,`last_edited_by`,`created_at`,`updated_at`,`publish_at`,`expire_at`,`max_age`) VALUES ('$parent','$nav_title','$route','$path','$in_nav','$title','$template','$external','$new_window','$resources','$callouts','$meta_keywords','$meta_description','".$this->ID."',NOW(),NOW(),$publish_at,$expire_at,'$max_age')");
-
-			$id = sqlid();
-
-			// Handle tags
-			if (is_array($data["_tags"])) {
-				foreach ($data["_tags"] as $tag) {
-					sqlquery("INSERT INTO bigtree_tags_rel (`module`,`entry`,`tag`) VALUES ('0','$id','$tag')");
-				}
-			}
-
-
-			// Handle resources
-			if (is_array($data["_resources"])) {
-				foreach ($data["_resources"] as $rid) {
-					sqlquery("UPDATE bigtree_resources SET `table` = 'bigtree_pages', entry = '$id' WHERE id = '$rid'");
-				}
-			}
-
-			$newpath = $this->getFullNavigationPath($id);
-			sqlquery("DELETE FROM bigtree_route_history WHERE old_route = '$newpath'");
-
-			$this->clearCache();
-			$this->pingSearchEngines();
-			$this->track("bigtree_pages",$id,"created");
-
-			return $id;
-		}
-
-		function createPendingPage($data) {
-			global $cms;
-
-			if ($d["external"]) {
-				$d["external"] = $this->makeIPL($d["external"]);
-			}
-
-			$tags = mysql_real_escape_string(json_encode($data["_tags"]));
-			unset($data["_tags"]);
-			unset($data["_resources"]);
-
-			$data["nav_title"] = htmlspecialchars($data["nav_title"]);
-			$data["title"] = htmlspecialchars($data["title"]);
-			$data["external"] = htmlspecialchars($data["external"]);
-			$data["meta_keywords"] = htmlspecialchars($data["meta_keywords"]);
-			$data["meta_description"] = htmlspecialchars($data["meta_description"]);
-
-			$data = mysql_real_escape_string(json_encode($data));
-			sqlquery("INSERT INTO bigtree_pending_changes (`user`,`date`,`title`,`table`,`changes`,`tags_changes`,`type`,`module`,`pending_page_parent`) VALUES ('".$this->ID."',NOW(),'New Page Created','bigtree_pages','$data','$tags','NEW','','".$data["parent"]."')");
-			$id = sqlid();
-
-			$this->track("bigtree_pages","p$id","created-pending");
-
-			return $id;
-		}
-
-		function deletePage($page) {
-			global $cms;
-
 			$page = mysql_real_escape_string($page);
-
-			$r = $this->getPageAccessLevelByUser($page,$this->ID);
-			if ($r == "p") {
-				if (!is_numeric($page)) {
-					sqlquery("DELETE FROM bigtree_pending_changes WHERE id = '".mysql_real_escape_string(substr($page,1))."'");
-					$this->growl("Pages","Deleted Page");
-					$this->track("bigtree_pages","p$page","deleted-pending");
-				} else {
-					sqlquery("DELETE FROM bigtree_pages WHERE id = '$page'");
-					$this->deletePageChildren($page);
-					$this->growl("Pages","Deleted Page");
-					$this->track("bigtree_pages",$page,"deleted");
-				}
-
-				return true;
-			}
-			$this->stop("You do not have permission to delete this page.");
-		}
-
-		function deletePageChildren($id) {
-			$q = sqlquery("SELECT * FROM bigtree_pages WHERE parent = '$id'");
-			while ($f = sqlfetch($q)) {
-				$this->deletePageChildren($f["id"]);
-			}
-			sqlquery("DELETE FROM bigtree_pages WHERE parent = '$id'");
-			$this->track("bigtree_pages",$id,"deleted");
-		}
-
-		function getPageVersion($id) {
-			$id = mysql_real_escape_string($id);
-			$item = sqlfetch(sqlquery("SELECT * FROM bigtree_page_versions WHERE id = '$id'"));
-			return $item;
-		}
-
-		function getPendingChange($id) {
-			$id = mysql_real_escape_string($id);
-			$item = sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE id = '$id'"));
-			if (!$item) {
-				return false;
-			}
-			$item["changes"] = json_decode($item["changes"],true);
-			return $item;
-		}
-
-		/*
-			Function: getPendingPage
-				Returns a page from the database with all its pending changes applied.
-
-			Parameters:
-				id - The ID of the live page or the ID of a pending page with "p" preceding the ID.
-
-			Returns:
-				A decoded page array with pending changes applied and related tags.
-
-			See Also:
-				<BigTreeCMS.getPage>
-		*/
-
-		function getPendingPage($id) {
-			// Get the live page.
-			if (is_numeric($id)) {
-				global $cms;
-				$page = $cms->getPage($id);
-				if (!$page) {
-					return false;
-				}
-				$page["tags"] = $this->getTagsForPage($id);
-				// Get pending changes for this page.
-				$f = sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE `table` = 'bigtree_pages' AND item_id = '".$page["id"]."'"));
-			} else {
-				$page = array();
-				// Get the page.
-				$f = sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE `id` = '".mysql_real_escape_string(substr($id,1))."'"));
-				if ($f) {
-					$f["id"] = $id;
-				} else {
-					return false;
-				}
-			}
-
-			// Sweep through pending changes and apply them to the page
-			if ($f) {
-				$page["updated_at"] = $f["date"];
-				$changes = json_decode($f["changes"],true);
-				foreach ($changes as $key => $val) {
-					if ($key == "external") {
-						$val = $cms->getInternalPageLink($val);
-					}
-					$page[$key] = $val;
-				}
-				// Decode the tag changes, apply them back.
-				$tags = array();
-				$temp_tags = json_decode($f["tags_changes"],true);
-				if (is_array($temp_tags)) {
-					foreach ($temp_tags as $tag) {
-						$tags[] = sqlfetch(sqlquery("SELECT * FROM bigtree_tags WHERE id = '$tag'"));
-					}
-				}
-				$page["tags"] = $tags;
-				// Say that changes exist
-				$page["changes_applied"] = true;
-			}
-			return $page;
-		}
-
-
-		function getTagsForPage($page) {
-			$tags = array();
-			$q = sqlquery("SELECT bigtree_tags.* FROM bigtree_tags JOIN bigtree_tags_rel WHERE bigtree_tags_rel.tag = bigtree_tags.id AND bigtree_tags_rel.entry = '$page' AND bigtree_tags_rel.module = '0' ORDER BY bigtree_tags.tag");
-			while ($f = sqlfetch($q)) {
-				$tags[] = $f;
-			}
-			return $tags;
-		}
-
-		function pingSearchEngines() {
-			global $cms;
-			if ($cms->getSetting("ping-search-engines") == "on") {
-				$google = file_get_contents("http://www.google.com/webmasters/tools/ping?sitemap=".urlencode($GLOBALS["www_root"]."sitemap.xml"));
-				$ask = file_get_contents("http://submissions.ask.com/ping?sitemap=".urlencode($GLOBALS["www_root"]."sitemap.xml"));
-				$yahoo = file_get_contents("http://search.yahooapis.com/SiteExplorerService/V1/ping?sitemap=".urlencode($GLOBALS["www_root"]."sitemap.xml"));
-				$bing = file_get_contents("http://www.bing.com/webmaster/ping.aspx?siteMap=".urlencode($GLOBALS["www_root"]."sitemap.xml"));
-			}
-		}
-
-		function submitPageChange($page,$changes,$type = "EDIT") {
-			global $cms;
-			if ($page[0] == "p") {
-				// It's still pending...
-				$pdata = array();
-				$pending = true;
-				$type = "NEW";
-			} else {
-				$pending = false;
-				$pdata = $cms->getPage($page);
-			}
-
-			$template = $pdata["template"];
-			if (!$pending) {
-				$f = sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE `table` = 'bigtree_pages' AND item_id = '$page'"));
-			} else {
-				$f = sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE id = '".substr($page,1)."'"));
-			}
-
-			$tags = mysql_real_escape_string(json_encode($changes["_tags"]));
-			unset($changes["_tags"]);
-
-			// If there's already a change in the queue, update it with this latest info.
-			if ($f) {
-				$comments = json_decode($f["comments"],true);
-				if ($f["user"] == $this->ID) {
-					$comments[] = array(
-						"user" => "BigTree",
-						"date" => date("F j, Y @ g:ia"),
-						"comment" => "A new revision has been made."
-					);
-				} else {
-					$user = $this->getUser($this->ID);
-					$comments[] = array(
-						"user" => "BigTree",
-						"date" => date("F j, Y @ g:ia"),
-						"comment" => "A new revision has been made.  Owner switched to ".$user["name"]."."
-					);
-				}
-
-				if ($pending) {
-					$changes = mysql_real_escape_string(json_encode($changes));
-				} else {
-					$ochanges = json_decode($f["changes"],true);
-					if (isset($ochanges["template"])) {
-						$template = $ochanges["template"];
-					}
-					if (isset($changes["external"])) {
-						$changes["external"] = $this->makeIPL($changes["external"]);
-					}
-
-					foreach ($changes as $key => $val) {
-						if ($val != $pdata[$key] && isset($pdata[$key])) {
-							$ochanges[$key] = $val;
-						}
-					}
-
-					$changes = mysql_real_escape_string(json_encode($ochanges));
-				}
-
-				$comments = mysql_real_escape_string(json_encode($comments));
-				if ($type == "DELETE") {
-					sqlquery("UPDATE bigtree_pending_changes SET comments = '$comments', title = 'Page Deletion Pending', date = NOW(), user = '".$this->ID."', type = 'DELETE' WHERE id = '".$f["id"]."'");
-				} else {
-					sqlquery("UPDATE bigtree_pending_changes SET comments = '$comments', changes = '$changes', tags_changes = '$tags', date = NOW(), user = '".$this->ID."', type = '$type' WHERE id = '".$f["id"]."'");
-				}
-
-				$this->track("bigtree_pages",$page,"updated-draft");
-
-			// We're submitting a change to a presently published page with no pending changes.
-			} else {
-				$ochanges = array();
-
-				foreach ($changes as $key => $val) {
-					if ($key == "external") {
-						$val = $this->makeIPL($val);
-					}
-
-					if (isset($pdata[$key]) && $val != $pdata[$key]) {
-						$ochanges[$key] = $val;
-					}
-				}
-
-				$changes = mysql_real_escape_string(json_encode($ochanges));
-				if ($type == "DELETE") {
-					sqlquery("INSERT INTO bigtree_pending_changes (`user`,`date`,`table`,`item_id`,`changes`,`type`,`title`) VALUES ('".$this->ID."',NOW(),'bigtree_pages','$page','$changes','DELETE','Page Deletion Pending')");
-				} else {
-					sqlquery("INSERT INTO bigtree_pending_changes (`user`,`date`,`table`,`item_id`,`changes`,`tags_changes`,`type`,`title`) VALUES ('".$this->ID."',NOW(),'bigtree_pages','$page','$changes','$tags','EDIT','Page Change Pending')");
-				}
-
-				$this->track("bigtree_pages",$page,"saved-draft");
-			}
-
-			return sqlid();
-		}
-
-		function unarchivePage($page) {
-			$page = mysql_real_escape_string($page);
-			$access = $this->getPageAccessLevel($page);
-			if ($access == "p") {
-				sqlquery("UPDATE bigtree_pages SET archived = '' WHERE id = '$page'");
-				$this->track("bigtree_pages",$page,"unarchived");
-				$this->unarchivePageChildren($page);
-				return true;
-			}
-			return false;
-		}
-
-		function unarchivePageChildren($id) {
-			$q = sqlquery("SELECT * FROM bigtree_pages WHERE parent = '$id'");
-			while ($f = sqlfetch($q)) {
-				if ($f["archived_inherited"]) {
-					sqlquery("UPDATE bigtree_pages SET archived = '', archived_inherited = '' WHERE id = '".$f["id"]."'");
-					$this->track("bigtree_pages",$f["id"],"unarchived");
-					$this->archivePageChildren($f["id"]);
-				}
-			}
-		}
-
-		function updateChildPageRoutes($page) {
-			global $cms;
 			$q = sqlquery("SELECT * FROM bigtree_pages WHERE parent = '$page'");
 			while ($f = sqlfetch($q)) {
 				$oldpath = $f["path"];
@@ -1109,10 +1431,20 @@
 					sqlquery("DELETE FROM bigtree_route_history WHERE old_route = '$path' OR old_route = '$oldpath'");
 					sqlquery("INSERT INTO bigtree_route_history (`old_route`,`new_route`) VALUES ('$oldpath','$path')");
 					sqlquery("UPDATE bigtree_pages SET path = '$path' WHERE id = '".$f["id"]."'");
-					$this->updateChildPageRoutes($f["id"]);
+					$this->updateChildPagePaths($f["id"]);
 				}
 			}
 		}
+		
+		/*
+			Function: updatePage
+				Updates a page.
+				Does not check permissions.
+			
+			Paramters:
+				page - The page id to update.
+				data - The page data to update with.	
+		*/
 
 		function updatePage($page,$data) {
 			global $cms;
@@ -1166,7 +1498,7 @@
 			$x = 2;
 			// Reserved paths.
 			if ($parent == 0) {
-				while (file_exists($GLOBALS["server_root"]."core/".$route."/") || file_exists($GLOBALS["server_root"]."site/".$route."/")) {
+				while (file_exists($GLOBALS["server_root"]."site/".$route."/")) {
 					$route = $oroute."-".$x;
 					$x++;
 				}
@@ -1226,7 +1558,7 @@
 				sqlquery("INSERT INTO bigtree_route_history (`old_route`,`new_route`) VALUES ('$oldpath','$newpath')");
 
 				// Update all child page routes, ping those engines, clean those caches
-				$this->updateChildPageRoutes($page);
+				$this->updateChildPagePaths($page);
 				$this->pingSearchEngines();
 				$this->clearCache();
 			}
@@ -1238,126 +1570,24 @@
 					sqlquery("INSERT INTO bigtree_tags_rel (`module`,`entry`,`tag`) VALUES ('0','$page','$tag')");
 				}
 			}
-
+			
+			// Audit trail.
 			$this->track("bigtree_pages",$page,"updated");
 
 			return $page;
 		}
-
-		// !Editor/Publisher Functions
-
-		function getChangeById($id) {
-			return sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE id = '$id'"));
-		}
-
+		
 		/*
-			Function: getChangeEditLink
-				Returns a link to where the item involved in the pending change can be edited.
-
+			Function: getModuleByRoute
+				Returns a module entry for the given route.
+			
 			Parameters:
-				change - The ID of the change or the change array from the database.
-
+				route - A module route.
+			
 			Returns:
-				A string containing a link to the admin.
+				A module entry with the "gbp" column decoded or false if a module was not found.
 		*/
-
-		function getChangeEditLink($change) {
-			if (!is_array($change)) {
-				$change = sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE id = '$change'"));
-			}
-
-			if ($change["table"] == "bigtree_pages" && $change["item_id"]) {
-				return $GLOBALS["admin_root"]."pages/edit/".$change["item_id"]."/";
-			}
-
-			if ($change["table"] == "bigtree_pages") {
-				return $GLOBALS["admin_root"]."pages/edit/p".$change["id"]."/";
-			}
-
-			$modid = $change["module"];
-			$module = sqlfetch(sqlquery("SELECT * FROM bigtree_modules WHERE id = '$modid'"));
-			$form = sqlfetch(sqlquery("SELECT * FROM bigtree_module_forms WHERE `table` = '".$change["table"]."'"));
-			$action = sqlfetch(sqlquery("SELECT * FROM bigtree_module_actions WHERE `form` = '".$form["id"]."' AND in_nav = ''"));
-
-			if (!$change["item_id"]) {
-				$change["item_id"] = "p".$change["id"];
-			}
-
-			if ($action) {
-				return $GLOBALS["admin_root"].$module["route"]."/".$action["route"]."/".$change["item_id"]."/";
-			} else {
-				return $GLOBALS["admin_root"].$module["route"]."/edit/".$change["item_id"]."/";
-			}
-		}
-
-		// !Module Functions
-
-		function getActionId($module,$action) {
-			$f = sqlfetch(sqlquery("SELECT id FROM bigtree_module_actions WHERE route = '$action' AND module = '$module'"));
-			if (!$f) {
-				return false;
-			}
-			return $f["id"];
-		}
-
-		function getAutoModuleActions($module) {
-			$am = new BigTreeAutoModule;
-			$items = array();
-			$id = mysql_real_escape_string($module);
-			$q = sqlquery("SELECT * FROM bigtree_module_actions WHERE module = '$id' AND (form != 0 OR view != 0) AND in_nav = 'on' ORDER BY position DESC, id ASC");
-			while ($f = sqlfetch($q)) {
-				if ($f["form"]) {
-					$f["form"] = $am->getForm($f["form"]);
-					$f["type"] = "form";
-				} elseif ($f["view"]) {
-					$f["view"] = $am->getView($f["view"]);
-					$f["type"] = "view";
-				}
-				$items[] = $f;
-			}
-			return $items;
-		}
-
-		function getModule($id) {
-			$id = mysql_real_escape_string($id);
-			$module = sqlfetch(sqlquery("SELECT * FROM bigtree_modules WHERE id = '$id'"));
-			if (!$module) {
-				return false;
-			}
-
-			$module["gbp"] = json_decode($module["gbp"],true);
-			return $module;
-		}
-
-		function getModuleAction($id) {
-			$id = mysql_real_escape_string($id);
-			return sqlfetch(sqlquery("SELECT * FROM bigtree_module_actions WHERE id = '$id'"));
-		}
-
-		function getModuleActionForForm($id) {
-			$id = mysql_real_escape_string($id);
-			return sqlfetch(sqlquery("SELECT * FROM bigtree_module_actions WHERE form = '$id'"));
-		}
-
-		function getModuleActionForView($id) {
-			$id = mysql_real_escape_string($id);
-			return sqlfetch(sqlquery("SELECT * FROM bigtree_module_actions WHERE view = '$id'"));
-		}
-
-		function getModuleActions($module) {
-			$items = array();
-			$id = mysql_real_escape_string($module);
-			$q = sqlquery("SELECT * FROM bigtree_module_actions WHERE module = '$id' ORDER BY position DESC, id ASC");
-			while ($f = sqlfetch($q)) {
-				$items[] = $f;
-			}
-			return $items;
-		}
-
-		function getModuleActionById($id) { return $this->getModuleAction($id); }
-
-		function getModuleById($id) { return $this->getModule($id); }
-
+		
 		function getModuleByRoute($route) {
 			$route = mysql_real_escape_string($route);
 			$module = sqlfetch(sqlquery("SELECT * FROM bigtree_modules WHERE route = '$route'"));
@@ -1368,6 +1598,10 @@
 			$module["gbp"] = json_decode($module["gbp"],true);
 			return $module;
 		}
+		
+		/*
+			Function: getModuleForm
+		*/
 
 		function getModuleForm($id) {
 			$id = mysql_real_escape_string($id);

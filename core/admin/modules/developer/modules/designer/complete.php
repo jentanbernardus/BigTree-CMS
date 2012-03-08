@@ -1,5 +1,5 @@
 <?
-	$module = $admin->getModuleById(end($commands));
+	$module = $admin->getModule(end($commands));
 ?>
 <h1><span class="icon_developer_modules"></span>Module Designer</h1>
 <? include bigtree_path("admin/modules/developer/modules/_nav.php"); ?>
