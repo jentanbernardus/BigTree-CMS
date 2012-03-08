@@ -5,9 +5,9 @@
 	<? if ($title) { ?><label<?=$label_validation_class?>><?=$title?><? if ($subtitle) { ?> <small><?=$subtitle?></small><? } ?></label><? } ?>
 	<input<?=$input_validation_class?> type="file" tabindex="<?=$tabindex?>" name="<?=$key?>" id="field_<?=$key?>" />
 	<? if ($value) { ?>
-	<input type="hidden" name="<?=$currently_key?>" value="<?=htmlspecialchars($value)?>" id="field_<?=$key?>" />
-	<div>
-		<small>Currently: <?=$value?> <a href="#" class="remove_resource">Remove</a></small>	
+	<div class="currently_file">
+		<input type="hidden" name="<?=$currently_key?>" value="<?=htmlspecialchars($value)?>" id="field_<?=$key?>" />
+		<strong>Currently:</strong> <?=$value?> <a href="#" class="remove_resource">Remove</a>
 	</div>
 	<? } ?>
 </fieldset>
