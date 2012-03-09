@@ -1,5 +1,5 @@
 <?
-	$form = $admin->getModuleForm($commands[0]);;
+	$form = BigTreeAutoModule::getForm($commands[0]);;
 	$module = $admin->getModule(BigTreeAutoModule::getModuleForForm($form));
 	
 	$action = $admin->getModuleActionForForm($form["id"]);

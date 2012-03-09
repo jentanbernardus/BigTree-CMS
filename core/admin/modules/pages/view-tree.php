@@ -176,17 +176,17 @@
 	if (count($nav_visible) || count($nav_hidden) || count($nav_archived)) {
 		// Drag Visible Pages
 		if (count($nav_visible)) {
-		    local_drawPageTree($nav_visible,"Visible","","visible",true);
+			local_drawPageTree($nav_visible,"Visible","","visible",true);
 		}
 		
 		// Draw Hidden Pages
 		if (count($nav_hidden)) {
-		    local_drawPageTree($nav_hidden,"Hidden","Not Appearing In Navigation","hidden",false);
+			local_drawPageTree($nav_hidden,"Hidden","Not Appearing In Navigation","hidden",false);
 		}
 		
 		// Draw Archived Pages
 		if (count($nav_archived)) {
-		    local_drawPageTree($nav_archived,"Archived","Not Accessible By Users","archived",false);
+			local_drawPageTree($nav_archived,"Archived","Not Accessible By Users","archived",false);
 		}
 	} else {
 ?>

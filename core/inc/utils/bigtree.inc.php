@@ -272,36 +272,6 @@
 		$href = str_replace($GLOBALS["www_root"],"{wwwroot}",$href);
 		return 'href="'.$href.'"';
 	}
-	
-	// A function to draw a module dropdown
-	function bigtree_draw_module_dropdown_contents($currently = false,$route = false) {
-?>
-<option></option>
-<?
-		$q = sqlquery("SELECT * FROM bigtree_module_groups ORDER BY name");
-		while ($group = sqlfetch($q)) {
-			$qq = sqlquery("SELECT * FROM bigtree_modules WHERE `group` = '".$group["id"]."' ORDER BY name");
-			if (sqlrows($qq)) {
-?>
-<optgroup label="<?=$group["name"]?>">
-	<? while ($module = sqlfetch($qq)) { ?>
-	<option value="<? if ($route) { ?><?=$module["route"]?><? } else { ?><?=$module["id"]?><? } ?>"<? if (($currently == $module["id"] && !$route) || ($currently == $module["route"] && $route)) { ?> selected="selected"<? } ?>><?=$module["name"]?></option>
-	<? } ?>
-</optgroup>
-<?
-			}
-		}
-		$qq = sqlquery("SELECT * FROM bigtree_modules WHERE `group` = '0' ORDER BY name");
-		if (sqlrows($qq)) {
-?>
-<optgroup label="Miscellaneous">
-	<? while ($module = sqlfetch($qq)) { ?>
-	<option value="<? if ($route) { ?><?=$module["route"]?><? } else { ?><?=$module["id"]?><? } ?>"<? if (($currently == $module["id"] && !$route) || ($currently == $module["route"] && $route)) { ?> selected="selected"<? } ?>><?=$module["name"]?></option>
-	<? } ?>
-</optgroup>
-<?
-		}
-	}
 
 	// Get a drop down of all the fields in a table.
 	function bigtree_field_select($table,$default = "",$sorting = false) {
@@ -767,54 +737,54 @@
 	// Modified to allow embeds and iframes to still exist but to take out crazy scripting things.
 	//
 	// +----------------------------------------------------------------------+
-	// | Copyright (c) 2001-2008 Liip AG                                      |
+	// | Copyright (c) 2001-2008 Liip AG									  |
 	// +----------------------------------------------------------------------+
-	// | Licensed under the Apache License, Version 2.0 (the "License");      |
-	// | you may not use this file except in compliance with the License.     |
-	// | You may obtain a copy of the License at                              |
-	// | http://www.apache.org/licenses/LICENSE-2.0                           |
+	// | Licensed under the Apache License, Version 2.0 (the "License");	  |
+	// | you may not use this file except in compliance with the License.	 |
+	// | You may obtain a copy of the License at							  |
+	// | http://www.apache.org/licenses/LICENSE-2.0						   |
 	// | Unless required by applicable law or agreed to in writing, software  |
-	// | distributed under the License is distributed on an "AS IS" BASIS,    |
-	// | WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or      |
-	// | implied. See the License for the specific language governing         |
-	// | permissions and limitations under the License.                       |
+	// | distributed under the License is distributed on an "AS IS" BASIS,	|
+	// | WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or	  |
+	// | implied. See the License for the specific language governing		 |
+	// | permissions and limitations under the License.					   |
 	// +----------------------------------------------------------------------+
-	// | Author: Christian Stocker <christian.stocker@liip.ch>                |
+	// | Author: Christian Stocker <christian.stocker@liip.ch>				|
 	// +----------------------------------------------------------------------+
 	
 	function htmlclean($string) {
 		$string = str_replace(array("&amp;", "&lt;", "&gt;"), array("&amp;amp;", "&amp;lt;", "&amp;gt;"), $string);
-        
-        // fix &entitiy\n;
-        $string = preg_replace('#(&\#*\w+)[\x00-\x20]+;#u', "$1;", $string);
-        $string = preg_replace('#(&\#x*)([0-9A-F]+);*#iu', "$1$2;", $string);
+		
+		// fix &entitiy\n;
+		$string = preg_replace('#(&\#*\w+)[\x00-\x20]+;#u', "$1;", $string);
+		$string = preg_replace('#(&\#x*)([0-9A-F]+);*#iu', "$1$2;", $string);
 
-        $string = html_entity_decode($string, ENT_COMPAT, "UTF-8");
-        
-        // remove any attribute starting with "on" or xmlns
-        $string = preg_replace('#(<[^>]+[\x00-\x20\"\'\/])(on|xmlns)[^>]*>#iUu', "$1>", $string);
-        
-        // remove javascript: and vbscript: protocol
-        $string = preg_replace('#([a-z]*)[\x00-\x20\/]*=[\x00-\x20\/]*([\`\'\"]*)[\x00-\x20\/]*j[\x00-\x20]*a[\x00-\x20]*v[\x00-\x20]*a[\x00-\x20]*s[\x00-\x20]*c[\x00-\x20]*r[\x00-\x20]*i[\x00-\x20]*p[\x00-\x20]*t[\x00-\x20]*:#iUu', '$1=$2nojavascript...', $string);
-        $string = preg_replace('#([a-z]*)[\x00-\x20\/]*=[\x00-\x20\/]*([\`\'\"]*)[\x00-\x20\/]*v[\x00-\x20]*b[\x00-\x20]*s[\x00-\x20]*c[\x00-\x20]*r[\x00-\x20]*i[\x00-\x20]*p[\x00-\x20]*t[\x00-\x20]*:#iUu', '$1=$2novbscript...', $string);
-        $string = preg_replace('#([a-z]*)[\x00-\x20\/]*=[\x00-\x20\/]*([\`\'\"]*)[\x00-\x20\/]*-moz-binding[\x00-\x20]*:#Uu', '$1=$2nomozbinding...', $string);
-        $string = preg_replace('#([a-z]*)[\x00-\x20\/]*=[\x00-\x20\/]*([\`\'\"]*)[\x00-\x20\/]*data[\x00-\x20]*:#Uu', '$1=$2nodata...', $string);
-        
-        // remove any style attributes, IE allows too much stupid things in them, eg.
-        // <span style="width: expression(alert('Ping!'));"></span> 
-        // and in general you really don't want style declarations in your UGC
+		$string = html_entity_decode($string, ENT_COMPAT, "UTF-8");
+		
+		// remove any attribute starting with "on" or xmlns
+		$string = preg_replace('#(<[^>]+[\x00-\x20\"\'\/])(on|xmlns)[^>]*>#iUu', "$1>", $string);
+		
+		// remove javascript: and vbscript: protocol
+		$string = preg_replace('#([a-z]*)[\x00-\x20\/]*=[\x00-\x20\/]*([\`\'\"]*)[\x00-\x20\/]*j[\x00-\x20]*a[\x00-\x20]*v[\x00-\x20]*a[\x00-\x20]*s[\x00-\x20]*c[\x00-\x20]*r[\x00-\x20]*i[\x00-\x20]*p[\x00-\x20]*t[\x00-\x20]*:#iUu', '$1=$2nojavascript...', $string);
+		$string = preg_replace('#([a-z]*)[\x00-\x20\/]*=[\x00-\x20\/]*([\`\'\"]*)[\x00-\x20\/]*v[\x00-\x20]*b[\x00-\x20]*s[\x00-\x20]*c[\x00-\x20]*r[\x00-\x20]*i[\x00-\x20]*p[\x00-\x20]*t[\x00-\x20]*:#iUu', '$1=$2novbscript...', $string);
+		$string = preg_replace('#([a-z]*)[\x00-\x20\/]*=[\x00-\x20\/]*([\`\'\"]*)[\x00-\x20\/]*-moz-binding[\x00-\x20]*:#Uu', '$1=$2nomozbinding...', $string);
+		$string = preg_replace('#([a-z]*)[\x00-\x20\/]*=[\x00-\x20\/]*([\`\'\"]*)[\x00-\x20\/]*data[\x00-\x20]*:#Uu', '$1=$2nodata...', $string);
+		
+		// remove any style attributes, IE allows too much stupid things in them, eg.
+		// <span style="width: expression(alert('Ping!'));"></span> 
+		// and in general you really don't want style declarations in your UGC
 
-        $string = preg_replace('#(<[^>]+[\x00-\x20\"\'\/])style[^>]*>#iUu', "$1>", $string);
+		$string = preg_replace('#(<[^>]+[\x00-\x20\"\'\/])style[^>]*>#iUu', "$1>", $string);
 
-        // remove namespaced elements (we do not need them...)
-        $string = preg_replace('#</*\w+:\w[^>]*>#i', "", $string);
-        
-        // remove really unwanted tags
-        do {
-            $oldstring = $string;
-            $string = preg_replace('#</*(applet|meta|xml|blink|link|style|script|frame|frameset|ilayer|layer|bgsound|title|base)[^>]*>#i', "", $string);
-        } while ($oldstring != $string);
-        
+		// remove namespaced elements (we do not need them...)
+		$string = preg_replace('#</*\w+:\w[^>]*>#i', "", $string);
+		
+		// remove really unwanted tags
+		do {
+			$oldstring = $string;
+			$string = preg_replace('#</*(applet|meta|xml|blink|link|style|script|frame|frameset|ilayer|layer|bgsound|title|base)[^>]*>#i', "", $string);
+		} while ($oldstring != $string);
+		
 		return str_replace("<br></br>","<br />",strip_tags($string,"<h1><h2><h3><h4><h5><h6><p><br><br/><br /><hr /><hr/><hr><b><big><em><i><small><strong><sub><sup><ins><del><s><strike><u><pre><blockquote><address><cite><q><a><table><tr><td><thead><th><tbody><ul><ol><li><dl><dt><dd><form><input><select><textarea><label><fieldset><legend><option><optgroup><img><map><area><font><span><div><button><caption><center><param><tfoot><iframe><embed><object>"));
 	}
 

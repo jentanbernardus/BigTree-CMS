@@ -10,7 +10,7 @@
 	}
 	$actions = $clean_actions;
 	
-	$old_view = $admin->getModuleView(end($path));
+	$old_view = BigTreeAutoModule::getView(end($path));
 	
 	$columns = sqlcolumns($table);
 	

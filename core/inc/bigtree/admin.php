@@ -265,6 +265,127 @@
 		}
 		
 		/*
+			Function: createModule
+				Creates a module and its class file.
+			
+			Parameters:
+				name - The name of the module.
+				group - The group for the module.
+				class - The module class to create.
+				table - The table this module relates to.
+				permissions - The group-based permissions.
+			
+			Returns:
+				The new module id.
+		*/
+		
+		function createModule($name,$group,$class,$table,$permissions) {
+			global $cms;
+			
+			// Find an available module route.
+			$route = $cms->urlify($name);
+			
+			// Go through the hard coded modules
+			$existing = array();
+			$d = opendir($GLOBALS["server_root"]."core/admin/modules/");
+			while ($f = readdir($d)) {
+				if ($f != "." && $f != "..") {
+					$existing[] = $f;
+				}
+			}
+			// Go through the directories (really ajax, css, images, js)
+			$d = opendir($GLOBALS["server_root"]."core/admin/");
+			while ($f = readdir($d)) {
+				if ($f != "." && $f != "..") {
+					$existing[] = $f;
+				}
+			}
+			// Go through the hard coded pages
+			$d = opendir($GLOBALS["server_root"]."core/admin/pages/");
+			while ($f = readdir($d)) {
+				if ($f != "." && $f != "..") {
+					// Drop the .php
+					$existing[] = substr($f,0,-4);
+				}
+			}
+			// Go through already created modules
+			$q = sqlquery("SELECT route FROM bigtree_modules");
+			while ($f = sqlfetch($q)) {
+				$existing[] = $f["route"];
+			}
+			
+			// Get a unique route
+			$x = 2;
+			$oroute = $route;
+			while (in_array($route,$existing)) {
+				$route = $oroute."-".$x;
+				$x++;
+			}
+			
+			$name = mysql_real_escape_string(htmlspecialchars($name));
+			$route = mysql_real_escape_string($route);
+			$class = mysql_real_escape_string($class);
+			$group = mysql_real_escape_string($group);
+			$gbp = mysql_real_escape_string(json_encode($permissions));
+			
+			sqlquery("INSERT INTO bigtree_modules (`name`,`route`,`class`,`group`,`gbp`) VALUES ('$name','$route','$class','$group','$gbp')");
+			$id = sqlid();
+			
+			if ($class) {
+				// Create class module.
+				$f = fopen($GLOBALS["server_root"]."custom/inc/modules/$route.php","w");
+				fwrite($f,"<?\n");
+				fwrite($f,"	class $class extends BigTreeModule {\n");
+				fwrite($f,"\n");
+				fwrite($f,'		var $Table = "'.$table.'";'."\n");
+				fwrite($f,'		var $Module = "'.$id.'";'."\n");
+				fwrite($f,"	}\n");
+				fwrite($f,"?>\n");
+				fclose($f);
+				chmod($GLOBALS["server_root"]."custom/inc/modules/$route.php",0777);
+				
+				// Remove cached class list.
+				unlink($GLOBALS["server_root"]."cache/module-class-list.btc");
+			}
+			
+			return $id;
+		}
+		
+		/*
+			Function: createModuleGroup
+				Creates a module group.
+			
+			Parameters:
+				name - The name of the group.
+				package - The (optional) package id the group originated from.
+			
+			Returns:
+				The id of the newly created group.
+		*/
+		
+		function createModuleGroup($name,$package = 0) {
+			global $cms;
+			
+			$name = mysql_real_escape_string($name);
+			$packge = mysql_real_escape_string($package);
+			
+			// Get a unique route
+			$x = 2;
+			$route = $cms->urlify($name);
+			$oroute = $route;
+			while ($this->getModuleByRoute($route)) {
+				$route = $oroute."-".$x;
+				$x++;			
+			}
+			
+			// Just to be safe
+			$route = mysql_real_escape_string($route);
+			
+			sqlquery("INSERT INTO bigtree_module_packages (`name`,`route`,`package`) VALUES ('$name','$route','$package')");
+			return sqlid();
+		}
+		
+		/*
 			Function: createPage
 				Creates a page.
 				Does not check permissions.
@@ -418,6 +539,53 @@
 			$this->track("bigtree_pages","p$id","created-pending");
 
 			return $id;
+		}
+		
+		/*
+			Function: deleteModule
+				Deletes a module.
+			
+			Parameters:
+				id - The id of the module.
+		*/
+		
+		function deleteModule($id) {
+			$id = mysql_real_escape_string($id);
+			
+			// Get info and delete the class.
+			$module = $admin->getModule($id);
+			unlink($GLOBALS["server_root"]."custom/inc/modules/".$module["route"].".php");
+	
+			// Delete all the related auto module actions
+			$actions = $admin->getModuleActions($id);
+			foreach ($actions as $action) {
+				if ($action["form"]) {
+					sqlquery("DELETE FROM bigtree_module_forms WHERE id = '".$action["form"]."'");
+				}
+				if ($action["view"]) {
+					sqlquery("DELETE FROM bigtree_module_views WHERE id = '".$action["view"]."'");
+				}
+			}
+			
+			// Delete actions
+			sqlquery("DELETE FROM bigtree_module_actions WHERE module = '$id'");
+			
+			// Delete the module
+			sqlquery("DELETE FROM bigtree_modules WHERE id = '$id'");
+		}
+		
+		/*
+			Function: deleteModuleGroup
+				Deletes a module group. Sets modules in the group to Misc.
+			
+			Parameters:
+				id - The id of the module group.
+		*/
+		
+		function deleteModuleGroup($id) {
+			$id = mysql_real_escape_string($id);
+			sqlquery("DELETE FROM bigtree_module_groups WHERE id = '$id'");
+			sqlquery("UPDATE bigtree_modules SET `group` = '0' WHERE `group` = '$id'");
 		}
 		
 		/*
@@ -577,45 +745,6 @@
 				$items[] = $f;
 			}
 			return $items;
-		}
-		
-		/*
-			Function: getAvailableModuleRoute
-				Returns a route for a module that won't collide with another module.
-			
-			Parameters:
-				route - The preferred route.
-			
-			Returns:
-				A safe route.
-		*/
-
-		function getAvailableModuleRoute($route) {
-			$existing = array();
-			$d = opendir($GLOBALS["server_root"]."core/admin/modules/");
-			while ($f = readdir($d)) {
-				if ($f != "." && $f != "..") {
-					$existing[] = $f;
-				}
-			}
-			$d = opendir($GLOBALS["server_root"]."core/admin/");
-			while ($f = readdir($d)) {
-				if ($f != "." && $f != "..") {
-					$existing[] = $f;
-				}
-			}
-			$q = sqlquery("SELECT * FROM bigtree_modules");
-			while ($f = sqlfetch($q)) {
-				$existing[] = $f["route"];
-			}
-
-			$x = 2;
-			$oroute = $route;
-			while (in_array($route,$existing)) {
-				$route = $oroute."-".$x;
-				$x++;
-			}
-			return $route;
 		}
 		
 		/*
@@ -843,7 +972,228 @@
 		}
 		
 		/*
-			Function: getHiddenNavigationByParent
+			Function: getModuleByRoute
+				Returns a module entry for the given route.
+			
+			Parameters:
+				route - A module route.
+			
+			Returns:
+				A module entry with the "gbp" column decoded or false if a module was not found.
+		*/
+		
+		function getModuleByRoute($route) {
+			$route = mysql_real_escape_string($route);
+			$module = sqlfetch(sqlquery("SELECT * FROM bigtree_modules WHERE route = '$route'"));
+			if (!$module) {
+				return false;
+			}
+
+			$module["gbp"] = json_decode($module["gbp"],true);
+			return $module;
+		}
+		
+		/*
+			Function: getModuleGroup
+				Returns a module group entry from the bigtree_module_groups table.
+			
+			Parameters:
+				id - The id of the module group.
+			
+			Returns:
+				A module group entry.
+			
+			See Also:
+				<getModuleGroupByName>
+				<getModuleGroupByRoute>
+		*/
+		
+		function getModuleGroup($id) {
+			$id = mysql_real_escape_string($id);
+			return sqlfetch(sqlquery("SELECT * FROM bigtree_module_groups WHERE id = '$id'"));
+		}
+		
+		/*
+			Function: getModuleGroupByName
+				Returns a module group entry from the bigtree_module_groups table.
+			
+			Parameters:
+				name - The name of the module group.
+			
+			Returns:
+				A module group entry.
+			
+			See Also:
+				<getModuleGroup>
+				<getModuleGroupByRoute>
+		*/
+			
+
+		function getModuleGroupByName($name) {
+			$name = mysql_real_escape_string(strtolower($name));
+			return sqlfetch(sqlquery("SELECT * FROM bigtree_module_groups WHERE LOWER(name) = '$name'"));
+		}
+		
+		/*
+			Function: getModuleGroupByRoute
+				Returns a module group entry from the bigtree_module_groups table.
+			
+			Parameters:
+				route - The route of the module group.
+			
+			Returns:
+				A module group entry.
+			
+			See Also:
+				<getModuleGroup>
+				<getModuleGroupByName>
+		*/
+		
+		function getModuleGroupByRoute($route) {
+			$name = mysql_real_escape_string($route);
+			return sqlfetch(sqlquery("SELECT * FROM bigtree_module_groups WHERE route = '$route'"));
+		}
+		
+		/*
+			Function: getModuleGroups
+				Returns a list of module groups.
+			
+			Parameters:
+				sort - Sort by (defaults to positioned)
+			
+			Returns:
+				An array of module group entries from bigtree_module_groups.
+		*/
+
+		function getModuleGroups($sort = "position DESC, id ASC") {
+			$items = array();
+			$q = sqlquery("SELECT * FROM bigtree_module_groups ORDER BY $sort");
+			while ($f = sqlfetch($q)) {
+				$items[$f["id"]] = $f;
+			}
+			return $items;
+		}
+		
+		/*
+			Function: getModuleNavigation
+				Returns a list of module actions that are in navigation.
+			
+			Parameters:
+				module - A module id or a module entry.
+			
+			Returns:
+				An array of module actions from bigtree_module_actions.
+		*/
+
+		function getModuleNavigation($module) {
+			if (is_array($module)) {
+				$module = mysql_real_escape_string($module["id"]);
+			} else {
+				$module = mysql_real_escape_string($module);
+			}
+			$items = array();
+			$q = sqlquery("SELECT * FROM bigtree_module_actions WHERE module = '$module' AND in_nav = 'on' ORDER BY position DESC, id ASC");
+			while ($f = sqlfetch($q)) {
+				$items[] = $f;
+			}
+			return $items;
+		}
+		
+		/*
+			Function: getModulePackage
+				Returns a module package with details decoded.
+			
+			Parameters:
+				id - The id of the module package.
+			
+			Returns:
+				A module package entry from bigtree_module_packages.
+		*/
+
+		function getModulePackage($id) {
+			$id = mysql_real_escape_string($id);
+			$item = sqlfetch(sqlquery("SELECT * FROM bigtree_module_packages WHERE id = '$id'"));
+			if (!$item) {
+				return false;
+			}
+			$item["details"] = json_decode($item["details"],true);
+			return $item;
+		}
+
+		/*
+			Function: getModulePackages
+				Returns a list of module packages.
+			
+			Parameters:
+				sort - Sort order (defaults to alphabetical by name)
+			
+			Returns:
+				An array of entries from bigtree_module_packages.
+		*/
+
+		function getModulePackages($sort = "name ASC") {
+			$packages = array();
+			$q = sqlquery("SELECT * FROM bigtree_module_packages ORDER BY $sort");
+			while ($f = sqlfetch($q)) {
+				$packages[] = $f;
+			}
+			return $packages;
+		}
+		
+		/*
+			Function: getModules
+				Returns a list of modules.
+			
+			Parameters:
+				sort - The sort order (defaults to oldest first).
+				auth - If set to true, only returns modules the logged in user has access to. Defaults to true.
+			
+			Returns:
+				An array of entries from the bigtree_modules table with an additional "group_name" column for the group the module is in.
+		*/
+
+		function getModules($sort = "id ASC",$auth = true) {
+			$items = array();
+			$q = sqlquery("SELECT bigtree_modules.*,bigtree_module_groups.name AS group_name FROM bigtree_modules LEFT JOIN bigtree_module_groups ON bigtree_modules.`group` = bigtree_module_groups.id ORDER BY $sort");
+			while ($f = sqlfetch($q)) {
+				if (!$auth || $this->checkAccess($f["id"])) {
+					$items[$f["id"]] = $f;
+				}
+			}
+			return $items;
+		}
+		
+		/*
+			Function: getModulesByGroup
+				Returns a list of modules in a given group.
+			
+			Parameters:
+				group - The group to return modules for.
+				sort - The sort order (defaults to positioned)
+				auth - If set to true, only returns modules the logged in user has access to. Defaults to true.
+			
+			Returns:
+				An array of entries from the bigtree_modules table with an additional "group_name" column for the group the module is in.
+		*/
+
+		function getModulesByGroup($group,$sort = "position DESC, id ASC",$auth = true) {
+			if (is_array($group)) {
+				$group = mysql_real_escape_string($group["id"]);
+			} else {
+				$group = mysql_real_escape_string($group);
+			}
+			$items = array();
+			$q = sqlquery("SELECT * FROM bigtree_modules WHERE `group` = '$group' ORDER BY $sort");
+			while ($f = sqlfetch($q)) {
+				if ($this->checkAccess($f["id"]) || !$auth) {
+					$items[$f["id"]] = $f;
+				}
+			}
+			return $items;
+		}
+		
+		/*
+			Function: getNaturalNavigationByParent
 				Returns a list of positioned navigation that is in navigation under the given parent.
 				Does not return module navigation.
 			
@@ -1151,6 +1501,28 @@
 		}
 		
 		/*
+			Function: moduleActionExists
+				Checks to see if an action exists for a given route and module.
+			
+			Parameters:
+				module - The module to check.
+				route - The route of the action to check.
+			
+			Returns:
+				true if an action exists, otherwise false.
+		*/
+
+		function moduleActionExists($module,$route) {
+			$module = mysql_real_escape_string($module);
+			$route = mysql_real_escape_string($route);
+			$f = sqlfetch(sqlquery("SELECT id FROM bigtree_module_actions WHERE module = '$module' AND route = '$route'"));
+			if ($f) {
+				return true;
+			}
+			return false;
+		}
+		
+		/*
 			Function: pingSearchEngines
 				Sends the latest sitemap.xml out to search engine ping services if enabled in settings.	
 		*/
@@ -1163,6 +1535,36 @@
 				$yahoo = file_get_contents("http://search.yahooapis.com/SiteExplorerService/V1/ping?sitemap=".urlencode($GLOBALS["www_root"]."sitemap.xml"));
 				$bing = file_get_contents("http://www.bing.com/webmaster/ping.aspx?siteMap=".urlencode($GLOBALS["www_root"]."sitemap.xml"));
 			}
+		}
+		
+		/*
+			Function: setModuleGroupPosition
+				Sets the position of a module group.
+			
+			Parameters:
+				id - The id of the module group.
+				position - The position to set.
+		*/
+		
+		function setModuleGroupPosition($id,$position) {
+			$id = mysql_real_escape_string($id);
+			$position = mysql_real_escape_string($position);
+			sqlquery("UPDATE bigtree_module_groups SET position = '$position' WHERE id = '$id'");
+		}
+		
+		/*
+			Function: setModulePosition
+				Sets the position of a module.
+			
+			Parameters:
+				id - The id of the module.
+				position - The position to set.
+		*/
+		
+		function setModulePosition($id,$position) {
+			$id = mysql_real_escape_string($id);
+			$position = mysql_real_escape_string($position);
+			sqlquery("UPDATE bigtree_modules SET position = '$position' WHERE id = '$id'");
 		}
 		
 		/*
@@ -1437,6 +1839,45 @@
 		}
 		
 		/*
+			Function: updateModule
+				Updates a module.
+			
+			Parameters:
+				id - The id of the module to update.
+				name - The name of the module.
+				group - The group for the module.
+				class - The module class to create.
+				permissions - The group-based permissions.
+		*/
+		
+		function updateModule($id,$name,$group,$class,$permissions) {
+			$id = mysql_real_escape_string($id);
+			$name = mysql_real_escape_string(htmlspecialchars($name));
+			$group = mysql_real_escape_string($group);
+			$class = mysql_real_escape_string($class);
+			$permissions = mysql_real_escape_string(json_encode($permissions));
+			sqlquery("UPDATE bigtree_modules SET name = '$name', `group` = '$group', class = '$class', `gbp` = '$permissions' WHERE id = '$id'");
+		
+			// Remove cached class list.
+			unlink($GLOBALS["server_root"]."cache/module-class-list.btc");
+		}
+		
+		/*
+			Function: updateModuleGroup
+				Updates a module group's name.
+			
+			Parameters:
+				id - The id of the module group to update.
+				name - The name of the module group.
+		*/
+		
+		function updateModuleGroup($id,$name) {
+			$id = mysql_real_escape_string($id);
+			$name = mysql_real_escape_string(htmlspecialchars($name));
+			sqlquery("UPDATE bigtree_module_groups SET name = '$name' WHERE id = '$id'");
+		}
+		
+		/*
 			Function: updatePage
 				Updates a page.
 				Does not check permissions.
@@ -1575,155 +2016,6 @@
 			$this->track("bigtree_pages",$page,"updated");
 
 			return $page;
-		}
-		
-		/*
-			Function: getModuleByRoute
-				Returns a module entry for the given route.
-			
-			Parameters:
-				route - A module route.
-			
-			Returns:
-				A module entry with the "gbp" column decoded or false if a module was not found.
-		*/
-		
-		function getModuleByRoute($route) {
-			$route = mysql_real_escape_string($route);
-			$module = sqlfetch(sqlquery("SELECT * FROM bigtree_modules WHERE route = '$route'"));
-			if (!$module) {
-				return false;
-			}
-
-			$module["gbp"] = json_decode($module["gbp"],true);
-			return $module;
-		}
-		
-		/*
-			Function: getModuleForm
-		*/
-
-		function getModuleForm($id) {
-			$id = mysql_real_escape_string($id);
-			$item = sqlfetch(sqlquery("SELECT * FROM bigtree_module_forms WHERE id = '$id'"));
-			$item["fields"] = json_decode($item["fields"],true);
-			return $item;
-		}
-
-		function getModuleGroup($id) {
-			$id = mysql_real_escape_string($id);
-			return sqlfetch(sqlquery("SELECT * FROM bigtree_module_groups WHERE id = '$id'"));
-		}
-
-		function getModuleGroupById($id) { return $this->getModuleGroup($id); }
-
-		function getModuleGroupByName($name) {
-			$name = mysql_real_escape_string($name);
-			return sqlfetch(sqlquery("SELECT * FROM bigtree_module_groups WHERE name = '$name'"));
-		}
-		
-		function getModuleGroupByRoute($route) {
-			$name = mysql_real_escape_string($route);
-			return sqlfetch(sqlquery("SELECT * FROM bigtree_module_groups WHERE route = '$route'"));
-		}
-
-		function getModuleGroups($sort = "position DESC, id ASC") {
-			$items = array();
-			$q = sqlquery("SELECT * FROM bigtree_module_groups ORDER BY $sort");
-			while ($f = sqlfetch($q)) {
-				$items[$f["id"]] = $f;
-			}
-			return $items;
-		}
-
-		function getModuleIdByRoute($route) {
-			$f = sqlfetch(sqlquery("SELECT id FROM bigtree_modules WHERE route = '$route'"));
-			if (!$f) {
-				return false;
-			}
-			return $f["id"];
-		}
-
-		function getModuleNavigation($module) {
-			$items = array();
-			$q = sqlquery("SELECT * FROM bigtree_module_actions WHERE module = '$module' AND in_nav = 'on' ORDER BY position DESC, id ASC");
-			while ($f = sqlfetch($q)) {
-				$items[] = $f;
-			}
-			return $items;
-		}
-
-		function getModulePackage($id) {
-			$id = mysql_real_escape_string($id);
-			$item = sqlfetch(sqlquery("SELECT * FROM bigtree_module_packages WHERE id = '$id'"));
-			if (!$item) {
-				return false;
-			}
-			$item["details"] = json_decode($item["details"],true);
-			return $item;
-		}
-
-		function getModulePackageByFoundryId($id) {
-			$id = mysql_real_escape_string($id);
-			$item = sqlfetch(sqlquery("SELECT * FROM bigtree_module_packages WHERE foundry_id = '$id'"));
-			if (!$item) {
-				return false;
-			}
-			$item["details"] = json_decode($item["details"],true);
-			return $item;
-		}
-
-		function getModulePackages($sort = "name ASC") {
-			$packages = array();
-			$q = sqlquery("SELECT * FROM bigtree_module_packages ORDER BY $sort");
-			while ($f = sqlfetch($q)) {
-				$packages[] = $f;
-			}
-			return $packages;
-		}
-
-		function getModules($sort = "id ASC",$auth = true) {
-			$items = array();
-			$q = sqlquery("SELECT bigtree_modules.*,bigtree_module_groups.name AS group_name FROM bigtree_modules LEFT JOIN bigtree_module_groups ON bigtree_modules.`group` = bigtree_module_groups.id ORDER BY $sort");
-			while ($f = sqlfetch($q)) {
-				if ($this->checkAccess($f["id"]) || !$auth) {
-					$items[$f["id"]] = $f;
-				}
-			}
-			return $items;
-		}
-
-		function getModulesByGroup($group,$sort = "position DESC, id ASC",$auth = true) {
-			if (is_array($group))
-				$group = $group["id"];
-			$items = array();
-			$q = sqlquery("SELECT * FROM bigtree_modules WHERE `group` = '$group' ORDER BY $sort");
-			while ($f = sqlfetch($q)) {
-				if ($this->checkAccess($f["id"]) || !$auth) {
-					$items[$f["id"]] = $f;
-				}
-			}
-			return $items;
-		}
-
-		function getModuleView($id) {
-			$id = mysql_real_escape_string($id);
-			$item = sqlfetch(sqlquery("SELECT * FROM bigtree_module_views WHERE id = '$id'"));
-			$item["fields"] = json_decode($item["fields"],true);
-			$item["options"] = json_decode($item["options"],true);
-			$item["actions"] = json_decode($item["actions"],true);
-			return $item;
-		}
-
-		function moduleActionExists($module,$route) {
-			$module = mysql_real_escape_string($module);
-			$route = mysql_real_escape_string($route);
-			$f = sqlfetch(sqlquery("SELECT id FROM bigtree_module_actions WHERE module = '$module' AND route = '$route'"));
-			if ($f) {
-				return true;
-			}
-
-			return false;
 		}
 
 		// !Users Module Functions
@@ -3088,18 +3380,18 @@
 
 					foreach ($changes as $change) {
 						if ($change["title"]) {
-					        $body .= $change["title"];
-					    } else {
-					        $body .= $change["mod"]["name"]." - ";
+							$body .= $change["title"];
+						} else {
+							$body .= $change["mod"]["name"]." - ";
 
-					        if ($change["type"] == "NEW") {
-					        	$body .= "Addition";
-					        } elseif ($change["type"] == "EDIT") {
-					        	$body .= "Edit";
-					        }
-					    }
-					    $body .= "\n".$change["user"]["name"]." has submitted this change request.\n";
-					    $body .= $this->getChangeEditLink($change)."\n\n";
+							if ($change["type"] == "NEW") {
+								$body .= "Addition";
+							} elseif ($change["type"] == "EDIT") {
+								$body .= "Edit";
+							}
+						}
+						$body .= "\n".$change["user"]["name"]." has submitted this change request.\n";
+						$body .= $this->getChangeEditLink($change)."\n\n";
 						
 					}
 				}
