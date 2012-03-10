@@ -161,7 +161,7 @@
 		dwrite("site/js/");
 		dwrite("templates");
 		dwrite("templates/ajax/");
-		dwrite("templates/droplets/");
+		//dwrite("templates/droplets/");
 		dwrite("templates/layouts/");
 		dtouch("templates/layouts/_header.php");
 		dtouch("templates/layouts/default.php",'<? include "_header.php" ?>
@@ -176,8 +176,8 @@
 		dtouch("templates/pages/content.php",'<h1><?php echo $page_header?></h1>
 <?php echo $page_content?>');
 		dwrite("templates/callouts/");
-		dwrite("templates/objects/");
-		dwrite("templates/objects/containers/");
+		//dwrite("templates/objects/");
+		//dwrite("templates/objects/containers/");
 		
 		dtouch("templates/config.php",str_replace($find,$replace,file_get_contents("core/config.example.php")));
 		
