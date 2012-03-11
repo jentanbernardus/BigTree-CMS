@@ -400,7 +400,7 @@
 			$x = 2;
 			$route = $cms->urlify($name);
 			$oroute = $route;
-			while ($this->getModuleByRoute($route)) {
+			while ($this->getModuleGroupByRoute($route)) {
 				$route = $oroute."-".$x;
 				$x++;			
 			}
@@ -408,7 +408,7 @@
 			// Just to be safe
 			$route = mysql_real_escape_string($route);
 			
-			sqlquery("INSERT INTO bigtree_module_packages (`name`,`route`,`package`) VALUES ('$name','$route','$package')");
+			sqlquery("INSERT INTO bigtree_module_groups (`name`,`route`,`package`) VALUES ('$name','$route','$package')");
 			return sqlid();
 		}
 		
@@ -2788,9 +2788,26 @@
 		*/
 		
 		function updateModuleGroup($id,$name) {
+			global $cms;
+			
 			$id = mysql_real_escape_string($id);
 			$name = mysql_real_escape_string(htmlspecialchars($name));
-			sqlquery("UPDATE bigtree_module_groups SET name = '$name' WHERE id = '$id'");
+			
+			// Get a unique route
+			$x = 2;
+			$route = $cms->urlify($name);
+			$oroute = $route;
+			while ($g = $this->getModuleGroupByRoute($route)) {
+				if ($g["id"] != $id) {
+					$route = $oroute."-".$x;
+					$x++;
+				}
+			}
+			
+			// Just to be safe
+			$route = mysql_real_escape_string($route);
+			
+			sqlquery("UPDATE bigtree_module_groups SET name = '$name', route = '$route' WHERE id = '$id'");
 		}
 		
 		/*
