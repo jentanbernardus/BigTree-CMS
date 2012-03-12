@@ -164,6 +164,40 @@
 		}
 		
 		/*
+			Function: canAccessGroup
+				Returns whether or not the logged in user can access a module group.
+				Utility for form field types / views -- we already know module group permissions are enabled so we skip some overhead
+		
+			Parameters:
+				module - A module entry.
+				group - A group id.
+			
+			Returns:
+				true if the user can access this group, otherwise false.
+		*/
+			
+		function canAccessGroup($module,$group) {
+			if ($this->Level > 0) {
+				return true;
+			}
+
+			$id = $module["id"];
+
+			if ($this->Permissions["module"][$id] && $this->Permissions["module"][$id] != "n") {
+				return true;
+			}
+
+			if (is_array($this->Permissions["module_gbp"][$id])) {
+				$gp = $this->Permissions["module_gbp"][$id][$group];
+				if ($gp && $gp != "n") {
+					return true;
+				}
+			}
+
+			return false;
+		}
+		
+		/*
 			Function: changePassword
 				Changes a user's password via a password change hash and redirects to a success page.
 
@@ -188,6 +222,41 @@
 			sqlquery("UPDATE bigtree_users SET password = '$password', change_password_hash = '' WHERE id = '".$user["id"]."'");
 			header("Location: ".$GLOBALS["admin_root"]."login/reset-success/");
 			die();
+		}
+		
+		/*
+			Function: checkAccess
+				Determines whether the logged in user has access to a module or not.
+			
+			Parameters:
+				module - Either a module id or module entry.
+			
+			Returns:
+				true if the user can access the module, otherwise false.
+		*/
+		
+		function checkAccess($module) {
+			if (is_array($module)) {
+				$module = $module["id"];
+			}
+
+			if ($this->Level > 0) {
+				return true;
+			}
+
+			if ($this->Permissions["module"][$module] && $this->Permissions["module"][$module] != "n") {
+				return true;
+			}
+
+			if (is_array($this->Permissions["module_gbp"][$module])) {
+				foreach ($this->Permissions["module_gbp"][$module] as $p) {
+					if ($p != "n") {
+						return true;
+					}
+				}
+			}
+
+			return false;
 		}
 		
 		/*
@@ -866,6 +935,83 @@
 		}
 		
 		/*
+			Function: getAccessGroups
+				Returns a list of all groups the logged in user has access to in a module.
+			
+			Parameters:
+				module - A module id or module entry.
+			
+			Returns:
+				An array of groups if a user has limited access to a module or "true" if the user has access to all groups.
+		*/
+
+		function getAccessGroups($module) {
+			if ($this->Level > 0) {
+				return true;
+			}
+
+			if (is_array($module)) {
+				$module = $module["id"];
+			}
+			
+			if ($this->Permissions["module"][$module] && $this->Permissions["module"][$module] != "n") {
+				return true;
+			}
+
+			$groups = array();
+			if (is_array($this->Permissions["module_gbp"][$module])) {
+				foreach ($this->Permissions["module_gbp"][$module] as $group => $permission) {
+					if ($permission && $permission != "n") {
+						$groups[] = $group;
+					}
+				}
+			}
+			return $groups;
+		}
+		
+		/*
+			Function: getAccessLevel
+				Returns the permission level for a given module and item.
+			
+			Parameters:
+				module - The module id or entry to check access for.
+				item - (optional) The item of the module to check access for.
+				table - (optional) The group based table.
+			
+			Returns:
+				The permission level for the given item or module (if item was not passed).
+			
+			See Also:
+				<getCachedAccessLevel>
+		*/
+
+		function getAccessLevel($module,$item = array(),$table = "") {
+			if ($this->Level > 0) {
+				return "p";
+			}
+
+			$id = is_array($module) ? $module["id"] : $module;
+
+			$perm = $this->Permissions["module"][$id];
+
+			// If group based permissions aren't on or we're a publisher of this module it's an easy solution… or if we're not even using the table.
+			if (!$item || !$module["gbp"]["enabled"] || $perm == "p" || $table != $module["gbp"]["table"]) {
+				return $perm;
+			}
+
+			if (is_array($this->Permissions["module_gbp"][$id])) {
+				$gv = $item[$module["gbp"]["group_field"]];
+				$gp = $this->Permissions["module_gbp"][$id][$gv];
+
+				if ($gp != "n") {
+					return $gp;
+				}
+			}
+
+			return $perm;
+		}
+		
+		/*
 			Function: getActionClass
 				Returns the button class for the given action and item.
 			
@@ -913,6 +1059,44 @@
 				$class = "icon_preview";
 			}
 			return $class;
+		}
+		
+		/*
+			Function: getAPIToken
+				Retrieves an API token for a given email address and password.
+			
+			Parameters:
+				email - The email address of the user.
+				password - The password of the user.
+			
+			Returns:
+				An API token if the email/password login was correct, otherwise false.
+				If a temporary API token already exists for the user its expiration is extended to 24 hours from now.
+				If a temporary token doesn't already exist, a new one is created that expires in 24 hours.
+		*/
+
+		function getAPIToken($email,$password) {
+			global $config;
+			$f = sqlfetch(sqlquery("SELECT * FROM bigtree_users WHERE email = '".mysql_real_escape_string($email)."'"));
+			$phpass = new PasswordHash($config["password_depth"], TRUE);
+			$ok = $phpass->CheckPassword($password,$f["password"]);
+			if ($ok) {
+				$existing = sqlfetch(sqlquery("SELECT * FROM bigtree_api_tokens WHERE temporary = 'on' AND user = '".$f["id"]."' AND expires > NOW()"));
+				if ($existing) {
+					sqlquery("UPDATE bigtree_api_tokens SET expires = '".date("Y-m-d H:i:s",strtotime("+1 day"))."' WHERE id = '".$existing["id"]."'");
+					return $existing["token"];
+				}
+				$token = str_rand(30);
+				$r = sqlrows(sqlquery("SELECT * FROM bigtree_api_tokens WHERE token = '$token'"));
+				while ($r) {
+					$token = str_rand(30);
+					$r = sqlrows(sqlquery("SELECT * FROM bigtree_api_tokens WHERE token = '$token'"));
+				}
+				sqlquery("DELETE FROM bigtree_api_tokens WHERE user = '".$f["id"]."' AND temporary = 'on'");
+				sqlquery("INSERT INTO bigtree_api_tokens (`token`,`user`,`expires`,`temporary`) VALUES ('$token','".$f["id"]."','".date("Y-m-d H:i:s",strtotime("+1 day"))."','on')");
+				return $token;
+			}
+			return false;
 		}
 		
 		/*
@@ -986,6 +1170,49 @@
 				}
 			}
 			return $items;
+		}
+		
+		/*
+			Function: getCachedAccessLevel
+				Returns the permission level for a given module and cached view entry.
+			
+			Parameters:
+				module - The module id or entry to check access for.
+				item - (optional) The item of the module to check access for.
+				table - (optional) The group based table.
+			
+			Returns:
+				The permission level for the given item or module (if item was not passed).
+			
+			See Also:
+				<getAccessLevel>
+		*/
+
+		// Since cached items don't use their normal columns...
+		function getCachedAccessLevel($module,$item = array(),$table = "") {
+			if ($this->Level > 0) {
+				return "p";
+			}
+
+			$id = is_array($module) ? $module["id"] : $module;
+
+			$perm = $this->Permissions["module"][$id];
+
+			// If group based permissions aren't on or we're a publisher of this module it's an easy solution… or if we're not even using the table.
+			if (!$item || !$module["gbp"]["enabled"] || $perm == "p" || $table != $module["gbp"]["table"]) {
+				return $perm;
+			}
+
+			if (is_array($this->Permissions["module_gbp"][$id])) {
+				$gv = $item["gbp_field"];
+				$gp = $this->Permissions["module_gbp"][$id][$gv];
+
+				if ($gp != "n") {
+					return $gp;
+				}
+			}
+
+			return $perm;
 		}
 		
 		/*
@@ -1189,6 +1416,67 @@
 			}
 			
 			return $alerts;
+		}
+		
+		/*
+			Function: getFeeds
+				Returns a list of feeds.
+				
+			Parameters:
+				sort - The sort direction, defaults to name.
+			
+			Returns:
+				An array of feed elements from bigtree_feeds sorted by name.
+		*/
+		
+		function getFeeds($sort) {
+			$feeds = array();
+			$q = sqlquery("SELECT * FROM bigtree_feeds ORDER BY $sort");
+			while ($f = sqlfetch($q)) {
+				$feeds[] = $f;
+			}
+			return $feeds;
+		}
+		
+		/*
+			Function: getFieldType
+				Returns a field type.
+			
+			Parameters:
+				id - The id of the file type.
+			
+			Returns:
+				A field type entry with the "files" column decoded.
+		*/
+		
+		function getFieldType($id) {
+			$id = mysql_real_escape_string($id);
+			$item = sqlfetch(sqlquery("SELECT * FROM bigtree_field_types WHERE id = '$id'"));
+			if (!$item) {
+				return false;
+			}
+			$item["files"] = json_decode($item["files"],true);
+			return $item;
+		}
+		
+		/*
+			Function: getFieldTypes
+				Returns a list of field types.
+			
+			Parameters:
+				sort - The sort directon, defaults to name ASC.
+			
+			Returns:
+				An array of entries from bigtree_field_types.
+		*/
+
+		function getFieldTypes($sort = "name ASC") {
+			$types = array();
+			$q = sqlquery("SELECT * FROM bigtree_field_types ORDER BY $sort");
+			while ($f = sqlfetch($q)) {
+				$types[] = $f;
+			}
+			return $types;
 		}
 		
 		/*
@@ -1588,6 +1876,77 @@
 		}
 		
 		/*
+			Function: getPageAccessLevel
+				Returns the access level for the logged in user to a given page.
+			
+			Parameters:
+				page - The page id.
+			
+			Returns:
+				"p" for publisher, "e" for editor, false for no access.
+			
+			See Also:
+				<getPageAccessLevelForUser>
+		*/
+
+		function getPageAccessLevel($page) {
+			return $this->getPageAccessLevelByUser($page,$this->ID);
+		}
+		
+		/*
+			Function: getPageAccessLevel
+				Returns the access level for the given user to a given page.
+			
+			Parameters:
+				page - The page id.
+				user - The user id.
+			
+			Returns:
+				"p" for publisher, "e" for editor, false for no access.
+			
+			See Also:
+				<getPageAccessLevel>
+		*/
+
+		function getPageAccessLevelByUser($page,$user) {
+			$u = $this->getUser($user);
+			if ($u["level"] > 0) {
+				return "p";
+			}
+
+			if (!is_numeric($page) && $page[0] == "p") {
+				$f = sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE id = '".substr($page,1)."'"));
+				if ($f["user"] == $user) {
+					return "p";
+				}
+				$pdata = json_decode($f["changes"],true);
+				return $this->getPageAccessLevelByUser($pdata["parent"],$admin->ID);
+			}
+
+			$pp = $this->Permissions["page"][$page];
+			if ($pp == "n") {
+				return false;
+			}
+
+			if ($pp && $pp != "i") {
+				return $pp;
+			}
+
+			$parent = sqlfetch(sqlquery("SELECT parent FROM bigtree_pages WHERE id = '".mysql_real_escape_string($page)."'"),true);
+			$pp = $this->Permissions["page"][$parent];
+			while ((!$pp || $pp == "i") && $parent) {
+				$parent = sqlfetch(sqlquery("SELECT parent FROM bigtree_pages WHERE id = '$parent'"),true);
+				$pp = $this->Permissions["page"][$parent];
+			}
+
+			if (!$pp || $pp == "i" || $pp == "n") {
+				return false;
+			}
+
+			return $pp;
+		}
+		
+		/*
 			Function: getPageOfSettings
 				Returns a page of settings.
 			
@@ -1644,6 +2003,35 @@
 		}
 		
 		/*
+			Function: getPageOfTokens
+				Returns a page of API tokens.
+			
+			Parameters:
+				page - The page number to return.
+				query - Optional query string to search against.
+			
+			Returns:
+				An array of API token entries with the "user" column replaced with a user entry.
+			
+			See Also:
+				<getUser>
+		*/		
+
+		function getPageOfTokens($page = 0,$query = "") {
+			if ($query) {
+				$q = sqlquery("SELECT * FROM bigtree_api_tokens WHERE token LIKE '%".mysql_real_escape_string($query)."%' ORDER BY id DESC LIMIT ".($page*$this->PerPage).",".$this->PerPage);
+			} else {
+				$q = sqlquery("SELECT * FROM bigtree_api_tokens ORDER BY id DESC LIMIT ".($page*$this->PerPage).",".$this->PerPage);
+			}
+			$items = array();
+			while ($f = sqlfetch($q)) {
+				$f["user"] = $this->getUser($f["user"]);
+				$items[] = $f;
+			}
+			return $items;
+		}
+		
+		/*
 			Function: getPageOfUsers
 				Returns a page of users.
 			
@@ -1677,6 +2065,193 @@
 			}
 
 			return $items;
+		}
+		
+		/*
+			Function: getPageSEORating
+				Returns the SEO rating for a page.
+			
+			Parameters:
+				page - A page array.
+				content - An array of resources.
+			
+			Returns:
+				An array of SEO data.
+				"score" reflects a score from 0 to 100 points.
+				"recommendations" is an array of recommendations to improve SEO score.
+				"color" is a color reflecting the SEO score.
+				
+				Score Parameters
+				- Having a title - 5 points
+				- Having a unique title - 5 points
+				- Title does not exceed 72 characters and has at least 4 words - 5 points
+				- Having a meta description - 5 points
+				- Meta description that is less than 165 characters - 5 points
+				- Having an h1 - 10 points
+				- Having page content - 5 points
+				- Having at least 300 words in your content - 15 points
+				- Having links in your content - 5 points
+				- Having external links in your content - 5 points
+				- Having one link for every 120 words of content - 5 points
+				- Readability Score - up to 20 points
+				- Fresh content - up to 10 points
+		*/
+		
+		function getPageSEORating($page,$content) {
+			global $cms;
+			$template = $cms->getTemplate($page["template"]);
+			$tsources = array();
+			$h1_field = "";
+			$body_fields = array();
+
+			if (is_array($template)) {
+				foreach ($template["resources"] as $item) {
+					if ($item["seo_body"]) {
+						$body_fields[] = $item["id"];
+					}
+					if ($item["seo_h1"]) {
+						$h1_field = $item["id"];
+					}
+					$tsources[$item["id"]] = $item;
+				}
+			}
+
+			if (!$h1_field && $tsources["page_header"]) {
+				$h1_field = "page_header";
+			}
+			if (!count($body_fields) && $tsources["page_content"]) {
+				$body_fields[] = "page_content";
+			}
+
+
+			$textStats = new TextStatistics;
+			$recommendations = array();
+
+			$score = 0;
+
+			// Check if they have a page title.
+			if ($page["title"]) {
+				$score += 5;
+				// They have a title, let's see if it's unique
+				$q = sqlquery("SELECT * FROM bigtree_pages WHERE title = '".mysql_real_escape_string($page["title"])."' AND id != '".$page["page"]."'");
+				if ($r == 0) {
+					// They have a unique title
+					$score += 5;
+				} else {
+					$recommendations[] = "Your page title should be unique. ".($r-1)." other page(s) have the same title.";
+				}
+				$words = $textStats->word_count($page["title"]);
+				$length = mb_strlen($page["title"]);
+				if ($words >= 4 && $length <= 72) {
+					// Fits the bill!
+					$score += 5;
+				} else {
+					$recommendations[] = "Your page title should be no more than 72 characters and should contain at least 4 words.";
+				}
+			} else {
+				$recommendations[] = "You should enter a page title.";
+			}
+
+			// Check for meta description
+			if ($page["meta_description"]) {
+				$score += 5;
+				// They have a meta description, let's see if it's no more than 165 characters.
+				if (mb_strlen($page["meta_description"]) <= 165) {
+					$score += 5;
+				} else {
+					$recommendations[] = "Your meta description should be no more than 165 characters.  It is currently ".mb_strlen($page["meta_description"])." characters.";
+				}
+			} else {
+				$recommendations[] = "You should enter a meta description.";
+			}
+
+			// Check for an H1
+			if (!$h1_field || $content[$h1_field]) {
+				$score += 10;
+			} else {
+				$recommendations[] = "You should enter a page header.";
+			}
+			// Check the content!
+			if (!count($body_fields)) {
+				// If this template doesn't for some reason have a seo body resource, give the benefit of the doubt.
+				$score += 65;
+			} else {
+				$regular_text = "";
+				$stripped_text = "";
+				foreach ($body_fields as $field) {
+					$regular_text .= $content[$field]." ";
+					$stripped_text .= strip_tags($content[$field])." ";
+				}
+				// Check to see if there is any content
+				if ($stripped_text) {
+					$score += 5;
+					$words = $textStats->word_count($stripped_text);
+					$readability = $textStats->flesch_kincaid_reading_ease($stripped_text);
+					$number_of_links = substr_count($regular_text,"<a ");
+					$number_of_external_links = substr_count($regular_text,'href="http://');
+
+					// See if there are at least 300 words.
+					if ($words >= 300) {
+						$score += 15;
+					} else {
+						$recommendations[] = "You should enter at least 300 words of page content.  You currently have ".$words." word(s).";
+					}
+
+					// See if we have any links
+					if ($number_of_links) {
+						$score += 5;
+						// See if we have at least one link per 120 words.
+						if (floor($words / 120) <= $number_of_links) {
+							$score += 5;
+						} else {
+							$recommendations[] = "You should have at least one link for every 120 words of page content.  You currently have $number_of_links link(s).  You should have at least ".floor($words / 120).".";
+						}
+						// See if we have any external links.
+						if ($number_of_external_links) {
+							$score += 5;
+						} else {
+							$recommendations[] = "Having an external link helps build Page Rank.";
+						}
+					} else {
+						$recommendations[] = "You should have at least one link in your content.";
+					}
+
+					// Check on our readability score.
+					if ($readability >= 90) {
+						$score += 20;
+					} else {
+						$read_score = round(($readability / 90),2);
+						$recommendations[] = "Your readability score is ".($read_score*100)."%.  Using shorter sentences and words with less syllables will make your site easier to read by search engines and users.";
+						$score += ceil($read_score * 20);
+					}
+				} else {
+					$recommendations[] = "You should enter page content.";
+				}
+
+				// Check page freshness
+				$updated = strtotime($page["updated_at"]);
+				$age = time()-$updated-(60*24*60*60);
+				// See how much older it is than 2 months.
+				if ($age > 0) {
+					$age_score = 10 - floor(2 * ($age / (30*24*60*60)));
+					if ($age_score < 0) {
+						$age_score = 0;
+					}
+					$score += $age_score;
+					$recommendations[] = "Your content is around ".ceil(2 + ($age / (30*24*60*60)))." months old.  Updating your page more frequently will make it rank higher.";
+				} else {
+					$score += 10;
+				}
+			}
+
+			$color = "#008000";
+			if ($score <= 50) {
+				$color = color_mesh("#CCAC00","#FF0000",100-(100 * $score / 50));
+			} elseif ($score <= 80) {
+				$color = color_mesh("#008000","#CCAC00",100-(100 * ($score-50) / 30));
+			}
+
+			return array("score" => $score, "recommendations" => $recommendations, "color" => $color);
 		}
 		
 		/*
@@ -2226,6 +2801,31 @@
 		}
 		
 		/*
+			Function: getTokensPageCount
+				Returns the number of pages of tokens.
+			
+			Parameters:
+				query - Optional query string to search against.
+			
+			Returns:
+				The number of pages matching the query string.
+		*/		
+
+		function getTokensPageCount($query = "") {
+			if ($query) {
+				$q = sqlquery("SELECT id FROM bigtree_api_tokens WHERE token LIKE '%".mysql_real_escape_string($query)."%'");
+			} else {
+				$q = sqlquery("SELECT id FROM bigtree_api_tokens");
+			}
+			$r = sqlrows($q);
+			$pages = ceil($r / $this->PerPage);
+			if ($pages == 0) {
+				$pages = 1;
+			}
+			return $pages;
+		}
+		
+		/*
 			Function: getUser
 				Gets a user's decoded information.
 			
@@ -2381,6 +2981,61 @@
 		}
 		
 		/*
+			Function: login
+				Attempts to login a user to the CMS.
+			
+			Parameters:
+				email - The email address of the user.
+				password - The password of the user.
+				stay_logged_in - Whether to set a cookie to keep the user logged in.
+			
+			Returns:
+				false if login failed, otherwise redirects back to the page the person requested.
+		*/
+
+		function login($email,$password,$stay_logged_in = false) {
+			global $path;
+			$f = sqlfetch(sqlquery("SELECT * FROM bigtree_users WHERE email = '".mysql_real_escape_string($email)."'"));
+			$phpass = new PasswordHash($config["password_depth"], TRUE);
+			$ok = $phpass->CheckPassword($password,$f["password"]);
+			if ($ok) {
+				if ($stay_logged_in) {
+					setcookie('bigtree[email]',$f["email"],time()+31*60*60*24,str_replace($GLOBALS["domain"],"",$GLOBALS["www_root"]));
+					setcookie('bigtree[password]',$f["password"],time()+31*60*60*24,str_replace($GLOBALS["domain"],"",$GLOBALS["www_root"]));
+				}
+
+				$_SESSION["bigtree"]["id"] = $f["id"];
+				$_SESSION["bigtree"]["email"] = $f["email"];
+				$_SESSION["bigtree"]["level"] = $f["level"];
+				$_SESSION["bigtree"]["name"] = $f["name"];
+				$_SESSION["bigtree"]["permissions"] = json_decode($f["permissions"],true);
+
+				if ($path[1] == "login") {
+					header("Location: ".$GLOBALS["admin_root"]);
+				} else {
+					header("Location: ".$GLOBALS["domain"].$_SERVER["REQUEST_URI"]);
+				}
+				die();
+			} else {
+				return false;
+			}
+		}
+		
+		/*
+			Function: logout
+				Logs out of the CMS.
+				Destroys the user's session and unsets the login cookies, then sends the user back to the login page.
+		*/
+
+		function logout() {
+			setcookie("bigtree[email]","",time()-3600,str_replace($GLOBALS["domain"],"",$GLOBALS["www_root"]));
+			setcookie("bigtree[password]","",time()-3600,str_replace($GLOBALS["domain"],"",$GLOBALS["www_root"]));
+			unset($_SESSION["bigtree"]);
+			header("Location: ".$GLOBALS["admin_root"]);
+			die();
+		}
+		
+		/*
 			Function: makeIPL
 				Creates an internal page link out of a URL.
 				
@@ -2436,6 +3091,139 @@
 				$yahoo = file_get_contents("http://search.yahooapis.com/SiteExplorerService/V1/ping?sitemap=".urlencode($GLOBALS["www_root"]."sitemap.xml"));
 				$bing = file_get_contents("http://www.bing.com/webmaster/ping.aspx?siteMap=".urlencode($GLOBALS["www_root"]."sitemap.xml"));
 			}
+		}
+		
+		/*
+			Function: requireAccess
+				Checks the logged in user's access to a given module.
+				Throws a permission denied page and stops page execution if the user doesn't have access.
+			
+			Parameters:
+				module - The id of the module to check access to.
+				
+			Returns:
+				The permission level of the logged in user.
+		*/
+
+		function requireAccess($module) {
+			global $cms,$admin_root,$css,$js,$site;
+			if ($this->Level > 0)
+				return "p";
+			if (!isset($this->Permissions[$module]) || $this->Permissions[$module] == "") {
+				ob_clean();
+				include bigtree_path("admin/pages/_denied.php");
+				$content = ob_get_clean();
+				include bigtree_path("admin/layouts/default.php");
+				die();
+			}
+			return $this->Permissions[$module];
+		}
+		
+		/*
+			Function: requireAPILevel
+				Requires a user level for a given action in the API.
+				Stops execution and returns an encoded error if the user's level is too low.
+			
+			Parameters:
+				level - User level to require (0 is normal user, 1 is administrator, 2 is developer)
+		*/
+
+		function requireAPILevel($level) {
+			if ($this->Level < $level) {
+				echo bigtree_api_encode(array("success" => false,"error" => "Permission level is too low."));
+				die();
+			}
+		}
+		
+		/*
+			Function: requireAPIModuleAccess
+				Requires acess to a given module in the API.
+				Stops execution and returns an encoded error if the user is unanable to access the module.
+			
+			Parameters:
+				module - The module id to check permission for.
+		*/
+
+		function requireAPIModuleAccess($module) {
+			if (!$this->Permissions[$module]) {
+				echo bigtree_api_encode(array("success" => false,"error" => "Not permitted."));
+				die();
+			}
+		}
+		
+		/*
+			Function: requireAPIModulePublisherAccess
+				Requires acess to a given module in the API.
+				Stops execution and returns an encoded error if the user is not a publisher of the module.
+			
+			Parameters:
+				module - The module id to check permission for.
+		*/
+
+		function requireAPIModulePublisherAccess($module) {
+			if ($this->Permissions[$module] != "p") {
+				echo bigtree_api_encode(array("success" => false,"error" => "Publishing permission required."));
+				die();
+			}
+		}
+		
+		/*
+			Function: requireAPIWrite
+				Requires write access to the API.
+				Stops execution and returns an encoded error if the token does not have write access
+		*/				
+
+		function requireAPIWrite() {
+			if ($this->ReadOnly) {
+				echo bigtree_api_encode(array("success" => false,"error" => "Not available in read only mode."));
+				die();
+			}
+		}
+		
+		/*
+			Function: requireLevel
+				Requires the logged in user to have a certain access level to continue.
+				Throws a permission denied page and stops page execution if the user doesn't have access.
+			
+			Parameters:
+				level - An access level (0 being normal user, 1 being administrator, 2 being developer)
+		*/
+
+		function requireLevel($level) {
+			global $cms,$admin_root,$css,$js,$site;
+			if (!isset($this->Level) || $this->Level < $level) {
+				ob_clean();
+				include bigtree_path("admin/pages/_denied.php");
+				$content = ob_get_clean();
+				include bigtree_path("admin/layouts/default.php");
+				die();
+			}
+		}
+		
+		/*
+			Function: requirePublisher
+				Checks the logged in user's access to a given module to make sure they are a publisher.
+				Throws a permission denied page and stops page execution if the user doesn't have access.
+			
+			Parameters:
+				module - The id of the module to check access to.
+				
+			Returns:
+				The permission level of the logged in user.
+		*/
+
+		function requirePublisher($module) {
+			global $cms,$admin_root,$css,$js,$site;
+			if ($this->Level > 0)
+				return true;
+			if ($this->Permissions[$module] != "p") {
+				ob_clean();
+				include bigtree_path("admin/pages/_denied.php");
+				$content = ob_get_clean();
+				include bigtree_path("admin/layouts/default.php");
+				die();
+			}
+			return true;
 		}
 		
 		/*
@@ -3112,571 +3900,18 @@
 
 			return true;
 		}
-
-		// !Feed Functions
-		function getFeeds() {
-			$feeds = array();
-			$q = sqlquery("SELECT * FROM bigtree_feeds ORDER BY name");
-			while ($f = sqlfetch($q)) {
-				$feeds[] = $f;
-			}
-			return $feeds;
-		}
-
-		// !Field Type Functions
-		function getFieldType($id) {
-			$id = mysql_real_escape_string($id);
-			$item = sqlfetch(sqlquery("SELECT * FROM bigtree_field_types WHERE id = '$id'"));
-			if (!$item) {
-				return false;
-			}
-			$item["files"] = json_decode($item["files"],true);
-			return $item;
-		}
-
-		function getFieldTypeByFoundryId($id) {
-			$id = mysql_real_escape_string($id);
-			$item = sqlfetch(sqlquery("SELECT * FROM bigtree_field_types WHERE foundry_id = '$id'"));
-			if (!$item) {
-				return false;
-			}
-			$item["files"] = json_decode($item["files"],true);
-			return $item;
-		}
-
-		function getFieldTypeById($id) { return $this->getFieldType($id); }
-
-		function getFieldTypes($sort = "name ASC") {
-			$types = array();
-			$q = sqlquery("SELECT * FROM bigtree_field_types ORDER BY $sort");
-			while ($f = sqlfetch($q)) {
-				$types[] = $f;
-			}
-			return $types;
-		}
-
-		// !SEO Functions
-
-		function getPageSEORating($page,$content) {
-			global $cms;
-			$template = $cms->getTemplate($page["template"]);
-			$tsources = array();
-			$h1_field = "";
-			$body_fields = array();
-
-			if (is_array($template)) {
-				foreach ($template["resources"] as $item) {
-					if ($item["seo_body"]) {
-						$body_fields[] = $item["id"];
-					}
-					if ($item["seo_h1"]) {
-						$h1_field = $item["id"];
-					}
-					$tsources[$item["id"]] = $item;
-				}
-			}
-
-			if (!$h1_field && $tsources["page_header"]) {
-				$h1_field = "page_header";
-			}
-			if (!count($body_fields) && $tsources["page_content"]) {
-				$body_fields[] = "page_content";
-			}
-
-
-			$textStats = new TextStatistics;
-			$recommendations = array();
-
-			// Get an SEO rating out of 100 points
-			// ===================================
-			// - Having a title - 5 points
-			// - Having a unique title - 5 points
-			// - Title does not exceed 72 characters and has at least 4 words - 5 points
-			// - Having a meta description - 5 points
-			// - Meta description that is less than 165 characters - 5 points
-			// - Having an h1 - 10 points
-			// - Having page content - 5 points
-			// - Having at least 300 words in your content - 15 points
-			// - Having links in your content - 5 points
-			// - Having external links in your content - 5 points
-			// - Having one link for every 120 words of content - 5 points
-			// - Readability Score - up to 20 points
-			// - Fresh content - up to 10 points
-
-			$score = 0;
-
-			// Check if they have a page title.
-			if ($page["title"]) {
-				$score += 5;
-				// They have a title, let's see if it's unique
-				$q = sqlquery("SELECT * FROM bigtree_pages WHERE title = '".mysql_real_escape_string($page["title"])."' AND id != '".$page["page"]."'");
-				if ($r == 0) {
-					// They have a unique title
-					$score += 5;
-				} else {
-					$recommendations[] = "Your page title should be unique. ".($r-1)." other page(s) have the same title.";
-				}
-				$words = $textStats->word_count($page["title"]);
-				$length = mb_strlen($page["title"]);
-				if ($words >= 4 && $length <= 72) {
-					// Fits the bill!
-					$score += 5;
-				} else {
-					$recommendations[] = "Your page title should be no more than 72 characters and should contain at least 4 words.";
-				}
-			} else {
-				$recommendations[] = "You should enter a page title.";
-			}
-
-			// Check for meta description
-			if ($page["meta_description"]) {
-				$score += 5;
-				// They have a meta description, let's see if it's no more than 165 characters.
-				if (mb_strlen($page["meta_description"]) <= 165) {
-					$score += 5;
-				} else {
-					$recommendations[] = "Your meta description should be no more than 165 characters.  It is currently ".mb_strlen($page["meta_description"])." characters.";
-				}
-			} else {
-				$recommendations[] = "You should enter a meta description.";
-			}
-
-			// Check for an H1
-			if (!$h1_field || $content[$h1_field]) {
-				$score += 10;
-			} else {
-				$recommendations[] = "You should enter a page header.";
-			}
-			// Check the content!
-			if (!count($body_fields)) {
-				// If this template doesn't for some reason have a seo body resource, give the benefit of the doubt.
-				$score += 65;
-			} else {
-				$regular_text = "";
-				$stripped_text = "";
-				foreach ($body_fields as $field) {
-					$regular_text .= $content[$field]." ";
-					$stripped_text .= strip_tags($content[$field])." ";
-				}
-				// Check to see if there is any content
-				if ($stripped_text) {
-					$score += 5;
-					$words = $textStats->word_count($stripped_text);
-					$readability = $textStats->flesch_kincaid_reading_ease($stripped_text);
-					$number_of_links = substr_count($regular_text,"<a ");
-					$number_of_external_links = substr_count($regular_text,'href="http://');
-
-					// See if there are at least 300 words.
-					if ($words >= 300) {
-						$score += 15;
-					} else {
-						$recommendations[] = "You should enter at least 300 words of page content.  You currently have ".$words." word(s).";
-					}
-
-					// See if we have any links
-					if ($number_of_links) {
-						$score += 5;
-						// See if we have at least one link per 120 words.
-						if (floor($words / 120) <= $number_of_links) {
-							$score += 5;
-						} else {
-							$recommendations[] = "You should have at least one link for every 120 words of page content.  You currently have $number_of_links link(s).  You should have at least ".floor($words / 120).".";
-						}
-						// See if we have any external links.
-						if ($number_of_external_links) {
-							$score += 5;
-						} else {
-							$recommendations[] = "Having an external link helps build Page Rank.";
-						}
-					} else {
-						$recommendations[] = "You should have at least one link in your content.";
-					}
-
-					// Check on our readability score.
-					if ($readability >= 90) {
-						$score += 20;
-					} else {
-						$read_score = round(($readability / 90),2);
-						$recommendations[] = "Your readability score is ".($read_score*100)."%.  Using shorter sentences and words with less syllables will make your site easier to read by search engines and users.";
-						$score += ceil($read_score * 20);
-					}
-				} else {
-					$recommendations[] = "You should enter page content.";
-				}
-
-				// Check page freshness
-				$updated = strtotime($page["updated_at"]);
-				$age = time()-$updated-(60*24*60*60);
-				// See how much older it is than 2 months.
-				if ($age > 0) {
-					$age_score = 10 - floor(2 * ($age / (30*24*60*60)));
-					if ($age_score < 0) {
-						$age_score = 0;
-					}
-					$score += $age_score;
-					$recommendations[] = "Your content is around ".ceil(2 + ($age / (30*24*60*60)))." months old.  Updating your page more frequently will make it rank higher.";
-				} else {
-					$score += 10;
-				}
-			}
-
-			$color = "#008000";
-			if ($score <= 50) {
-				$color = color_mesh("#CCAC00","#FF0000",100-(100 * $score / 50));
-			} elseif ($score <= 80) {
-				$color = color_mesh("#008000","#CCAC00",100-(100 * ($score-50) / 30));
-			}
-
-			return array("score" => $score, "recommendations" => $recommendations, "color" => $color);
-		}
-
-		// !Authorization Functions
-
-		// Utility for form field types / views -- we already know module group permissions are enabled so we skip some overhead
-		function canAccessGroup($module,$group) {
-			if ($this->Level > 0) {
-				return true;
-			}
-
-			$id = $module["id"];
-
-			if ($this->Permissions["module"][$id] && $this->Permissions["module"][$id] != "n") {
-				return true;
-			}
-
-			if (is_array($this->Permissions["module_gbp"][$id])) {
-				$gp = $this->Permissions["module_gbp"][$id][$group];
-				if ($gp && $gp != "n") {
-					return true;
-				}
-			}
-
-			return false;
-		}
-
-		function checkAccess($module) {
-			if (is_array($module)) {
-				$module = $module["id"];
-			}
-
-			if ($this->Level > 0) {
-				return true;
-			}
-
-			if ($this->Permissions["module"][$module] && $this->Permissions["module"][$module] != "n") {
-				return true;
-			}
-
-			if (is_array($this->Permissions["module_gbp"][$module])) {
-				foreach ($this->Permissions["module_gbp"][$module] as $p) {
-					if ($p != "n") {
-						return true;
-					}
-				}
-			}
-
-			return false;
-		}
-
-		// Pass in the entire module array (or just the ID if not passing in $item), returns the permission level for the given item.
-		// If no item is passed in, it will give the access level for the module ignoring gbp.
-		function getAccessLevel($module,$item = array(),$table = "") {
-			if ($this->Level > 0) {
-				return "p";
-			}
-
-			$id = is_array($module) ? $module["id"] : $module;
-
-			$perm = $this->Permissions["module"][$id];
-
-			// If group based permissions aren't on or we're a publisher of this module it's an easy solution… or if we're not even using the table.
-			if (!$item || !$module["gbp"]["enabled"] || $perm == "p" || $table != $module["gbp"]["table"]) {
-				return $perm;
-			}
-
-			if (is_array($this->Permissions["module_gbp"][$id])) {
-				$gv = $item[$module["gbp"]["group_field"]];
-				$gp = $this->Permissions["module_gbp"][$id][$gv];
-
-				if ($gp != "n") {
-					return $gp;
-				}
-			}
-
-			return $perm;
-		}
-
-		// Since cached items don't use their normal columns...
-		function getCachedAccessLevel($module,$item = array(),$table = "") {
-			if ($this->Level > 0) {
-				return "p";
-			}
-
-			$id = is_array($module) ? $module["id"] : $module;
-
-			$perm = $this->Permissions["module"][$id];
-
-			// If group based permissions aren't on or we're a publisher of this module it's an easy solution… or if we're not even using the table.
-			if (!$item || !$module["gbp"]["enabled"] || $perm == "p" || $table != $module["gbp"]["table"]) {
-				return $perm;
-			}
-
-			if (is_array($this->Permissions["module_gbp"][$id])) {
-				$gv = $item["gbp_field"];
-				$gp = $this->Permissions["module_gbp"][$id][$gv];
-
-				if ($gp != "n") {
-					return $gp;
-				}
-			}
-
-			return $perm;
-		}
-
-		// Get a list of all groups the user has access to in a module.
-		function getAccessGroups($module) {
-			if ($this->Level > 0) {
-				return true;
-			}
-
-			if ($this->Permissions["module"][$module] && $this->Permissions["module"][$module] != "n") {
-				return true;
-			}
-
-			$groups = array();
-			if (is_array($this->Permissions["module_gbp"][$module])) {
-				foreach ($this->Permissions["module_gbp"][$module] as $group => $permission) {
-					if ($permission && $permission != "n") {
-						$groups[] = $group;
-					}
-				}
-			}
-			return $groups;
-		}
-
-		function getPageAccessLevel($page) {
-			return $this->getPageAccessLevelByUser($page,$this->ID);
-		}
-
-		function getPageAccessLevelByUser($page,$user) {
-			$u = $this->getUser($user);
-			if ($u["level"] > 0) {
-				return "p";
-			}
-
-			if (!is_numeric($page) && $page[0] == "p") {
-				$f = sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE id = '".substr($page,1)."'"));
-				if ($f["user"] == $user) {
-					return "p";
-				}
-				$pdata = json_decode($f["changes"],true);
-				return $this->getPageAccessLevelByUser($pdata["parent"],$admin->ID);
-			}
-
-			$pp = $this->Permissions["page"][$page];
-			if ($pp == "n") {
-				return false;
-			}
-
-			if ($pp && $pp != "i") {
-				return $pp;
-			}
-
-			$parent = sqlfetch(sqlquery("SELECT parent FROM bigtree_pages WHERE id = '".mysql_real_escape_string($page)."'"),true);
-			$pp = $this->Permissions["page"][$parent];
-			while ((!$pp || $pp == "i") && $parent) {
-				$parent = sqlfetch(sqlquery("SELECT parent FROM bigtree_pages WHERE id = '$parent'"),true);
-				$pp = $this->Permissions["page"][$parent];
-			}
-
-			if (!$pp || $pp == "i" || $pp == "n") {
-				return false;
-			}
-
-			return $pp;
-		}
-
-		function getPageAccessType($page) {
-			return $this->getPageAccessTypeByUserId($page,$this->ID);
-		}
-
-		function getPageAccessTypeByUserId($page,$user,$origin = true) {
-			$page = mysql_real_escape_string($page);
-			if ($origin) {
-				$u = $this->getUser($user);
-				if ($u["level"] > 0) {
-					return "i";
-				}
-			}
-			$f = sqlfetch(sqlquery("SELECT permissions,parent FROM bigtree_pages WHERE id = '$page'"));
-			$rights = json_decode($f["permissions"],true);
-			if (isset($rights[$user])) {
-				if ($origin) {
-					return $rights[$user]["type"];
-				}
-				if ($rights[$user]["type"] == "t") {
-					return "i";
-				}
-			}
-			if ($f["parent"] > -1) {
-				return $this->getPageAccessTypeByUserId($f["parent"],$user,false);
-			}
-			return false;
-		}
-
-		function login($email,$password,$stay_logged_in = false) {
-			global $path;
-			$f = sqlfetch(sqlquery("SELECT * FROM bigtree_users WHERE email = '".mysql_real_escape_string($email)."'"));
-			$phpass = new PasswordHash($config["password_depth"], TRUE);
-			$ok = $phpass->CheckPassword($password,$f["password"]);
-			if ($ok) {
-				if ($stay_logged_in) {
-					setcookie('bigtree[email]',$f["email"],time()+31*60*60*24,str_replace($GLOBALS["domain"],"",$GLOBALS["www_root"]));
-					setcookie('bigtree[password]',$f["password"],time()+31*60*60*24,str_replace($GLOBALS["domain"],"",$GLOBALS["www_root"]));
-				}
-
-				$_SESSION["bigtree"]["id"] = $f["id"];
-				$_SESSION["bigtree"]["email"] = $f["email"];
-				$_SESSION["bigtree"]["level"] = $f["level"];
-				$_SESSION["bigtree"]["name"] = $f["name"];
-				$_SESSION["bigtree"]["permissions"] = json_decode($f["permissions"],true);
-
-				if ($path[1] == "login") {
-					header("Location: ".$GLOBALS["admin_root"]);
-				} else {
-					header("Location: ".$GLOBALS["domain"].$_SERVER["REQUEST_URI"]);
-				}
-				die();
-			} else {
-				return false;
-			}
-		}
-
-		function logout() {
-			setcookie("bigtree[email]","",time()-3600,str_replace($GLOBALS["domain"],"",$GLOBALS["www_root"]));
-			setcookie("bigtree[password]","",time()-3600,str_replace($GLOBALS["domain"],"",$GLOBALS["www_root"]));
-			unset($_SESSION["bigtree"]);
-			header("Location: ".$GLOBALS["admin_root"]);
-			die();
-		}
-
-		function requireAccess($module) {
-			global $cms,$admin_root,$css,$js,$site;
-			if ($this->Level > 0)
-				return "p";
-			if (!isset($this->Permissions[$module]) || $this->Permissions[$module] == "") {
-				ob_clean();
-				include bigtree_path("admin/pages/_denied.php");
-				$content = ob_get_clean();
-				include bigtree_path("admin/layouts/default.php");
-				die();
-			}
-			return $this->Permissions[$module];
-		}
-
-		function requireLevel($level) {
-			global $cms,$admin_root,$css,$js,$site;
-			if (!isset($this->Level) || $this->Level < $level) {
-				$this->stop("<h1>Access Denied</h1>");
-			}
-		}
-
-		function requirePublisher($module) {
-			global $cms,$admin_root,$css,$js,$site;
-			if ($this->Level > 0)
-				return true;
-			if ($this->Permissions[$module] != "p") {
-				ob_clean();
-				include bigtree_path("admin/pages/_denied.php");
-				$content = ob_get_clean();
-				include bigtree_path("admin/layouts/default.php");
-				die();
-			}
-			return true;
-		}
-
-		//! API Related Functions
-
-		function getAPIToken($email,$password) {
-			global $config;
-			$f = sqlfetch(sqlquery("SELECT * FROM bigtree_users WHERE email = '".mysql_real_escape_string($email)."'"));
-			$phpass = new PasswordHash($config["password_depth"], TRUE);
-			$ok = $phpass->CheckPassword($password,$f["password"]);
-			if ($ok) {
-				$existing = sqlfetch(sqlquery("SELECT * FROM bigtree_api_tokens WHERE temporary = 'on' AND user = '".$f["id"]."' AND expires > NOW()"));
-				if ($existing) {
-					sqlquery("UPDATE bigtree_api_tokens SET expires = '".date("Y-m-d H:i:s",strtotime("+1 day"))."' WHERE id = '".$existing["id"]."'");
-					return $existing["token"];
-				}
-				$token = str_rand(30);
-				$r = sqlrows(sqlquery("SELECT * FROM bigtree_api_tokens WHERE token = '$token'"));
-				while ($r) {
-					$token = str_rand(30);
-					$r = sqlrows(sqlquery("SELECT * FROM bigtree_api_tokens WHERE token = '$token'"));
-				}
-				sqlquery("DELETE FROM bigtree_api_tokens WHERE user = '".$f["id"]."' AND temporary = 'on'");
-				sqlquery("INSERT INTO bigtree_api_tokens (`token`,`user`,`expires`,`temporary`) VALUES ('$token','".$f["id"]."','".date("Y-m-d H:i:s",strtotime("+1 day"))."','on')");
-				return $token;
-			}
-			return false;
-		}
-
-
-		function getPageOfTokens($page = 0,$query = "") {
-			if ($query) {
-				$q = sqlquery("SELECT * FROM bigtree_api_tokens WHERE token LIKE '%".mysql_real_escape_string($query)."%' ORDER BY id DESC LIMIT ".($page*$this->PerPage).",".$this->PerPage);
-			} else {
-				$q = sqlquery("SELECT * FROM bigtree_api_tokens ORDER BY id DESC LIMIT ".($page*$this->PerPage).",".$this->PerPage);
-			}
-			$items = array();
-			while ($f = sqlfetch($q)) {
-				$f["user"] = $this->getUser($f["user"]);
-				$items[] = $f;
-			}
-			return $items;
-		}
-
-		function getTokensPageCount($query = "") {
-			if ($query) {
-				$q = sqlquery("SELECT id FROM bigtree_api_tokens WHERE token LIKE '%".mysql_real_escape_string($query)."%'");
-			} else {
-				$q = sqlquery("SELECT id FROM bigtree_api_tokens");
-			}
-			$r = sqlrows($q);
-			$pages = ceil($r / $this->PerPage);
-			if ($pages == 0) {
-				$pages = 1;
-			}
-			return $pages;
-		}
-
-		function requireAPILevel($level) {
-			if ($this->Level < $level) {
-				echo bigtree_api_encode(array("success" => false,"error" => "Permission level is too low."));
-				die();
-			}
-		}
-
-		function requireAPIModuleAccess($module) {
-			if (!$this->Permissions[$module]) {
-				echo bigtree_api_encode(array("success" => false,"error" => "Not permitted."));
-				die();
-			}
-		}
-
-		function requireAPIModulePublisherAccess($module) {
-			if ($this->Permissions[$module] != "p") {
-				echo bigtree_api_encode(array("success" => false,"error" => "Publishing permission required."));
-				die();
-			}
-		}
-
-		function requireAPIWrite() {
-			if ($this->ReadOnly) {
-				echo bigtree_api_encode(array("success" => false,"error" => "Not available in read only mode."));
-				die();
-			}
-		}
+		
+		/*
+			Function: validateToken
+				Validates a token.
+				Sets up a token's "user session" if validation passes.
+			
+			Parameters:
+				token - The token to validate.
+				
+			Returns:
+				true if successful, otherwise false.
+		*/
 
 		function validateToken($token) {
 			$t = sqlfetch(sqlquery("SELECT * FROM bigtree_api_tokens WHERE token = '$token' AND (expires > NOW() OR temporary != 'on')"));
