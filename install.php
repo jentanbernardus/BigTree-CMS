@@ -111,7 +111,6 @@
 			$query = trim($query);
 			if ($query != "") {
 				$q = mysql_query($query);
-				echo mysql_error() . "  :  " . $query . "  <br />";
 			}
 		}
 		
@@ -121,8 +120,6 @@
 		$phpass = new PasswordHash(8, TRUE);
 		$enc_pass = mysql_real_escape_string($phpass->HashPassword($cms_pass));
 		mysql_query("INSERT INTO bigtree_users (`email`,`password`,`name`,`level`) VALUES ('$cms_user','$enc_pass','Developer','2')");
-		
-		die();
 		
 		function dwrite($dir) {
 			global $root;
