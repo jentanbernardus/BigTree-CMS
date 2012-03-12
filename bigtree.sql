@@ -7,9 +7,6 @@ CREATE TABLE `bigtree_api_tokens` (`id` int(11) NOT NULL AUTO_INCREMENT, `token`
 DROP TABLE IF EXISTS `bigtree_audit_trail`;
 CREATE TABLE `bigtree_audit_trail` ( `id` int(11) unsigned NOT NULL AUTO_INCREMENT, `table` varchar(255) NOT NULL, `user` int(11) NOT NULL, `entry` int(11) NOT NULL, `date` datetime NOT NULL, `type` varchar(255) NOT NULL, PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
-DROP TABLE IF EXISTS `bigtree_cache`;
-CREATE TABLE `bigtree_cache` ( `view` int(11) NOT NULL, `id` varchar(255) NOT NULL, `gbp_field` text NOT NULL, `group_field` text NOT NULL, `group_sort_field` text NOT NULL, `position` int(11) NOT NULL, `approved` char(2) NOT NULL, `archived` char(2) NOT NULL, `featured` char(2) NOT NULL, `status` char(1) NOT NULL DEFAULT '', `pending_owner` int(11) NOT NULL, `column1` text NOT NULL, `column2` text NOT NULL, `column3` text NOT NULL, `column4` text NOT NULL, `column5` text NOT NULL) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
 DROP TABLE IF EXISTS `bigtree_callouts`;
 CREATE TABLE `bigtree_callouts` ( `id` varchar(255) NOT NULL, `name` varchar(255) NOT NULL DEFAULT '', `description` text NOT NULL, `resources` text NOT NULL, `position` int(11) NOT NULL, `package` int(11) NOT NULL, `level` int(11) NOT NULL, PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
@@ -36,6 +33,9 @@ CREATE TABLE `bigtree_module_groups` ( `id` int(11) NOT NULL AUTO_INCREMENT, `na
 
 DROP TABLE IF EXISTS `bigtree_module_packages`;
 CREATE TABLE `bigtree_module_packages` ( `id` int(11) NOT NULL AUTO_INCREMENT, `foundry_id` int(11) NOT NULL, `author` varchar(255) NOT NULL, `name` varchar(255) NOT NULL, `primary_version` int(11) NOT NULL, `secondary_version` int(11) NOT NULL, `tertiary_version` int(11) NOT NULL, `description` text NOT NULL, `release_notes` text NOT NULL, `details` text NOT NULL, `group_id` int(11) NOT NULL, `module_id` int(11) NOT NULL, `tables` text NOT NULL, `files` text NOT NULL, `downloaded` char(2) NOT NULL, `private` char(2) NOT NULL, `last_updated` datetime NOT NULL, PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+DROP TABLE IF EXISTS `bigtree_module_view_cache`;
+CREATE TABLE `bigtree_module_view_cache` ( `view` int(11) NOT NULL, `id` varchar(255) NOT NULL, `gbp_field` text NOT NULL, `group_field` text NOT NULL, `group_sort_field` text NOT NULL, `position` int(11) NOT NULL, `approved` char(2) NOT NULL, `archived` char(2) NOT NULL, `featured` char(2) NOT NULL, `status` char(1) NOT NULL DEFAULT '', `pending_owner` int(11) NOT NULL, `column1` text NOT NULL, `column2` text NOT NULL, `column3` text NOT NULL, `column4` text NOT NULL, `column5` text NOT NULL) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 DROP TABLE IF EXISTS `bigtree_module_views`;
 CREATE TABLE `bigtree_module_views` ( `id` int(11) NOT NULL AUTO_INCREMENT, `title` varchar(255) NOT NULL DEFAULT '', `description` text NOT NULL, `type` varchar(255) NOT NULL DEFAULT '', `table` varchar(255) NOT NULL DEFAULT '', `fields` text NOT NULL, `options` text NOT NULL, `actions` text NOT NULL, `suffix` varchar(255) NOT NULL, `uncached` char(2) NOT NULL, `preview_url` varchar(255) NOT NULL, PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
@@ -86,4 +86,4 @@ DROP TABLE IF EXISTS `bigtree_user_groups`;
 CREATE TABLE `bigtree_user_groups` ( `id` int(11) NOT NULL AUTO_INCREMENT, `name` varchar(255) NOT NULL, `description` text NOT NULL, `permissions` longtext NOT NULL, PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 DROP TABLE IF EXISTS `bigtree_users`;
-CREATE TABLE `bigtree_users` ( `id` int(11) NOT NULL AUTO_INCREMENT, `ldap` varchar(255) NOT NULL, `email` varchar(255) CHARACTER SET latin1 NOT NULL DEFAULT '', `password` varchar(255) CHARACTER SET latin1 NOT NULL, `name` varchar(255) CHARACTER SET latin1 NOT NULL DEFAULT '', `company` varchar(255) CHARACTER SET latin1 NOT NULL DEFAULT '', `level` int(11) NOT NULL DEFAULT '0', `permissions` text CHARACTER SET latin1 NOT NULL, `change_password_hash` varchar(255) NOT NULL, `foundry_author` text NOT NULL, PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+CREATE TABLE `bigtree_users` ( `id` int(11) NOT NULL AUTO_INCREMENT, `ldap` varchar(255) NOT NULL, `email` varchar(255) CHARACTER SET latin1 NOT NULL DEFAULT '', `password` varchar(255) CHARACTER SET latin1 NOT NULL, `name` varchar(255) CHARACTER SET latin1 NOT NULL DEFAULT '', `company` varchar(255) CHARACTER SET latin1 NOT NULL DEFAULT '', `level` int(11) NOT NULL DEFAULT '0', `permissions` text CHARACTER SET latin1 NOT NULL, `alerts` text CHARACTER SET latin1 NOT NULL, `daily_digest` char(2) NOT NULL DEFAULT '', `change_password_hash` varchar(255) NOT NULL, PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=utf8;
