@@ -1,5 +1,5 @@
 <?
-	$view = $admin->getModuleView(end($path));
+	$view = BigTreeAutoModule::getView(end($path));
 	
 	$fields = $view["fields"];
 	$x = 0;

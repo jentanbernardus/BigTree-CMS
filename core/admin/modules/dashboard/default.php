@@ -49,12 +49,12 @@
 		<div class="graph">
 			<?
 				$x = 0;
-			    foreach ($visits as $date => $count) {
-			    	$height = round($bar_height * ($count - $min) / $max) + 12;
-			    	$x++;
+				foreach ($visits as $date => $count) {
+					$height = round($bar_height * ($count - $min) / $max) + 12;
+					$x++;
 			?>
 			<section class="bar<? if ($x == 14) { ?> last<? } elseif ($x == 1) { ?> first<? } ?>" style="height: <?=$height?>px; margin-top: <?=(82-$height)?>px;">
-			    <?=$count?>
+				<?=$count?>
 			</section>
 			<?
 				}

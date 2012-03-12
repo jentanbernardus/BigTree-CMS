@@ -74,7 +74,7 @@
 				<ul>
 					<?
 						foreach ($nav as $item) {
-							if ($admin->Level >= $item["level"]) {
+							if ($admin->Level >= $item["access"]) {
 					?>
 					<li<? if ($path[1] == $item["link"] || ($item["link"] == "modules" && $in_module)) { ?> class="active"<? } ?>>
 						<a href="<?=$admin_root?><?=$item["link"]?>/"<? if ($path[1] == $item["link"] || ($item["link"] == "modules" && $in_module)) { ?> class="active"<? } ?>><span class="<?=$cms->urlify($item["title"])?>"></span><?=$item["title"]?></a>
@@ -82,7 +82,7 @@
 						<ul>
 							<?
 								foreach ($item["children"] as $child) {
-									if ($admin->Level >= $child["level"]) {
+									if ($admin->Level >= $child["access"]) {
 							?>
 							<li><a href="<?=$admin_root?><?=$item["link"]?>/<?=$child["link"]?>/"><?=$child["title"]?></a></li>
 							<?

@@ -6,7 +6,7 @@
 	
 	// Calculate related modules
 	if ($module["group"]) {
-		$mgroup = sqlfetch(sqlquery("SELECT * FROM bigtree_module_groups WHERE id = '".$module["group"]."'"));
+		$mgroup = $admin->getModuleGroup($module["group"]);
 		$other = $admin->getModulesByGroup($module["group"]);
 		if (count($other) > 1) {
 			$subnav = array();
@@ -26,5 +26,5 @@
 	$breadcrumb[] = array("link" => $module["route"], "title" => $module["name"]);
 	
 	// Sub Nav
-	$actions = $admin->getModuleNavigation($module["id"]);
+	$actions = $admin->getModuleNavigation($module);
 ?>

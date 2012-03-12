@@ -21,21 +21,21 @@
 .BigTreeSkin .mceIframeContainer {border-top:1px solid #CCC; border-bottom:1px solid #CCC}
 .BigTreeSkin td.mceToolbar{background:#ddd;
 	background: -moz-linear-gradient(#eeeeee, #dddddd); /* FF 3.6+ */  
-    background: -ms-linear-gradient(#eeeeee, #dddddd); /* IE10 */  
-    background: -webkit-linear-gradient(#eeeeee, #dddddd); /* Safari 5.1+, Chrome 10+ */  
-    background: -o-linear-gradient(#eeeeee, #dddddd); /* Opera 11.10 */  
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#eeeeee', endColorstr='#dddddd'); /* IE6 & IE7 */  
-    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr='#eeeeee', endColorstr='#dddddd')"; /* IE8+ */  
-    background: linear-gradient(#eeeeee, #dddddd); /* the standard */ 
+	background: -ms-linear-gradient(#eeeeee, #dddddd); /* IE10 */  
+	background: -webkit-linear-gradient(#eeeeee, #dddddd); /* Safari 5.1+, Chrome 10+ */  
+	background: -o-linear-gradient(#eeeeee, #dddddd); /* Opera 11.10 */  
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#eeeeee', endColorstr='#dddddd'); /* IE6 & IE7 */  
+	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr='#eeeeee', endColorstr='#dddddd')"; /* IE8+ */  
+	background: linear-gradient(#eeeeee, #dddddd); /* the standard */ 
 }
 .BigTreeSkin .mceStatusbar {background:#ddd; display:block; font-family:'MS Sans Serif',sans-serif,Verdana,Arial; font-size:9pt; line-height:16px; overflow:visible; color:#000;height:20px;
 	background: -moz-linear-gradient(#eeeeee, #dddddd); /* FF 3.6+ */  
-    background: -ms-linear-gradient(#eeeeee, #dddddd); /* IE10 */  
-    background: -webkit-linear-gradient(#eeeeee, #dddddd); /* Safari 5.1+, Chrome 10+ */  
-    background: -o-linear-gradient(#eeeeee, #dddddd); /* Opera 11.10 */  
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#eeeeee', endColorstr='#dddddd'); /* IE6 & IE7 */  
-    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr='#eeeeee', endColorstr='#dddddd')"; /* IE8+ */  
-    background: linear-gradient(#eeeeee, #dddddd); /* the standard */ 
+	background: -ms-linear-gradient(#eeeeee, #dddddd); /* IE10 */  
+	background: -webkit-linear-gradient(#eeeeee, #dddddd); /* Safari 5.1+, Chrome 10+ */  
+	background: -o-linear-gradient(#eeeeee, #dddddd); /* Opera 11.10 */  
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#eeeeee', endColorstr='#dddddd'); /* IE6 & IE7 */  
+	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr='#eeeeee', endColorstr='#dddddd')"; /* IE8+ */  
+	background: linear-gradient(#eeeeee, #dddddd); /* the standard */ 
 }
 .BigTreeSkin .mceStatusbar div {float:left; padding:2px 4px; font-size:10px; }
 .BigTreeSkin .mceStatusbar a.mceResize {display:block; float:right; background:url(img/icons.png) -788px 0; margin: 0 0 0 0; padding: 0 5px 5px 0; width:18px; height:14px; cursor:ns-resize; outline:0}

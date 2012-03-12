@@ -138,23 +138,23 @@
 		<div class="graph">
 			<?
 				$x = 0;
-			    foreach ($two_week_visits as $date => $count) {
-			    	$height = round($graph_bar_height * ($count - $graph_min) / $graph_max) + 12;
-			    	$x++;
+				foreach ($two_week_visits as $date => $count) {
+					$height = round($graph_bar_height * ($count - $graph_min) / $graph_max) + 12;
+					$x++;
 			?>
 			<section class="bar<? if ($x == 14) { ?> last<? } elseif ($x == 1) { ?> first<? } ?>" style="height: <?=$height?>px; margin-top: <?=(82-$height)?>px;">
-			    <?=$count?>
+				<?=$count?>
 			</section>
 			<?
-			    }
-			    
-			    $x = 0;
-			    foreach ($two_week_visits as $date => $count) {
-			    	$x++;
+				}
+				
+				$x = 0;
+				foreach ($two_week_visits as $date => $count) {
+					$x++;
 			?>
 			<section class="date<? if ($x == 14) { ?> last<? } elseif ($x == 1) { ?> first<? } ?>"><?=date("n/j/y",strtotime($date))?></section>
 			<?
-			    }
+				}
 			?>
 		</div>
 	</section>

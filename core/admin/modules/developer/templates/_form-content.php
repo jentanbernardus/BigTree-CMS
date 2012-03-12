@@ -47,7 +47,20 @@
 		<fieldset>
 			<label>Related Module</label>
 			<select name="module">
-				<? bigtree_draw_module_dropdown_contents($module) ?>
+				<option></option>
+				<?
+					$groups = $admin->getModuleGroups();
+					foreach ($groups as $group) {
+						$modules = $admin->getModulesByGroup($group["id"]);
+				?>
+				<optgroup label="<?=$group["name"]?>">
+					<? foreach ($modules as $m) { ?>
+					<option value="<?=$m["id"]?>"<? if ($m["id"] == $module) { ?> selected="selected"<? } ?>><?=$m["name"]?></option>
+					<? } ?>
+				</optgroup>
+				<?
+					}
+				?>
 			</select>	
 		</fieldset>
 		

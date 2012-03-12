@@ -9,6 +9,6 @@
 		settings: Array of Setting Objects|
 	*/
 	$admin->requireAPILevel(1);
-	$s = $admin->getAllSettings();
+	$s = $admin->getSettings();
 	echo bigtree_api_encode(array("success" => true,"settings" => $s));
 ?>
