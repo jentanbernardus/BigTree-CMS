@@ -52,7 +52,7 @@ LOCK TABLES `bigtree_pages` WRITE;
 
 INSERT INTO `bigtree_pages` (`id`, `parent`, `in_nav`, `nav_title`, `route`, `path`, `title`, `meta_keywords`, `meta_description`, `template`, `external`, `new_window`, `resources`, `callouts`, `archived`, `archived_inherited`, `locked`, `position`, `created_at`, `updated_at`, `publish_at`, `expire_at`, `max_age`, `last_edited_by`, `ga_page_views`)
 VALUES
-	(0,-1,'on','BigTree Site','','','BigTree Site','','','','','','','','','','',0,'0000-00-00 00:00:00','2012-02-28 11:38:53',NULL,NULL,0,0,0);
+	(0,-1,'on','BigTree Site','','','BigTree Site','','','home','','','{}','[]','','','',0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,0,0,0);
 UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `bigtree_pending_changes`;
@@ -78,6 +78,13 @@ CREATE TABLE `bigtree_tags_rel` ( `id` int(11) NOT NULL AUTO_INCREMENT, `module`
 
 DROP TABLE IF EXISTS `bigtree_templates`;
 CREATE TABLE `bigtree_templates` ( `id` varchar(255) NOT NULL DEFAULT '', `name` varchar(255) NOT NULL DEFAULT '', `image` varchar(255) NOT NULL DEFAULT '', `module` int(11) NOT NULL, `resources` text NOT NULL, `position` int(11) NOT NULL DEFAULT '0', `description` text NOT NULL, `callouts_enabled` char(2) NOT NULL DEFAULT '', `level` int(11) NOT NULL, `package` int(11) NOT NULL, `routed` char(2) NOT NULL DEFAULT '', PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+LOCK TABLES `bigtree_templates` WRITE;
+
+INSERT INTO `bigtree_templates` (`id`, `name`, `image`, `module`, `resources`, `position`, `description`, `callouts_enabled`, `level`, `package`, `routed`)
+VALUES
+	('home', 'Home', 'page.png', 0, '[]', 0, 'Home Page', '', 0, 0, ''),
+	('content', 'Content', 'page.png', 0, '[{\"id\":\"page_header\",\"title\":\"Page Header\",\"subtitle\":\"\",\"type\":\"text\",\"name\":\"\"},{\"id\":\"page_content\",\"title\":\"Page Content\",\"subtitle\":\"\",\"type\":\"html\",\"name\":\"\"}}]', 0, 'Master Content', 'on', 0, 0, '');
+UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `bigtree_user_group_membership`;
 CREATE TABLE `bigtree_user_group_membership` ( `user` int(11) NOT NULL, `group` int(11) NOT NULL) ENGINE=MyISAM DEFAULT CHARSET=latin1;

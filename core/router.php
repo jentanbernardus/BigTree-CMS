@@ -347,7 +347,22 @@
 			header("Location: ".$page["external"]);
 		}
 	} elseif (!$_GET["bigtree_htaccess_url"] || empty($path[0])) {
-		include "../templates/pages/_home.php";
+		$page = $cms->getPage(0);
+		
+		$resources = $page["resources"];
+		$callouts = $page["callouts"];
+
+		// Quick access to resources
+		if (is_array($resources)) {
+			foreach ($resources as $key => $val) {
+				if (substr($key,0,1) != "_") {
+					$$key = &$resources[$key];
+				}
+			}
+		}
+		
+		//include "../templates/pages/_home.php";
+		include "../templates/pages/" . $page["template"] . ".php";
 	} elseif ($sitemap) {
 		include "../templates/pages/_sitemap.php";
 	} elseif ($sitemap_xml) {
