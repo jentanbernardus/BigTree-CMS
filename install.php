@@ -108,14 +108,21 @@
 		
 		$sql_queries = explode("\n",file_get_contents("bigtree.sql"));
 		foreach ($sql_queries as $query) {
-			mysql_query($query);
+			$query = trim($query);
+			if ($query != "") {
+				$q = mysql_query($query);
+				echo mysql_error() . "  :  " . $query . "  <br />";
+			}
 		}
-		mysql_query("UPDATE bigtree_pages SET id = '0' WHERE id = '1'");
-		include "core/inc/utils/PasswordHash.php";
 		
+		mysql_query("UPDATE bigtree_pages SET id = '0' WHERE id = '1'");
+		
+		include "core/inc/utils/PasswordHash.php";
 		$phpass = new PasswordHash(8, TRUE);
 		$enc_pass = mysql_real_escape_string($phpass->HashPassword($cms_pass));
 		mysql_query("INSERT INTO bigtree_users (`email`,`password`,`name`,`level`) VALUES ('$cms_user','$enc_pass','Developer','2')");
+		
+		die();
 		
 		function dwrite($dir) {
 			global $root;
@@ -157,7 +164,6 @@
 		dwrite("site/files/pages/");
 		dwrite("site/files/resources/");
 		dwrite("site/images/");
-		dwrite("site/swf/");
 		dwrite("site/js/");
 		dwrite("templates");
 		dwrite("templates/ajax/");

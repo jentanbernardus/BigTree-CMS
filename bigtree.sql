@@ -48,11 +48,9 @@ CREATE TABLE `bigtree_page_versions` ( `id` int(11) NOT NULL AUTO_INCREMENT, `pa
 
 DROP TABLE IF EXISTS `bigtree_pages`;
 CREATE TABLE `bigtree_pages` ( `id` int(11) NOT NULL AUTO_INCREMENT, `parent` int(11) NOT NULL DEFAULT '0', `in_nav` varchar(5) NOT NULL DEFAULT 'on', `nav_title` varchar(255) NOT NULL DEFAULT '', `route` varchar(30) NOT NULL, `path` text NOT NULL, `title` varchar(255) NOT NULL DEFAULT '', `meta_keywords` text NOT NULL, `meta_description` text NOT NULL, `template` varchar(255) NOT NULL DEFAULT '', `external` varchar(255) NOT NULL DEFAULT '', `new_window` varchar(5) NOT NULL DEFAULT '', `resources` longtext NOT NULL, `callouts` longtext NOT NULL, `archived` char(2) NOT NULL, `archived_inherited` char(2) NOT NULL, `locked` char(2) NOT NULL, `position` int(11) NOT NULL DEFAULT '0', `created_at` datetime NOT NULL, `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP, `publish_at` date DEFAULT NULL, `expire_at` date DEFAULT NULL, `max_age` int(11) DEFAULT 0, `last_edited_by` int(11) NOT NULL, `ga_page_views` int(11) DEFAULT 0, PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-LOCK TABLES `bigtree_pages` WRITE;
 
-INSERT INTO `bigtree_pages` (`id`, `parent`, `in_nav`, `nav_title`, `route`, `path`, `title`, `meta_keywords`, `meta_description`, `template`, `external`, `new_window`, `resources`, `callouts`, `archived`, `archived_inherited`, `locked`, `position`, `created_at`, `updated_at`, `publish_at`, `expire_at`, `max_age`, `last_edited_by`, `ga_page_views`)
-VALUES
-	(0,-1,'on','BigTree Site','','','BigTree Site','','','home','','','{}','[]','','','',0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,0,0,0);
+LOCK TABLES `bigtree_pages` WRITE;
+INSERT INTO `bigtree_pages` (`id`, `parent`, `in_nav`, `nav_title`, `route`, `path`, `title`, `meta_keywords`, `meta_description`, `template`, `external`, `new_window`, `resources`, `callouts`, `archived`, `archived_inherited`, `locked`, `position`, `created_at`, `updated_at`, `publish_at`, `expire_at`, `max_age`, `last_edited_by`, `ga_page_views`) VALUES (0,-1,'on','BigTree Site','','','BigTree Site','','','home','','','{}','[]','','','',0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,0,0,0);
 UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `bigtree_pending_changes`;
@@ -78,12 +76,9 @@ CREATE TABLE `bigtree_tags_rel` ( `id` int(11) NOT NULL AUTO_INCREMENT, `module`
 
 DROP TABLE IF EXISTS `bigtree_templates`;
 CREATE TABLE `bigtree_templates` ( `id` varchar(255) NOT NULL DEFAULT '', `name` varchar(255) NOT NULL DEFAULT '', `image` varchar(255) NOT NULL DEFAULT '', `module` int(11) NOT NULL, `resources` text NOT NULL, `position` int(11) NOT NULL DEFAULT '0', `description` text NOT NULL, `callouts_enabled` char(2) NOT NULL DEFAULT '', `level` int(11) NOT NULL, `package` int(11) NOT NULL, `routed` char(2) NOT NULL DEFAULT '', PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-LOCK TABLES `bigtree_templates` WRITE;
 
-INSERT INTO `bigtree_templates` (`id`, `name`, `image`, `module`, `resources`, `position`, `description`, `callouts_enabled`, `level`, `package`, `routed`)
-VALUES
-	('home', 'Home', 'page.png', 0, '[]', 0, 'Home Page', '', 0, 0, ''),
-	('content', 'Content', 'page.png', 0, '[{\"id\":\"page_header\",\"title\":\"Page Header\",\"subtitle\":\"\",\"type\":\"text\",\"name\":\"\"},{\"id\":\"page_content\",\"title\":\"Page Content\",\"subtitle\":\"\",\"type\":\"html\",\"name\":\"\"}}]', 0, 'Master Content', 'on', 0, 0, '');
+LOCK TABLES `bigtree_templates` WRITE;
+INSERT INTO `bigtree_templates` (`id`, `name`, `image`, `module`, `resources`, `position`, `description`, `callouts_enabled`, `level`, `package`, `routed`) VALUES ('home', 'Home', 'page.png', 0, '[]', 0, 'Home Page', '', 0, 0, ''), ('content', 'Content', 'page.png', 0, '[{\"id\":\"page_header\",\"title\":\"Page Header\",\"subtitle\":\"\",\"type\":\"text\",\"name\":\"\"},{\"id\":\"page_content\",\"title\":\"Page Content\",\"subtitle\":\"\",\"type\":\"html\",\"name\":\"\"}}]', 0, 'Master Content', 'on', 0, 0, '');
 UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `bigtree_user_group_membership`;
