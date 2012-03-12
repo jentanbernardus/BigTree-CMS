@@ -9,13 +9,13 @@
 	$forms = array();
 	foreach ($actions as $action) {
 		if ($action["view"]) {
-			$view = $admin->getModuleView($action["view"]);
+			$view = BigTreeAutoModule::getView($action["view"]);
 			if (!in_array($view,$views)) {
 				$views[] = $view;
 			}
 		}
 		if ($action["form"]) {
-			$form = $admin->getModuleForm($action["form"]);
+			$form = BigTreeAutoModule::getForm($action["form"]);
 			if (!in_array($form,$forms)) {
 				$forms[] = $form;
 			}

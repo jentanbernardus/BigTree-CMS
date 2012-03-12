@@ -34,33 +34,35 @@
 	$results["Pages"] = $pages;
 	
 	// Get every module's results based on auto module views.
-	$q = sqlquery("SELECT * FROM bigtree_modules ORDER BY name");
-	while ($m = sqlfetch($q)) {
+	$modules = $admin->getModules("name ASC");
+	foreach ($modules as $m) {
 		// Get all auto module view actions for this module.
-		$qa = sqlquery("SELECT * FROM bigtree_module_actions WHERE module = '".$m["id"]."' AND view > 0");
-		while ($a = sqlfetch($qa)) {
-			$view = sqlfetch(sqlquery("SELECT * FROM bigtree_module_views WHERE id = '".$a["view"]."'"));
-			$m_results = array();
-			
-			$qcolumns = sqlcolumns($view["table"]);
-			$qparts = array();
-			foreach ($qcolumns as $column => $data) {
-				$qparts[] = "`$column` LIKE $w";
-			}
-			
-			// Get matching results
-			$qs = sqlquery("SELECT * FROM `".$view["table"]."` WHERE ".implode(" OR ",$qparts));
-			while ($r = sqlfetch($qs)) {
-				$m_results[] = $r;
-				$total_results++;
-			}
-			
-			if (count($m_results)) {
-				$results[$m["name"]][] = array(
-					"view" => $view,
-					"results" => $m_results,
-					"module" => $m
-				);
+		$actions = $admin->getModuleActions($module);
+		foreach ($actions as $action) {
+			if ($action["view"]) {
+				$view = BigTreeAutoModule::getView($action["view"]);
+				$m_results = array();
+				
+				$qcolumns = sqlcolumns($view["table"]);
+				$qparts = array();
+				foreach ($qcolumns as $column => $data) {
+					$qparts[] = "`$column` LIKE $w";
+				}
+				
+				// Get matching results
+				$qs = sqlquery("SELECT * FROM `".$view["table"]."` WHERE ".implode(" OR ",$qparts));
+				while ($r = sqlfetch($qs)) {
+					$m_results[] = $r;
+					$total_results++;
+				}
+				
+				if (count($m_results)) {
+					$results[$m["name"]][] = array(
+						"view" => $view,
+						"results" => $m_results,
+						"module" => $m
+					);
+				}
 			}
 		}
 	}

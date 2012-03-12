@@ -1,5 +1,5 @@
 <?
-	$view = $admin->getModuleView(end($path));
+	$view = BigTreeAutoModule::getView(end($path));
 	
 	$fields = $view["fields"];
 	foreach ($fields as $key => $field) {

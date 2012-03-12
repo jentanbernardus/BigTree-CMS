@@ -7,8 +7,9 @@
 <div class="table">
 	<summary><h2>Settings</h2></summary>
 	<header>
-		<span class="developer_settings_name">Setting Name</span>
-		<span class="developer_settings_id">Setting ID</span>
+		<span class="developer_settings_name">Name</span>
+		<span class="developer_settings_id">ID</span>
+		<span class="developer_settings_type">Type</span>
 		<span class="view_action">Edit</span>
 		<span class="view_action">Delete</span>
 	</header>
@@ -17,6 +18,7 @@
 		<li>
 			<section class="developer_settings_name"><?=$setting["name"]?></section>
 			<section class="developer_settings_id"><?=$setting["id"]?></section>
+			<section class="developer_settings_type"><?=$setting["type"]?></section>
 			<section class="view_action">
 				<a href="<?=$section_root?>edit/<?=$setting["id"]?>/" class="icon_edit"></a>
 			</section>

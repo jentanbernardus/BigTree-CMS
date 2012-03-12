@@ -14,8 +14,8 @@
 ?>
 <nav class="sub">
 	<ul>
-		<? foreach ($subnav as $item) { ?>
-		<li><a href="<?=$developer_root?>modules/<?=$item["route"]?>/"<? if ($item["route"] == $current) { ?> class="active"<? } ?>><span class="icon_small icon_small_<?=$item["class"]?>"></span><?=$item["title"]?></a></li>
+		<? foreach ($subnav as $nav_item) { ?>
+		<li><a href="<?=$developer_root?>modules/<?=$nav_item["route"]?>/"<? if ($nav_item["route"] == $current) { ?> class="active"<? } ?>><span class="icon_small icon_small_<?=$nav_item["class"]?>"></span><?=$nav_item["title"]?></a></li>
 		<? } ?>
 	</ul>
 </nav>

@@ -13,12 +13,12 @@
 /* Top */
 .BigTreeModal .mceTop { background: #CCCCCC; border-top: 1px solid #fff;
 	background: -moz-linear-gradient(#F7F7F7, #CCCCCC); /* FF 3.6+ */  
-    background: -ms-linear-gradient(#F7F7F7, #CCCCCC); /* IE10 */  
-    background: -webkit-linear-gradient(#F7F7F7, #CCCCCC); /* Safari 5.1+, Chrome 10+ */  
-    background: -o-linear-gradient(#F7F7F7, #CCCCCC); /* Opera 11.10 */  
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#F7F7F7', endColorstr='#CCCCCC'); /* IE6 & IE7 */  
-    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr='#F7F7F7', endColorstr='#CCCCCC')"; /* IE8+ */  
-    background: linear-gradient(#F7F7F7, #CCCCCC); /* the standard */ 
+	background: -ms-linear-gradient(#F7F7F7, #CCCCCC); /* IE10 */  
+	background: -webkit-linear-gradient(#F7F7F7, #CCCCCC); /* Safari 5.1+, Chrome 10+ */  
+	background: -o-linear-gradient(#F7F7F7, #CCCCCC); /* Opera 11.10 */  
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#F7F7F7', endColorstr='#CCCCCC'); /* IE6 & IE7 */  
+	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr='#F7F7F7', endColorstr='#CCCCCC')"; /* IE8+ */  
+	background: linear-gradient(#F7F7F7, #CCCCCC); /* the standard */ 
 }
 .BigTreeModal .mceTop, .BigTreeModal .mceTop div {top:0; width:100%; height:23px}
 .BigTreeModal .mceTop .mceLeft {width:6px; /* background:url(img/corners.gif) */}
