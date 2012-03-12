@@ -1,5 +1,5 @@
 <?
-	bigtree_process_post_vars(array("htmlspecialchars","mysql_real_escape_string"));
+	BigTree::globalizePOSTVars(array("htmlspecialchars","mysql_real_escape_string"));
 	
 	// Let's see if the ID has already been used.
 	if (sqlrows(sqlquery("SELECT * FROM bigtree_templates WHERE id = '$id'"))) {
@@ -40,7 +40,7 @@
 	$resources = mysql_real_escape_string(json_encode($resources));
 	
 	if ($_FILES["image"]["tmp_name"]) {
-		$image = get_safe_filename($GLOBALS["server_root"]."custom/admin/images/templates/",$_FILES["image"]["name"]);
+		$image = BigTree::getAvailableFileName($GLOBALS["server_root"]."custom/admin/images/templates/",$_FILES["image"]["name"]);
 		move_uploaded_file($_FILES["image"]["tmp_name"],$GLOBALS["server_root"]."custom/admin/images/templates/".$image);
 		chmod($GLOBALS["server_root"]."custom/admin/images/templates/".$image,0777);
 		$image = mysql_real_escape_string($image);

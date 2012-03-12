@@ -3,7 +3,7 @@
 		$resources = json_decode(base64_decode($_POST["data"]),true);
 		foreach ($resources as &$val) {
 			if (is_array(json_decode($val,true))) {
-				$val = bigtree_untranslate_array(json_decode($val,true));
+				$val = BigTree::untranslateArray(json_decode($val,true));
 			} else {
 				$val = $cms->replaceInternalPageLinks($val);
 			}

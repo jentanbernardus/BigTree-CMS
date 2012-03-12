@@ -46,7 +46,7 @@
 	<ul>
 		<?
 			foreach ($files as $file) {
-				$parts = safe_pathinfo($file);
+				$parts = BigTree::pathInfo($file);
 				$ext = strtolower($parts["extension"]);
 				if (($ext == "png" || $ext == "jpg" || $ext == "gif") && substr($postdirectory,0,5) == "site/") {
 					$image = $www_root.str_replace("site/","",$postdirectory).$file;

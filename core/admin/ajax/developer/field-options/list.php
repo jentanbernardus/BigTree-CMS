@@ -58,7 +58,7 @@
 		<label>Table</label>
 		<select name="pop-table" class="table_select">
 			<option></option>
-			<? bigtree_table_select($d["pop-table"]); ?>
+			<? BigTree::getTableSelectOptions($d["pop-table"]); ?>
 		</select>
 	</fieldset>
 	
@@ -66,7 +66,7 @@
 		<label>Description Field</label>
 		<div name="pop-description" class="pop-dependant pop-table">
 			<? if ($d["pop-table"]) { ?>
-			<select name="pop-description"><? bigtree_field_select($d["pop-table"],$d["pop-description"]) ?></select>
+			<select name="pop-description"><? BigTree::getFieldSelectOptions($d["pop-table"],$d["pop-description"]) ?></select>
 			<? } else { ?>
 			<small>-- Please select a table --</small>
 			<? } ?>
@@ -77,7 +77,7 @@
 		<label>Sort By</label>
 		<div name="pop-sort" class="sort_by pop-dependant pop-table">
 			<? if ($d["pop-table"]) { ?>
-			<select name="pop-sort"><? bigtree_field_select($d["pop-table"],$d["pop-sort"],true) ?></select>
+			<select name="pop-sort"><? BigTree::getFieldSelectOptions($d["pop-table"],$d["pop-sort"],true) ?></select>
 			<? } else { ?>
 			<small>-- Please select a table --</small>
 			<? } ?>

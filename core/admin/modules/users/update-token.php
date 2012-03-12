@@ -1,7 +1,7 @@
 <?
 	$admin->requireLevel(1);
 	
-	bigtree_process_post_vars(array("mysql_real_escape_string"));
+	BigTree::globalizePOSTVars(array("mysql_real_escape_string"));
 	
 	$id = mysql_real_escape_string(end($path));
 	

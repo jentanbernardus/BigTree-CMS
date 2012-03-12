@@ -1,6 +1,6 @@
 <?
 	$mpage = $admin_root.$module["route"]."/";
-	bigtree_clean_globalize_array($view);
+	BigTree::globalizeArray($view);
 
 	$options = json_decode($options,true);
 	$fields = json_decode($fields,true);

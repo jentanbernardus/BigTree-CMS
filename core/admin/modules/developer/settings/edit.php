@@ -3,10 +3,10 @@
 	
 	$item = $admin->getSetting(end($path));
 
-	bigtree_clean_globalize_array($item,array("htmlspecialchars"));
+	BigTree::globalizeArray($item,array("htmlspecialchars"));
 	
 	if (is_array($_SESSION["bigtree"]["developer"]["setting_data"])) {
-		bigtree_clean_globalize_array($_SESSION["bigtree"]["developer"]["setting_data"]);
+		BigTree::globalizeArray($_SESSION["bigtree"]["developer"]["setting_data"]);
 	}
 	
 	$e = $_SESSION["bigtree"]["developer"]["error"];

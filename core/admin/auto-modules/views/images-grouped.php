@@ -1,7 +1,7 @@
 <?
 	$mpage = $admin_root.$module["route"]."/";
 	
-	bigtree_clean_globalize_array($view);
+	BigTree::globalizeArray($view);
 	$o = $options;
 	
 	$suffix = $suffix ? "-".$suffix : "";
@@ -57,7 +57,7 @@
 				foreach ($items as $item) {
 					$item["column1"] = str_replace("{wwwroot}",$www_root,$item["column1"]);
 					if ($options["preview_prefix"]) {
-						$preview_image = file_prefix($item["column1"],$options["preview_prefix"]);
+						$preview_image = BigTree::prefixFile($item["column1"],$options["preview_prefix"]);
 					} else {
 						$preview_image = $item["column1"];
 					}
@@ -115,7 +115,7 @@
 			<?
 				foreach ($pending_items as $item) {
 					if ($options["preview_prefix"]) {
-						$preview_image = file_prefix($item["column1"],$options["preview_prefix"]);
+						$preview_image = BigTree::prefixFile($item["column1"],$options["preview_prefix"]);
 					} else {
 						$preview_image = $item["column1"];
 					}

@@ -2,7 +2,7 @@
 	$file = sqlfetch(sqlquery("SELECT * FROM bigtree_resources WHERE file = '".mysql_real_escape_string($_POST["file"])."'"));
 	$file["file"] = str_replace("{wwwroot}",$www_root,$file["file"]);
 	$thumbs = json_decode($file["thumbs"],true);
-	$pinfo = safe_pathinfo($file["file"]);
+	$pinfo = BigTree::pathInfo($file["file"]);
 	foreach ($thumbs as &$thumb) {
 		$thumb = str_replace("{wwwroot}",$www_root,$thumb);
 	}

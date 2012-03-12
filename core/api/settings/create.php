@@ -19,8 +19,8 @@
 	
 	$success = $admin->createSetting($_POST);
 	if ($success) {
-		echo bigtree_api_encode(array("success" => true,"setting" => $admin->getSetting($_POST["id"])));
+		echo BigTree::apiEncode(array("success" => true,"setting" => $admin->getSetting($_POST["id"])));
 	} else {
-		echo bigtree_api_encode(array("success" => true,"error" => "A setting already exists with that id."));
+		echo BigTree::apiEncode(array("success" => true,"error" => "A setting already exists with that id."));
 	}
 ?>

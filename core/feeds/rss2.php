@@ -12,7 +12,7 @@
 			while ($item = sqlfetch($q)) {
 				foreach ($item as $key => $val) {
 					if (is_array(json_decode($val,true))) {
-						$item[$key] = bigtree_untranslate_array(json_decode($val,true));
+						$item[$key] = BigTree::untranslateArray(json_decode($val,true));
 					} else {
 						$item[$key] = $cms->replaceInternalPageLinks($val);
 					}
@@ -29,7 +29,7 @@
 				
 				$content = $item[$feed["options"]["description"]];
 				$limit = $feed["options"]["content_limit"] ? $feed["options"]["content_limit"] : 500;
-				$blurb = smarter_trim($content,$limit);
+				$blurb = BigTree::trimLength($content,$limit);
 				$time = strtotime($item[$feed["options"]["date"]]);
 		?>
 		<item>

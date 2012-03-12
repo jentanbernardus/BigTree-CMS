@@ -16,13 +16,13 @@
 <fieldset>
 	<label>Image Field</label>
 	<select name="image">
-		<? bigtree_field_select($table,$d["image"]) ?>
+		<? BigTree::getFieldSelectOptions($table,$d["image"]) ?>
 	</select>
 </fieldset>
 
 <fieldset>
 	<label>Caption Field</label>
 	<select name="caption">
-		<? bigtree_field_select($table,$d["caption"]) ?>
+		<? BigTree::getFieldSelectOptions($table,$d["caption"]) ?>
 	</select>
 </fieldset>

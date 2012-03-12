@@ -109,7 +109,7 @@
 				$this->RSContainers = $cms->getSetting("bigtree-internal-rackspace-containers");
 			}
 			
-			$parts = safe_pathinfo($file_location);
+			$parts = BigTree::pathInfo($file_location);
 			
 			foreach ($this->RSContainers as $key => $val) {
 				if ($val == $parts["dirname"]) {
@@ -157,7 +157,7 @@
 		
 		private function replaceLocal($local_file,$file_name,$relative_path,$remove_original) {
 			if ($remove_original) {	
-				$success = bigtree_move($local_file,$GLOBALS["site_root"].$relative_path.$file_name);
+				$success = BigTree::moveFile($local_file,$GLOBALS["site_root"].$relative_path.$file_name);
 			} else {
 				$success = bigtree_copy($local_file,$GLOBALS["site_root"].$relative_path.$file_name);
 			}
@@ -301,10 +301,10 @@
 		*/
 		
 		private function uploadLocal($local_file,$file_name,$relative_path,$remove_original) {
-			$safe_name = get_safe_filename($GLOBALS["site_root"].$relative_path,$file_name);
+			$safe_name = BigTree::getAvailableFileName($GLOBALS["site_root"].$relative_path,$file_name);
 			
 			if ($remove_original) {
-				$success = bigtree_move($local_file,$GLOBALS["site_root"].$relative_path.$safe_name);
+				$success = BigTree::moveFile($local_file,$GLOBALS["site_root"].$relative_path.$safe_name);
 			} else {
 				$success = bigtree_copy($local_file,$GLOBALS["site_root"].$relative_path.$safe_name);
 			}
@@ -354,7 +354,7 @@
 			}
 			
 			// Get a nice clean file name
-			$parts = safe_pathinfo($file_name);
+			$parts = BigTree::pathInfo($file_name);
 			$clean_name = $cms->urlify($parts["filename"]);
 			if (strlen($clean_name) > 50) {
 				$clean_name = substr($clean_name,0,50);
@@ -428,7 +428,7 @@
 			}
 			
 			// Get a nice clean file name
-			$parts = safe_pathinfo($file_name);
+			$parts = BigTree::pathInfo($file_name);
 			$clean_name = $cms->urlify($parts["filename"]);
 			if (strlen($clean_name) > 50) {
 				$clean_name = substr($clean_name,0,50);

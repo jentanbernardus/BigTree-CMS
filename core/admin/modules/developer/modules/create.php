@@ -1,7 +1,7 @@
 <?
 	$breadcrumb[] = array("title" => "Created Modules", "link" => "#");
 
-	bigtree_process_post_vars();
+	BigTree::globalizePOSTVars();
 	
 	if ($group_new) {
 		$group = $admin->createModuleGroup($group_new);

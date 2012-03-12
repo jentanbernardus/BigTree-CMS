@@ -56,7 +56,7 @@
 		}
 		header("Content-type: text/css");		
 		header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_modified).' GMT', true, 200);
-		echo bigtree_parse_css3(file_get_contents($ifile));
+		echo BigTree::formatCSS3(file_get_contents($ifile));
 		die();
 	}
 	

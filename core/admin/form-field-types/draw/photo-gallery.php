@@ -27,7 +27,7 @@
 				if (is_array($pgw_data)) {
 					foreach ($pgw_data as $pd) {
 						if ($options["preview_prefix"]) {
-							$pinfo = safe_pathinfo($pd["image"]);
+							$pinfo = BigTree::pathInfo($pd["image"]);
 							$preview_image = $pinfo["dirname"]."/".$options["preview_prefix"].$pinfo["basename"];
 						} else {
 							$preview_image = $pd["image"];

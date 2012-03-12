@@ -1,5 +1,5 @@
 <?
-	bigtree_process_post_vars(array("htmlspecialchars","mysql_real_escape_string"));
+	BigTree::globalizePOSTVars(array("htmlspecialchars","mysql_real_escape_string"));
 	
 	// If we're creating a new file, let's populate it with some convenience things to show what resources are available.
 	$file_contents = '<?

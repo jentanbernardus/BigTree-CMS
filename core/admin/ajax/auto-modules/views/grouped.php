@@ -4,7 +4,7 @@
 		$view = BigTreeAutoModule::getView($_POST["view"]);
 	}
 	
-	bigtree_clean_globalize_array($view);
+	BigTree::globalizeArray($view);
 	$m = BigTreeAutoModule::getModuleForView($view);
 	$perm = $admin->getAccessLevel($m);
 	$module = $admin->getModule($m);

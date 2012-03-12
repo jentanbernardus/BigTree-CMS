@@ -14,5 +14,5 @@
 		$module["actions"] = $admin->getAutoModuleActions($module["id"]);
 	}
 
-	echo bigtree_api_encode(array("success" => true,"modules" => $modules));
+	echo BigTree::apiEncode(array("success" => true,"modules" => $modules));
 ?>

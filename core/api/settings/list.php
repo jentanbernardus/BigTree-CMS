@@ -10,5 +10,5 @@
 	*/
 	$admin->requireAPILevel(1);
 	$s = $admin->getSettings();
-	echo bigtree_api_encode(array("success" => true,"settings" => $s));
+	echo BigTree::apiEncode(array("success" => true,"settings" => $s));
 ?>

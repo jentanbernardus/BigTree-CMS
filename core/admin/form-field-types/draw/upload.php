@@ -14,7 +14,7 @@
 <?
 	} else {
 		if ($options["preview_prefix"]) {
-			$preview_image = file_prefix($value,$options["preview_prefix"]);
+			$preview_image = BigTree::prefixFile($value,$options["preview_prefix"]);
 		} else {
 			$preview_image = $value;
 		}

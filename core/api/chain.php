@@ -10,5 +10,5 @@
 		$response["calls"][] = array("call" => $call["name"],"response" => $last_api_data);
 	}
 	
-	echo bigtree_api_encode($response);
+	echo BigTree::apiEncode($response);
 ?>

@@ -11,7 +11,7 @@
 		if (is_array($item["value"])) {
 			$value = "&mdash; Click Edit To View &mdash;";
 		} else {
-			$value = smarter_trim(strip_tags($item["value"]),100);
+			$value = BigTree::trimLength(strip_tags($item["value"]),100);
 		}
 ?>
 <li>

@@ -16,21 +16,21 @@
 <fieldset>
 	<label>Image Field</label>
 	<select name="image">
-		<? bigtree_field_select($table,$d["image"]) ?>
+		<? BigTree::getFieldSelectOptions($table,$d["image"]) ?>
 	</select>
 </fieldset>
 
 <fieldset>
 	<label>Caption Field</label>
 	<select name="caption">
-		<? bigtree_field_select($table,$d["caption"]) ?>
+		<? BigTree::getFieldSelectOptions($table,$d["caption"]) ?>
 	</select>
 </fieldset>
 
 <fieldset>
 	<label>Group Field</label>
 	<select name="group_field">
-		<? bigtree_field_select($table,$d["group_field"]) ?>
+		<? BigTree::getFieldSelectOptions($table,$d["group_field"]) ?>
 	</select>
 </fieldset>
 
@@ -40,7 +40,7 @@
 	<label>Other Table</label>
 	<select name="other_table" class="table_select">
 		<option></option>
-		<? bigtree_table_select($d["other_table"]) ?>
+		<? BigTree::getTableSelectOptions($d["other_table"]) ?>
 	</select>
 </fieldset>
 
@@ -49,7 +49,7 @@
 	<div name="title_field">
 		<? if ($d["title_field"]) { ?>
 		<select name="title_field">
-			<? bigtree_field_select($d["other_table"],$d["title_field"]) ?>
+			<? BigTree::getFieldSelectOptions($d["other_table"],$d["title_field"]) ?>
 		</select>
 		<? } else { ?>
 		&mdash;

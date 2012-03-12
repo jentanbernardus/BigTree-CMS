@@ -27,11 +27,11 @@
 	$p = $admin->getPageAccessLevel($_POST["id"]);
 	
 	if (!$p) {
-		echo bigtree_api_encode(array("success" => false,"error" => "You do not have permission to edit this page."));
+		echo BigTree::apiEncode(array("success" => false,"error" => "You do not have permission to edit this page."));
 	} else {
 		$warnings = array();
 		if (!isset($_POST["id"]) || $_POST["id"] === "") {
-			echo bigtree_api_encode(array("success" => false,"error" => "You did not provide a Page ID."));
+			echo BigTree::apiEncode(array("success" => false,"error" => "You did not provide a Page ID."));
 			die();
 		}
 		$page = $cms->getPage($_POST["id"]);
@@ -121,6 +121,6 @@
 			$id = $admin->updatePage($_POST["id"],$_POST);
 			$status = "APPROVED";
 		}
-		echo bigtree_api_encode(array("success" => true,"id" => $id,"status" => $status,"warnings" => $warnings));
+		echo BigTree::apiEncode(array("success" => true,"id" => $id,"status" => $status,"warnings" => $warnings));
 	}
 ?>

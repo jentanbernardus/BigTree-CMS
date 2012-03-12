@@ -57,10 +57,10 @@
 					foreach ($d as $kk => $dd) {
 						if (is_array($dd)) {
 							// If this value is an array, untranslate it so that {wwwroot} and ipls get fixed.
-							$p[$kk] = bigtree_untranslate_array($dd);
+							$p[$kk] = BigTree::untranslateArray($dd);
 						} elseif (is_array(json_decode($dd,true))) {
 							// If this value is an array, untranslate it so that {wwwroot} and ipls get fixed.
-							$p[$kk] = bigtree_untranslate_array(json_decode($dd,true));
+							$p[$kk] = BigTree::untranslateArray(json_decode($dd,true));
 						} else {
 							// Otherwise it's a string, just replace the {wwwroot} and ipls.
 							$p[$kk] = $this->replaceInternalPageLinks($dd);
@@ -92,10 +92,10 @@
 				foreach ($data as $key => $val) {
 					if (is_array($val)) {
 						// If this value is an array, untranslate it so that {wwwroot} and ipls get fixed.
-						$val = bigtree_untranslate_array($val);
+						$val = BigTree::untranslateArray($val);
 					} elseif (is_array(json_decode($val,true))) {
 						// If this value is an array, untranslate it so that {wwwroot} and ipls get fixed.
-						$val = bigtree_untranslate_array(json_decode($val,true));
+						$val = BigTree::untranslateArray(json_decode($val,true));
 					} else {
 						// Otherwise it's a string, just replace the {wwwroot} and ipls.
 						$val = $this->replaceInternalPageLinks($val);				
@@ -615,7 +615,7 @@
 			
 			$value = json_decode($f["value"],true);
 			if (is_array($value)) {
-				return bigtree_untranslate_array($value);
+				return BigTree::untranslateArray($value);
 			} else {
 				return $this->replaceInternalPageLinks($value);
 			}
@@ -737,7 +737,7 @@
 				$html = $this->getInternalPageLink($html);
 			} else {
 				$html = str_replace(array("{wwwroot}","%7Bwwwroot%7D"),$GLOBALS["www_root"],$html);
-				$html = preg_replace_callback('^="(ipl:\/\/[a-zA-Z0-9\:\/\.\?\=\-]*)"^','bigtree_regex_get_ipl',$html);
+				$html = preg_replace_callback('^="(ipl:\/\/[a-zA-Z0-9\:\/\.\?\=\-]*)"^',create_function('$matches','global $cms; return \'="\'.$cms->getInternalPageLink($matches[1]).\'"\';'),$html);
 			}
 
 			return $html;

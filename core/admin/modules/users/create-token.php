@@ -1,12 +1,12 @@
 <?
 	$admin->requireLevel(1);
 	
-	bigtree_process_post_vars(array("mysql_real_escape_string"));
+	BigTree::globalizePOSTVars(array("mysql_real_escape_string"));
 	
-	$token = str_rand(30);
+	$token = BigTree::randomString(30);
 	$r = sqlrows(sqlquery("SELECT * FROM bigtree_api_tokens WHERE token = '$token'"));
 	while ($r) {
-		$token = str_rand(30);
+		$token = BigTree::randomString(30);
 		$r = sqlrows(sqlquery("SELECT * FROM bigtree_api_tokens WHERE token = '$token'"));				
 	}
 	

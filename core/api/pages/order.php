@@ -24,5 +24,5 @@
 		$x++;
 	}	
 	
-	echo bigtree_api_encode(array("success" => true));
+	echo BigTree::apiEncode(array("success" => true));
 ?>

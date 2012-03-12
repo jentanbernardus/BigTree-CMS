@@ -94,7 +94,7 @@
 				}
 			}
 			// Replace CSS3 easymode and Minify
-			$data = bigtree_parse_css3($data);
+			$data = BigTree::formatCSS3($data);
 			
 			require_once($server_root."core/inc/utils/less-compiler.inc.php");
 			$less = new lessc();
@@ -192,12 +192,12 @@
 		if ($apipath.$path[$x] != "users/authenticate") {
 			if (isset($_POST["bigtreeapi"]["token"])) {
 				if (!$admin->validateToken($_POST["bigtreeapi"]["token"])) {
-					echo bigtree_api_encode(array("success" => false,"error" => "Invalid token. Please login."));
+					echo BigTree::apiEncode(array("success" => false,"error" => "Invalid token. Please login."));
 					die();
 				}			
 			} else {
 				if (!$admin->validateToken($_POST["token"])) {
-					echo bigtree_api_encode(array("success" => false,"error" => "Invalid token. Please login."));
+					echo BigTree::apiEncode(array("success" => false,"error" => "Invalid token. Please login."));
 					die();
 				}
 			}

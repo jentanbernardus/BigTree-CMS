@@ -37,7 +37,7 @@
 				<fieldset>
 					<label class="required">Data Table</label>
 					<select name="table" id="view_table" class="required" >
-						<? bigtree_table_select($view["table"]); ?>
+						<? BigTree::getTableSelectOptions($view["table"]); ?>
 					</select>
 				</fieldset>
 				<fieldset>

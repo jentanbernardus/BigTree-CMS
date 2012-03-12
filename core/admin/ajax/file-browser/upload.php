@@ -48,7 +48,7 @@
 				if (file_exists(substr($first_copy,0,-3)."png")) {
 					unlink($first_copy);
 					$first_copy = substr($first_copy,0,-3)."png";
-					$name_parts = safe_pathinfo($f["name"]);
+					$name_parts = BigTree::pathInfo($f["name"]);
 					$name = $name_parts["filename"].".png";
 				}
 				
@@ -70,9 +70,9 @@
 			$thumbs = array();
 			
 			// First up is the list view
-			$pinfo = safe_pathinfo($f["name"]);
+			$pinfo = BigTree::pathInfo($f["name"]);
 			$temp_thumb = $site_root."files/".uniqid("temp-").$itype_exts[$itype];
-			create_thumbnail($first_copy,$temp_thumb,100,100);
+			BigTree::createThumbnail($first_copy,$temp_thumb,100,100);
 			
 			list($twidth,$theight) = getimagesize($temp_thumb);
 			$margin = floor((100 - $theight) / 2);
@@ -82,7 +82,7 @@
 			
 			// Next up is the more info view
 			$temp_thumb = $site_root."files/".uniqid("temp-").$itype_exts[$itype];
-			create_thumbnail($first_copy,$temp_thumb,190,145);
+			BigTree::createThumbnail($first_copy,$temp_thumb,190,145);
 			
 			$thumb = $upload_service->upload($temp_thumb,"detail_thumb_".$pinfo["basename"],"files/resources/");
 			$thumbs["bigtree_internal_detail"] = $thumb;
@@ -92,7 +92,7 @@
 			foreach ($more_thumb_types as $mtk => $mtt) {
 				if ($iwidth > $mtt["width"] || $iheight > $mtt["height"]) {
 					$temp_thumb = $site_root."files/".uniqid("temp-").$itype_exts[$itype];
-					create_thumbnail($first_copy,$temp_thumb,$mtt["width"],$mtt["height"]);
+					BigTree::createThumbnail($first_copy,$temp_thumb,$mtt["width"],$mtt["height"]);
 				
 					$thumb = $upload_service->upload($temp_thumb,$mtt["prefix"].$pinfo["basename"],"files/resources/");
 					$thumbs[$mtk] = $thumb;

@@ -7,7 +7,7 @@
 	
 	// Clear tags out of the subject, sanitize the message body of XSS attacks.
 	$subject = mysql_real_escape_string(htmlspecialchars(strip_tags($_POST["subject"])));
-	$message = mysql_real_escape_string(htmlclean($_POST["message"]));
+	$message = mysql_real_escape_string(strip_tags($_POST["message"],"<p><b><strong><em><i><a>"));
 	// We build the send_to field this way so that we don't have to create a second table of recipients.  Is it faster database wise using a LIKE over a JOIN? I don't know, but it makes for one less table.
 	$send_to = "|";
 	foreach ($_POST["send_to"] as $r) {

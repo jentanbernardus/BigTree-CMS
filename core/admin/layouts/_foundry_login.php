@@ -2,7 +2,7 @@
 	$user = $admin->getUser($admin->ID);
 	if ($user["foundry_author"]) {
 		// Let's check to see if the credentials in their saved information are still valid.
-		$verify = bigtree_curl("http://developer.bigtreecms.com/ajax/foundry/verify-author/",json_decode($user["foundry_author"],true));
+		$verify = BigTree::cURL("http://developer.bigtreecms.com/ajax/foundry/verify-author/",json_decode($user["foundry_author"],true));
 		if ($verify == "1") {
 			$logged_in = true;
 		} else {

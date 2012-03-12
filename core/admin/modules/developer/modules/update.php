@@ -1,5 +1,5 @@
 <?
-	bigtree_process_post_vars();
+	BigTree::globalizePOSTVars();
 
 	$id = end($path);
 

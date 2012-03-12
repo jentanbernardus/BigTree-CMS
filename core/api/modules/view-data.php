@@ -17,5 +17,5 @@
 		$sort = "id asc";
 	}
 
-	echo bigtree_api_encode(array("success" => true,"data" => $autoModule->getParsedViewData($view,$sort)));
+	echo BigTree::apiEncode(array("success" => true,"data" => $autoModule->getParsedViewData($view,$sort)));
 ?>

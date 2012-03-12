@@ -8,7 +8,7 @@
 			<label class="required">Data Table</label>
 			<select name="table" id="feed_table" class="required left">
 				<option></option>
-				<? bigtree_table_select($table); ?>
+				<? BigTree::getTableSelectOptions($table); ?>
 			</select>
 		</fieldset>
 		<fieldset>

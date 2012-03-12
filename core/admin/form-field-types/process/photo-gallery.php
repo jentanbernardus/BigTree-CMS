@@ -37,7 +37,7 @@
 				$resource = mysql_real_escape_string($d["existing"]);
 				
 				$r = sqlfetch(sqlquery("SELECT * FROM bigtree_resources WHERE file = '".$resource."'"));
-				$pinfo = safe_pathinfo($r["file"]);					
+				$pinfo = BigTree::pathInfo($r["file"]);					
 				
 				// We're going to need to create a local copy if we need more 
 				if ((is_array($options["crops"]) && count($options["crops"])) || (is_array($options["thumbs"]) && count($options["thumbs"]))) {
@@ -45,7 +45,7 @@
 					file_put_contents($local_copy,file_get_contents($r["file"]));
 					
 					$value = $upload_service->upload($local_copy,$pinfo["basename"],$options["directory"],false);
-					$pinfo = safe_pathinfo($value);
+					$pinfo = BigTree::pathInfo($value);
 				
 					if (is_array($options["crops"])) {
 						foreach ($options["crops"] as $crop) {
@@ -64,7 +64,7 @@
 					if (is_array($options["thumbs"])) {
 						foreach ($options["thumbs"] as $thumb) {
 							$temp_thumb = $site_root."files/".uniqid("temp-").".".$pinfo["extension"];
-							create_thumbnail($local_copy,$temp_thumb,$thumb["width"],$thumb["height"]);
+							BigTree::createThumbnail($local_copy,$temp_thumb,$thumb["width"],$thumb["height"]);
 							// We use replace here instead of upload because we want to be 100% sure that this file name doesn't change.
 							$upload_service->replace($temp_thumb,$thumb["prefix"].$pinfo["basename"],$options["directory"]);
 						}
@@ -78,7 +78,7 @@
 			}
 		}
 		
-		$value = json_encode(bigtree_translate_array($photo_gallery));
+		$value = json_encode(BigTree::translateArray($photo_gallery));
 	} else {
 		$value = $data[$key];
 	}

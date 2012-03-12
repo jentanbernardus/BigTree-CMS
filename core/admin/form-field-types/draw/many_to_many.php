@@ -56,7 +56,7 @@
 				<? if ($sortable) { ?>
 				<span class="icon_sort"></span>
 				<? } ?>
-				<p><?=smarter_trim(strip_tags($description),100)?></p>
+				<p><?=BigTree::trimLength(strip_tags($description),100)?></p>
 				<a href="#" class="icon_delete"></a>
 			</li>
 			<?
@@ -67,7 +67,7 @@
 		<footer>
 			<select>
 				<? foreach ($list as $k => $v) { ?>
-				<option value="<?=htmlspecialchars($k)?>"><?=htmlspecialchars(smarter_trim(strip_tags($v),50))?></option>
+				<option value="<?=htmlspecialchars($k)?>"><?=htmlspecialchars(BigTree::trimLength(strip_tags($v),50))?></option>
 				<? } ?>
 			</select>
 			<a href="#" class="add button"><span class="icon_small icon_small_add"></span>Add Item</a>

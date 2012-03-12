@@ -1,6 +1,6 @@
 <?
 	if (!empty($d)) {
-		bigtree_clean_globalize_array($d);
+		BigTree::globalizeArray($d);
 	}
 
 	if (!$sort_column) {
@@ -13,7 +13,7 @@
 <fieldset>
 	<label>Sort By</label>
 	<select name="sort_column" style="float: left; margin: 0 5px 0 0;">
-		<? bigtree_field_select($table,$sort_column) ?>
+		<? BigTree::getFieldSelectOptions($table,$sort_column) ?>
 	</select> <select name="sort_direction"><option value="ASC">ASC</option><option<? if ($sort_direction == "DESC") { ?> selected="selected"<? } ?> value="DESC">DESC</option></select>
 </fieldset>
 <fieldset>

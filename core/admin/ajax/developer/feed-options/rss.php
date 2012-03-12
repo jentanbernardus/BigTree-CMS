@@ -17,13 +17,13 @@
 <fieldset>
 	<label>Title Field</label>
 	<select name="title">
-		<? bigtree_field_select($table,$d["title"]); ?>
+		<? BigTree::getFieldSelectOptions($table,$d["title"]); ?>
 	</select>
 </fieldset>
 <fieldset>
 	<label>Description Field</label>
 	<select name="description">
-		<? bigtree_field_select($table,$d["description"]); ?>
+		<? BigTree::getFieldSelectOptions($table,$d["description"]); ?>
 	</select>
 </fieldset>
 <fieldset>
@@ -33,7 +33,7 @@
 <fieldset>
 	<label>Link Field</label>
 	<select name="link">
-		<? bigtree_field_select($table,$d["link"]); ?>
+		<? BigTree::getFieldSelectOptions($table,$d["link"]); ?>
 	</select>
 </fieldset>
 <fieldset>
@@ -43,7 +43,7 @@
 <fieldset>
 	<label>Order By</label>
 	<select name="sort">
-		<? bigtree_field_select($table,$d["sort"],true); ?>
+		<? BigTree::getFieldSelectOptions($table,$d["sort"],true); ?>
 	</select>
 </fieldset>
 <? } ?>

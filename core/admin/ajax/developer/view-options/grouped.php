@@ -1,7 +1,7 @@
 <fieldset>
 	<label>Group Field</label>
 	<select name="group_field">
-		<? bigtree_field_select($table,$d["group_field"]) ?>
+		<? BigTree::getFieldSelectOptions($table,$d["group_field"]) ?>
 	</select>
 </fieldset>
 
@@ -14,7 +14,7 @@
 	<label>Field to Sort By Inside Groups <small>(if not draggable)</small></label>
 	<div name="sort_field">
 		<select name="sort_field">
-			<? bigtree_field_select($table,$d["sort_field"]) ?>
+			<? BigTree::getFieldSelectOptions($table,$d["sort_field"]) ?>
 		</select>
 	</div>
 </fieldset>
@@ -33,7 +33,7 @@
 	<label>Other Table</label>
 	<select name="other_table" class="table_select">
 		<option></option>
-		<? bigtree_table_select($d["other_table"]) ?>
+		<? BigTree::getTableSelectOptions($d["other_table"]) ?>
 	</select>
 </fieldset>
 
@@ -42,7 +42,7 @@
 	<div name="title_field">
 		<? if ($d["other_table"]) { ?>
 		<select name="title_field">
-			<? bigtree_field_select($d["other_table"],$d["title_field"]) ?>
+			<? BigTree::getFieldSelectOptions($d["other_table"],$d["title_field"]) ?>
 		</select>
 		<? } else { ?>
 		&mdash;
@@ -55,7 +55,7 @@
 	<div name="sort_field">
 		<? if ($d["other_table"]) { ?>
 		<select name="ot_sort_field">
-			<? bigtree_field_select($d["other_table"],$d["sort_field"]) ?>
+			<? BigTree::getFieldSelectOptions($d["other_table"],$d["sort_field"]) ?>
 		</select>
 		<? } else { ?>
 		&mdash;

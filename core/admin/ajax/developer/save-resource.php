@@ -1,5 +1,5 @@
 <?
-	bigtree_process_get_vars();
+	BigTree::globalizeGETVars();
 	
 	if ($type == "list") {
 		$options = explode("-----",$list_options);

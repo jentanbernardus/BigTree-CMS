@@ -2,7 +2,7 @@
 	$breadcrumb[] = array("title" => "Edit Callout", "link" => "#");
 	$callout = $cms->getCallout(end($path));
 	
-	bigtree_clean_globalize_array($callout);
+	BigTree::globalizeArray($callout);
 	
 	$resources = json_decode($callout["resources"],true);
 ?>

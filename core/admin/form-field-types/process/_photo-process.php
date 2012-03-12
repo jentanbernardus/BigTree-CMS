@@ -74,7 +74,7 @@
 			if (file_exists(substr($first_copy,0,-3)."png")) {
 				unlink($first_copy);
 				$first_copy = substr($first_copy,0,-3)."png";
-				$name_parts = safe_pathinfo($name);
+				$name_parts = BigTree::pathInfo($name);
 				$name = $name_parts["filename"].".png";
 			}
 			
@@ -106,7 +106,7 @@
 	
 	// If we didn't fail, let's check on crops and thumbnails.
 	if (!$failed) {
-		$pinfo = safe_pathinfo($value);
+		$pinfo = BigTree::pathInfo($value);
 		// Handle Crops
 		foreach ($options["crops"] as $crop) {
 			$cwidth = $crop["width"];
@@ -128,7 +128,7 @@
 				if (is_array($crop["thumbs"])) {
 					foreach ($crop["thumbs"] as $thumb) {
 						$temp_thumb = $site_root."files/".uniqid("temp-").$itype_exts[$itype];
-						create_thumbnail($temp_copy,$temp_thumb,$thumb["width"],$thumb["height"]);
+						BigTree::createThumbnail($temp_copy,$temp_thumb,$thumb["width"],$thumb["height"]);
 						// We use replace here instead of upload because we want to be 100% sure that this file name doesn't change.
 						$upload_service->replace($temp_thumb,$thumb["prefix"].$pinfo["basename"],$options["directory"]);
 					}
@@ -142,7 +142,7 @@
 		if (is_array($options["thumbs"])) {
 			foreach ($options["thumbs"] as $thumb) {
 				$temp_thumb = $site_root."files/".uniqid("temp-").$itype_exts[$itype];
-				create_thumbnail($temp_copy,$temp_thumb,$thumb["width"],$thumb["height"]);
+				BigTree::createThumbnail($temp_copy,$temp_thumb,$thumb["width"],$thumb["height"]);
 				// We use replace here instead of upload because we want to be 100% sure that this file name doesn't change.
 				$upload_service->replace($temp_thumb,$thumb["prefix"].$pinfo["basename"],$options["directory"]);
 			}

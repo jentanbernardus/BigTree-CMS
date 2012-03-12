@@ -39,5 +39,5 @@
 	
 	$data = json_encode(bigtree_recurse_timestamps($server_root));
 	
-	echo bigtree_api_encode(array("success" => true,"data" => $data));
+	echo BigTree::apiEncode(array("success" => true,"data" => $data));
 ?>

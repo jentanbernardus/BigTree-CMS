@@ -1,5 +1,5 @@
 <?
-	bigtree_process_post_vars(array("htmlspecialchars","mysql_real_escape_string"));
+	BigTree::globalizePOSTVars(array("htmlspecialchars","mysql_real_escape_string"));
 
 	$fields = array();	
 	

@@ -1,5 +1,5 @@
 <?	
-	bigtree_clean_globalize_array($view);
+	BigTree::globalizeArray($view);
 		
 	$m = BigTreeAutoModule::getModuleForView($view);
 	$perm = $admin->getAccessLevel($m);

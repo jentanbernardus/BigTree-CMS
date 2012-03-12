@@ -1,5 +1,5 @@
 <?
-	bigtree_process_post_vars(array("mysql_real_escape_string"));
+	BigTree::globalizePOSTVars(array("mysql_real_escape_string"));
 	
 	if (file_exists("../core/admin/form-field-types/draw/$id.php") || file_exists("../core/admin/form-field-types/process/$id.php")) {
 		$_SESSION["bigtree"]["admin_error"] = "The ID you have chosen is reserved for a core field type.";
@@ -21,12 +21,12 @@
 	sqlquery("INSERT INTO bigtree_field_types (`id`,`author`,`name`,`primary_version`,`pages`,`modules`,`callouts`,`last_updated`) VALUES ('$id','$author','$name','1','$pages','$modules','$callouts',NOW())");
 	
 	if (!file_exists($server_root."custom/admin/form-field-types/draw/$file")) {
-		bigtree_touch($server_root."custom/admin/form-field-types/draw/$file");
+		BigTree::touchFile($server_root."custom/admin/form-field-types/draw/$file");
 		file_put_contents($server_root."custom/admin/form-field-types/draw/$file",'<? include bigtree_path("admin/form-field-types/draw/text.php"); ?>');
 		chmod($server_root."custom/admin/form-field-types/draw/$file",0777);
 	}
 	if (!file_exists($server_root."custom/admin/form-field-types/process/$file")) {
-		bigtree_touch($server_root."custom/admin/form-field-types/process/$file");
+		BigTree::touchFile($server_root."custom/admin/form-field-types/process/$file");
 		file_put_contents($server_root."custom/admin/form-field-types/process/$file",'<? $value = $data[$key]; ?>');
 		chmod($server_root."custom/admin/form-field-types/process/$file",0777);
 	}

@@ -1,6 +1,6 @@
 <div class="form_container">
 	<form method="post" action="process/" enctype="multipart/form-data" class="module" id="auto_module_form">
-		<input type="hidden" name="MAX_FILE_SIZE" value="<?=upload_max_filesize()?>" />
+		<input type="hidden" name="MAX_FILE_SIZE" value="<?=BigTree::uploadMaxFileSize()?>" />
 		<? if ($item) { ?>
 		<input type="hidden" name="id" value="<?=htmlspecialchars($item_id)?>" />
 		<? } ?>

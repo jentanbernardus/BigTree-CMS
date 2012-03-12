@@ -1,5 +1,5 @@
 <?
-	bigtree_process_post_vars();
+	BigTree::globalizePOSTVars();
 	
 	$tag = strtolower(html_entity_decode($tag));
 	// Check if the tag exists already.

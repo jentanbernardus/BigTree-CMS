@@ -1,7 +1,7 @@
 <?
 	$breadcrumb[] = array("title" => "Created Feed", "link" => "#");
 	
-	bigtree_process_post_vars(array("htmlspecialchars","mysql_real_escape_string"));
+	BigTree::globalizePOSTVars(array("htmlspecialchars","mysql_real_escape_string"));
 		
 	$options = json_decode($_POST["options"],true);
 	if (is_array($options)) {

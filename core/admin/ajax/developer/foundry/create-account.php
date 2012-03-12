@@ -1,6 +1,6 @@
 <?
 	header("Content-type: application/json");
-	$result = bigtree_curl("http://developer.bigtreecms.com/ajax/foundry/create-author/",$_POST);
+	$result = BigTree::cURL("http://developer.bigtreecms.com/ajax/foundry/create-author/",$_POST);
 	
 	$i = json_decode($result,true);
 	

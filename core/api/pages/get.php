@@ -18,8 +18,8 @@
 		} else {
 			$page["template_locked"] = false;
 		}
-		echo bigtree_api_encode(array("success" => true,"page" => $page));
+		echo BigTree::apiEncode(array("success" => true,"page" => $page));
 	} else {
-		echo bigtree_api_encode(array("success" => false,"error" => "Page not found."));
+		echo BigTree::apiEncode(array("success" => false,"error" => "Page not found."));
 	}
 ?>

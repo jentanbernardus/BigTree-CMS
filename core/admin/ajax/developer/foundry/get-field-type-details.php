@@ -1,5 +1,5 @@
 <?
-	$details = json_decode(bigtree_curl("http://developer.bigtreecms.com/ajax/foundry/get-type-details/",array("id" => $_GET["id"])),true);
+	$details = json_decode(BigTree::cURL("http://developer.bigtreecms.com/ajax/foundry/get-type-details/",array("id" => $_GET["id"])),true);
 ?>
 <div style="width: 400px; height: 300px; overflow: auto;">
 	<h4><?=$details["name"]?> <small>Version <?=$details["primary_version"]?>.<?=$details["secondary_version"]?>.<?=$details["tertiary_version"]?></small></h4>

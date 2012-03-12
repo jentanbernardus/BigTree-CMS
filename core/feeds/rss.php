@@ -24,7 +24,7 @@
 				
 				$content = $f[$feed["options"]["description"]];
 				$limit = $feed["options"]["content_limit"] ? $feed["options"]["content_limit"] : 500;
-				$blurb = smarter_trim($content,$limit);
+				$blurb = BigTree::trimLength($content,$limit);
 		?>
 		<item>
 			<title><![CDATA[<?=strip_tags($f[$feed["options"]["title"]])?>]]></title>

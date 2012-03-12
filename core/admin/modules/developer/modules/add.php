@@ -31,7 +31,7 @@
 					<label class="required">Related Table</label>
 					<select name="table" id="rel_table" class="required">
 						<option></option>
-						<? bigtree_table_select($table) ?>
+						<? BigTree::getTableSelectOptions($table) ?>
 					</select>
 				</fieldset>
 				<fieldset>
@@ -57,7 +57,7 @@
 					<label>Main Table</label>
 					<select name="gbp[table]" class="table_select">
 						<option></option>
-						<? bigtree_table_select($gbp["table"]) ?>
+						<? BigTree::getTableSelectOptions($gbp["table"]) ?>
 					</select>
 				</fieldset>
 				<fieldset name="gbp[group_field]">
@@ -65,7 +65,7 @@
 					<div>
 						<? if ($gbp["table"]) { ?>
 						<select name="gbp[group_field]">
-							<? bigtree_field_select($gbp["table"],$gbp["group_field"]) ?>
+							<? BigTree::getFieldSelectOptions($gbp["table"],$gbp["group_field"]) ?>
 						</select>
 						<? } else { ?>
 						&mdash;
@@ -78,7 +78,7 @@
 					<label>Other Table</label>
 					<select name="gbp[other_table]" class="table_select">
 						<option></option>
-						<? bigtree_table_select($gbp["other_table"]) ?>
+						<? BigTree::getTableSelectOptions($gbp["other_table"]) ?>
 					</select>
 				</fieldset>
 				<fieldset name="gbp[title_field]">
@@ -86,7 +86,7 @@
 					<div>
 						<? if ($gbp["title_field"]) { ?>
 						<select name="gbp[title_field]">
-							<? bigtree_field_select($gbp["other_table"],$gbp["title_field"]) ?>
+							<? BigTree::getFieldSelectOptions($gbp["other_table"],$gbp["title_field"]) ?>
 						</select>
 						<? } else { ?>
 						&mdash;

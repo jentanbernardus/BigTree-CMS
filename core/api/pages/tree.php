@@ -41,5 +41,5 @@
 
 	$nav = recurseBigTreeNav(0);
 	
-	echo bigtree_api_encode(array("success" => true,"visible" => $nav["visible"],"hidden" => $nav["hidden"],"archived" => $nav["archived"], "pages" => $pages));
+	echo BigTree::apiEncode(array("success" => true,"visible" => $nav["visible"],"hidden" => $nav["hidden"],"archived" => $nav["archived"], "pages" => $pages));
 ?>

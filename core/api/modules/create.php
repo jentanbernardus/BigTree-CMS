@@ -20,7 +20,7 @@
 	$data = $parser->sanitizeFormDataForDB($_POST["item"]);
 	
 	if (!$a) {
-		echo bigtree_api_encode(array("success" => false,"error" => "User does not have access to this module."));
+		echo BigTree::apiEncode(array("success" => false,"error" => "User does not have access to this module."));
 		die();
 	}
 	
@@ -34,5 +34,5 @@
 		$status = "APPROVED";
 	}
 	
-	echo bigtree_api_encode(array("success" => true,"id" => $id,"status" => $status));
+	echo BigTree::apiEncode(array("success" => true,"id" => $id,"status" => $status));
 ?>

@@ -31,7 +31,7 @@
 		$fields = json_decode($f["fields"],true);
 		foreach ($fields as $key => $data) {
 			if ($data["directory"]) {
-				if (!bigtree_is_writable($site_root.$data["directory"])) {
+				if (!BigTree::isDirectoryWritable($site_root.$data["directory"])) {
 					$warnings[] = array(
 						"parameter" => "Directory Permissions Error",
 						"rec" => "Make ".$site_root.$data["directory"]." writable.",

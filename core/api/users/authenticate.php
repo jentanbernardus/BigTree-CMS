@@ -13,7 +13,7 @@
 	
 	$token = $admin->getAPIToken($_POST["email"],$_POST["password"]);
 	if ($token)
-		echo bigtree_api_encode(array("success" => true,"token" => $token));
+		echo BigTree::apiEncode(array("success" => true,"token" => $token));
 	else
-		echo bigtree_api_encode(array("success" => false));
+		echo BigTree::apiEncode(array("success" => false));
 ?>

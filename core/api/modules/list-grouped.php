@@ -22,5 +22,5 @@
 		}
 	}
 
-	echo bigtree_api_encode(array("success" => true,"groups" => $groups));
+	echo BigTree::apiEncode(array("success" => true,"groups" => $groups));
 ?>

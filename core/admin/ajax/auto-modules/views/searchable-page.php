@@ -8,7 +8,7 @@
 		$module = $admin->getModuleByRoute($_GET["module"]);
 
 	$view = BigTreeAutoModule::getView($view);
-	bigtree_clean_globalize_array($view);
+	BigTree::globalizeArray($view);
 		
 	$search = $_GET["search"] ? $_GET["search"] : "";
 	

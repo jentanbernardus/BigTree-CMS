@@ -7,7 +7,7 @@
 				$entries[] = json_decode($v,true);
 			}
 		}
-		$value = json_encode(bigtree_translate_array($entries));
+		$value = json_encode(BigTree::translateArray($entries));
 	} else {
 		$value = $data[$key];
 	}

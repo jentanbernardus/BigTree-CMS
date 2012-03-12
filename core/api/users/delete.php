@@ -16,7 +16,7 @@
 	$success = $admin->deleteUser($_POST["id"]);
 	
 	if ($success)
-		echo bigtree_api_encode(array("success" => true));
+		echo BigTree::apiEncode(array("success" => true));
 	else
-		echo bigtree_api_encode(array("success" => false,"error" => "You may not delete a user with a higher permission level."));
+		echo BigTree::apiEncode(array("success" => false,"error" => "You may not delete a user with a higher permission level."));
 ?>

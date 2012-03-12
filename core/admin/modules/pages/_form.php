@@ -49,7 +49,7 @@
 	</header>
 	<? include bigtree_path("admin/layouts/_tinymce.php"); ?>
 	<form method="post" class="module" action="<?=$admin_root?>pages/<?=$action?>/" enctype="multipart/form-data" id="page_form">
-		<input type="hidden" name="MAX_FILE_SIZE" value="<?=upload_max_filesize()?>" />
+		<input type="hidden" name="MAX_FILE_SIZE" value="<?=BigTree::uploadMaxFileSize()?>" />
 		
 		<? if ($pdata) { ?>
 		<input type="hidden" name="page" value="<?=$pdata["id"]?>" />

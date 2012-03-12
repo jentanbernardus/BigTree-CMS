@@ -14,5 +14,5 @@
 	while ($f = sqlfetch($q))
 		$pages[] = $f;
 	
-	echo bigtree_api_encode(array("success" => true,"pages" => $pages));
+	echo BigTree::apiEncode(array("success" => true,"pages" => $pages));
 ?>

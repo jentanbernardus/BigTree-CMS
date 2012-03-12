@@ -2,7 +2,7 @@
 	$breadcrumb[] = array("link" => "#", "title" => "Edit User");
 	
 	$user = $admin->getUser($commands[0]);
-	bigtree_clean_globalize_array($user,array("htmlspecialchars"));
+	BigTree::globalizeArray($user,array("htmlspecialchars"));
 	
 	if (!$permissions) {
 		$permissions = array(
@@ -76,7 +76,7 @@
 	$e = false;
 
 	if (isset($_SESSION["bigtree"]["update_user"])) {
-		bigtree_clean_globalize_array($_SESSION["bigtree"]["update_user"],array("htmlspecialchars"));
+		BigTree::globalizeArray($_SESSION["bigtree"]["update_user"],array("htmlspecialchars"));
 		$e = true;
 		unset($_SESSION["bigtree"]["update_user"]);
 	}

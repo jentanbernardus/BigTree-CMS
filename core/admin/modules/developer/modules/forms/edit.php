@@ -34,7 +34,7 @@
 					<label class="required">Data Table</label>
 					<select name="table" id="form_table" class="required">
 						<option></option>
-						<? bigtree_table_select($form["table"]); ?>
+						<? BigTree::getTableSelectOptions($form["table"]); ?>
 					</select>
 				</fieldset>
 			</div>

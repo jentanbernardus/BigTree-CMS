@@ -186,7 +186,7 @@
 			
 			foreach ($item as $key => $val) {
 				if (is_array(json_decode($val,true))) {
-					$item[$key] = bigtree_untranslate_array(json_decode($val,true));
+					$item[$key] = BigTree::untranslateArray(json_decode($val,true));
 				} else {
 					$item[$key] = $cms->replaceInternalPageLinks($val);
 				}

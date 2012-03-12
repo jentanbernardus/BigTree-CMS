@@ -28,8 +28,8 @@
 			$item = false;
 		}
 		
-		echo bigtree_api_encode(array("success" => true,"form" => $form,"item" => $item));
+		echo BigTree::apiEncode(array("success" => true,"form" => $form,"item" => $item));
 	} else {
-		echo bigtree_api_encode(array("success" => false,"error" => "Could not find edit form for given view."));
+		echo BigTree::apiEncode(array("success" => false,"error" => "Could not find edit form for given view."));
 	}
 ?>

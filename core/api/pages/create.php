@@ -25,7 +25,7 @@
 	
 	$p = $admin->getPageAccessLevel($_POST["id"]);
 	if (!$p) {
-		echo bigtree_api_encode(array("success" => false,"error" => "You do not have permission to edit this page."));
+		echo BigTree::apiEncode(array("success" => false,"error" => "You do not have permission to edit this page."));
 	} else {
 		$warnings = array();
 		
@@ -42,7 +42,7 @@
 			}
 		}
 		if (!$_POST["template"] && !$_POST["external"]) {
-			echo bigtree_api_encode(array("success" => false,"error" => "You did not choose a template for this page."));
+			echo BigTree::apiEncode(array("success" => false,"error" => "You did not choose a template for this page."));
 			die();
 		}
 		
@@ -76,6 +76,6 @@
 			$id = $admin->createPage($_POST);
 			$status = "APPROVED";
 		}
-		echo bigtree_api_encode(array("success" => true,"id" => $id,"status" => $status,"warnings" => $warnings));
+		echo BigTree::apiEncode(array("success" => true,"id" => $id,"status" => $status,"warnings" => $warnings));
 	}
 ?>

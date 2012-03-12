@@ -157,7 +157,20 @@
 				$html = $this->makeIPL($html);
 			// Otherwise, switch all the image srcs and javascripts srcs and whatnot to {wwwroot}.
 			} else {
-				$html = preg_replace_callback('^href="([a-zA-Z0-9\:\/\.\?\=\-]*)"^','bigtree_regex_set_ipl',$html);
+				$html = preg_replace_callback('^href="([a-zA-Z0-9\:\/\.\?\=\-]*)"^',create_function('$matches','
+					global $cms;
+					$href = str_replace("{wwwroot}",$GLOBALS["www_root"],$matches[1]);
+					if (strpos($href,$GLOBALS["www_root"]) !== false) {
+						$command = explode("/",rtrim(str_replace($GLOBALS["www_root"],"",$href),"/"));
+						list($navid,$commands) = $cms->getNavId($command);
+						$page = $cms->getPage($navid,false);
+						if ($navid && (!$commands[0] || substr($page["template"],0,6) == "module" || substr($commands[0],0,1) == "#")) {
+							$href = "ipl://".$navid."//".base64_encode(json_encode($commands));
+						}
+					}
+					$href = str_replace($GLOBALS["www_root"],"{wwwroot}",$href);
+					return \'href="\'.$href.\'"\';'
+				),$html);
 				$html = str_replace($GLOBALS["www_root"],"{wwwroot}",$html);
 			}
 			return $html;
@@ -1086,10 +1099,10 @@
 					sqlquery("UPDATE bigtree_api_tokens SET expires = '".date("Y-m-d H:i:s",strtotime("+1 day"))."' WHERE id = '".$existing["id"]."'");
 					return $existing["token"];
 				}
-				$token = str_rand(30);
+				$token = BigTree::randomString(30);
 				$r = sqlrows(sqlquery("SELECT * FROM bigtree_api_tokens WHERE token = '$token'"));
 				while ($r) {
-					$token = str_rand(30);
+					$token = BigTree::randomString(30);
 					$r = sqlrows(sqlquery("SELECT * FROM bigtree_api_tokens WHERE token = '$token'"));
 				}
 				sqlquery("DELETE FROM bigtree_api_tokens WHERE user = '".$f["id"]."' AND temporary = 'on'");
@@ -2246,9 +2259,9 @@
 
 			$color = "#008000";
 			if ($score <= 50) {
-				$color = color_mesh("#CCAC00","#FF0000",100-(100 * $score / 50));
+				$color = BigTree::colorMesh("#CCAC00","#FF0000",100-(100 * $score / 50));
 			} elseif ($score <= 80) {
-				$color = color_mesh("#008000","#CCAC00",100-(100 * ($score-50) / 30));
+				$color = BigTree::colorMesh("#008000","#CCAC00",100-(100 * ($score-50) / 30));
 			}
 
 			return array("score" => $score, "recommendations" => $recommendations, "color" => $color);
@@ -3130,7 +3143,7 @@
 
 		function requireAPILevel($level) {
 			if ($this->Level < $level) {
-				echo bigtree_api_encode(array("success" => false,"error" => "Permission level is too low."));
+				echo BigTree::apiEncode(array("success" => false,"error" => "Permission level is too low."));
 				die();
 			}
 		}
@@ -3146,7 +3159,7 @@
 
 		function requireAPIModuleAccess($module) {
 			if (!$this->Permissions[$module]) {
-				echo bigtree_api_encode(array("success" => false,"error" => "Not permitted."));
+				echo BigTree::apiEncode(array("success" => false,"error" => "Not permitted."));
 				die();
 			}
 		}
@@ -3162,7 +3175,7 @@
 
 		function requireAPIModulePublisherAccess($module) {
 			if ($this->Permissions[$module] != "p") {
-				echo bigtree_api_encode(array("success" => false,"error" => "Publishing permission required."));
+				echo BigTree::apiEncode(array("success" => false,"error" => "Publishing permission required."));
 				die();
 			}
 		}
@@ -3175,7 +3188,7 @@
 
 		function requireAPIWrite() {
 			if ($this->ReadOnly) {
-				echo bigtree_api_encode(array("success" => false,"error" => "Not available in read only mode."));
+				echo BigTree::apiEncode(array("success" => false,"error" => "Not available in read only mode."));
 				die();
 			}
 		}

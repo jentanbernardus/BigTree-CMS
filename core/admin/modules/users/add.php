@@ -4,7 +4,7 @@
 	$e = false;
 
 	if (isset($_SESSION["bigtree"]["create_user"])) {
-		bigtree_clean_globalize_array($_SESSION["bigtree"]["create_user"],array("htmlspecialchars"));
+		BigTree::globalizeArray($_SESSION["bigtree"]["create_user"],array("htmlspecialchars"));
 		$e = true;
 		unset($_SESSION["bigtree"]["create_user"]);
 	}

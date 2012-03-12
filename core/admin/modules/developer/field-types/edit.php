@@ -3,7 +3,7 @@
 	
 	$type = $admin->getFieldType(end($commands));
 	
-	bigtree_clean_globalize_array($type,array("htmlspecialchars"));
+	BigTree::globalizeArray($type,array("htmlspecialchars"));
 ?>
 <h1><span class="icon_developer_field_types"></span>Edit Field Type</h1>
 <? include bigtree_path("admin/modules/developer/field-types/_nav.php") ?>

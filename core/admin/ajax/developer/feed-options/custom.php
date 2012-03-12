@@ -4,7 +4,7 @@
 <fieldset>
 	<label>Order By</label>
 	<select name="sort">
-		<? bigtree_field_select($table,$d["sort"],true); ?>
+		<? BigTree::getFieldSelectOptions($table,$d["sort"],true); ?>
 	</select>
 </fieldset>
 <fieldset>

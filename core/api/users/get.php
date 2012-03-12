@@ -13,5 +13,5 @@
 
 	$admin->requireAPIWrite();
 	$admin->requireAPILevel(1);
-	echo bigtree_api_encode(array("success" => true,"user" => $admin->getUser($_POST["id"])));
+	echo BigTree::apiEncode(array("success" => true,"user" => $admin->getUser($_POST["id"])));
 ?>

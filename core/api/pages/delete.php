@@ -12,13 +12,13 @@
 	
 	$p = $admin->getPageAccessLevel($_POST["id"]);
 	if (!$p) {
-		echo bigtree_api_encode(array("success" => false,"error" => "You do not have permission to edit this page."));
+		echo BigTree::apiEncode(array("success" => false,"error" => "You do not have permission to edit this page."));
 	} else {
 		$admin->deletePage($_POST["id"]);
 		if ($p == "e")
 			$status = "PENDING";
 		else
 			$status = "APPROVED";
-		echo bigtree_api_encode(array("success" => true,"status" => $status));
+		echo BigTree::apiEncode(array("success" => true,"status" => $status));
 	}
 ?>

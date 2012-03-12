@@ -1,6 +1,6 @@
 <?
 	$autoModule = new BigTreeAutoModule;
-	bigtree_clean_globalize_array($view);	
+	BigTree::globalizeArray($view);	
 	
 	$fields = json_decode($fields,true);
 	$options = json_decode($options,true);

@@ -2,7 +2,7 @@
 	$breadcrumb[] = array("title" => "Add Setting", "link" => "#");
 	
 	if (is_array($_SESSION["bigtree"]["developer"]["setting_data"])) {
-		bigtree_clean_globalize_array($_SESSION["bigtree"]["developer"]["setting_data"]);
+		BigTree::globalizeArray($_SESSION["bigtree"]["developer"]["setting_data"]);
 	}
 	
 	$e = $_SESSION["bigtree"]["developer"]["error"];

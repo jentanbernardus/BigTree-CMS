@@ -2,7 +2,7 @@
 	$breadcrumb[] = array("title" => "Add Field Type", "link" => "#");
 	
 	if (is_array($_SESSION["bigtree"]["admin_saved"])) {
-		bigtree_clean_globalize_array($_SESSION["bigtree"]["admin_saved"],array("htmlspecialchars"));
+		BigTree::globalizeArray($_SESSION["bigtree"]["admin_saved"],array("htmlspecialchars"));
 	}
 	
 	unset($_SESSION["bigtree"]["admin_saved"]);

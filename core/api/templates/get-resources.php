@@ -12,8 +12,8 @@
 
 	$tsources = $cms->getTemplateResourcesById($_POST["id"]);
 	if ($tsources) {
-		echo bigtree_api_encode(array("success" => true,"resources" => $tsources));
+		echo BigTree::apiEncode(array("success" => true,"resources" => $tsources));
 	} else {
-		echo bigtree_api_encode(array("success" => false,"error" => "Template not found."));
+		echo BigTree::apiEncode(array("success" => false,"error" => "Template not found."));
 	}
 ?>
