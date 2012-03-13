@@ -41,6 +41,101 @@
 		}
 		
 		/*
+			Function: arrayToXML
+				Turns a PHP array into an XML string.
+			
+			Parameters:
+				array - The array to convert.
+				tab - Current tab depth (for recursion).
+			
+			Returns:
+				A string of XML.
+		*/				
+		
+		static function arrayToXML($array,$tab = "") {
+			$xml = "";
+			foreach ($array as $key => $val) {
+				if (is_array($val)) {
+					$xml .= "$tab<$key>\n".self::arrayToXML($val,"$tab\t")."$tab</$key>\n";
+				} else {
+					if (strpos($val,">") === false && strpos($val,"<") === false && strpos($val,"&") === false) {
+						$xml .= "$tab<$key>$val</$key>\n";
+					} else {
+						$xml .= "$tab<$key><![CDATA[$val]]></$key>\n";
+					}
+				}
+			}
+			return $xml;
+		}
+		
+		/*
+			Function: centerCrop
+				Crop from the center of an image to create a new one.
+			
+			Parameters:
+				file - The location of the image to crop.
+				newfile - The location to save the new cropped image.
+				cw - The crop width.
+				ch - The crop height.
+		*/
+		
+		static function centerCrop($file, $newfile, $cw, $ch) {
+			list($w, $h) = getimagesize($file);
+			
+			// Find out what orientation we're cropping at.
+			$v = $cw / $w;
+			$nh = $h * $v;
+			if ($nh < $ch) {
+				// We're shrinking the height to the crop height and then chopping the left and right off.
+				$v = $ch / $h;
+				$nw = $w * $v;
+				$x = ceil(($nw - $cw) / 2 * $w / $nw);
+				$y = 0;
+				self::createCrop($file,$newfile,$x,$y,$cw,$ch,($w - $x * 2),$h);
+			} else {
+				$y = ceil(($nh - $ch) / 2 * $h / $nh);
+				$x = 0;
+				self::createCrop($file,$newfile,$x,$y,$cw,$ch,$w,($h - $y * 2));
+			}
+		}
+		
+		/*
+			Function: colorMesh
+				Returns a color a % of the way between two colors.
+			
+			Parameters:
+				first_color - The first color.
+				second_color - The second color.
+				percentage - The percentage between the first color and the second you want to move.
+			
+			Returns:
+				A hex value color between the first and second colors.
+		*/
+		
+		static function colorMesh($first_color,$second_color,$percentage) {
+			$percentage = intval(str_replace("%","",$percentage));
+			$first_color = ltrim($first_color,"#");
+			$second_color = ltrim($second_color,"#");
+		
+			// Get the RGB values for the colors
+			$fc_r = hexdec(substr($first_color,0,2));
+			$fc_g = hexdec(substr($first_color,2,2));
+			$fc_b = hexdec(substr($first_color,4,2));
+		
+			$sc_r = hexdec(substr($second_color,0,2));
+			$sc_g = hexdec(substr($second_color,2,2));
+			$sc_b = hexdec(substr($second_color,4,2));
+		
+			$r_diff = ceil(($sc_r - $fc_r) * $percentage / 100);
+			$g_diff = ceil(($sc_g - $fc_g) * $percentage / 100);
+			$b_diff = ceil(($sc_b - $fc_b) * $percentage / 100);
+		
+			$new_color = "#".str_pad(dechex($fc_r + $r_diff),2,"0",STR_PAD_LEFT).str_pad(dechex($fc_g + $g_diff),2,"0",STR_PAD_LEFT).str_pad(dechex($fc_b + $b_diff),2,"0",STR_PAD_LEFT);
+		
+			return $new_color;
+		}
+		
+		/*
 			Function: compareTables
 				Compares two tables in a MySQL database and tells you the SQL needed to get Table A to Table B.
 				You can pass in the columns ahead of time if these tables exist in separate databases.
@@ -119,389 +214,42 @@
 		}
 		
 		/*
-			Function: uploadMaxFileSize
-				Returns Apache's max file size value for use in forms.
-		
-			Returns:
-				The integer value for setting a form's MAX_FILE_SIZE.
-		*/
-		
-		static function uploadMaxFileSize() {
-			$upload_max_filesize = ini_get("upload_max_filesize");
-			if (!is_integer($upload_max_filesize)) {
-				$upload_max_filesize = self::unformatBytes($upload_max_filesize);
-			}
-			
-			$post_max_size = ini_get("post_max_size");
-			if (!is_integer($post_max_size)) {
-				self::unformatBytes($post_max_size);
-			}
-			
-			if ($post_max_size < $upload_max_filesize) {
-				$upload_max_filesize = $post_max_size;
-			}
-			
-			return $upload_max_filesize;
-		}
-		
-		/*
-			Function: formatCSS3
-				Replaces CSS3 delcarations with vendor appropriate ones to reduce CSS redundancy.
+			Function: copyFile
+				Copies a file into a directory, even if that directory doesn't exist yet.
 			
 			Parameters:
-				css - CSS string.
+				from - The current location of the file.
+				to - The location of the new copy.
 			
 			Returns:
-				A string of CSS with vendor prefixes.
-		*/
-
-		static function formatCSS3($css) {
-			// Border Radius Top Left - border-radius-top-left: 0px
-			$css = preg_replace_callback('/border-radius-top-left:([^\"]*);/iU',create_function('$data','
-				$r = trim($data[1]);
-				return "border-top-left-radius: $r; -webkit-border-top-left-radius: $r; -moz-border-radius-topleft: $r;";
-			'),$css);
-			
-			// Border Radius Top Right - border-radius-top-right: 0px
-			$css = preg_replace_callback('/border-radius-top-right:([^\"]*);/iU',create_function('$data','
-				$r = trim($data[1]);
-				return "border-top-right-radius: $r; -webkit-border-top-right-radius: $r; -moz-border-radius-topright: $r;";
-			'),$css);
-			
-			// Border Radius Bottom Left - border-radius-bottom-left: 0px
-			$css = preg_replace_callback('/border-radius-bottom-left:([^\"]*);/iU',create_function('$data','
-				$r = trim($data[1]);
-				return "border-bottom-left-radius: $r; -webkit-border-bottom-left-radius: $r; -moz-border-radius-bottomleft: $r;";
-			'),$css);
-			
-			// Border Radius Bottom Right - border-radius-bottom-right: 0px
-			$css = preg_replace_callback('/border-radius-bottom-right:([^\"]*);/iU',create_function('$data','
-				$r = trim($data[1]);
-				return "border-bottom-right-radius: $r; -webkit-border-bottom-right-radius: $r; -moz-border-radius-bottomright: $r;";
-			'),$css);
-			
-			// Background Gradients - background-gradient: #top #bottom
-			$css = preg_replace_callback('/background-gradient:([^\"]*);/iU',create_function('$data','
-				$d = trim($data[1]);
-				list($stop,$start) = explode(" ",$d);
-				$start_rgb = "rgb(".hexdec(substr($start,1,2)).",".hexdec(substr($start,3,2)).",".hexdec(substr($start,5,2)).")";
-				$stop_rgb = "rgb(".hexdec(substr($stop,1,2)).",".hexdec(substr($stop,3,2)).",".hexdec(substr($stop,5,2)).")";
-				return "background-image: -webkit-gradient(linear,left bottom,left top, color-stop(0, $start_rgb), color-stop(1, $stop_rgb)); background-image: -moz-linear-gradient(center bottom, $start_rgb 0%, $stop_rgb 100%); filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=$stop, endColorstr=$start);-ms-filter: \"progid:DXImageTransform.Microsoft.gradient(startColorstr=$stop, endColorstr=$start)\"; zoom:1;";
-			'),$css);
-			
-			// Border Radius - border-radius: 0px 0px 0px 0px
-			$css = preg_replace_callback('/border-radius:([^\"]*);/iU', 'BigTree::formatVendorPrefixes', $css);
-			
-			// Box Shadow - box-shadow: 0px 0px 5px #color
-			$css = preg_replace_callback('/box-shadow:([^\"]*);/iU', 'BigTree::formatVendorPrefixes', $css);
-			
-			// Column Count - column-count: number
-			$css = preg_replace_callback('/column-count:([^\"]*);/iU', 'BigTree::formatVendorPrefixes', $css);
-			
-			// Column Rule - column-rule: 1px solid color
-			$css = preg_replace_callback('/column-rule:([^\"]*);/iU', 'BigTree::formatVendorPrefixes', $css);
-			
-			// Column Gap - column-gap: number
-			$css = preg_replace_callback('/column-gap:([^\"]*);/iU', 'BigTree::formatVendorPrefixes', $css);
-			
-			// Transition - transition: definition
-			$css = preg_replace_callback('/transition:([^\"]*);/iU', 'BigTree::formatVendorPrefixes', $css);
-			
-			// User Select - user-select: none | text | toggle | element | elements | all | inherit
-			$css = preg_replace_callback('/user-select:([^\"]*);/iU', 'BigTree::formatVendorPrefixes', $css);
-			
-			return $css;
-		}
-		
-		/*
-			Function: formatVendorPrefixes
-				A preg_replace function for transforming a standard CSS3 entry into a vendor prefixed string.
-			
-			Parameters:
-				data - preg data
-			
-			Returns:
-				Replaced string.
+				true if the copy was successful, false if the directories were not writable.
 		*/
 		
-		static function formatVendorPrefixes($data) {
-		    $p = explode(":", $data[0]);
-		    $d = trim($data[1]);
-		    
-		    $return = $p[0] . ": $d; ";
-		    $return .= "-webkit-".$p[0].": $d; ";
-		    $return .= "-moz-".$p[0].": $d; ";
-		    $return .= "-ms-".$p[0].": $d; ";
-		    $return .= "-o-".$p[0].": $d; ";
-		    
-		    return $return;
-		}
-		
-		/*
-			Function: globalizeArray
-				Globalizes all the keys of an array into global variables without compromising $_ variables.
-				Runs an array of functions on values that aren't arrays.
+		static function copyFile($from,$to) {
+			if (!self::isDirectoryWritable($to)) {
+				return false;
+			}
+			if (!is_readable($from)) {
+				return false;
+			}
+			$pathinfo = self::pathInfo($to);
+			$file_name = $pathinfo["basename"];
+			$directory = $pathinfo["dirname"];
+			$dir_parts = explode("/",ltrim($directory,"/"));
 			
-			Parameters:
-				array - An array with key/value pairs.
-				non_array_functions - An array of functions to perform on values that aren't arrays.
-			
-			See Also:
-				<globalizeGETVars>
-				<globalizePOSTVars>
-		*/
-		
-		static function globalizeArray($array,$non_array_functions = array()) {
-			foreach ($array as $key => $val) {
-				if (strpos($key,0,1) != "_") {
-					global $$key;
-					if (is_array($val)) {
-						$$key = $val;
-					} else {
-						foreach ($non_array_functions as $func) {
-							$val = $func($val);
-						}
-						$$key = $val;
-					}
+			$dpath = "/";
+			foreach ($dir_parts as $d) {
+				$dpath .= $d;
+				if (!file_exists($dpath)) {
+					mkdir($dpath);
+					chmod($dpath,0777);
 				}
+				$dpath .= "/";
 			}
-		}
-		
-		/*
-			Function: globalizeGETVars
-				Globalizes all the $_GET variables without compromising $_ variables.
-				Runs an array of functions on values that aren't arrays.
 			
-			Parameters:
-				non_array_functions - An array of functions to perform on values that aren't arrays.
-			
-			See Also:
-				<globalizeArray>
-				<globalizePOSTVars>
-				
-		*/
-		
-		static function globalizeGETVars($non_array_functions = array()) {
-			foreach ($_GET as $key => $val) {
-				if (strpos($key,0,1) != "_") {
-					global $$key;
-					if (is_array($val)) {
-						$$key = $val;
-					} else {
-						foreach ($non_array_functions as $func) {
-							$val = $func($val);
-						}
-						$$key = $val;
-					}
-				}
-			}
-		}
-		
-		/*
-			Function: globalizePOSTVars
-				Globalizes all the $_POST variables without compromising $_ variables.
-				Runs an array of functions on values that aren't arrays.
-			
-			Parameters:
-				non_array_functions - An array of functions to perform on values that aren't arrays.
-			
-			See Also:
-				<globalizeArray>
-				<globalizeGETVars>
-		*/
-		
-		static function globalizePOSTVars($non_array_functions = array()) {
-			foreach ($_POST as $key => $val) {
-				if (strpos($key,0,1) != "_") {
-					global $$key;
-					if (is_array($val)) {
-						$$key = $val;
-					} else {
-						foreach ($non_array_functions as $func) {
-							$val = $func($val);
-						}
-						$$key = $val;
-					}
-				}
-			}
-		}
-		
-		/*
-			Function: translateArray
-				Steps through an array and creates internal page links for all parts of it.
-				Requires $admin to be presently instantiated to BigTreeAdmin.
-			
-			Parameters:
-				array - The array to process.
-			
-			Returns:
-				An array with internal page links encoded.
-			
-			See Also:
-				<untranslateArray>
-		*/
-		
-		static function translateArray($array) {
-			global $admin;
-			foreach ($array as &$piece) {
-				if (is_array($piece)) {
-					$piece = self::translateArray($piece);
-				} else {
-					$piece = $admin->autoIPL($piece);
-				}
-			}
-			return $array;
-		}
-		
-		/*
-			Function: untranslateArray
-				Steps through an array and creates hard links for all internal page links.
-			
-			Parameters:
-				array - The array to process.
-			
-			Returns:
-				An array with internal page links decoded.
-			
-			See Also:
-				<translateArray>
-		*/
-		
-		static function untranslateArray($array) {
-			global $cms;
-			foreach ($array as &$piece) {
-				if (is_array($piece)) {
-					$piece = self::untranslateArray($piece);
-				} else {
-					$piece = $cms->replaceInternalPageLinks($piece);
-				}
-			}
-			return $array;
-		}
-		
-		/*
-			Function: getFieldSelectOptions
-				Get the <select> options of all the fields in a table.
-			
-			Parameters:
-				table - The table to draw the fields for.
-				default - The currently selected value.
-				sorting - Whether to duplicate fields into "ASC" and "DESC" versions.
-		*/
-		
-		static function getFieldSelectOptions($table,$default = "",$sorting = false) {
-			$cols = sqlcolumns($table);
-			echo '<option></option>';
-			foreach ($cols as $col) {
-				if ($sorting) {
-					if ($default == $col["name"]." asc") {
-						echo '<option selected="selected">'.$col["name"].' asc</option>';
-					} else {
-						echo '<option>'.$col["name"].' asc</option>';
-					}
-					
-					if ($default == $col["name"]." desc") {
-						echo '<option selected="selected">'.$col["name"].' desc</option>';
-					} else {
-						echo '<option>'.$col["name"].' desc</option>';
-					}
-				} else {
-					if ($default == $col["name"]) {
-						echo '<option selected="selected">'.$col["name"].'</option>';
-					} else {
-						echo '<option>'.$col["name"].'</option>';
-					}
-				}
-			}
-		}
-		
-		/*
-			Function: getTableSelectOptions
-				Get the <select> options for all of tables in the database excluding bigtree_ prefixed tables.
-			
-			Parameters:
-				default - The currentlly selected value.
-		*/
-		
-		static function getTableSelectOptions($default = false) {
-			$q = sqlquery("SHOW TABLES");
-			while ($f = sqlfetch($q)) {
-				$tname = $f["Tables_in_".$GLOBALS["config"]["db"]["name"]];
-				if ($GLOBALS["config"]["show_all_tables_in_dropdowns"] || ((substr($tname,0,8) !== "bigtree_"))) {
-					if ($default == $f["Tables_in_".$GLOBALS["config"]["db"]["name"]]) {
-						echo '<option selected="selected">'.$f["Tables_in_".$GLOBALS["config"]["db"]["name"]].'</option>';
-					} else {
-						echo '<option>'.$f["Tables_in_".$GLOBALS["config"]["db"]["name"]].'</option>';
-					}
-				}
-			}
-		}
-		
-		/*
-			Function: centerCrop
-				Crop from the center of an image to create a new one.
-			
-			Parameters:
-				file - The location of the image to crop.
-				newfile - The location to save the new cropped image.
-				cw - The crop width.
-				ch - The crop height.
-		*/
-		
-		static function centerCrop($file, $newfile, $cw, $ch) {
-			list($w, $h) = getimagesize($file);
-			
-			// Find out what orientation we're cropping at.
-			$v = $cw / $w;
-			$nh = $h * $v;
-			if ($nh < $ch) {
-				// We're shrinking the height to the crop height and then chopping the left and right off.
-				$v = $ch / $h;
-				$nw = $w * $v;
-				$x = ceil(($nw - $cw) / 2 * $w / $nw);
-				$y = 0;
-				self::createCrop($file,$newfile,$x,$y,$cw,$ch,($w - $x * 2),$h);
-			} else {
-				$y = ceil(($nh - $ch) / 2 * $h / $nh);
-				$x = 0;
-				self::createCrop($file,$newfile,$x,$y,$cw,$ch,$w,($h - $y * 2));
-			}
-		}
-		
-		/*
-			Function: colorMesh
-				Returns a color a % of the way between two colors.
-			
-			Parameters:
-				first_color - The first color.
-				second_color - The second color.
-				percentage - The percentage between the first color and the second you want to move.
-			
-			Returns:
-				A hex value color between the first and second colors.
-		*/
-		
-		static function colorMesh($first_color,$second_color,$percentage) {
-			$percentage = intval(str_replace("%","",$percentage));
-			$first_color = ltrim($first_color,"#");
-			$second_color = ltrim($second_color,"#");
-		
-			// Get the RGB values for the colors
-			$fc_r = hexdec(substr($first_color,0,2));
-			$fc_g = hexdec(substr($first_color,2,2));
-			$fc_b = hexdec(substr($first_color,4,2));
-		
-			$sc_r = hexdec(substr($second_color,0,2));
-			$sc_g = hexdec(substr($second_color,2,2));
-			$sc_b = hexdec(substr($second_color,4,2));
-		
-			$r_diff = ceil(($sc_r - $fc_r) * $percentage / 100);
-			$g_diff = ceil(($sc_g - $fc_g) * $percentage / 100);
-			$b_diff = ceil(($sc_b - $fc_b) * $percentage / 100);
-		
-			$new_color = "#".str_pad(dechex($fc_r + $r_diff),2,"0",STR_PAD_LEFT).str_pad(dechex($fc_g + $g_diff),2,"0",STR_PAD_LEFT).str_pad(dechex($fc_b + $b_diff),2,"0",STR_PAD_LEFT);
-		
-			return $new_color;
+			copy($from,$to);
+			chmod($to,0777);
+			return true;
 		}
 		
 		/*
@@ -631,20 +379,140 @@
 		}
 		
 		/*
-			Function: prefixFile
-				Prefixes a file name with a given prefix.
+			Function: cURL
+				Posts to a given URL and returns the response.
+				Wrapper for cURL.
 			
 			Parameters:
-				file - A file name or full file path.
-				prefix - The prefix for the file name.
+				url - The URL to retrieve / POST to.
+				post - A key/value pair array of things to POST (optional).
 			
 			Returns:
-				The full path or file name with a prefix appended to the file name.
+				The string response from the URL.
 		*/
 		
-		static function prefixFile($file,$prefix) {
-			$pinfo = self::pathInfo($file);
-			return $pinfo["dirname"]."/".$prefix.$pinfo["basename"];
+		static function cURL($url,$post = array()) {
+			$ch = curl_init();
+			curl_setopt($ch, CURLOPT_URL, $url);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+			if (count($post)) {
+				curl_setopt($ch, CURLOPT_POST, true);
+				curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+			}
+			$output = curl_exec($ch);
+			curl_close($ch);
+			return $output;
+		}
+
+		/*
+			Function: formatBytes
+				Formats bytes into larger units to make them more readable.
+			
+			Parameters:
+				size - The number of bytes.
+			
+			Returns:
+				A string with the number of bytes in kilobytes, megabytes, or gigabytes.
+		*/
+		function formatBytes($size) {
+			$units = array(' B', ' KB', ' MB', ' GB', ' TB');
+			for ($i = 0; $size >= 1024 && $i < 4; $i++) {
+				$size /= 1024;
+			}
+			return round($size, 2).$units[$i];
+		}
+
+		/*
+			Function: formatCSS3
+				Replaces CSS3 delcarations with vendor appropriate ones to reduce CSS redundancy.
+			
+			Parameters:
+				css - CSS string.
+			
+			Returns:
+				A string of CSS with vendor prefixes.
+		*/
+
+		static function formatCSS3($css) {
+			// Border Radius Top Left - border-radius-top-left: 0px
+			$css = preg_replace_callback('/border-radius-top-left:([^\"]*);/iU',create_function('$data','
+				$r = trim($data[1]);
+				return "border-top-left-radius: $r; -webkit-border-top-left-radius: $r; -moz-border-radius-topleft: $r;";
+			'),$css);
+			
+			// Border Radius Top Right - border-radius-top-right: 0px
+			$css = preg_replace_callback('/border-radius-top-right:([^\"]*);/iU',create_function('$data','
+				$r = trim($data[1]);
+				return "border-top-right-radius: $r; -webkit-border-top-right-radius: $r; -moz-border-radius-topright: $r;";
+			'),$css);
+			
+			// Border Radius Bottom Left - border-radius-bottom-left: 0px
+			$css = preg_replace_callback('/border-radius-bottom-left:([^\"]*);/iU',create_function('$data','
+				$r = trim($data[1]);
+				return "border-bottom-left-radius: $r; -webkit-border-bottom-left-radius: $r; -moz-border-radius-bottomleft: $r;";
+			'),$css);
+			
+			// Border Radius Bottom Right - border-radius-bottom-right: 0px
+			$css = preg_replace_callback('/border-radius-bottom-right:([^\"]*);/iU',create_function('$data','
+				$r = trim($data[1]);
+				return "border-bottom-right-radius: $r; -webkit-border-bottom-right-radius: $r; -moz-border-radius-bottomright: $r;";
+			'),$css);
+			
+			// Background Gradients - background-gradient: #top #bottom
+			$css = preg_replace_callback('/background-gradient:([^\"]*);/iU',create_function('$data','
+				$d = trim($data[1]);
+				list($stop,$start) = explode(" ",$d);
+				$start_rgb = "rgb(".hexdec(substr($start,1,2)).",".hexdec(substr($start,3,2)).",".hexdec(substr($start,5,2)).")";
+				$stop_rgb = "rgb(".hexdec(substr($stop,1,2)).",".hexdec(substr($stop,3,2)).",".hexdec(substr($stop,5,2)).")";
+				return "background-image: -webkit-gradient(linear,left bottom,left top, color-stop(0, $start_rgb), color-stop(1, $stop_rgb)); background-image: -moz-linear-gradient(center bottom, $start_rgb 0%, $stop_rgb 100%); filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=$stop, endColorstr=$start);-ms-filter: \"progid:DXImageTransform.Microsoft.gradient(startColorstr=$stop, endColorstr=$start)\"; zoom:1;";
+			'),$css);
+			
+			// Border Radius - border-radius: 0px 0px 0px 0px
+			$css = preg_replace_callback('/border-radius:([^\"]*);/iU', 'BigTree::formatVendorPrefixes', $css);
+			
+			// Box Shadow - box-shadow: 0px 0px 5px #color
+			$css = preg_replace_callback('/box-shadow:([^\"]*);/iU', 'BigTree::formatVendorPrefixes', $css);
+			
+			// Column Count - column-count: number
+			$css = preg_replace_callback('/column-count:([^\"]*);/iU', 'BigTree::formatVendorPrefixes', $css);
+			
+			// Column Rule - column-rule: 1px solid color
+			$css = preg_replace_callback('/column-rule:([^\"]*);/iU', 'BigTree::formatVendorPrefixes', $css);
+			
+			// Column Gap - column-gap: number
+			$css = preg_replace_callback('/column-gap:([^\"]*);/iU', 'BigTree::formatVendorPrefixes', $css);
+			
+			// Transition - transition: definition
+			$css = preg_replace_callback('/transition:([^\"]*);/iU', 'BigTree::formatVendorPrefixes', $css);
+			
+			// User Select - user-select: none | text | toggle | element | elements | all | inherit
+			$css = preg_replace_callback('/user-select:([^\"]*);/iU', 'BigTree::formatVendorPrefixes', $css);
+			
+			return $css;
+		}
+		
+		/*
+			Function: formatVendorPrefixes
+				A preg_replace function for transforming a standard CSS3 entry into a vendor prefixed string.
+			
+			Parameters:
+				data - preg data
+			
+			Returns:
+				Replaced string.
+		*/
+		
+		static function formatVendorPrefixes($data) {
+		    $p = explode(":", $data[0]);
+		    $d = trim($data[1]);
+		    
+		    $return = $p[0] . ": $d; ";
+		    $return .= "-webkit-".$p[0].": $d; ";
+		    $return .= "-moz-".$p[0].": $d; ";
+		    $return .= "-ms-".$p[0].": $d; ";
+		    $return .= "-o-".$p[0].": $d; ";
+		    
+		    return $return;
 		}
 		
 		/*
@@ -681,118 +549,150 @@
 		}
 		
 		/*
-			Function: pathInfo
-				Wrapper for PHP's pathinfo to make sure it supports returning "filename"
+			Function: getFieldSelectOptions
+				Get the <select> options of all the fields in a table.
 			
 			Parameters:
-				file - The full file path.
-			
-			Returns:
-				Everything PHP's pathinfo() returns (with "filename" even when PHP doesn't suppor it).
-			
-			See Also:
-				<http://php.net/manual/en/function.pathinfo.php>
+				table - The table to draw the fields for.
+				default - The currently selected value.
+				sorting - Whether to duplicate fields into "ASC" and "DESC" versions.
 		*/
 		
-		static function pathInfo($file) {
-			$parts = pathinfo($file);
-			if (!defined('PATHINFO_FILENAME')) {
-				$parts["filename"] = substr($parts["basename"],0,strrpos($parts["basename"],'.'));
-			}
-			return $parts;
-		}
-		
-		/*
-			Function: arrayToXML
-				Turns a PHP array into an XML string.
-			
-			Parameters:
-				array - The array to convert.
-				tab - Current tab depth (for recursion).
-			
-			Returns:
-				A string of XML.
-		*/				
-		
-		static function arrayToXML($array,$tab = "") {
-			$xml = "";
-			foreach ($array as $key => $val) {
-				if (is_array($val)) {
-					$xml .= "$tab<$key>\n".self::arrayToXML($val,"$tab\t")."$tab</$key>\n";
-				} else {
-					if (strpos($val,">") === false && strpos($val,"<") === false && strpos($val,"&") === false) {
-						$xml .= "$tab<$key>$val</$key>\n";
+		static function getFieldSelectOptions($table,$default = "",$sorting = false) {
+			$cols = sqlcolumns($table);
+			echo '<option></option>';
+			foreach ($cols as $col) {
+				if ($sorting) {
+					if ($default == $col["name"]." asc") {
+						echo '<option selected="selected">'.$col["name"].' asc</option>';
 					} else {
-						$xml .= "$tab<$key><![CDATA[$val]]></$key>\n";
+						echo '<option>'.$col["name"].' asc</option>';
+					}
+					
+					if ($default == $col["name"]." desc") {
+						echo '<option selected="selected">'.$col["name"].' desc</option>';
+					} else {
+						echo '<option>'.$col["name"].' desc</option>';
+					}
+				} else {
+					if ($default == $col["name"]) {
+						echo '<option selected="selected">'.$col["name"].'</option>';
+					} else {
+						echo '<option>'.$col["name"].'</option>';
 					}
 				}
 			}
-			return $xml;
 		}
 		
 		/*
-			Function: copyFile
-				Copies a file into a directory, even if that directory doesn't exist yet.
+			Function: getTableSelectOptions
+				Get the <select> options for all of tables in the database excluding bigtree_ prefixed tables.
 			
 			Parameters:
-				from - The current location of the file.
-				to - The location of the new copy.
-			
-			Returns:
-				true if the copy was successful, false if the directories were not writable.
+				default - The currentlly selected value.
 		*/
 		
-		static function copyFile($from,$to) {
-			if (!self::isDirectoryWritable($to)) {
-				return false;
-			}
-			if (!is_readable($from)) {
-				return false;
-			}
-			$pathinfo = self::pathInfo($to);
-			$file_name = $pathinfo["basename"];
-			$directory = $pathinfo["dirname"];
-			$dir_parts = explode("/",ltrim($directory,"/"));
-			
-			$dpath = "/";
-			foreach ($dir_parts as $d) {
-				$dpath .= $d;
-				if (!file_exists($dpath)) {
-					mkdir($dpath);
-					chmod($dpath,0777);
+		static function getTableSelectOptions($default = false) {
+			$q = sqlquery("SHOW TABLES");
+			while ($f = sqlfetch($q)) {
+				$tname = $f["Tables_in_".$GLOBALS["config"]["db"]["name"]];
+				if ($GLOBALS["config"]["show_all_tables_in_dropdowns"] || ((substr($tname,0,8) !== "bigtree_"))) {
+					if ($default == $f["Tables_in_".$GLOBALS["config"]["db"]["name"]]) {
+						echo '<option selected="selected">'.$f["Tables_in_".$GLOBALS["config"]["db"]["name"]].'</option>';
+					} else {
+						echo '<option>'.$f["Tables_in_".$GLOBALS["config"]["db"]["name"]].'</option>';
+					}
 				}
-				$dpath .= "/";
 			}
-			
-			copy($from,$to);
-			chmod($to,0777);
-			return true;
 		}
 		
 		/*
-			Function: cURL
-				Posts to a given URL and returns the response.
-				Wrapper for cURL.
+			Function: globalizeArray
+				Globalizes all the keys of an array into global variables without compromising $_ variables.
+				Runs an array of functions on values that aren't arrays.
 			
 			Parameters:
-				url - The URL to retrieve / POST to.
-				post - A key/value pair array of things to POST (optional).
+				array - An array with key/value pairs.
+				non_array_functions - An array of functions to perform on values that aren't arrays.
 			
-			Returns:
-				The string response from the URL.
+			See Also:
+				<globalizeGETVars>
+				<globalizePOSTVars>
 		*/
 		
-		static function cURL($url,$post = array()) {
-			$ch = curl_init();
-			curl_setopt($ch, CURLOPT_URL, $url);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-			if (count($post)) {
-				curl_setopt($ch, CURLOPT_POST, true);
-				curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+		static function globalizeArray($array,$non_array_functions = array()) {
+			foreach ($array as $key => $val) {
+				if (strpos($key,0,1) != "_") {
+					global $$key;
+					if (is_array($val)) {
+						$$key = $val;
+					} else {
+						foreach ($non_array_functions as $func) {
+							$val = $func($val);
+						}
+						$$key = $val;
+					}
+				}
 			}
-			$output = curl_exec($ch);
-			curl_close($ch);
-			return $output;
+		}
+		
+		/*
+			Function: globalizeGETVars
+				Globalizes all the $_GET variables without compromising $_ variables.
+				Runs an array of functions on values that aren't arrays.
+			
+			Parameters:
+				non_array_functions - An array of functions to perform on values that aren't arrays.
+			
+			See Also:
+				<globalizeArray>
+				<globalizePOSTVars>
+				
+		*/
+		
+		static function globalizeGETVars($non_array_functions = array()) {
+			foreach ($_GET as $key => $val) {
+				if (strpos($key,0,1) != "_") {
+					global $$key;
+					if (is_array($val)) {
+						$$key = $val;
+					} else {
+						foreach ($non_array_functions as $func) {
+							$val = $func($val);
+						}
+						$$key = $val;
+					}
+				}
+			}
+		}
+		
+		/*
+			Function: globalizePOSTVars
+				Globalizes all the $_POST variables without compromising $_ variables.
+				Runs an array of functions on values that aren't arrays.
+			
+			Parameters:
+				non_array_functions - An array of functions to perform on values that aren't arrays.
+			
+			See Also:
+				<globalizeArray>
+				<globalizeGETVars>
+		*/
+		
+		static function globalizePOSTVars($non_array_functions = array()) {
+			foreach ($_POST as $key => $val) {
+				if (strpos($key,0,1) != "_") {
+					global $$key;
+					if (is_array($val)) {
+						$$key = $val;
+					} else {
+						foreach ($non_array_functions as $func) {
+							$val = $func($val);
+						}
+						$$key = $val;
+					}
+				}
+			}
 		}
 		
 		/*
@@ -840,6 +740,104 @@
 		}
 		
 		/*
+			Function: pathInfo
+				Wrapper for PHP's pathinfo to make sure it supports returning "filename"
+			
+			Parameters:
+				file - The full file path.
+			
+			Returns:
+				Everything PHP's pathinfo() returns (with "filename" even when PHP doesn't suppor it).
+			
+			See Also:
+				<http://php.net/manual/en/function.pathinfo.php>
+		*/
+		
+		static function pathInfo($file) {
+			$parts = pathinfo($file);
+			if (!defined('PATHINFO_FILENAME')) {
+				$parts["filename"] = substr($parts["basename"],0,strrpos($parts["basename"],'.'));
+			}
+			return $parts;
+		}
+		
+		/*
+			Function: prefixFile
+				Prefixes a file name with a given prefix.
+			
+			Parameters:
+				file - A file name or full file path.
+				prefix - The prefix for the file name.
+			
+			Returns:
+				The full path or file name with a prefix appended to the file name.
+		*/
+		
+		static function prefixFile($file,$prefix) {
+			$pinfo = self::pathInfo($file);
+			return $pinfo["dirname"]."/".$prefix.$pinfo["basename"];
+		}
+		
+		/*
+			Function: randomString
+				Returns a random string.
+			
+			Parameters:
+				length - The number of characters to return.
+				seeds - The seed set to use ("alpha" for lowercase letters, "numeric" for numbers, "alphanum" for uppercase letters and numbers, "hexidec" for hexidecimal)
+			
+			Returns:
+				A random string.
+		*/
+		
+		static function randomString($length = 8, $seeds = 'alphanum') {
+			// Possible seeds
+			$seedings['alpha'] = 'abcdefghijklmnopqrstuvwqyz';
+			$seedings['numeric'] = '0123456789';
+			$seedings['alphanum'] = 'ABCDEFGHJKLMNPQRTUVWXY0123456789';
+			$seedings['hexidec'] = '0123456789abcdef';
+		
+			// Choose seed
+			if (isset($seedings[$seeds])) {
+				$seeds = $seedings[$seeds];
+			}
+		
+			// Seed generator
+			list($usec, $sec) = explode(' ', microtime());
+			$seed = (float) $sec + ((float) $usec * 100000);
+			mt_srand($seed);
+		
+			// Generate
+			$str = '';
+			$seeds_count = strlen($seeds);
+			for ($i = 0; $length > $i; $i++) {
+				$str .= $seeds { mt_rand(0, $seeds_count - 1) };
+			}
+			return $str;
+		}
+		
+		/*
+			Function: redirect
+				Simple URL redirect via header with proper code #
+			
+			Parameters:
+				url - The URL to redirect to.
+				type - The type of redirect, defaults to normal 302 redirect.
+		*/
+		
+		static function redirect($url = false, $type = "302") {
+			if (!$url) {
+				return false;
+			} else if ($type == "301") {
+				header ('HTTP/1.1 301 Moved Permanently');
+			} else if ($type == "404") {
+				header('HTTP/1.0 404 Not Found');
+			}
+			header("Location: ".$url);
+			die();
+		}
+		
+		/*
 			Function: touchFile
 				touch()s a file even if the directory for it doesn't exist yet.
 			
@@ -872,24 +870,30 @@
 		}
 		
 		/*
-			Function: redirect
-				Simple URL redirect via header with proper code #
+			Function: translateArray
+				Steps through an array and creates internal page links for all parts of it.
+				Requires $admin to be presently instantiated to BigTreeAdmin.
 			
 			Parameters:
-				url - The URL to redirect to.
-				type - The type of redirect, defaults to normal 302 redirect.
+				array - The array to process.
+			
+			Returns:
+				An array with internal page links encoded.
+			
+			See Also:
+				<untranslateArray>
 		*/
 		
-		static function redirect($url = false, $type = "302") {
-			if (!$url) {
-				return false;
-			} else if ($type == "301") {
-				header ('HTTP/1.1 301 Moved Permanently');
-			} else if ($type == "404") {
-				header('HTTP/1.0 404 Not Found');
+		static function translateArray($array) {
+			global $admin;
+			foreach ($array as &$piece) {
+				if (is_array($piece)) {
+					$piece = self::translateArray($piece);
+				} else {
+					$piece = $admin->autoIPL($piece);
+				}
 			}
-			header("Location: ".$url);
-			die();
+			return $array;
 		}
 		
 		/*
@@ -990,62 +994,6 @@
 		}
 		
 		/*
-			Function: randomString
-				Returns a random string.
-			
-			Parameters:
-				length - The number of characters to return.
-				seeds - The seed set to use ("alpha" for lowercase letters, "numeric" for numbers, "alphanum" for uppercase letters and numbers, "hexidec" for hexidecimal)
-			
-			Returns:
-				A random string.
-		*/
-		
-		static function randomString($length = 8, $seeds = 'alphanum') {
-			// Possible seeds
-			$seedings['alpha'] = 'abcdefghijklmnopqrstuvwqyz';
-			$seedings['numeric'] = '0123456789';
-			$seedings['alphanum'] = 'ABCDEFGHJKLMNPQRTUVWXY0123456789';
-			$seedings['hexidec'] = '0123456789abcdef';
-		
-			// Choose seed
-			if (isset($seedings[$seeds])) {
-				$seeds = $seedings[$seeds];
-			}
-		
-			// Seed generator
-			list($usec, $sec) = explode(' ', microtime());
-			$seed = (float) $sec + ((float) $usec * 100000);
-			mt_srand($seed);
-		
-			// Generate
-			$str = '';
-			$seeds_count = strlen($seeds);
-			for ($i = 0; $length > $i; $i++) {
-				$str .= $seeds { mt_rand(0, $seeds_count - 1) };
-			}
-			return $str;
-		}
-		
-		/*
-			Function: formatBytes
-				Formats bytes into larger units to make them more readable.
-			
-			Parameters:
-				size - The number of bytes.
-			
-			Returns:
-				A string with the number of bytes in kilobytes, megabytes, or gigabytes.
-		*/
-		function formatBytes($size) {
-			$units = array(' B', ' KB', ' MB', ' GB', ' TB');
-			for ($i = 0; $size >= 1024 && $i < 4; $i++) {
-				$size /= 1024;
-			}
-			return round($size, 2).$units[$i];
-		}
-		
-		/*
 			Function: unformatBytes
 				Formats a string of kilobytes / megabytes / gigabytes back into bytes.
 			
@@ -1067,6 +1015,58 @@
 				return ($num * 1024 * 1024 * 1024);
 			}
 			return 0;
+		}
+		
+		/*
+			Function: untranslateArray
+				Steps through an array and creates hard links for all internal page links.
+			
+			Parameters:
+				array - The array to process.
+			
+			Returns:
+				An array with internal page links decoded.
+			
+			See Also:
+				<translateArray>
+		*/
+		
+		static function untranslateArray($array) {
+			global $cms;
+			foreach ($array as &$piece) {
+				if (is_array($piece)) {
+					$piece = self::untranslateArray($piece);
+				} else {
+					$piece = $cms->replaceInternalPageLinks($piece);
+				}
+			}
+			return $array;
+		}
+		
+		/*
+			Function: uploadMaxFileSize
+				Returns Apache's max file size value for use in forms.
+		
+			Returns:
+				The integer value for setting a form's MAX_FILE_SIZE.
+		*/
+		
+		static function uploadMaxFileSize() {
+			$upload_max_filesize = ini_get("upload_max_filesize");
+			if (!is_integer($upload_max_filesize)) {
+				$upload_max_filesize = self::unformatBytes($upload_max_filesize);
+			}
+			
+			$post_max_size = ini_get("post_max_size");
+			if (!is_integer($post_max_size)) {
+				self::unformatBytes($post_max_size);
+			}
+			
+			if ($post_max_size < $upload_max_filesize) {
+				$upload_max_filesize = $post_max_size;
+			}
+			
+			return $upload_max_filesize;
 		}
 		
 	}

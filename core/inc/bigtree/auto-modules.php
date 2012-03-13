@@ -1,12 +1,19 @@
 <?
-	// Auto Module Class for BigTree 3.0+
-	// ----------------------------------
-	// Handles various functions for Auto Modules.
-
+	/*
+		Class: BigTreeAutoModule
+			Handles functions for auto module forms / views created in Developer.
+	*/
 
 	class BigTreeAutoModule {
-	
-		// This will grab all the data from a view and do parsing on it based on automatic assumptions and manual parsers.
+		
+		/*
+			Function: cacheViewData
+				Grabs all the data from a view and does parsing on it based on automatic assumptions and manual parsers.
+			
+			Parameters:
+				view - The view entry to cache data for.
+		*/
+		
 		static function cacheViewData($view) {
 			// See if we already have cached data.
 			$r = sqlrows(sqlquery("SELECT id FROM bigtree_module_view_cache WHERE view = '".$view["id"]."'"));
@@ -66,6 +73,17 @@
 				self::cacheRecord($item,$view,$parsers,$poplists);
 			}
 		}
+		
+		/*
+			Function: cacheRecord
+				Caches a single item in a view to the bigtree_module_view_cache table.
+			
+			Parameters:
+				item - The database record to cache.
+				view - The related view entry.
+				parsers - An array of manual parsers set in the view.
+				poplists - An array of populated lists that relate to the item.
+		*/
 		
 		static function cacheRecord($item,$view,$parsers,$poplists) {
 			// Setup the fields and VALUES to INSERT INTO the cache table.
@@ -150,7 +168,20 @@
 			}
 		}
 		
-		// For new items created
+		/*
+			Function: cacheNewItem
+				Caches a new database entry by investigating associated views.
+			
+			Parameters:
+				id - The id of the new item.
+				table - The table the new item is in.
+				pending - Whether this is actually a pending entry or not.
+				recache - Whether to delete previous cached entries with this id (for use by recacheItem)
+			
+			See Also:
+				<recacheItem>
+		*/
+		
 		static function cacheNewItem($id,$table,$pending = false,$recache = false) {
 			if (!$pending) {
 				$item = sqlfetch(sqlquery("SELECT `$table`.*,bigtree_pending_changes.changes AS bigtree_changes FROM `$table` LEFT JOIN bigtree_pending_changes ON (bigtree_pending_changes.item_id = `$table`.id AND bigtree_pending_changes.table = '$table') WHERE `$table`.id = '$id'"));
@@ -201,26 +232,34 @@
 			}
 		}
 		
-		// For updates to existing items
-		static function recacheItem($id,$table,$pending = false) {
-			self::cacheNewItem($id,$table,$pending,true);
-		}
+		/*
+			Function: clearCache
+				Clears the cache of a view.
+			
+			Parameters:
+				view - The view id or view entry to clear the cache for.
+		*/
 		
-		// For deleted items
-		static function uncacheItem($id,$table) {
-			$q = sqlquery("SELECT * FROM bigtree_module_views WHERE `table` = '$table'");
-			while ($view = sqlfetch($q)) {
-				sqlquery("DELETE FROM bigtree_module_view_cache WHERE `view` = '".$view["id"]."' AND id = '$id'");
-			}
-		}
-		
-		// Clear a view's cache
 		static function clearCache($view) {
 			$view = is_array($view) ? $view["id"] : mysql_real_escape_string($view);
 			sqlquery("DELETE FROM bigtree_module_view_cache WHERE view = '$view'");
 		}
+		
+		/*
+			Function: createItem
+				Creates an entry in the database for an auto module form.
+		
+			Parameters:
+				table - The table to put the data in.
+				data - An array of form data to enter into the table. This function determines what data in the array applies to a column in the database and discards the rest.
+				many_to_many - Many to many relationship entries.
+				tags - Tags for the entry.
+			
+			Returns:
+				The id of the new entry in the database.
+		*/
 
-		static function createItem($table,$data,$many_to_many = array(),$tags = array(),$resources = array()) {
+		static function createItem($table,$data,$many_to_many = array(),$tags = array()) {
 			global $admin,$module;
 			
 			$columns = sqlcolumns($table);
@@ -262,26 +301,35 @@
 				}
 			}
 			
-			// Handle the resources
-			if (is_array($resources)) {
-				foreach ($resources as $rid) {
-					sqlquery("UPDATE bigtree_resources SET entry = '$id' WHERE id = '$rid'");
-				}
-			}
-
 			self::cacheNewItem($id,$table);
 			
 			$admin->track($table,$id,"created");
 
 			return $id;
 		}
+		
+		/*
+			Function: createPendingItem
+				Creates an entry in the bigtree_pending_changes table for an auto module form.
+		
+			Parameters:
+				module - The module for the entry.
+				table - The table to put the data in.
+				data - An array of form data to enter into the table. This function determines what data in the array applies to a column in the database and discards the rest.
+				many_to_many - Many to many relationship entries.
+				tags - Tags for the entry.
+			
+			Returns:
+				The id of the new entry in the bigtree_pending_changes table.
+		*/
 
-		static function createPendingItem($module,$table,$data,$many_to_many = array(),$tags = array(),$resources = array()) {
+		static function createPendingItem($module,$table,$data,$many_to_many = array(),$tags = array()) {
 			global $admin;
 
 			foreach ($data as $key => $val) {
-				if ($val === "NULL")
+				if ($val === "NULL") {
 					$data[$key] = "";
+				}
 			}
 
 			$data = mysql_real_escape_string(json_encode($data));
@@ -298,6 +346,15 @@
 			
 			return $id;
 		}
+		
+		/*
+			Function: deleteItem
+				Deletes an item from the given table and removes any pending changes, then uncaches it from its views.
+			
+			Parameters:
+				table - The table to delete an entry from.
+				id - The id of the entry.
+		*/
 
 		static function deleteItem($table,$id) {
 			global $admin;
@@ -309,154 +366,32 @@
 			$admin->track($table,$id,"deleted");
 		}
 		
+		/*
+			Function: deleteItem
+				Deletes a pending item from bigtree_pending_changes and uncaches it.
+			
+			Parameters:
+				table - The table the entry would have been in (should it have ever been published).
+				id - The id of the pending entry.
+		*/
+		
 		static function deletePendingItem($table,$id) {
 			$id = mysql_real_escape_string($id);
 			sqlquery("DELETE FROM bigtree_pending_changes WHERE `table` = '$table' AND id = '$id'");
 			self::uncacheItem("p$id",$table);
 			$admin->track($table,"p$id","deleted-pending");
 		}
-
-		static function getForm($id) {
-			if (is_array($id)) {
-				$id = $id["id"];
-			}
-			$f = sqlfetch(sqlquery("SELECT * FROM bigtree_module_forms WHERE id = '$id'"));
-			$f["fields"] = json_decode($f["fields"],true);
-			return $f;
-		}
 		
-		static function getModuleForForm($form) {
-			if (is_array($form)) {
-				$form = $form["id"];
-			}
-			$f = sqlfetch(sqlquery("SELECT * FROM bigtree_module_actions WHERE form = '$form'"));
-			return $f["module"];
-		}
-
-		static function getModuleForView($view) {
-			if (is_array($view)) {
-				$view = $view["id"];
-			}
-			$f = sqlfetch(sqlquery("SELECT * FROM bigtree_module_actions WHERE view = '$view'"));
-			return $f["module"];
-		}
-
-		static function getPendingItem($table,$id) {
-			global $cms,$module;
-			$status = "published";
-			$many_to_many = array();
-			$resources = array();
-			if (substr($id,0,1) == "p") {
-				$change = sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE id = '".substr($id,1)."'"));
-				if (!$change) {
-					return false;
-				}
-				
-				$item = json_decode($change["changes"],true);
-				$many_to_many = json_decode($change["mtm_changes"],true);
-				$resources = json_decode($change["resources_changes"],true);
-				$temp_tags = json_decode($change["tags_changes"],true);
-				$tags = array();
-				if (!empty($temp_tags)) {
-					foreach ($temp_tags as $tid) {
-						$tags[] = sqlfetch(sqlquery("SELECT * FROM bigtree_tags WHERE id = '$tid'"));
-					}
-				}
-				$status = "pending";
-			} else {
-				$item = sqlfetch(sqlquery("SELECT * FROM $table WHERE id = '$id'"));
-				if (!$item) {
-					return false;
-				}
-				
-				$change = sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE `table` = '$table' AND `item_id` = '$id'"));
-				if ($change) {
-					$status = "updated";
-					$changes = json_decode($change["changes"],true);
-					foreach ($changes as $key => $val) {
-						$item[$key] = $val;
-					}
-					$many_to_many = json_decode($change["mtm_changes"],true);
-					$temp_tags = json_decode($change["tags_changes"],true);
-					$tags = array();
-					if (is_array($temp_tags)) {
-						foreach ($temp_tags as $tid) {
-							$tags[] = sqlfetch(sqlquery("SELECT * FROM bigtree_tags WHERE id = '$tid'"));
-						}
-					}
-				} else {
-					$tags = self::getTagsForEntry($module["id"],$id);
-				}
-			}
-			foreach ($item as $key => $val) {
-				if (is_array(json_decode($val,true))) {
-					$item[$key] = BigTree::untranslateArray(json_decode($val,true));
-				} else {
-					$item[$key] = $cms->replaceInternalPageLinks($val);
-				}
-			}
-			return array("item" => $item, "mtm" => $many_to_many, "tags" => $tags, "resources" => $resources, "status" => $status);
-		}
-
-		// This will grab all the data from a view and do parsing on it based on automatic assumptions and manual parsers.
-		static function getViewData($view,$sort = "id DESC",$type = "both",$module = false) {
-			// If we don't need parsed data, just use the normal table.
-			if ($view["uncached"]) {
-				$view["per_page"] = 10000;
-				$r = self::getSearchResults($view,0,"",$sort,"",false,$module);
-				return $r["results"];
-			}
-		
-			// Check to see if we've cached this table before.
-			self::cacheViewData($view);
+		/*
+			Function: getFilterQuery
+				Returns a query string that is used for searching views based on group permissions.
 			
-			$items = array();
-			if ($type == "both") {
-				$q = sqlquery("SELECT * FROM bigtree_module_view_cache WHERE view = '".$view["id"]."'".self::getFilterQuery($view)." ORDER BY $sort");
-			} elseif ($type == "active") {
-				$q = sqlquery("SELECT * FROM bigtree_module_view_cache WHERE status != 'p' AND view = '".$view["id"]."'".self::getFilterQuery($view)." ORDER BY $sort");	
-			} elseif ($type == "pending") {
-				$q = sqlquery("SELECT * FROM bigtree_module_view_cache WHERE status = 'p' AND view = '".$view["id"]."'".self::getFilterQuery($view)." ORDER BY $sort");				
-			}
+			Parameters:
+				view - The view to create a filter for.
 			
-			while ($f = sqlfetch($q)) {
-				$items[] = $f;
-			}
-			
-			return $items;
-		}
-		
-		// Same as getViewData only you can choose a group.
-		static function getViewDataForGroup($view,$group,$sort,$type = "both") {
-			// Check to see if we've cached this table before.
-			self::cacheViewData($view);
-			
-			$items = array();
-			if ($type == "both") {
-				$q = sqlquery("SELECT * FROM bigtree_module_view_cache WHERE group_field = '".mysql_real_escape_string($group)."' AND view = '".$view["id"]."'".self::getFilterQuery($view)." ORDER BY $sort");
-			} elseif ($type == "active") {
-				$q = sqlquery("SELECT * FROM bigtree_module_view_cache WHERE group_field = '".mysql_real_escape_string($group)."' AND status != 'p' AND view = '".$view["id"]."'".self::getFilterQuery($view)." ORDER BY $sort");
-			} elseif ($type == "pending") {
-				$q = sqlquery("SELECT * FROM bigtree_module_view_cache WHERE group_field = '".mysql_real_escape_string($group)."' AND status = 'p' AND view = '".$view["id"]."'".self::getFilterQuery($view)." ORDER BY $sort");
-			}
-			
-			while ($f = sqlfetch($q)) {
-				$items[] = $f;
-			}
-			
-			return $items;
-		}
-
-		static function getRelatedFormForView($view) {
-			$f = sqlfetch(sqlquery("SELECT * FROM bigtree_module_forms WHERE `table` = '".mysql_real_escape_string($view["table"])."'"));
-			$f["fields"] = json_decode($f["fields"],true);
-			return $f;
-		}
-
-		static function getRelatedViewForForm($form) {
-			$f = sqlfetch(sqlquery("SELECT * FROM bigtree_module_views WHERE `table` = '".mysql_real_escape_string($form["table"])."'"));
-			return $f;
-		}
+			Returns:
+				A set of MySQL statements that filter out information the user cannot access.
+		*/
 		
 		static function getFilterQuery($view) {
 			global $admin;
@@ -474,23 +409,194 @@
 			return "";
 		}
 		
-		static function getUncachedFilterQuery($view) {
-			global $admin;
-			$module = $admin->getModule(self::getModuleForView($view));
-			if ($module["gbp"]["enabled"] && $module["gbp"]["table"] == $view["table"]) {
-				$groups = $admin->getAccessGroups($module["id"]);
-				if (is_array($groups)) {
-					$gfl = array();
-					foreach ($groups as $g) {
-						$gfl[] = "`".$module["gbp"]["group_field"]."` = '".mysql_real_escape_string($g)."'";
+		/*
+			Function: getForm
+				Returns a module form.
+			
+			Parameters:
+				id - The id of the form.
+			
+			Returns:
+				A module form entry with fields decoded.
+		*/
+
+		static function getForm($id) {
+			if (is_array($id)) {
+				$id = $id["id"];
+			}
+			$f = sqlfetch(sqlquery("SELECT * FROM bigtree_module_forms WHERE id = '$id'"));
+			$f["fields"] = json_decode($f["fields"],true);
+			return $f;
+		}
+		
+		/*
+			Function: getModuleForForm
+				Returns the associated module id for the given form.
+			
+			Parameters:
+				form - Either a form entry or form id.
+			
+			Returns:
+				The id of the module the form is a member of.
+		*/
+		
+		static function getModuleForForm($form) {
+			if (is_array($form)) {
+				$form = $form["id"];
+			}
+			$f = sqlfetch(sqlquery("SELECT * FROM bigtree_module_actions WHERE form = '$form'"));
+			return $f["module"];
+		}
+		
+		/*
+			Function: getModuleForView
+				Returns the associated module id for the given view.
+			
+			Parameters:
+				view - Either a view entry or view id.
+			
+			Returns:
+				The id of the module the view is a member of.
+		*/
+
+		static function getModuleForView($view) {
+			if (is_array($view)) {
+				$view = $view["id"];
+			}
+			$f = sqlfetch(sqlquery("SELECT * FROM bigtree_module_actions WHERE view = '$view'"));
+			return $f["module"];
+		}
+		
+		/*
+			Function: getPendingItem
+				Gets an entry from a table with all its related information and pending changes applied.
+			
+			Parameters:
+				table - The table to pull the entry from.
+				id - The id of the entry.
+			
+			Returns:
+				An array with the follow elements:
+				"item" - The entry from the table with pending changes already applied.
+				"mtm" - A list of many to many pending changes.
+				"tags" - A list of tags for the entry.
+				"status" - Whether the item is pending ("pending"), published ("published"), or has changes ("updated") awaiting publish.
+				
+				Returns false if the entry could not be found.
+		*/
+
+		static function getPendingItem($table,$id) {
+			global $cms,$module;
+			$status = "published";
+			$many_to_many = array();
+			$resources = array();
+			// The entry is pending if there's a "p" prefix on the id
+			if (substr($id,0,1) == "p") {
+				$change = sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE id = '".substr($id,1)."'"));
+				if (!$change) {
+					return false;
+				}
+				
+				$item = json_decode($change["changes"],true);
+				$many_to_many = json_decode($change["mtm_changes"],true);
+				$temp_tags = json_decode($change["tags_changes"],true);
+				$tags = array();
+				if (!empty($temp_tags)) {
+					foreach ($temp_tags as $tid) {
+						$tags[] = sqlfetch(sqlquery("SELECT * FROM bigtree_tags WHERE id = '$tid'"));
 					}
-					return " AND (".implode(" OR ",$gfl).")";
+				}
+				$status = "pending";
+			// Otherwise it's a live entry
+			} else {
+				$item = sqlfetch(sqlquery("SELECT * FROM $table WHERE id = '$id'"));
+				if (!$item) {
+					return false;
+				}
+				
+				// Apply changes that are pending
+				$change = sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE `table` = '$table' AND `item_id` = '$id'"));
+				if ($change) {
+					$status = "updated";
+					$changes = json_decode($change["changes"],true);
+					foreach ($changes as $key => $val) {
+						$item[$key] = $val;
+					}
+					$many_to_many = json_decode($change["mtm_changes"],true);
+					$temp_tags = json_decode($change["tags_changes"],true);
+					$tags = array();
+					if (is_array($temp_tags)) {
+						foreach ($temp_tags as $tid) {
+							$tags[] = sqlfetch(sqlquery("SELECT * FROM bigtree_tags WHERE id = '$tid'"));
+						}
+					}
+				// If there's no pending changes, just pull the tags
+				} else {
+					$tags = self::getTagsForEntry($module["id"],$id);
 				}
 			}
-			return "";
+			
+			// Process the internal page links, turn json_encoded arrays into arrays.
+			foreach ($item as $key => $val) {
+				if (is_array(json_decode($val,true))) {
+					$item[$key] = BigTree::untranslateArray(json_decode($val,true));
+				} else {
+					$item[$key] = $cms->replaceInternalPageLinks($val);
+				}
+			}
+			return array("item" => $item, "mtm" => $many_to_many, "tags" => $tags, "status" => $status);
 		}
+		
+		/*
+			Function: getRelatedFormForView
+				Returns the form for the same table as the given view.
+			
+			Paramaters:
+				view - A view entry.
+			
+			Returns:
+				A form entry with fields decoded.
+		*/
 
-		// Provides data to the Searchable view.
+		static function getRelatedFormForView($view) {
+			$f = sqlfetch(sqlquery("SELECT * FROM bigtree_module_forms WHERE `table` = '".mysql_real_escape_string($view["table"])."'"));
+			$f["fields"] = json_decode($f["fields"],true);
+			return $f;
+		}
+		
+		/*
+			Function: getRelatedViewForForm
+				Returns the view for the same table as the given form.
+			
+			Paramaters:
+				form - A form entry.
+			
+			Returns:
+				A view entry.
+		*/
+
+		static function getRelatedViewForForm($form) {
+			$f = sqlfetch(sqlquery("SELECT * FROM bigtree_module_views WHERE `table` = '".mysql_real_escape_string($form["table"])."'"));
+			return $f;
+		}
+		
+		/*
+			Function: getSearchResults
+				Returns results from the bigtree_module_view_cache table.
+		
+			Parameters:
+				view - The view to pull data for.
+				page - The page of data to retrieve.
+				query - The query string to search against.
+				sort - The column to use to sort.
+				sort_direction - The direction to sort.
+				group - The group to pull information for.
+				module - The module entry to check permissions against.
+		
+			Returns:
+				An array containing "pages" with the number of result pages and "results" with the results for the given page.
+		*/
+		
 		static function getSearchResults($view,$page = 0,$query = "",$sort = "id",$sort_direction = "DESC",$group = false, $module = false) {
 			global $last_query,$admin;
 			
@@ -592,6 +698,18 @@
 			return array("pages" => $pages, "results" => $results);
 		}
 		
+		/*
+			Function: getTagsForEntry
+				Returns the tags for an entry.
+				
+			Parameters:
+				module - The module id for the entry.
+				id - The id of the entry.
+			
+			Returns:
+				An array ot tags from bigtree_tags.
+		*/
+		
 		static function getTagsForEntry($module,$id) {
 			$tags = array();
 			$q = sqlquery("SELECT bigtree_tags.* FROM bigtree_tags JOIN bigtree_tags_rel WHERE bigtree_tags_rel.module = '$module' AND bigtree_tags_rel.entry = '$id' AND bigtree_tags_rel.tag = bigtree_tags.id ORDER BY bigtree_tags.tag ASC");
@@ -600,6 +718,123 @@
 			}
 			return $tags;
 		}
+		
+		/*
+			Function: getViewData
+				Gets a list of data for a view.
+			
+			Parameters:
+				view - The view entry to pull data for.
+				sort - The sort direction, defaults to most recent.
+				type - Whether to get only active entries, pending entries, or both.
+				module - The module entry for the view (for group based permissions)
+			
+			Returns:
+				An array of items from bigtree_module_view_cache.
+		*/
+		
+		static function getViewData($view,$sort = "id DESC",$type = "both",$module = false) {
+			// If we don't need parsed data, just use the normal table.
+			if ($view["uncached"]) {
+				$view["per_page"] = 10000;
+				$r = self::getSearchResults($view,0,"",$sort,"",false,$module);
+				return $r["results"];
+			}
+		
+			// Check to see if we've cached this table before.
+			self::cacheViewData($view);
+			
+			$items = array();
+			if ($type == "both") {
+				$q = sqlquery("SELECT * FROM bigtree_module_view_cache WHERE view = '".$view["id"]."'".self::getFilterQuery($view)." ORDER BY $sort");
+			} elseif ($type == "active") {
+				$q = sqlquery("SELECT * FROM bigtree_module_view_cache WHERE status != 'p' AND view = '".$view["id"]."'".self::getFilterQuery($view)." ORDER BY $sort");	
+			} elseif ($type == "pending") {
+				$q = sqlquery("SELECT * FROM bigtree_module_view_cache WHERE status = 'p' AND view = '".$view["id"]."'".self::getFilterQuery($view)." ORDER BY $sort");				
+			}
+			
+			while ($f = sqlfetch($q)) {
+				$items[] = $f;
+			}
+			
+			return $items;
+		}
+		
+		/*
+			Function: getViewDataForGroup
+				Gets a list of data for a view in a given group.
+			
+			Parameters:
+				view - The view entry to pull data for.
+				group - The group to get data for.
+				sort - The sort direction, defaults to most recent.
+				type - Whether to get only active entries, pending entries, or both.
+			
+			Returns:
+				An array of items from bigtree_module_view_cache.
+		*/
+		
+		// Same as getViewData only you can choose a group.
+		static function getViewDataForGroup($view,$group,$sort,$type = "both") {
+			// Check to see if we've cached this table before.
+			self::cacheViewData($view);
+			
+			$items = array();
+			if ($type == "both") {
+				$q = sqlquery("SELECT * FROM bigtree_module_view_cache WHERE group_field = '".mysql_real_escape_string($group)."' AND view = '".$view["id"]."'".self::getFilterQuery($view)." ORDER BY $sort");
+			} elseif ($type == "active") {
+				$q = sqlquery("SELECT * FROM bigtree_module_view_cache WHERE group_field = '".mysql_real_escape_string($group)."' AND status != 'p' AND view = '".$view["id"]."'".self::getFilterQuery($view)." ORDER BY $sort");
+			} elseif ($type == "pending") {
+				$q = sqlquery("SELECT * FROM bigtree_module_view_cache WHERE group_field = '".mysql_real_escape_string($group)."' AND status = 'p' AND view = '".$view["id"]."'".self::getFilterQuery($view)." ORDER BY $sort");
+			}
+			
+			while ($f = sqlfetch($q)) {
+				$items[] = $f;
+			}
+			
+			return $items;
+		}
+		
+		/*
+			Function: getUncachedFilterQuery
+				Returns a query string that is used for searching views based on group permissions.
+				This query is used on the table itself instead of the view cache.
+			
+			Parameters:
+				view - The view to create a filter for.
+			
+			Returns:
+				A set of MySQL statements that filter out information the user cannot access.
+		*/
+		
+		static function getUncachedFilterQuery($view) {
+			global $admin;
+			$module = $admin->getModule(self::getModuleForView($view));
+			if ($module["gbp"]["enabled"] && $module["gbp"]["table"] == $view["table"]) {
+				$groups = $admin->getAccessGroups($module["id"]);
+				if (is_array($groups)) {
+					$gfl = array();
+					foreach ($groups as $g) {
+						$gfl[] = "`".$module["gbp"]["group_field"]."` = '".mysql_real_escape_string($g)."'";
+					}
+					return " AND (".implode(" OR ",$gfl).")";
+				}
+			}
+			return "";
+		}
+		
+		
+		
+		/*
+			Function: getView
+				Returns a view.
+			
+			Parameters:
+				id - The id of the view.
+				
+			Returns:
+				A view entry with actions, options, and fields decoded.  fields also receive a width column for the view.
+		*/
 
 		static function getView($id) {
 			if (is_array($id)) {
@@ -626,8 +861,19 @@
 
 			return $f;
 		}
+		
+		/*
+			Function: parseViewData
+				Parses data and returns the parsed columns (runs parsers and populated lists).
+			
+			Parameters:
+				view - The view to parse items for.
+				items - An array of entries to parse.
+			
+			Returns:
+				An array of parsed entries.
+		*/
 
-		// Parser for view data.
 		static function parseViewData($view,$items) {
 			$form = self::getRelatedFormForView($view);
 			$parsed = array();
@@ -656,8 +902,22 @@
 			return $parsed;
 		}
 
-		// Publish a Pending Item
-		static function publishPendingItem($table,$id,$data,$many_to_many = array(),$tags = array(),$resources = array()) {
+		/*
+			Function: publishPendingItem
+				Publishes a pending item and caches it.
+				
+			Parameters:
+				table - The table to store the entry in.
+				id - The id of the pending entry (prefixed with a p)
+				data - The form data to create an entry with.
+				many_to_many - Many to Many information
+				tags - Tag information
+			
+			Returns:
+				The id of the new entry.
+		*/
+		
+		static function publishPendingItem($table,$id,$data,$many_to_many = array(),$tags = array()) {
 			global $module;
 			
 			self::deletePendingItem($table,substr($id,1));
@@ -699,19 +959,44 @@
 				}
 			}
 			
-			// Handle the resources
-			if (!empty($resources)) {
-				foreach ($resources as $rid) {
-					sqlquery("UPDATE bigtree_resources SET entry = '$id' WHERE id = '$rid'");
-				}
-			}
-
 			self::cacheNewItem($id,$table);
 			
 			return $id;
 		}
+		
+		/*
+			Function: recacheItem
+				Re-caches a database entry.
+			
+			Parameters:
+				id - The id of the entry.
+				table - The table the entry is in.
+				pending - Whether the entry is pending or not.
+			
+			See Also:
+				<cacheNewItem>
+		*/
+		
+		static function recacheItem($id,$table,$pending = false) {
+			self::cacheNewItem($id,$table,$pending,true);
+		}
 
-		// Create a Change Request for an Auto Module Item
+		/*
+			Function: submitChange
+				Creates a change request for an item and caches it.
+			
+			Parameters:
+				module - The module for the entry.
+				table - The table the entry is stored in.
+				id - The id of the entry.
+				data - The change request data.
+				many_to_many - The many to many changes.
+				tags - The tag changes.
+			
+			Returns:
+				The id of the pending change.
+		*/
+		
 		static function submitChange($module,$table,$id,$data,$many_to_many = array(),$tags = array()) {
 			global $admin;
 
@@ -760,8 +1045,35 @@
 				return sqlid();
 			}
 		}
+		
+		/*
+			Function: uncacheItem
+				Removes a database entry from the view cache.
+			
+			Parameters:
+				id - The id of the entry.
+				table - The table the entry is in.
+		*/
+		
+		static function uncacheItem($id,$table) {
+			$q = sqlquery("SELECT * FROM bigtree_module_views WHERE `table` = '$table'");
+			while ($view = sqlfetch($q)) {
+				sqlquery("DELETE FROM bigtree_module_view_cache WHERE `view` = '".$view["id"]."' AND id = '$id'");
+			}
+		}
 
-		// Update an entry
+		/*
+			Function: updateItem
+				Update an entry and cache it.
+			
+			Parameters:
+				table - The table the entry is in.
+				id - The id of the entry.
+				data - The data to update in the entry.
+				many_to_many - Many To Many information
+				tags - Tag information.
+		*/
+		
 		static function updateItem($table,$id,$data,$many_to_many = array(),$tags = array()) {
 			global $admin,$module;
 			$columns = sqlcolumns($table);
@@ -810,8 +1122,6 @@
 
 			self::recacheItem($id,$table);
 			$admin->track($table,$id,"updated");
-
-			return sqlid();
 		}
 
 	}
