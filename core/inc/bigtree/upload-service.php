@@ -23,7 +23,7 @@
 				$this->Service = "local";
 				$this->optipng = false;
 				$this->jpegtran = false;
-				sqlquery("INSERT INTO bigtree_settings (`id`,`system`) VALUES ('bigtree-internal-upload-service','on')");
+				sqlquery("INSERT INTO bigtree_settings (`id`,`value`,`system`) VALUES ('bigtree-internal-upload-service','{\"service\":\"local\"}','on')");
 			} else {
 				$this->Service = $ups["service"];
 				$this->optipng = $ups["optipng"];
