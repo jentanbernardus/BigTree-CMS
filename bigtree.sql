@@ -78,7 +78,7 @@ DROP TABLE IF EXISTS `bigtree_templates`;
 CREATE TABLE `bigtree_templates` ( `id` varchar(255) NOT NULL DEFAULT '', `name` varchar(255) NOT NULL DEFAULT '', `image` varchar(255) NOT NULL DEFAULT '', `module` int(11) NOT NULL, `resources` text NOT NULL, `position` int(11) NOT NULL DEFAULT '0', `description` text NOT NULL, `callouts_enabled` char(2) NOT NULL DEFAULT '', `level` int(11) NOT NULL, `package` int(11) NOT NULL, `routed` char(2) NOT NULL DEFAULT '', PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 LOCK TABLES `bigtree_templates` WRITE;
-INSERT INTO `bigtree_templates` (`id`, `name`, `image`, `module`, `resources`, `position`, `description`, `callouts_enabled`, `level`, `package`, `routed`) VALUES ('home', 'Home', 'page.png', 0, '[]', 2, 'Home Page', '', 0, 0, ''), ('content', 'Content', 'page.png', 0, '[{\"id\":\"page_header\",\"title\":\"Page Header\",\"subtitle\":\"\",\"type\":\"text\",\"name\":\"\"},{\"id\":\"page_content\",\"title\":\"Page Content\",\"subtitle\":\"\",\"type\":\"html\",\"name\":\"\"}}]', 1, 'Master Content', 'on', 0, 0, '');
+INSERT INTO `bigtree_templates` (`id`, `name`, `image`, `module`, `resources`, `position`, `description`, `callouts_enabled`, `level`, `package`, `routed`) VALUES ('home', 'Home', 'page.png', 0, '[]', 2, 'Home Page', '', 0, 0, ''), ('content', 'Content', 'page.png', 0, '[{"id":"page_header","title":"Page Header","subtitle":"","type":"text","validation":"required","seo_h1":"on","sub_type":"","wrapper":"","name":""},{"id":"page_content","title":"Page Content","subtitle":"","type":"html","validation":"required","seo_body":"on","wrapper":"","name":""}]', 1, 'Master Content', 'on', 0, 0, '');
 UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `bigtree_user_group_membership`;
