@@ -56,7 +56,7 @@
 		$admin->growl("Pages","Saved Page Draft");
 	}
 	
-	sqlquery("DELETE FROM bigtree_locks WHERE `table` = 'bigtree_pages' AND item_id = '$page'");
+	$admin->unlock("bigtree_pages",$page);
 	
 	if (count($crops)) {
 		$retpage = $admin_root."pages/view-tree/".$pdata["parent"]."/";

@@ -17,26 +17,9 @@
 <h1><span class="refresh"></span><?=$pdata["nav_title"]?></h1>	
 <?
 	include BigTree::path("admin/modules/pages/_nav.php");
-	// Force your way through the page lock
-	if (isset($_GET["force"])) {
-		$f = sqlfetch(sqlquery("SELECT * FROM bigtree_locks WHERE `table` = 'bigtree_pages' AND item_id = '$page'"));
-		sqlquery("UPDATE bigtree_locks SET user = '".$_SESSION["bigtree"]["id"]."', last_accessed = NOW() WHERE id = '".$f["id"]."'");
-	}
 	
 	// Check for a page lock
-	$f = sqlfetch(sqlquery("SELECT * FROM bigtree_locks WHERE `table` = 'bigtree_pages' AND item_id = '$page'"));
-	if ($f && $f["user"] != $_SESSION["bigtree"]["id"] && strtotime($f["last_accessed"]) > (time()-300)) {
-		include BigTree::path("admin/modules/pages/_locked.php");
-		$admin->stop();
-	}
-	
-	if ($f) {
-		sqlquery("UPDATE bigtree_locks SET last_accessed = NOW(), user = '".$_SESSION["bigtree"]["id"]."' WHERE id = '".$f["id"]."'");
-		$lockid = $f["id"];
-	} else {
-		sqlquery("INSERT INTO bigtree_locks (`table`,`item_id`,`user`,`title`) VALUES ('bigtree_pages','$page','".$_SESSION["bigtree"]["id"]."','Page')");
-		$lockid = sqlid();
-	}
+	$admin->lockCheck("bigtree_pages",$page,"admin/modules/pages/_locked.php",$_GET["force"]);
 	
 	// See if there's a draft copy.
 	$draft = sqlfetch(sqlquery("SELECT date,user,id FROM bigtree_pending_changes WHERE `table` = 'bigtree_pages' AND item_id = '".$pdata["id"]."'"));

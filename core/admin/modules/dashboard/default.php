@@ -3,24 +3,10 @@
 	$breadcrumb[] = array("title" => "Overview", "link" => "#");
 	
 	// Get all the messages we've received.
-	$sent = array();
-	$read = array();
-	$unread = array();
-	$q = sqlquery("SELECT bigtree_messages.*, bigtree_users.name AS sender_name FROM bigtree_messages JOIN bigtree_users ON bigtree_messages.sender = bigtree_users.id WHERE recipients LIKE '%|".$admin->ID."|%' ORDER BY date DESC");
-	
-	while ($f = sqlfetch($q)) {
-		// If we're the sender put it in the sent array.
-		if ($f["sender"] == $admin->ID) {
-			$sent[] = $f;
-		} else {
-			// If we've been marked read, put it in the read array.
-			if ($f["read_by"] && strpos("|".$admin->ID."|",$f["read_by"]) !== false) {
-				$read[] = $f;
-			} else {
-				$unread[] = $f;
-			}
-		}
-	}
+	$messages = $admin->getMessages();
+	$unread = $messages["unread"];
+	$read = $messages["read"];
+	$sent = $messages["sent"];
 	
 	// Get pending changes.
 	$changes = $admin->getPendingChanges();

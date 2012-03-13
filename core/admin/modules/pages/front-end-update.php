@@ -56,7 +56,7 @@
 		$refresh_link = $cms->getPreviewLink($page);
 	}
 	
-	sqlquery("DELETE FROM bigtree_locks WHERE `table` = 'bigtree_pages' AND item_id = '$page'");
+	$admin->unlock("bigtree_pages",$page);
 	
 	if (count($crops)) {
 		include BigTree::path("admin/modules/pages/_front-end-crop.php");

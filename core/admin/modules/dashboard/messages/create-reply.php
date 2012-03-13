@@ -10,24 +10,10 @@
 	}
 	
 	// Make sure the user has the right to see this message
-	$parent = sqlfetch(sqlquery("SELECT * FROM bigtree_messages WHERE id = '".mysql_real_escape_string($_POST["response_to"])."'"));
-	if ($parent["sender"] != $admin->ID && strpos("|".$admin->ID."|",$parent["recipients"]) === false) {
-		$admin->stop("This message was not sent by you, or to you.");
-	}
+	$parent = $admin->getMessage($_POST["response_to"]);
 	
-	// Clear tags out of the subject, sanitize the message body of XSS attacks.
-	$subject = mysql_real_escape_string(htmlspecialchars(strip_tags($_POST["subject"])));
-	$message = mysql_real_escape_string(strip_tags($_POST["message"],"<p><b><strong><em><i><a>"));
-	$response_to = mysql_real_escape_string($_POST["response_to"]);
-	
-	// We build the send_to field this way so that we don't have to create a second table of recipients.  Is it faster database wise using a LIKE over a JOIN? I don't know, but it makes for one less table.
-	$send_to = "|";
-	foreach ($_POST["send_to"] as $r) {
-		// Make sure they actually put in a number and didn't try to screw with the $_POST
-		$send_to .= intval($r)."|";
-	}
-	
-	sqlquery("INSERT INTO bigtree_messages (`sender`,`recipients`,`subject`,`message`,`response_to`,`date`) VALUES ('".$admin->ID."','$send_to','$subject','$message','$response_to',NOW())");
+	// Send the response.
+	$admin->createMessage($_POST["subject"],$_POST["message"],$_POST["send_to"],$_POST["response_to"]);
 	
 	$admin->growl("Message Center","Replied To Message");
 	header("Location: ../");

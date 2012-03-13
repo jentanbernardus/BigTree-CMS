@@ -32,7 +32,7 @@
 		))
 	);
 	
-	$unread_messages = sqlrows(sqlquery("SELECT id FROM bigtree_messages WHERE recipients LIKE '%|".$admin->ID."|%' AND read_by NOT LIKE '%|".$admin->ID."|%'"));	
+	$unread_messages = $admin->getUnreadMessageCount();	
 	$site = $cms->getPage(0,false);
 ?>
 <!doctype html> 

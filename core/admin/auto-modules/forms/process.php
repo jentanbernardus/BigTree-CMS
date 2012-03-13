@@ -103,7 +103,7 @@
 		
 		// Kill off any applicable locks to the entry
 		if ($edit_id) {
-			sqlquery("DELETE FROM bigtree_locks WHERE `table` = '$table' AND item_id = '$edit_id'");
+			$admin->unlock($table,$edit_id);
 		}
 		
 		// Get the redirect location.

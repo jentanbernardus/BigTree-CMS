@@ -1,25 +1,11 @@
 <?
 	$page = end($path);
 	
-	// Force your way through the page lock
-	if (isset($_GET["force"])) {
-		$f = sqlfetch(sqlquery("SELECT * FROM bigtree_locks WHERE `table` = 'bigtree_pages' AND item_id = '$page'"));
-		sqlquery("UPDATE bigtree_locks SET user = '".$_SESSION["bigtree"]["id"]."', last_accessed = NOW() WHERE id = '".$f["id"]."'");
-	}
 	
 	// Check for a page lock
-	$f = sqlfetch(sqlquery("SELECT * FROM bigtree_locks WHERE `table` = 'bigtree_pages' AND item_id = '$page'"));
-	if ($f && $f["user"] != $_SESSION["bigtree"]["id"] && strtotime($f["last_accessed"]) > (time()-300)) {
-		include BigTree::path("admin/modules/pages/front-end-locked.php");
-	} else {
-		if ($f) {
-			sqlquery("UPDATE bigtree_locks SET last_accessed = NOW(), user = '".$_SESSION["bigtree"]["id"]."' WHERE id = '".$f["id"]."'");
-			$lockid = $f["id"];
-		} else {
-			sqlquery("INSERT INTO bigtree_locks (`table`,`item_id`,`user`,`title`) VALUES ('bigtree_pages','$page','".$_SESSION["bigtree"]["id"]."','Page')");
-			$lockid = sqlid();
-		}
+	$lock = $admin->lockCheck("bigtree_pages",$page,"admin/modules/pages/front-end-locked.php",$_GET["force"],false);
 	
+	if ($lock) {	
 		if ($page[0] == "p") {
 			$cid = substr($page,1);
 			$f = $admin->getPendingChange($cid);

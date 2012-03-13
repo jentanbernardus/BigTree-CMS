@@ -1,3 +1,3 @@
 <?
-	sqlquery("UPDATE bigtree_locks SET last_accessed = NOW() WHERE id = '".$_GET["id"]."'");
+	$admin->refreshLock($_POST["id"]);
 ?>

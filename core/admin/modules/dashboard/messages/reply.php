@@ -1,16 +1,8 @@
 <?
 	// Make sure the user has the right to see this message
-	$parent = sqlfetch(sqlquery("SELECT * FROM bigtree_messages WHERE id = '".mysql_real_escape_string(end($path))."'"));
-	if ($parent["sender"] != $admin->ID && strpos("|".$admin->ID."|",$parent["recipients"]) === false) {
-		$admin->stop("This message was not sent by you, or to you.");
-	}
-	
-	$users = array();
-	$q = sqlquery("SELECT id,name FROM bigtree_users ORDER BY name");
-	while ($f = sqlfetch($q)) {
-		$users[$f["id"]] = $f["name"];
-	}
-	
+	$parent = $admin->getMessage(end($path));	
+	$users = $admin->getUsers();
+		
 	if ($_SESSION["saved_message"]) {
 		$send_to = $_SESSION["saved_message"]["send_to"];
 		$subject = htmlspecialchars($_SESSION["saved_message"]["subject"]);

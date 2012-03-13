@@ -562,6 +562,36 @@
 		}
 		
 		/*
+			Function: createMessage
+				Creates a message in message center.
+			
+			Parameters:
+				subject - The subject line.
+				message - The message.
+				recipients - The recipients.
+				in_response_to - The message being replied to.
+		*/
+		
+		function createMessage($subject,$message,$recipients,$in_response_to = 0) {
+			// Clear tags out of the subject, sanitize the message body of XSS attacks.
+			$subject = mysql_real_escape_string(htmlspecialchars(strip_tags($subject)));
+			$message = mysql_real_escape_string(strip_tags($message,"<p><b><strong><em><i><a>"));
+			$in_response_to = mysql_real_escape_string($in_response_to);
+			
+			// We build the send_to field this way so that we don't have to create a second table of recipients.
+			// Is it faster database wise using a LIKE over a JOIN? I don't know, but it makes for one less table.
+			$send_to = "|";
+			foreach ($recipients as $r) {
+				// Make sure they actually put in a number and didn't try to screw with the $_POST
+				$send_to .= intval($r)."|";
+			}
+			
+			$send_to = mysql_real_escape_string($send_to);
+			
+			sqlquery("INSERT INTO bigtree_messages (`sender`,`recipients`,`subject`,`message`,`date`,`response_to`) VALUES ('".$this->ID."','$send_to','$subject','$message',NOW(),'$in_response_to')");	
+		}
+		
+		/*
 			Function: createModule
 				Creates a module and its class file.
 			
@@ -1803,6 +1833,56 @@
 				$nav[] = $nav_item;
 			}
 			return $nav;
+		}
+		
+		/*
+			Function: getMessages
+				Returns all a user's messages.
+			
+			Returns:
+				An array containing "sent", "read", and "unread" keys that contain an array of messages each.
+		*/
+		
+		function getMessages() {
+			$sent = array();
+			$read = array();
+			$unread = array();
+			$q = sqlquery("SELECT bigtree_messages.*, bigtree_users.name AS sender_name FROM bigtree_messages JOIN bigtree_users ON bigtree_messages.sender = bigtree_users.id WHERE sender = '".$this->ID."' OR recipients LIKE '%|".$this->ID."|%' ORDER BY date DESC");
+			
+			while ($f = sqlfetch($q)) {
+				// If we're the sender put it in the sent array.
+				if ($f["sender"] == $this->ID) {
+					$sent[] = $f;
+				} else {
+					// If we've been marked read, put it in the read array.
+					if ($f["read_by"] && strpos("|".$this->ID."|",$f["read_by"]) !== false) {
+						$read[] = $f;
+					} else {
+						$unread[] = $f;
+					}
+				}
+			}
+			
+			return array("sent" => $sent, "read" => $read, "unread" => $unread);
+		}
+		
+		/*
+			Function: getMessage
+				Returns a message from message center.
+			
+			Paramters:
+				id - The id of the message.
+		
+			Returns:
+				An entry from bigtree_messages.
+		*/
+		
+		function getMessage($id) {
+			$message = sqlfetch(sqlquery("SELECT * FROM bigtree_messages WHERE id = '".mysql_real_escape_string($id)."'"));
+			if ($message["sender"] != $this->ID && strpos("|".$this->ID."|",$message["recipients"]) === false) {
+				$admin->stop("This message was not sent by you, or to you.");
+			}
+			return $message;
 		}
 		
 		/*
@@ -3120,6 +3200,18 @@
 		}
 		
 		/*
+			Function: getUnreadMessageCount
+				Returns the number of unread messages for the logged in user.
+			
+			Returns:
+				The number of unread messages.
+		*/
+		
+		function getUnreadMessageCount() {
+			return sqlrows(sqlquery("SELECT id FROM bigtree_messages WHERE recipients LIKE '%|".$this->ID."|%' AND read_by NOT LIKE '%|".$this->ID."|%'"))
+		}
+		
+		/*
 			Function: getUser
 				Gets a user's decoded information.
 			
@@ -3156,13 +3248,14 @@
 			
 			Returns:
 				An array of entries from bigtree_users.
+				The keys of the array are the ids of the user.
 		*/
 
 		function getUsers($sort = "name ASC") {
 			$items = array();
 			$q = sqlquery("SELECT * FROM bigtree_users ORDER BY $sort");
 			while ($f = sqlfetch($q)) {
-				$items[] = $f;
+				$items[$f["id"]] = $f;
 			}
 
 			return $items;
@@ -3290,6 +3383,47 @@
 		}
 		
 		/*
+			Function: lockCheck
+				Checks if a lock exists.
+				If a lock exists and it's currently active, stops page execution and shows the lock page.
+				If a lock is yours, refreshes the lock.
+				If there is no lock, creates one for you.
+			
+			Parameters:
+				table - The table to check.
+				id - The id of the entry to check.
+				include - The lock page to include (relative to /core/ or /custom/)
+				force - Whether to force through the lock or not.
+				in_admin - Whether to call stop()
+			
+			Returns:
+				Your lock id.
+		*/
+		
+		function lockCheck($table,$id,$include,$force = false,$in_admin = true) {
+			global $www_root,$admin_root;
+			$table = mysql_real_escape_string($table);
+			$id = mysql_real_escape_string($id);
+			
+			$f = sqlfetch(sqlquery("SELECT * FROM bigtree_locks WHERE `table` = '$table' AND item_id = '$id'"));
+			if ($f && $f["user"] != $this->ID && strtotime($f["last_accessed"]) > (time()-300) && !$force) {
+				include BigTree::path($include);
+				if ($in_admin) {
+					$admin->stop();
+				}
+				return false;
+			}
+			
+			if ($f) {
+				sqlquery("UPDATE bigtree_locks SET last_accessed = NOW(), user = '".$this->ID."' WHERE id = '".$f["id"]."'");
+				return $f["id"];
+			} else {
+				sqlquery("INSERT INTO bigtree_locks (`table`,`item_id`,`user`,`title`) VALUES ('$table','$id','".$this->ID."','Page')");
+				return sqlid();
+			}
+		}
+		
+		/*
 			Function: login
 				Attempts to login a user to the CMS.
 			
@@ -3400,6 +3534,19 @@
 				$yahoo = file_get_contents("http://search.yahooapis.com/SiteExplorerService/V1/ping?sitemap=".urlencode($GLOBALS["www_root"]."sitemap.xml"));
 				$bing = file_get_contents("http://www.bing.com/webmaster/ping.aspx?siteMap=".urlencode($GLOBALS["www_root"]."sitemap.xml"));
 			}
+		}
+		
+		/*
+			Function: refreshLock
+				Refreshes a lock.
+			
+			Paramters:
+				id - The id of the lock.
+		*/
+		
+		function refreshLock($id) {
+			$id = mysql_real_escape_string($id);
+			sqlquery("UPDATE bigtree_locks SET last_accessed = NOW() WHERE id = '$id' AND user = '".$this->ID."'");
 		}
 		
 		/*
@@ -3911,6 +4058,19 @@
 			$this->requireLevel(1);
 			$id = mysql_real_escape_string($id);
 			sqlquery("UPDATE bigtree_404s SET ignored = '' WHERE id = '$id'");
+		}
+		
+		/*
+			Function: unlock
+				Removes a lock from a table entry.
+			
+			Parameters:
+				table - The table the entry is in.
+				id - The id of the entry.
+		*/
+		
+		function unlock($table,$id) {
+			sqlquery("DELETE FROM bigtree_locks WHERE `table` = '".mysql_real_escape_string($table)."' AND item_id = '".mysql_real_escape_string($id)."'");
 		}
 		
 		/*
