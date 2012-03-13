@@ -1,14 +1,14 @@
 <?
-	include bigtree_path($relative_path."_check.php");
+	include BigTree::path($relative_path."_check.php");
 	$breadcrumb[] = array("link" => "dashboard/vitals-statistics/analytics/traffic-sources/", "title" => "Traffic Sources");
 
 	$cache = $cms->getSetting("bigtree-internal-google-analytics-cache"); 
 ?>
 <h1>
 	<span class="analytics"></span>Traffic Sources
-	<? include bigtree_path("admin/modules/dashboard/vitals-statistics/_jump.php"); ?>
+	<? include BigTree::path("admin/modules/dashboard/vitals-statistics/_jump.php"); ?>
 </h1>
-<? include bigtree_path($relative_path."_nav.php") ?>
+<? include BigTree::path($relative_path."_nav.php") ?>
 <div class="table">
 	<summary>
 		<p>This report shows the traffic sources for your visitors in the past month.</p>

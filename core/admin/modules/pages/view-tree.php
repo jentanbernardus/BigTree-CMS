@@ -164,8 +164,8 @@
 	<? } ?>
 </h1>
 <?
-	include bigtree_path("admin/modules/pages/_nav.php");
-	include bigtree_path("admin/modules/pages/_properties.php");
+	include BigTree::path("admin/modules/pages/_nav.php");
+	include BigTree::path("admin/modules/pages/_properties.php");
 ?>
 <h3>Subpages</h3>
 <?

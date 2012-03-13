@@ -6,7 +6,7 @@
 	BigTree::globalizeArray($type,array("htmlspecialchars"));
 ?>
 <h1><span class="icon_developer_field_types"></span>Edit Field Type</h1>
-<? include bigtree_path("admin/modules/developer/field-types/_nav.php") ?>
+<? include BigTree::path("admin/modules/developer/field-types/_nav.php") ?>
 
 <div class="form_container">
 	<form method="post" action="<?=$developer_root?>field-types/update/" enctype="multipart/form-data" class="module">
@@ -23,18 +23,6 @@
 					<li><input type="checkbox" name="modules"<? if ($modules) { ?> checked="checked"<? } ?> /> <label class="for_checkbox">Modules</label></li>
 					<li><input type="checkbox" name="callouts"<? if ($callouts) { ?> checked="checked"<? } ?> /> <label class="for_checkbox">Callouts</label></li>
 				</ul>
-			</fieldset>
-			<fieldset>
-				<label>Version <small>(for <a href="http://developer.bigtreecms.com/foundry/" target="_blank">Foundry</a>)</small></label>
-				<input type="text" name="primary_version" value="<?=$primary_version?>" class="field_type_version" />.<input type="text" name="secondary_version" value="<?=$secondary_version?>" class="field_type_version" />.<input type="text" name="tertiary_version" value="<?=$tertiary_version?>" class="field_type_version" />
-			</fieldset>
-			<fieldset>
-				<label>Description <small>(for <a href="http://developer.bigtreecms.com/foundry/" target="_blank">Foundry</a>)</small></label>
-				<textarea name="description"><?=$description?></textarea>
-			</fieldset>
-			<fieldset>
-				<label>Latest Release Notes <small>(for <a href="http://developer.bigtreecms.com/foundry/" target="_blank">Foundry</a>)</small></label>
-				<textarea name="release_notes"><?=$release_notes?></textarea>
 			</fieldset>
 		</section>
 		<footer>

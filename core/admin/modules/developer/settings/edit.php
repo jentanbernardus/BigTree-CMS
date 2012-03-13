@@ -14,11 +14,11 @@
 	unset($_SESSION["bigtree"]["developer"]["setting_data"]);
 ?>
 <h1><span class="icon_developer_settings"></span>Edit Setting</h1>
-<? include bigtree_path("admin/modules/developer/settings/_nav.php") ?>
+<? include BigTree::path("admin/modules/developer/settings/_nav.php") ?>
 
 <div class="form_container">
 	<form class="module" method="post" action="<?=$section_root?>update/<?=$item["id"]?>/">
-		<? include bigtree_path("admin/modules/developer/settings/_form-content.php") ?>
+		<? include BigTree::path("admin/modules/developer/settings/_form-content.php") ?>
 		<footer>
 			<input type="submit" class="button blue" value="Update" />
 		</footer>
@@ -29,8 +29,8 @@
 </script>
 <?
 	$htmls = array("setting_description");
-	include bigtree_path("admin/layouts/_tinymce.php");
-	include bigtree_path("admin/layouts/_tinymce_specific.php");
+	include BigTree::path("admin/layouts/_tinymce.php");
+	include BigTree::path("admin/layouts/_tinymce_specific.php");
 	
 	unset($module);
 ?>

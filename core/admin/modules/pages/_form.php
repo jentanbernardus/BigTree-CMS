@@ -47,7 +47,7 @@
 			});
 		</script>
 	</header>
-	<? include bigtree_path("admin/layouts/_tinymce.php"); ?>
+	<? include BigTree::path("admin/layouts/_tinymce.php"); ?>
 	<form method="post" class="module" action="<?=$admin_root?>pages/<?=$action?>/" enctype="multipart/form-data" id="page_form">
 		<input type="hidden" name="MAX_FILE_SIZE" value="<?=BigTree::uploadMaxFileSize()?>" />
 		
@@ -58,20 +58,20 @@
 		<? } ?>
 		
 		<section id="properties_tab"<? if ($action == "update") { ?> style="display: none;"<? } ?>>
-			<? include bigtree_path("admin/modules/pages/tabs/properties.php") ?>
+			<? include BigTree::path("admin/modules/pages/tabs/properties.php") ?>
 		</section>
 		<section id="template_tab" style="display: none;">
-			<? include bigtree_path("admin/modules/pages/tabs/template.php") ?>
+			<? include BigTree::path("admin/modules/pages/tabs/template.php") ?>
 		</section>
 		<section id="content_tab"<? if ($action == "create") { ?> style="display: none;"<? } ?>>
-			<? include bigtree_path("admin/modules/pages/tabs/content.php") ?>
+			<? include BigTree::path("admin/modules/pages/tabs/content.php") ?>
 		</section>
 		<section id="seo_tab" style="display: none;">
-			<? include bigtree_path("admin/modules/pages/tabs/seo.php") ?>
+			<? include BigTree::path("admin/modules/pages/tabs/seo.php") ?>
 		</section>
 		<? if ($admin->Level > 0 && $action == "update") { ?>
 		<section id="move_tab" style="display: none;">
-			<? include bigtree_path("admin/modules/pages/tabs/move.php") ?>
+			<? include BigTree::path("admin/modules/pages/tabs/move.php") ?>
 		</section>
 		<? } ?>
 		<footer>

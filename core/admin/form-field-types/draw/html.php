@@ -5,5 +5,5 @@
 		$htmls[] = "field_$key";
 	}
 	
-	include bigtree_path("admin/form-field-types/draw/textarea.php");
+	include BigTree::path("admin/form-field-types/draw/textarea.php");
 ?>

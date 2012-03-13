@@ -3,7 +3,7 @@
 ?>
 <h1><span class="icon_developer_modules"></span>Tweak View Styles</h1>
 <?
-	include bigtree_path("admin/modules/developer/modules/_nav.php");
+	include BigTree::path("admin/modules/developer/modules/_nav.php");
 	if ($view == "images" || $view == "images-group") {
 ?>
 <p>The view type does not have any style settings.</p>

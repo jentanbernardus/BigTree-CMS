@@ -11,7 +11,7 @@
 		<span class="view_action">Edit</span>
 	</header>
 	<ul id="results">
-		<? include bigtree_path("admin/ajax/settings/get-page.php") ?>	
+		<? include BigTree::path("admin/ajax/settings/get-page.php") ?>	
 	</ul>
 </div>
 

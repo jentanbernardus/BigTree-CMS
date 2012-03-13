@@ -4,7 +4,7 @@
 ?>
 
 <h1><span class="icon_developer_modules"></span>Add Module</h1>
-<? include bigtree_path("admin/modules/developer/modules/_nav.php"); ?>
+<? include BigTree::path("admin/modules/developer/modules/_nav.php"); ?>
 <div class="form_container">
 	<form method="post" action="<?=$section_root?>create/" class="module">
 		<section>
@@ -100,4 +100,4 @@
 		</footer>
 	</form>
 </div>
-<? include bigtree_path("admin/modules/developer/modules/_module-add-edit-js.php") ?>
+<? include BigTree::path("admin/modules/developer/modules/_module-add-edit-js.php") ?>

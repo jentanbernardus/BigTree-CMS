@@ -4,5 +4,5 @@
 		array("title" => "Link (include http://)", "key" => "link")
 	);
 	
-	include bigtree_path("admin/form-field-types/draw/array.php");
+	include BigTree::path("admin/form-field-types/draw/array.php");
 ?>

@@ -5,7 +5,7 @@
 	$admin->requireLevel(1);
 ?>
 <h1><span class="users"></span>Add Token</h1>
-<? include bigtree_path("admin/modules/users/_nav.php"); ?>
+<? include BigTree::path("admin/modules/users/_nav.php"); ?>
 <div class="form_container">
 	<form class="module" action="<?=$admin_root?>users/create-token/" method="post">
 		<section>

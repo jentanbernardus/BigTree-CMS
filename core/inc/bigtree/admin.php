@@ -374,6 +374,194 @@
 		}
 		
 		/*
+			Function: createAPIToken
+				Creates an API token.
+				Checks permissions.
+			
+			Parameters:
+				user - The user to create the token for.
+				read_only - Whether the token is read-only or not.
+				
+			Returns:
+				The id of the newly created token.
+		*/
+		
+		function createAPIToken($user,$read_only) {
+			$this->requireLevel(1);
+			
+			$user = mysql_real_escape_string($user);
+			$read_only = mysql_real_escape_string($read_only);
+			
+			$token = BigTree::randomString(30);
+			$r = sqlrows(sqlquery("SELECT * FROM bigtree_api_tokens WHERE token = '$token'"));
+			while ($r) {
+				$token = BigTree::randomString(30);
+				$r = sqlrows(sqlquery("SELECT * FROM bigtree_api_tokens WHERE token = '$token'"));				
+			}
+			
+			$token = mysql_real_escape_string($token);
+			
+			sqlquery("INSERT INTO bigtree_api_tokens (`token`,`user`,`readonly`) VALUES ('$token','$user','$read_only')");
+			
+			return sqlid();
+		}
+		
+		/*
+			Function: createCallout
+				Creates a callout and its files.
+			
+			Parameters:
+				id - The id.
+				name - The name.
+				description - The description.
+				level - Access level (0 for everyone, 1 for administrators, 2 for developers).
+				resources - An array of resources.
+		*/
+		
+		function createCallout($id,$name,$description,$level,$resources) {
+			// If we're creating a new file, let's populate it with some convenience things to show what resources are available.
+			$file_contents = '<?
+	/*
+		Resources Available:
+';			
+			
+			$cached_types = $this->getCachedFieldTypes();
+			$types = $cached_types["callout"];
+			
+			$resources = array();
+			foreach ($_POST["resources"] as $resource) {
+				if ($resource["id"] && $resource["id"] != "type") {
+					$options = json_decode($resource["options"],true);
+					foreach ($options as $key => $val) {
+						if ($key != "name" && $key != "id" && $key != "type") {
+							$resource[$key] = $val;
+						}
+					}
+					
+					$file_contents .= '		$'.$resource["id"].' = '.$resource["name"].' - '.$types[$resource["type"]]."\n";
+					
+					$resource["id"] = htmlspecialchars($resource["id"]);
+					$resource["name"] = htmlspecialchars($resource["name"]);
+					$resource["subtitle"] = htmlspecialchars($resource["subtitle"]);
+					unset($resource["options"]);
+					$resources[] = $resource;
+				}
+			}
+			
+			$file_contents .= '	*/
+?>';		
+			
+			// Clean up the post variables
+			$id = mysql_real_escape_string(htmlspecialchars($id));
+			$name = mysql_real_escape_string(htmlspecialchars($name));
+			$description = mysql_real_escape_string(htmlspecialchars($description));
+			$level = mysql_real_escape_string($level);
+			$resources = mysql_real_escape_string(json_encode($resources));
+			
+			if (!file_exists($GLOBALS["server_root"]."templates/callouts/".$id.".php")) {
+				file_put_contents($GLOBALS["server_root"]."templates/callouts/".$id.".php",$file_contents);
+				chmod($GLOBALS["server_root"]."templates/callouts/".$id.".php",0777);
+			}
+			
+			sqlquery("INSERT INTO bigtree_callouts (`id`,`name`,`description`,`resources`,`level`) VALUES ('$id','$name','$description','$resources','$level')");
+		}
+		
+		/*
+			Function: createFeed
+				Creates a feed.
+			
+			Parameters:
+				name - The name.
+				description - The description.
+				table - The data table.
+				type - The feed type.
+				options - The feed type options.
+				fields - The fields.
+			
+			Returns:
+				The route to the new feed.
+		*/
+		
+		function createFeed($name,$description,$table,$type,$options,$fields) {
+			global $cms;
+			
+			// Options were encoded before submitting the form, so let's get them back.
+			$options = json_decode($options,true);
+			if (is_array($options)) {
+				foreach ($options as &$option) {
+					$option = str_replace($www_root,"{wwwroot}",$option);
+				}
+			}
+			
+			// Get a unique route!
+			$route = $cms->urlify($name);
+			$x = 2;
+			$oroute = $route;
+			$f = $cms->getFeedByRoute($route);
+			while ($f) {
+				$route = $oroute."-".$x;
+				$f = $cms->getFeedByRoute($route);
+				$x++;
+			}
+			
+			// Fix stuff up for the db.
+			$name = mysql_real_escape_string(htmlspecialchars($name));
+			$description = mysql_real_escape_string(htmlspecialchars($description));
+			$table = mysql_real_escape_string($table);
+			$type = mysql_real_escape_string($type);
+			$options = mysql_real_escape_string(json_encode($options));
+			$fields = mysql_real_escape_string(json_encode($fields));
+			$route = mysql_real_escape_string($route);
+			
+			sqlquery("INSERT INTO bigtree_feeds (`route`,`name`,`description`,`type`,`table`,`fields`,`options`) VALUES ('$route','$name','$description','$type','$table','$fields','$options')");
+			
+			return $route;
+		}
+		
+		/*
+			Function: createFieldType
+				Creates a field type and its files.
+			
+			Parameters:
+				id - The id of the field type.
+				name - The name.
+				pages - Whether it can be used as a page resource or not ("on" is yes)
+				modules - Whether it can be used as a module resource or not ("on" is yes)
+				callouts - Whether it can be used as a callout resource or not ("on" is yes)
+		*/
+		
+		function createFieldType($id,$name,$pages,$modules,$callouts) {
+			$id = mysql_real_escape_string($id);
+			$name = mysql_real_escape_string(htmlspecialchars($name));
+			$author = mysql_real_escape_string($this->Name);
+			$pages = mysql_real_escape_string($pages);
+			$modules = mysql_real_escape_string($modules);
+			$callouts = mysql_real_escape_string($callouts);
+			
+			$file = "$id.php";
+			
+			sqlquery("INSERT INTO bigtree_field_types (`id`,`name`,`pages`,`modules`,`callouts`) VALUES ('$id','$name','$pages','$modules','$callouts')");
+			
+			// Make the files for draw and process and options if they don't exist.
+			if (!file_exists($GLOBALS["server_root"]."custom/admin/form-field-types/draw/$file")) {
+				BigTree::touchFile($GLOBALS["server_root"]."custom/admin/form-field-types/draw/$file");
+				file_put_contents($GLOBALS["server_root"]."custom/admin/form-field-types/draw/$file",'<? include BigTree::path("admin/form-field-types/draw/text.php"); ?>');
+				chmod($GLOBALS["server_root"]."custom/admin/form-field-types/draw/$file",0777);
+			}
+			if (!file_exists($GLOBALS["server_root"]."custom/admin/form-field-types/process/$file")) {
+				BigTree::touchFile($GLOBALS["server_root"]."custom/admin/form-field-types/process/$file");
+				file_put_contents($GLOBALS["server_root"]."custom/admin/form-field-types/process/$file",'<? $value = $data[$key]; ?>');
+				chmod($GLOBALS["server_root"]."custom/admin/form-field-types/process/$file",0777);
+			}
+			if (!file_exists($GLOBALS["server_root"]."custom/admin/ajax/developer/field-options/$file")) {
+				BigTree::touchFile($GLOBALS["server_root"]."custom/admin/ajax/developer/field-options/$file");
+				chmod($GLOBALS["server_root"]."custom/admin/ajax/developer/field-options/$file",0777);
+			}
+				
+			unlink($GLOBALS["server_root"]."cache/form-field-types.btc");
+		}
+		
+		/*
 			Function: createModule
 				Creates a module and its class file.
 			
@@ -734,6 +922,62 @@
 		}
 		
 		/*
+			Function: deleteAPIToken
+				Deletes an API token.
+				Checks permissions.
+			
+			Parameters:
+				id - The id of the token.
+		*/
+		
+		function deleteAPIToken($id) {
+			$this->requireLevel(1);
+			$id = mysql_real_escape_string($id);
+			sqlquery("DELETE FROM bigtree_api_tokens WHERE id = '$id'");
+		}
+		
+		/*
+			Function: deleteCallout
+				Deletes a callout and removes its file.
+			
+			Parameters:
+				id - The id of the callout.
+		*/
+		
+		function deleteCallout($id) {
+			$id = mysql_real_escape_string($id);
+			sqlquery("DELETE FROM bigtree_callouts WHERE id = '$id'");
+			unlink($GLOBALS["server_root"]."templates/callouts/$id.php");
+		}
+		
+		/*
+			Function: deleteFeed
+				Deletes a feed.
+			
+			Parameters:
+				id - The id of the feed.
+		*/
+		
+		function deleteFeed($id) {
+			$id = mysql_real_escape_string($id);
+			sqlquery("DELETE FROM bigtree_feeds WHERE id = '$id'");
+		}
+		
+		/*
+			Function: deleteFieldType
+				Deletes a field type and erases its files.
+		
+			Parameters:
+				id - The id of the field type.
+		*/
+		
+		function deleteFieldType($id) {
+			unlink($GLOBALS["server_root"]."custom/admin/form-field-types/draw/$id.php");
+			unlink($GLOBALS["server_root"]."custom/admin/form-field-types/process/$id.php");
+			sqlquery("DELETE FROM bigtree_field_types WHERE id = '".mysql_real_escape_string($id)."'");
+		}
+		
+		/*
 			Function: deleteModule
 				Deletes a module.
 			
@@ -745,11 +989,11 @@
 			$id = mysql_real_escape_string($id);
 			
 			// Get info and delete the class.
-			$module = $admin->getModule($id);
+			$module = $this->getModule($id);
 			unlink($GLOBALS["server_root"]."custom/inc/modules/".$module["route"].".php");
 	
 			// Delete all the related auto module actions
-			$actions = $admin->getModuleActions($id);
+			$actions = $this->getModuleActions($id);
 			foreach ($actions as $action) {
 				if ($action["form"]) {
 					sqlquery("DELETE FROM bigtree_module_forms WHERE id = '".$action["form"]."'");
@@ -945,6 +1189,29 @@
 			mail($email,"Reset Your Password","A user with the IP address ".$_SERVER["REMOTE_ADDR"]." has requested to reset your password.\n\nIf this was you, please click the link below:\n".$GLOBALS["admin_root"]."login/reset-password/$hash/","From: no-reply@bigtreecms.com");
 			header("Location: ".$GLOBALS["admin_root"]."login/forgot-success/");
 			die();
+		}
+		
+		/*
+			Function: get404Total
+				Get the total number of 404s of a certain type.
+			
+			Parameters:
+				type - The type to retrieve the count for (301, ignored, 404)
+			
+			Returns:
+				The number of 404s in the table of the given type.
+		*/
+		
+		function get404Total($type) {
+			if ($type == "404") {
+				$total = sqlfetch(sqlquery("SELECT COUNT(id) AS `total` FROM bigtree_404s WHERE ignored = '' AND redirect_url = ''"));
+			} elseif ($type == "301") {
+				$total = sqlfetch(sqlquery("SELECT COUNT(id) AS `total` FROM bigtree_404s WHERE ignored = '' AND redirect_url != ''"));
+			} elseif ($type == "ignored") {
+				$total = sqlfetch(sqlquery("SELECT COUNT(id) AS `total` FROM bigtree_404s WHERE ignored = 'on'"));
+			}
+			
+			return $total["total"];
 		}
 		
 		/*
@@ -1442,7 +1709,7 @@
 				An array of feed elements from bigtree_feeds sorted by name.
 		*/
 		
-		function getFeeds($sort) {
+		function getFeeds($sort = "name ASC") {
 			$feeds = array();
 			$q = sqlquery("SELECT * FROM bigtree_feeds ORDER BY $sort");
 			while ($f = sqlfetch($q)) {
@@ -1468,7 +1735,6 @@
 			if (!$item) {
 				return false;
 			}
-			$item["files"] = json_decode($item["files"],true);
 			return $item;
 		}
 		
@@ -1933,7 +2199,7 @@
 					return "p";
 				}
 				$pdata = json_decode($f["changes"],true);
-				return $this->getPageAccessLevelByUser($pdata["parent"],$admin->ID);
+				return $this->getPageAccessLevelByUser($pdata["parent"],$this->ID);
 			}
 
 			$pp = $this->Permissions["page"][$page];
@@ -2360,7 +2626,7 @@
 					} else {
 						$id = $f["item_id"];
 					}
-					$r = $this->getPageAccessLevelByUser($f["item_id"],$admin->ID);
+					$r = $this->getPageAccessLevelByUser($f["item_id"],$this->ID);
 					// If we're a publisher, this is ours!
 					if ($r == "p") {
 						$ok = true;
@@ -2814,6 +3080,21 @@
 		}
 		
 		/*
+			Function: getToken
+				Returns a token.
+			
+			Parameters:
+				id - The id for the token.
+			
+			Returns:
+				A token entry.
+		*/
+		
+		function getToken($id) {
+			return sqlfetch(sqlquery("SELECT * FROM bigtree_api_tokens WHERE id = '".mysql_real_escape_string($id)."'"));
+		}
+		
+		/*
 			Function: getTokensPageCount
 				Returns the number of pages of tokens.
 			
@@ -2949,6 +3230,21 @@
 
 		function htmlClean($html) {
 			return str_replace("<br></br>","<br />",strip_tags($html,"<a><abbr><address><area><article><aside><audio><b><base><bdo><blockquote><body><br><button><canvas><caption><cite><code><col><colgroup><command><datalist><dd><del><details><dfn><div><dl><dt><em><emded><fieldset><figcaption><figure><footer><form><h1><h2><h3><h4><h5><h6><header><hgroup><hr><i><iframe><img><input><ins><keygen><kbd><label><legend><li><link><map><mark><menu><meter><nav><noscript><object><ol><optgroup><option><output><p><param><pre><progress><q><rp><rt><ruby><s><samp><script><section><select><small><source><span><strong><style><sub><summary><sup><table><tbody><td><textarea><tfoot><th><thead><time><title><tr><ul><var><video><wbr>"));
+		}
+		
+		/*
+			Function: ignore404
+				Ignores a 404 error.
+				Checks permissions.
+			
+			Parameters:
+				id - The id of the reported 404.
+		*/
+		
+		function ignore404($id) {
+			$this->requireLevel(1);
+			$id = mysql_real_escape_string($id);
+			sqlquery("UPDATE bigtree_404s SET ignored = 'on' WHERE id = '$id'");
 		}
 		
 		/*
@@ -3124,9 +3420,9 @@
 				return "p";
 			if (!isset($this->Permissions[$module]) || $this->Permissions[$module] == "") {
 				ob_clean();
-				include bigtree_path("admin/pages/_denied.php");
+				include BigTree::path("admin/pages/_denied.php");
 				$content = ob_get_clean();
-				include bigtree_path("admin/layouts/default.php");
+				include BigTree::path("admin/layouts/default.php");
 				die();
 			}
 			return $this->Permissions[$module];
@@ -3206,9 +3502,9 @@
 			global $cms,$admin_root,$css,$js,$site;
 			if (!isset($this->Level) || $this->Level < $level) {
 				ob_clean();
-				include bigtree_path("admin/pages/_denied.php");
+				include BigTree::path("admin/pages/_denied.php");
 				$content = ob_get_clean();
-				include bigtree_path("admin/layouts/default.php");
+				include BigTree::path("admin/layouts/default.php");
 				die();
 			}
 		}
@@ -3231,12 +3527,85 @@
 				return true;
 			if ($this->Permissions[$module] != "p") {
 				ob_clean();
-				include bigtree_path("admin/pages/_denied.php");
+				include BigTree::path("admin/pages/_denied.php");
 				$content = ob_get_clean();
-				include bigtree_path("admin/layouts/default.php");
+				include BigTree::path("admin/layouts/default.php");
 				die();
 			}
 			return true;
+		}
+		
+		/*
+			Function: search404s
+				Searches 404s, returns results.
+			
+			Parameters:
+				type - The type of results (301, 404, or ignored).
+				query - The search query.
+			
+			Returns:
+				An array of entries from bigtree_404s.
+		*/
+		
+		function search404s($type,$query = "") {
+			$items = array();
+			
+			if ($query) {
+				$s = mysql_real_escape_string($query);
+				if ($type == "301") {
+					$q = sqlquery("SELECT * FROM bigtree_404s WHERE ignored = '' AND (broken_url LIKE '%$s%' OR redirect_url LIKE '%$s%') AND redirect_url != '' ORDER BY requests DESC LIMIT 50");
+				} elseif ($type == "ignored") {
+					$q = sqlquery("SELECT * FROM bigtree_404s WHERE ignored != '' AND (broken_url LIKE '%$s%' OR redirect_url LIKE '%$s%') ORDER BY requests DESC LIMIT 50");
+				} else {
+					$q = sqlquery("SELECT * FROM bigtree_404s WHERE ignored = '' AND broken_url LIKE '%$s%' AND redirect_url = '' ORDER BY requests DESC LIMIT 50");
+				}
+			} else {
+				if ($type == "301") {
+					$q = sqlquery("SELECT * FROM bigtree_404s WHERE ignored = '' AND redirect_url != '' ORDER BY requests DESC LIMIT 50");
+				} elseif ($type == "ignored") {
+					$q = sqlquery("SELECT * FROM bigtree_404s WHERE ignored != '' ORDER BY requests DESC LIMIT 50");
+				} else {
+					$q = sqlquery("SELECT * FROM bigtree_404s WHERE ignored = '' AND redirect_url = '' ORDER BY requests DESC LIMIT 50");
+				}
+			}
+			
+			while ($f = sqlfetch($q)) {
+				$items[] = $f;
+			}
+			
+			return $items;
+		}
+		
+		/*
+			Function: set404Redirect
+				Sets the redirect address for a 404.
+				Checks permissions.
+			
+			Parameters:
+				id - The id of the 404.
+				url - The redirect URL.
+		*/
+		
+		function set404Redirect($id,$url) {
+			$this->requireLevel(1);
+			$id = mysql_real_escape_string($id);
+			$url = mysql_real_escape_string($url);
+			sqlquery("UPDATE bigtree_404s SET redirect_url = '$url' WHERE id = '$id'");
+		}
+		
+		/*
+			Function: setCalloutPosition
+				Sets the position of a callout.
+			
+			Parameters:
+				id - The id of the callout.
+				position - The position to set.
+		*/
+		
+		function setCalloutPosition($id,$position) {
+			$id = mysql_real_escape_string($id);
+			$position = mysql_real_escape_string($position);
+			sqlquery("UPDATE bigtree_callouts SET position = '$position' WHERE id = '$id'");
 		}
 		
 		/*
@@ -3296,7 +3665,7 @@
 			global $cms,$admin,$www_root,$admin_root,$site,$breadcrumb;
 			echo $message;
 			$content = ob_get_clean();
-			include bigtree_path("admin/layouts/default.php");
+			include BigTree::path("admin/layouts/default.php");
 			die();
 		}
 		
@@ -3422,7 +3791,7 @@
 			$table = mysql_real_escape_string($table);
 			$entry = mysql_real_escape_string($entry);
 			$type = mysql_real_escape_string($type);
-			sqlquery("INSERT INTO bigtree_audit_trail VALUES (`table`,`user`,`entry`,`date`,`type`) VALUES ('$table','".$admin->ID."','$entry',NOW(),'$type')");
+			sqlquery("INSERT INTO bigtree_audit_trail VALUES (`table`,`user`,`entry`,`date`,`type`) VALUES ('$table','".$this->ID."','$entry',NOW(),'$type')");
 		}
 		
 		/*
@@ -3530,6 +3899,78 @@
 		}
 		
 		/*
+			Function: unignore404
+				Unignores a 404.
+				Checks permissions.
+			
+			Parameters:
+				id - The id of the 404.
+		*/
+		
+		function unignore404($id) {
+			$this->requireLevel(1);
+			$id = mysql_real_escape_string($id);
+			sqlquery("UPDATE bigtree_404s SET ignored = '' WHERE id = '$id'");
+		}
+		
+		/*
+			Function: updateAPIToken
+				Updates a token.
+				Checks permissions.
+			
+			Parameters:
+				id - The id of the token.
+				user - The user for the token.
+				read_only - Whether the token is read-only or not.
+		*/
+		
+		function updateAPIToken($id,$user,$read_only) {
+			$this->requireLevel(1);
+			$id = mysql_real_escape_string($id);
+			$user = mysql_real_escape_string($user);
+			$read_only = mysql_real_escape_string($read_only);
+		
+			sqlquery("UPDATE bigtree_api_tokens SET user = '$user', readonly = '$read_only' WHERE id = '$id'");
+		}
+		
+		/*
+			Function: updateCallout
+				Updates a callout.
+			
+			Parameters:
+				id - The id of the callout to update.
+				name - The name.
+				description - The description.
+				level - The access level (0 for all users, 1 for administrators, 2 for developers)
+				resources - An array of resources.
+		*/
+		
+		function updateCallout($id,$name,$description,$level,$resources) {
+			foreach ($resources as $resource) {
+				if ($resource["id"] && $resource["id"] != "type") {
+					$options = json_decode($resource["options"],true);
+					foreach ($options as $key => $val) {
+						if ($key != "name" && $key != "id" && $key != "type")
+							$resource[$key] = $val;
+					}
+					$resource["id"] = htmlspecialchars($resource["id"]);
+					$resource["name"] = htmlspecialchars($resource["name"]);
+					$resource["subtitle"] = htmlspecialchars($resource["subtitle"]);
+					unset($resource["options"]);
+					$r[] = $resource;
+				}
+			}
+			
+			$id = mysql_real_escape_string($id);
+			$name = mysql_real_escape_string(htmlspecialchars($name));
+			$description = mysql_real_escape_string(htmlspecialchars($description));
+			$level = mysql_real_escape_string($level);
+			$resources = mysql_real_escape_string(json_encode($r));
+			
+			sqlquery("UPDATE bigtree_callouts SET resources = '$resources', name = '$name', description = '$description', level = '$level' WHERE id = '$id'");
+		}
+		
+		/*
 			Function: updateChildPagePaths
 				Updates the paths for pages who are descendants of a given page to reflect the page's new route.
 				Also sets route history if the page has changed paths.
@@ -3554,6 +3995,60 @@
 				}
 			}
 		}
+		
+		/*
+			Function: updateFeed
+				Updates a feed.
+			
+			Parameters:
+				id - The id of the feed to update.
+				name - The name.
+				description - The description.
+				table - The data table.
+				type - The feed type.
+				options - The feed type options.
+				fields - The fields.
+		*/
+		
+		function updateFeed($id,$name,$description,$table,$type,$options,$fields) {
+			$options = json_decode($options,true);
+			foreach ($options as &$option) {
+				$option = str_replace($www_root,"{wwwroot}",$option);
+			}
+			
+			// Fix stuff up for the db.
+			$id = mysql_real_escape_string($id);
+			$name = mysql_real_escape_string(htmlspecialchars($name));
+			$description = mysql_real_escape_string(htmlspecialchars($description));
+			$table = mysql_real_escape_string($table);
+			$type = mysql_real_escape_string($type);
+			$options = mysql_real_escape_string(json_encode($options));
+			$fields = mysql_real_escape_string(json_encode($fields));
+			
+			sqlquery("UPDATE bigtree_feeds SET name = '$name', description = '$description', `table` = '$table', type = '$type', fields = '$fields', options = '$options' WHERE id = '$id'");
+		}
+		
+		/*
+			Function: updateFieldType
+				Updates a field type.
+			
+			Parameters:
+				id - The id of the field type.
+				name - The name.
+				pages - Whether it can be used as a page resource or not ("on" is yes)
+				modules - Whether it can be used as a module resource or not ("on" is yes)
+				callouts - Whether it can be used as a callout resource or not ("on" is yes)
+		*/
+		
+		function updateFieldType($id,$name,$pages,$modules,$callouts) {
+			$id = mysql_real_escape_string($id);
+			$name = mysql_real_escape_string(htmlspecialchars($name));
+			$pages = mysql_real_escape_string($pages);
+			$modules = mysql_real_escape_string($modules);
+			$callouts = mysql_real_escape_string($callouts);
+			
+			sqlquery("UPDATE bigtree_field_types SET name = '$name', pages = '$pages', modules = '$modules', callouts = '$callouts' WHERE id = '$id'");
+		}		
 		
 		/*
 			Function: updateModule

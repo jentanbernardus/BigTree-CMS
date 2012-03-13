@@ -30,7 +30,7 @@
 	$_POST["template"] = $pdata["template"];
 	
 	// Parse resources
-	include bigtree_path("admin/modules/pages/_resource-parse.php");
+	include BigTree::path("admin/modules/pages/_resource-parse.php");
 	
 	$pdata["resources"] = $_POST["resources"];
 	
@@ -59,9 +59,9 @@
 	sqlquery("DELETE FROM bigtree_locks WHERE `table` = 'bigtree_pages' AND item_id = '$page'");
 	
 	if (count($crops)) {
-		include bigtree_path("admin/modules/pages/_front-end-crop.php");
+		include BigTree::path("admin/modules/pages/_front-end-crop.php");
 	} elseif (count($fails)) {
-		include bigtree_path("admin/modules/pages/_front-end-failed.php");
+		include BigTree::path("admin/modules/pages/_front-end-failed.php");
 	} else {
 ?>
 <script type="text/javascript">parent.bigtree_bar_refresh("<?=$refresh_link?>");</script>

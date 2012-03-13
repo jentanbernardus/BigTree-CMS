@@ -37,11 +37,11 @@
 							echo $options["wrapper"];
 						}
 						
-						$path = bigtree_path("admin/form-field-types/draw/$type.php");
+						$path = BigTree::path("admin/form-field-types/draw/$type.php");
 						if (file_exists($path)) {
 							include $path;
 						} else {
-							include bigtree_path("admin/form-field-types/draw/text.php");
+							include BigTree::path("admin/form-field-types/draw/text.php");
 						}
 						
 						if ($options["wrapper"]) {
@@ -85,14 +85,14 @@
 </div>
 <?
 	if (count($htmls) || count($small_htmls) || count ($simplehtmls)) {
-		include bigtree_path("admin/layouts/_tinymce.php"); 
+		include BigTree::path("admin/layouts/_tinymce.php"); 
 
 		if (count($htmls))
-			include bigtree_path("admin/layouts/_tinymce_specific.php");
+			include BigTree::path("admin/layouts/_tinymce_specific.php");
 		if (count($small_htmls))
-			include bigtree_path("admin/layouts/_tinymce_block_small.php");
+			include BigTree::path("admin/layouts/_tinymce_block_small.php");
 		if (count($simplehtmls))
-			include bigtree_path("admin/layouts/_tinymce_specific_simple.php");
+			include BigTree::path("admin/layouts/_tinymce_specific_simple.php");
 	}
 ?>
 <script type="text/javascript">

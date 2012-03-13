@@ -5,15 +5,15 @@
 	BigTree::globalizeArray($item);
 ?>
 <h1><span class="icon_developer_feeds"></span>Edit Feed</h1>
-<? include bigtree_path("admin/modules/developer/feeds/_nav.php") ?>
+<? include BigTree::path("admin/modules/developer/feeds/_nav.php") ?>
 
 <div class="form_container">
 	<form method="post" action="<?=$developer_root?>feeds/update/<?=$id?>/" class="module">
-		<? include bigtree_path("admin/modules/developer/feeds/_form-content.php") ?>
+		<? include BigTree::path("admin/modules/developer/feeds/_form-content.php") ?>
 		<footer>
 			<input type="submit" class="button blue" value="Update" />
 		</footer>
 	</form>
 </div>
 
-<? include bigtree_path("admin/modules/developer/feeds/_common-js.php") ?>
+<? include BigTree::path("admin/modules/developer/feeds/_common-js.php") ?>

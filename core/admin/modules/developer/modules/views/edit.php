@@ -7,7 +7,7 @@
 	$breadcrumb[] = array("title" => "Edit View", "link" => "#");
 ?>
 <h1><span class="icon_developer_modules"></span>Edit View</h1>
-<? include bigtree_path("admin/modules/developer/modules/_nav.php") ?>
+<? include BigTree::path("admin/modules/developer/modules/_nav.php") ?>
 
 <div class="form_container">
 	
@@ -71,7 +71,7 @@
 				$table = $view["table"];
 				$fields = $view["fields"];
 				$actions = $view["actions"];
-				include bigtree_path("admin/ajax/developer/load-view-fields.php");
+				include BigTree::path("admin/ajax/developer/load-view-fields.php");
 			?>
 		</section>
 		<footer>
@@ -80,4 +80,4 @@
 	</form>
 </div>
 
-<? include bigtree_path("admin/modules/developer/modules/views/_js.php") ?>
+<? include BigTree::path("admin/modules/developer/modules/views/_js.php") ?>

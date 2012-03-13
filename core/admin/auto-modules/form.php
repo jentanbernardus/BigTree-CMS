@@ -1,5 +1,5 @@
 <?
-	include bigtree_path("admin/auto-modules/_setup.php");
+	include BigTree::path("admin/auto-modules/_setup.php");
 	
 	$form = BigTreeAutoModule::getForm($action["form"]);
 	
@@ -13,14 +13,14 @@
 	$action = end($path);
 	
 	if ($action == "process" || $action == "preview") {
-		include bigtree_path("admin/auto-modules/forms/process.php");
+		include BigTree::path("admin/auto-modules/forms/process.php");
 	} elseif ($action == "process-crops") {
-		include bigtree_path("admin/auto-modules/forms/process-crops.php");
+		include BigTree::path("admin/auto-modules/forms/process-crops.php");
 	} elseif (isset($_GET["force"])) {
-		include bigtree_path("admin/auto-modules/forms/unlock.php");
+		include BigTree::path("admin/auto-modules/forms/unlock.php");
 	} elseif ($edit_id) {
-		include bigtree_path("admin/auto-modules/forms/edit.php");
+		include BigTree::path("admin/auto-modules/forms/edit.php");
 	} else {
-		include bigtree_path("admin/auto-modules/forms/add.php");
+		include BigTree::path("admin/auto-modules/forms/add.php");
 	}
 ?>

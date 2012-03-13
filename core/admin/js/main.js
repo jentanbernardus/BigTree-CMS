@@ -22,7 +22,7 @@ $(document).ready(function() {
 		if (q == "") {
 			$("#link_finder_results").hide().html("");
 		} else {
-			$("#link_finder_results").load("admin_root/ajax/resources/links/", { query: q }, function() {
+			$("#link_finder_results").load("admin_root/ajax/link-finder/", { query: q }, function() {
 				$("#link_finder_results").show().children("a").click(function() { return false; });
 			});
 		}

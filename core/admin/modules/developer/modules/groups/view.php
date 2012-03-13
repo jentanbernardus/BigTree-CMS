@@ -2,7 +2,7 @@
 	$groups = $admin->getModuleGroups();
 ?>
 <h1><span class="icon_developer_modules"></span>Groups</h1>
-<? include bigtree_path("admin/modules/developer/modules/_nav.php"); ?>
+<? include BigTree::path("admin/modules/developer/modules/_nav.php"); ?>
 <div class="table">
 	<summary>
 		<h2>Module Groups</h2>

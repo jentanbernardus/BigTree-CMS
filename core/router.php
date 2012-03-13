@@ -178,8 +178,8 @@
 		if (!count($_POST) && count($_GET)) {
 			$_POST = $_GET;
 		}
-		include bigtree_path("inc/bigtree/admin.php");
-		include bigtree_path("inc/bigtree/auto-modules.php");
+		include BigTree::path("inc/bigtree/admin.php");
+		include BigTree::path("inc/bigtree/auto-modules.php");
 		$admin = new BigTreeAdmin;
 		$autoModule = new BigTreeAutoModule;
 		$api_type = $path[1];
@@ -202,7 +202,7 @@
 				}
 			}
 		}
-		include bigtree_path("api/".$apipath.$path[$x].".php");
+		include BigTree::path("api/".$apipath.$path[$x].".php");
 		die();	
 	}
 
@@ -247,7 +247,7 @@
 		if ($feed) {
 			header("Content-type: text/xml");
 			echo '<?xml version="1.0"?>';
-			include bigtree_path("feeds/".$feed["type"].".php");
+			include BigTree::path("feeds/".$feed["type"].".php");
 			die();
 		}
 	}
@@ -407,36 +407,7 @@
 			header("Location: ".$www_root.str_replace($old,$new,$_GET["bigtree_htaccess_url"]));
 			die();
 		} else {
-			header("HTTP/1.0 404 Not Found");
-			$f = sqlfetch(sqlquery("SELECT * FROM bigtree_404s WHERE broken_url = '".mysql_real_escape_string(rtrim($_GET["bigtree_htaccess_url"],"/"))."'"));
-			if ($f["redirect_url"]) {
-				if ($f["redirect_url"] == "/") {
-					$f["redirect_url"] = "";
-				}
-				
-				if (substr($f["redirect_url"],0,7) == "http://" || substr($f["redirect_url"],0,8) == "https://") {
-					$redirect = $f["redirect_url"];
-				} else {
-					$redirect = $www_root.str_replace($www_root,"",$f["redirect_url"]);
-				}
-				
-				sqlquery("UPDATE bigtree_404s SET requests = (requests + 1) WHERE = '".$f["id"]."'");
-				header("HTTP/1.1 301 Moved Permanently");
-				header("Location: $redirect");
-				die();
-			} else {
-				$referer = $_SERVER["HTTP_REFERER"];
-				$requester = $_SERVER["REMOTE_ADDR"];
-
-				if ($f) {
-					sqlquery("UPDATE bigtree_404s SET requests = (requests + 1) WHERE id = '".$f["id"]."'");
-				} else {
-					sqlquery("INSERT INTO bigtree_404s (`broken_url`,`requests`) VALUES ('".mysql_real_escape_string(rtrim($_GET["bigtree_htaccess_url"],"/"))."','1')");
-				}
-				include "../templates/pages/_404.php";
-			}
-			
-			$nocache = true;
+			$cms->handle404($_GET["bigtree_htaccess_url"]);		
 		}
 	}
 	
@@ -460,10 +431,9 @@
 		$content = str_replace(array('src="http://','link href="http://'),array('src="https://','link href="https://'),$content);
 	}
 	
-	
 	// Load the BigTree toolbar if you're logged in to the admin.
 	if ($page["id"] && !$cms->Secure && isset($_COOKIE["bigtree"]["email"]) && !$_SESSION["bigtree"]["id"]) {
-		include bigtree_path("inc/bigtree/admin.php");
+		include BigTree::path("inc/bigtree/admin.php");
 
 		if (BIGTREE_CUSTOM_ADMIN_CLASS) {
 			eval('$admin = new '.BIGTREE_CUSTOM_ADMIN_CLASS.';');
@@ -489,7 +459,7 @@
 	echo $content;
 	
 	// Write to the cache
-	if ($config["cache"] && !$nocache) {
+	if ($config["cache"] && !defined("BIGTREE_DO_NOT_CACHE")) {
 		$cache = ob_get_flush();
 		$curl = $_GET["bigtree_htaccess_url"];
 		if (!$curl) {

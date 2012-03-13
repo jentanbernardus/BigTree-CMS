@@ -10,7 +10,7 @@
 	// Check for a page lock
 	$f = sqlfetch(sqlquery("SELECT * FROM bigtree_locks WHERE `table` = 'bigtree_pages' AND item_id = '$page'"));
 	if ($f && $f["user"] != $_SESSION["bigtree"]["id"] && strtotime($f["last_accessed"]) > (time()-300)) {
-		include bigtree_path("admin/modules/pages/front-end-locked.php");
+		include BigTree::path("admin/modules/pages/front-end-locked.php");
 	} else {
 		if ($f) {
 			sqlquery("UPDATE bigtree_locks SET last_accessed = NOW(), user = '".$_SESSION["bigtree"]["id"]."' WHERE id = '".$f["id"]."'");
@@ -100,7 +100,7 @@
 								echo $options["wrapper"];
 							}
 							
-							include bigtree_path("admin/form-field-types/draw/$type.php");
+							include BigTree::path("admin/form-field-types/draw/$type.php");
 							
 							if ($options["wrapper"]) {
 								$parts = explode(" ",$options["wrapper"]);
@@ -114,15 +114,15 @@
 						$mce_height = 365;
 						
 						if (count($htmls) || count($small_htmls) || count ($simplehtmls)) {
-							include bigtree_path("admin/layouts/_tinymce.php");
+							include BigTree::path("admin/layouts/_tinymce.php");
 							if (count($htmls)) {
-								include bigtree_path("admin/layouts/_tinymce_specific.php");
+								include BigTree::path("admin/layouts/_tinymce_specific.php");
 							}
 							if (count($small_htmls)) {
-								include bigtree_path("admin/layouts/_tinymce_block_small.php");
+								include BigTree::path("admin/layouts/_tinymce_block_small.php");
 							}
 							if (count($simplehtmls)) {
-								include bigtree_path("admin/layouts/_tinymce_specific_simple.php");
+								include BigTree::path("admin/layouts/_tinymce_specific_simple.php");
 							}
 						}
 					?>

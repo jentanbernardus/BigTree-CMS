@@ -52,7 +52,7 @@
 					$image = $www_root.str_replace("site/","",$postdirectory).$file;
 					$class = "image";
 				} else {
-					if (file_exists(bigtree_path("admin/images/file-types/$ext.png"))) {
+					if (file_exists(BigTree::path("admin/images/file-types/$ext.png"))) {
 						$image = $admin_root."images/file-types/$ext.png";
 					} else {
 						$image = $admin_root."images/file-types/other.png";

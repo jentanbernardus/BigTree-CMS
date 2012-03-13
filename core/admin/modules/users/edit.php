@@ -84,7 +84,7 @@
 	$modules = $admin->getModules("name ASC");
 ?>
 <h1><span class="users"></span>Edit User</h1>
-<? include bigtree_path("admin/modules/users/_nav.php"); ?>
+<? include BigTree::path("admin/modules/users/_nav.php"); ?>
 <div class="form_container">
 	<form class="module" action="<?=$admin_root?>users/update/<?=$path[3]?>/" method="post">
 		<section>

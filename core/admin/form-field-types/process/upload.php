@@ -29,7 +29,7 @@
 	// We're processing an image.
 	} else {
 		if ($temp_name) {
-			include bigtree_path("admin/form-field-types/process/_photo-process.php");
+			include BigTree::path("admin/form-field-types/process/_photo-process.php");
 		} else {
 			$value = $data["currently_$key"];
 			

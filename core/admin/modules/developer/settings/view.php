@@ -2,7 +2,7 @@
 	$settings = $admin->getSettings();
 ?>
 <h1><span class="icon_developer_settings"></span>Settings</h1>
-<? include bigtree_path("admin/modules/developer/settings/_nav.php") ?>
+<? include BigTree::path("admin/modules/developer/settings/_nav.php") ?>
 
 <div class="table">
 	<summary><h2>Settings</h2></summary>

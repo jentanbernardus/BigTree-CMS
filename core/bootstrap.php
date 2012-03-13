@@ -23,14 +23,14 @@
 	define("SITE_ROOT",$GLOBALS["site_root"]);
 	
 	// Include required utility functions
-	if (file_exists($server_root."custom/inc/utils/bigtree.inc.php")) {
-		include $server_root."custom/inc/utils/bigtree.inc.php";
+	if (file_exists($server_root."custom/inc/bigtree/utils.php")) {
+		include $server_root."custom/inc/bigtree/utils.php";
 	} else {
-		include $server_root."core/inc/utils/bigtree.inc.php";
+		include $server_root."core/inc/bigtree/utils.php";
 	}
 	
 	// Connect to MySQL and include the shorterner functions
-	include bigtree_path("inc/utils/mysql.inc.php");
+	include BigTree::path("inc/utils/mysql.inc.php");
 	
 	// Setup our connections as disconnected by default.
 	$GLOBALS["mysql_read_connection"] = "disconnected";
@@ -45,7 +45,7 @@
 	}
 	
 	// Load Up BigTree!
-	include bigtree_path("inc/bigtree/core.php");
+	include BigTree::path("inc/bigtree/core.php");
 	if (BIGTREE_CUSTOM_BASE_CLASS) {
 		include BIGTREE_CUSTOM_BASE_CLASS_PATH;
 		eval('$cms = new '.BIGTREE_CUSTOM_BASE_CLASS.';');
@@ -77,7 +77,7 @@
 	
 	function __autoload($class) {
 		if (isset($GLOBALS["other_classes"][$class])) {
-			include_once bigtree_path($GLOBALS["other_classes"][$class]); 
+			include_once BigTree::path($GLOBALS["other_classes"][$class]); 
 		} elseif (file_exists($GLOBALS["server_root"]."custom/inc/modules/".$GLOBALS["module_list"][$class].".php")) {
 			include_once $GLOBALS["server_root"]."custom/inc/modules/".$GLOBALS["module_list"][$class].".php";
 		} elseif (file_exists($GLOBALS["server_root"]."core/inc/modules/".$GLOBALS["module_list"][$class].".php")) {

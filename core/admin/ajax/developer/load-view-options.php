@@ -5,7 +5,7 @@
 ?>
 <div style="width: 450px;">
 	<?
-		$path = bigtree_path("admin/ajax/developer/view-options/".$t.".php");
+		$path = BigTree::path("admin/ajax/developer/view-options/".$t.".php");
 		if (file_exists($path)) {
 			include $path;
 		}

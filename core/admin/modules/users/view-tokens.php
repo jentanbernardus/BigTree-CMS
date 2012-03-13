@@ -2,7 +2,7 @@
 	$breadcrumb[] = array("link" => "users/tokens/","title" => "API Tokens");
 ?>
 <h1><span class="users"></span>API Tokens</h1>
-<? include bigtree_path("admin/modules/users/_nav.php") ?>
+<? include BigTree::path("admin/modules/users/_nav.php") ?>
 
 <div class="table">
 	<summary>
@@ -17,7 +17,7 @@
 		<span class="view_action">Delete</span>
 	</header>
 	<ul id="results">
-		<? include bigtree_path("admin/ajax/users/get-tokens-page.php") ?>	
+		<? include BigTree::path("admin/ajax/users/get-tokens-page.php") ?>	
 	</ul>
 </div>
 

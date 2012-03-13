@@ -33,8 +33,8 @@
 <?	
 	}
 
-	if (file_exists(bigtree_path("admin/ajax/developer/field-options/".$t.".php"))) {
-		include bigtree_path("admin/ajax/developer/field-options/".$t.".php");
+	if (file_exists(BigTree::path("admin/ajax/developer/field-options/".$t.".php"))) {
+		include BigTree::path("admin/ajax/developer/field-options/".$t.".php");
 	}
 	
 	if ($t != "geocoding" && $t != "route") {

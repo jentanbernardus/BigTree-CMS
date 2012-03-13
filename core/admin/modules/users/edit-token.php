@@ -4,10 +4,10 @@
 	
 	$admin->requireLevel(1);
 	
-	$token = sqlfetch(sqlquery("SELECT * FROM bigtree_api_tokens WHERE id = '".mysql_real_escape_string(end($path))."'"));
+	$token = $admin->getToken(end($path));
 ?>
 <h1><span class="users"></span>Edit Token</h1>
-<? include bigtree_path("admin/modules/users/_nav.php"); ?>
+<? include BigTree::path("admin/modules/users/_nav.php"); ?>
 <div class="form_container">
 	<form class="module" action="<?=$admin_root?>users/update-token/<?=end($path)?>/" method="post">
 		<section>

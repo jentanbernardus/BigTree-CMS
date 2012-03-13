@@ -12,7 +12,7 @@
 	$breadcrumb[] = array("title" => "Edit Form", "link" => "#");
 ?>
 <h1><span class="icon_developer_modules"></span>Edit Form</h1>
-<? include bigtree_path("admin/modules/developer/modules/_nav.php"); ?>
+<? include BigTree::path("admin/modules/developer/modules/_nav.php"); ?>
 
 <div class="form_container">
 	<form method="post" action="<?=$developer_root?>modules/forms/update/<?=$form["id"]?>/" class="module">
@@ -56,7 +56,7 @@
 			</div>
 		</section>
 		<section class="sub" id="field_area">
-			<? include bigtree_path("admin/ajax/developer/load-form.php") ?>
+			<? include BigTree::path("admin/ajax/developer/load-form.php") ?>
 		</section>
 		<footer>
 			<input type="submit" class="button blue" value="Update" />

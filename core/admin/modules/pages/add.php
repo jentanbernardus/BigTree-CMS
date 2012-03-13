@@ -14,7 +14,7 @@
 ?>
 <h1><span class="add_page"></span>Add Page</h1>
 <?
-	include bigtree_path("admin/modules/pages/_nav.php");
+	include BigTree::path("admin/modules/pages/_nav.php");
 	$action = "create";
-	include bigtree_path("admin/modules/pages/_form.php");
+	include BigTree::path("admin/modules/pages/_form.php");
 ?>

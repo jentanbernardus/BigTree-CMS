@@ -1,5 +1,5 @@
 <?
-	include bigtree_path($relative_path."_check.php");
+	include BigTree::path($relative_path."_check.php");
 	
 	$breadcrumb[] = array("link" => "dashboard/analytics/", "title" => "Traffic Report");
 	
@@ -127,9 +127,9 @@
 ?>
 <h1>
 	<span class="analytics"></span>Traffic Report
-	<? include bigtree_path("admin/modules/dashboard/vitals-statistics/_jump.php"); ?>
+	<? include BigTree::path("admin/modules/dashboard/vitals-statistics/_jump.php"); ?>
 </h1>
-<? include bigtree_path($relative_path."_nav.php"); ?>
+<? include BigTree::path($relative_path."_nav.php"); ?>
 <div class="table">
 	<summary>
 		<h2>Two Week Heads-Up <small>(visits)</small></h2>

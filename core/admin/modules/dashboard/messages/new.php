@@ -81,8 +81,8 @@
 </div>
 <?
 	$htmls = array("message");
-	include bigtree_path("admin/layouts/_tinymce.php");
-	include bigtree_path("admin/layouts/_tinymce_specific.php");
+	include BigTree::path("admin/layouts/_tinymce.php");
+	include BigTree::path("admin/layouts/_tinymce_specific.php");
 ?>
 <script type="text/javascript">
 	new BigTreeManyToMany("send_to",<?=$x?>,"send_to",false);

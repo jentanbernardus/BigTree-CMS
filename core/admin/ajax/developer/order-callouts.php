@@ -4,6 +4,6 @@
 	
 	foreach ($row as $pos => $id) {
 		$id = $_POST["rel"][$id];
-		sqlquery("UPDATE bigtree_callouts SET position = '".($max-$pos)."' WHERE id = '$id'");
+		$admin->setCalloutPosition($id,$max - $pos);
 	}
 ?>

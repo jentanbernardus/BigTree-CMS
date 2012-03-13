@@ -2,7 +2,7 @@
 	$feeds = $admin->getFeeds();
 ?>
 <h1><span class="icon_developer_feeds"></span>Feeds</h1>
-<? include bigtree_path("admin/modules/developer/feeds/_nav.php") ?>
+<? include BigTree::path("admin/modules/developer/feeds/_nav.php") ?>
 
 <div class="table">
 	<summary><h2>Feeds</h2></summary>

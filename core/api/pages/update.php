@@ -59,7 +59,7 @@
 			$key = $options["id"];
 			$type = $options["type"];
 			$options["directory"] = "files/pages/";
-			$tpath = bigtree_path("admin/form-field-types/process/$type.php");
+			$tpath = BigTree::path("admin/form-field-types/process/$type.php");
 			
 			$no_process = false;
 			// If we have a customized handler for this data type, run it, otherwise, it's simply the post value.
@@ -96,7 +96,7 @@
 				$type = $options["type"];
 				$options["directory"] = "files/pages/";
 				
-				$tpath = bigtree_path("admin/form-field-types/process/$type.php");
+				$tpath = BigTree::path("admin/form-field-types/process/$type.php");
 			
 				$no_process = false;
 				// If we have a customized handler for this data type, run it, otherwise, it's simply the post value.

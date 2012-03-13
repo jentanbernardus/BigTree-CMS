@@ -27,11 +27,11 @@
 		?>
 	</header>
 	<ul id="sort_table">
-		<? include bigtree_path("admin/ajax/auto-modules/views/draggable.php") ?>
+		<? include BigTree::path("admin/ajax/auto-modules/views/draggable.php") ?>
 	</ul>
 </div>
 
-<? include bigtree_path("admin/auto-modules/views/_common-js.php") ?>
+<? include BigTree::path("admin/auto-modules/views/_common-js.php") ?>
 <script type="text/javascript">
 	function reSearch() {
 		$("#sort_table").load("<?=$admin_root?>ajax/auto-modules/views/draggable/", { view: <?=$view["id"]?>, search: $("#search").val() }, _local_createSortable);

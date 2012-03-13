@@ -1,5 +1,5 @@
 <h1><span class="users"></span>Users</h1>
-<? include bigtree_path("admin/modules/users/_nav.php"); ?>
+<? include BigTree::path("admin/modules/users/_nav.php"); ?>
 
 <div class="table">
 	<summary>
@@ -14,7 +14,7 @@
 		<span class="view_action">Delete</span>
 	</header>
 	<ul id="results">
-		<? include bigtree_path("admin/ajax/users/get-page.php") ?>	
+		<? include BigTree::path("admin/ajax/users/get-page.php") ?>	
 	</ul>
 </div>
 

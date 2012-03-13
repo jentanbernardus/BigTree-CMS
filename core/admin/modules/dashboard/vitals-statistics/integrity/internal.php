@@ -9,7 +9,7 @@
 ?>
 <h1>
 	<span class="integrity"></span>Site Integrity Check
-	<? include bigtree_path("admin/modules/dashboard/vitals-statistics/_jump.php"); ?>
+	<? include BigTree::path("admin/modules/dashboard/vitals-statistics/_jump.php"); ?>
 </h1>
 <div class="table">
 	<summary>

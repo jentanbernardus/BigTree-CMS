@@ -96,9 +96,9 @@
 						$items = $data["results"];
 						$module = $data["module"];
 						if ($view["type"] == "images" || $view["type"] == "images-group") {
-							include bigtree_path("admin/pages/search-views/images.php");
+							include BigTree::path("admin/pages/search-views/images.php");
 						} else {
-							include bigtree_path("admin/pages/search-views/table.php");
+							include BigTree::path("admin/pages/search-views/table.php");
 						}
 					}
 				} else {

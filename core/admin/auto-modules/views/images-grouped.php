@@ -167,7 +167,7 @@
 	?>
 </div>
 
-<? include bigtree_path("admin/auto-modules/views/_common-js.php") ?>
+<? include BigTree::path("admin/auto-modules/views/_common-js.php") ?>
 <script type="text/javascript">
 	<? if ($perm == "p" && $o["draggable"]) { ?>
 	$(".image_list").each(function() {

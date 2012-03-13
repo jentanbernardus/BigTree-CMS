@@ -4,8 +4,8 @@
 			The primary interface to BigTree that is used by the front end of the site for pulling settings, navigation, and page content.
 	*/
 
-	include bigtree_path("inc/bigtree/modules.php");
-	include bigtree_path("inc/bigtree/forms.php");
+	include BigTree::path("inc/bigtree/modules.php");
+	include BigTree::path("inc/bigtree/forms.php");
 
 	class BigTreeCMS {
 
@@ -700,6 +700,50 @@
 			$parts = explode("/",$page["path"]);
 			$f = sqlfetch(sqlquery("SELECT id FROM bigtree_pages WHERE path = '".mysql_real_escape_string($parts[0])."'"));
 			return $f["id"];
+		}
+		
+		/*
+			Function: handle404
+				Handles a 404.
+			
+			Parameters:
+				url - The URL you hit that's a 404.
+		*/
+		
+		function handle404($url) {
+			global $www_root;
+			
+			header("HTTP/1.0 404 Not Found");
+			$url = mysql_real_escape_string(rtrim($url,"/"));
+			$f = sqlfetch(sqlquery("SELECT * FROM bigtree_404s WHERE broken_url = '$url'"));
+
+			if ($f["redirect_url"]) {
+				if ($f["redirect_url"] == "/") {
+					$f["redirect_url"] = "";
+				}
+				
+				if (substr($f["redirect_url"],0,7) == "http://" || substr($f["redirect_url"],0,8) == "https://") {
+					$redirect = $f["redirect_url"];
+				} else {
+					$redirect = $www_root.str_replace($www_root,"",$f["redirect_url"]);
+				}
+				
+				sqlquery("UPDATE bigtree_404s SET requests = (requests + 1) WHERE = '".$f["id"]."'");
+				header("HTTP/1.1 301 Moved Permanently");
+				header("Location: $redirect");
+				die();
+			} else {
+				$referer = $_SERVER["HTTP_REFERER"];
+				$requester = $_SERVER["REMOTE_ADDR"];
+
+				if ($f) {
+					sqlquery("UPDATE bigtree_404s SET requests = (requests + 1) WHERE id = '".$f["id"]."'");
+				} else {
+					sqlquery("INSERT INTO bigtree_404s (`broken_url`,`requests`) VALUES ('".mysql_real_escape_string(rtrim($_GET["bigtree_htaccess_url"],"/"))."','1')");
+				}
+				include "../templates/pages/_404.php";
+				define("BIGTREE_DO_NOT_CACHE",true);
+			}
 		}
 		
 		/*

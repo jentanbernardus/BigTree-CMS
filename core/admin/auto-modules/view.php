@@ -1,5 +1,5 @@
 <?
-	include bigtree_path("admin/auto-modules/_setup.php");
+	include BigTree::path("admin/auto-modules/_setup.php");
 	$view = BigTreeAutoModule::getView($action["view"]);
 	
 	// Setup the preview action if we have a preview URL and field.
@@ -22,7 +22,7 @@
 	<? } ?>
 </h1>
 <?
-	include bigtree_path("admin/auto-modules/_nav.php");
+	include BigTree::path("admin/auto-modules/_nav.php");
 
 	if ($view["description"]) {
 		echo "<p>".$view["description"]."</p>";
@@ -38,7 +38,7 @@
 		"featured" => "Featured"
 	);
 	
-	include bigtree_path("admin/auto-modules/views/".$view["type"].".php");
+	include BigTree::path("admin/auto-modules/views/".$view["type"].".php");
 
 	$action = $maction;
 ?>

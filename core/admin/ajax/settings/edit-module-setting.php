@@ -15,5 +15,5 @@
 	<? if ($setting["description"]) { ?>
 	<p><?=$setting["description"]?></p>
 	<? } ?>
-	<? include bigtree_path("admin/form-field-types/draw/".$setting["type"].".php"); ?>
+	<? include BigTree::path("admin/form-field-types/draw/".$setting["type"].".php"); ?>
 </div>

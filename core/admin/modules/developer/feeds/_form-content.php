@@ -31,7 +31,7 @@
 <section class="sub" id="field_area"<? if ($type == "rss" || $type == "rss2") { ?> style="display: none;"<? } ?>>
 	<?
 		if ($item) {
-			include bigtree_path("admin/ajax/developer/load-feed-fields.php");
+			include BigTree::path("admin/ajax/developer/load-feed-fields.php");
 		} else {
 			echo "<p>Choose a Data Table to populate fields.</p>";
 		}

@@ -9,7 +9,7 @@
 	}
 	
 	if (strpos($_SERVER["HTTP_USER_AGENT"],"MSIE") !== false && !$_SESSION["ignore_browser_warning"]) {
-		include bigtree_path("admin/pages/browser-warning.php");
+		include BigTree::path("admin/pages/browser-warning.php");
 		$admin->stop();
 	}
 ?>

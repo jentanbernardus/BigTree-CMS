@@ -16,7 +16,7 @@
 ?>
 <h1><span class="refresh"></span><?=$pdata["nav_title"]?></h1>	
 <?
-	include bigtree_path("admin/modules/pages/_nav.php");
+	include BigTree::path("admin/modules/pages/_nav.php");
 	// Force your way through the page lock
 	if (isset($_GET["force"])) {
 		$f = sqlfetch(sqlquery("SELECT * FROM bigtree_locks WHERE `table` = 'bigtree_pages' AND item_id = '$page'"));
@@ -26,7 +26,7 @@
 	// Check for a page lock
 	$f = sqlfetch(sqlquery("SELECT * FROM bigtree_locks WHERE `table` = 'bigtree_pages' AND item_id = '$page'"));
 	if ($f && $f["user"] != $_SESSION["bigtree"]["id"] && strtotime($f["last_accessed"]) > (time()-300)) {
-		include bigtree_path("admin/modules/pages/_locked.php");
+		include BigTree::path("admin/modules/pages/_locked.php");
 		$admin->stop();
 	}
 	

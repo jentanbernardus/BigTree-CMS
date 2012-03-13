@@ -2,7 +2,7 @@
 <div id="callouts_disabled"></div>
 
 <div id="template_type">
-	<? include bigtree_path("admin/ajax/pages/get-template-form.php") ?>
+	<? include BigTree::path("admin/ajax/pages/get-template-form.php") ?>
 </div>
 
 <div class="tags" id="bigtree_tag_browser">

@@ -6,7 +6,7 @@
 	$rel_table = array();
 ?>
 <h1><span class="icon_developer_templates"></span>Templates</h1>
-<? include bigtree_path("admin/modules/developer/templates/_nav.php") ?>
+<? include BigTree::path("admin/modules/developer/templates/_nav.php") ?>
 <div class="table">
 	<summary><h2>Basic Templates</h2></summary>
 	<header>

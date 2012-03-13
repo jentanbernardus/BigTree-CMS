@@ -1,14 +1,4 @@
 <?
-	// Get the proper path for a file based on whether a custom override exists.
-	function bigtree_path($file) {
-		global $server_root;
-		if (file_exists($server_root."custom/".$file)) {
-			return $server_root."custom/".$file;
-		} else {
-			return $server_root."core/".$file;
-		}
-	}
-
 	/*
 		Class: BigTree
 			A utilities class with many useful functions.
@@ -319,7 +309,7 @@
 				jpeg_quality - The quality to save (for GD) the new image at. Defaults to 90.
 		*/
 		
-		function createThumbnail($file,$newfile,$maxwidth,$maxheight,$jpeg_quality = 90) {
+		static function createThumbnail($file,$newfile,$maxwidth,$maxheight,$jpeg_quality = 90) {
 			list($w, $h, $type) = getimagesize($file);
 			if ($w > $maxwidth && $maxwidth) {
 				$perc = $maxwidth / $w;
@@ -414,7 +404,7 @@
 			Returns:
 				A string with the number of bytes in kilobytes, megabytes, or gigabytes.
 		*/
-		function formatBytes($size) {
+		static function formatBytes($size) {
 			$units = array(' B', ' KB', ' MB', ' GB', ' TB');
 			for ($i = 0; $size >= 1024 && $i < 4; $i++) {
 				$size /= 1024;
@@ -563,16 +553,16 @@
 			echo '<option></option>';
 			foreach ($cols as $col) {
 				if ($sorting) {
-					if ($default == $col["name"]." asc") {
-						echo '<option selected="selected">'.$col["name"].' asc</option>';
+					if ($default == $col["name"]." ASC") {
+						echo '<option selected="selected">'.$col["name"].' ASC</option>';
 					} else {
-						echo '<option>'.$col["name"].' asc</option>';
+						echo '<option>'.$col["name"].' ASC</option>';
 					}
 					
-					if ($default == $col["name"]." desc") {
-						echo '<option selected="selected">'.$col["name"].' desc</option>';
+					if ($default == $col["name"]." DESC") {
+						echo '<option selected="selected">'.$col["name"].' DESC</option>';
 					} else {
-						echo '<option>'.$col["name"].' desc</option>';
+						echo '<option>'.$col["name"].' DESC</option>';
 					}
 				} else {
 					if ($default == $col["name"]) {
@@ -737,6 +727,26 @@
 			}
 			unlink($from);
 			return true;
+		}
+		
+		/*
+			Function: path
+				Get the proper path for a file based on whether a custom override exists.
+			
+			Parameters:
+				file - File path relative to either core/ or custom/
+			
+			Returns:
+				Hard file path to a custom/ (preferred) or core/ file depending on what exists.
+		*/
+		
+		static function path($file) {
+			global $server_root;
+			if (file_exists($server_root."custom/".$file)) {
+				return $server_root."custom/".$file;
+			} else {
+				return $server_root."core/".$file;
+			}
 		}
 		
 		/*
@@ -1004,7 +1014,7 @@
 				The number of bytes.
 		*/
 		
-		function unformatBytes($size) {
+		static function unformatBytes($size) {
 			$type = substr($size,-1,1);
 			$num = substr($size,0,-1);
 			if ($type == "M") {
@@ -1059,7 +1069,7 @@
 			
 			$post_max_size = ini_get("post_max_size");
 			if (!is_integer($post_max_size)) {
-				self::unformatBytes($post_max_size);
+				$post_max_size = self::unformatBytes($post_max_size);
 			}
 			
 			if ($post_max_size < $upload_max_filesize) {

@@ -28,7 +28,7 @@
 ?>
 
 <h1><span class="icon_developer_modules"></span><?=$mod["name"]?></h1>
-<? include bigtree_path("admin/modules/developer/modules/_nav.php"); ?>
+<? include BigTree::path("admin/modules/developer/modules/_nav.php"); ?>
 <div class="form_container">
 	<form method="post" action="<?=$developer_root?>modules/update/<?=end($path)?>/" enctype="multipart/form-data" class="module left">
 		<section>
@@ -183,7 +183,7 @@
 	</ul>
 </div>
 
-<? include bigtree_path("admin/modules/developer/modules/_module-add-edit-js.php") ?>
+<? include BigTree::path("admin/modules/developer/modules/_module-add-edit-js.php") ?>
 
 <script type="text/javascript">
 	$("#actions").sortable({ axis: "y", containment: "parent", handle: ".icon_sort", items: "li", placeholder: "ui-sortable-placeholder", tolerance: "pointer", update: function() {

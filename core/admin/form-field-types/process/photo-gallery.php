@@ -27,7 +27,7 @@
 				} elseif ($error == 3) {
 					$fails[] = array("field" => $options["title"], "error" => "The file upload failed ($name).");
 				} else {
-					include bigtree_path("admin/form-field-types/process/_photo-process.php");
+					include BigTree::path("admin/form-field-types/process/_photo-process.php");
 				
 					if (!$failed) {
 						$photo_gallery[] = array("caption" => htmlspecialchars($d["caption"]),"image" => $value);

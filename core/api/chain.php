@@ -5,7 +5,7 @@
 	foreach ($calls as $call) {
 		$name = rtrim($call["name"],"/").".php";
 		$_POST = $call["variables"];
-		include bigtree_path("api/".$name);
+		include BigTree::path("api/".$name);
 		ob_clean();
 		$response["calls"][] = array("call" => $call["name"],"response" => $last_api_data);
 	}

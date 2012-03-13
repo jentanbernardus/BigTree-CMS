@@ -32,7 +32,7 @@
 	$mod = $admin->getModule(end($path));
 ?>
 <h1><span class="icon_developer_modules"></span>Created Form</h1>
-<? include bigtree_path("admin/modules/developer/modules/_nav.php"); ?>
+<? include BigTree::path("admin/modules/developer/modules/_nav.php"); ?>
 <div class="form_container">
 	<section>
 		<h3 class="action_title">Add/Edit <?=$title?></h3>

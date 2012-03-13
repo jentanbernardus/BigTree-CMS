@@ -11,7 +11,7 @@
 	unset($_SESSION["bigtree"]["admin_error"]);
 ?>
 <h1><span class="icon_developer_field_types"></span>Add Field Type</h1>
-<? include bigtree_path("admin/modules/developer/field-types/_nav.php") ?>
+<? include BigTree::path("admin/modules/developer/field-types/_nav.php") ?>
 
 <div class="form_container">
 	<form method="post" action="<?=$developer_root?>field-types/create/" enctype="multipart/form-data" class="module">

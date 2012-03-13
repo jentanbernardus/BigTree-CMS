@@ -35,10 +35,10 @@
 	}
 	
 	if ($path[1] == "css") {
-		if (file_exists("../custom/inc/utils/bigtree.inc.php")) {
-			include "../custom/inc/utils/bigtree.inc.php";		
+		if (file_exists("../custom/inc/bigtree/utils.php")) {
+			include "../custom/inc/bigtree/utils.php";		
 		} else {
-			include "../core/inc/utils/bigtree.inc.php";
+			include "../core/inc/bigtree/utils.php";
 		}
 		$x = 2;
 		$ipath = "";
@@ -112,8 +112,8 @@
 	bigtree_setup_sql_connection();
 	ob_start();
 	session_start();
-	include bigtree_path("inc/bigtree/admin.php");
-	include bigtree_path("inc/bigtree/auto-modules.php");
+	include BigTree::path("inc/bigtree/admin.php");
+	include BigTree::path("inc/bigtree/auto-modules.php");
 	
 	if (BIGTREE_CUSTOM_ADMIN_CLASS) {
 		eval('$admin = new '.BIGTREE_CUSTOM_ADMIN_CLASS.';');
@@ -148,7 +148,7 @@
 			// Permissions!
 			$module = $admin->getModuleByRoute($path[2]);
 			if ($module && !$admin->checkAccess($module["id"])) {
-				include bigtree_path("admin/ajax/login.php");
+				include BigTree::path("admin/ajax/login.php");
 				die();
 			}
 
@@ -156,7 +156,7 @@
 			
 			$path[$x] = str_replace(".php","",$path[$x]);
 
-			include bigtree_path("admin/ajax/".$ajpath.$path[$x].".php");
+			include BigTree::path("admin/ajax/".$ajpath.$path[$x].".php");
 			die();
 		// We've actually chosen a section now.
 		} else {
@@ -236,9 +236,9 @@
 				$module_title = $module["name"];
 				if ($module && !$admin->checkAccess($module["id"])) {
 					ob_clean();
-					include bigtree_path("admin/pages/_denied.php");
+					include BigTree::path("admin/pages/_denied.php");
 					$content = ob_get_clean();
-					include bigtree_path("admin/layouts/".$layout.".php");
+					include BigTree::path("admin/layouts/".$layout.".php");
 					die();
 				}
 			}
@@ -257,35 +257,35 @@
 			if ($module && ($action["view"] || $action["form"])) {
 				if ($action["form"]) {
 					$edit_id = isset($path[3]) ? $path[3] : "";
-					include bigtree_path("admin/auto-modules/form.php");
+					include BigTree::path("admin/auto-modules/form.php");
 				} else {
-					include bigtree_path("admin/auto-modules/view.php");
+					include BigTree::path("admin/auto-modules/view.php");
 				}
 			} elseif (file_exists($inc)) {
-				if (!$ispage && file_exists(bigtree_path("admin/modules/".$path[1]."/_header.php"))) {
-					include bigtree_path("admin/modules/".$path[1]."/_header.php");
+				if (!$ispage && file_exists(BigTree::path("admin/modules/".$path[1]."/_header.php"))) {
+					include BigTree::path("admin/modules/".$path[1]."/_header.php");
 				}
-				if (!$ispage && file_exists($inc_dir."_header.php") && bigtree_path("admin/modules/".$path[1]."/_header.php") != ($inc_dir."_header.php")) {
+				if (!$ispage && file_exists($inc_dir."_header.php") && BigTree::path("admin/modules/".$path[1]."/_header.php") != ($inc_dir."_header.php")) {
 					include $inc_dir."_header.php";
 				}
 				
 				include $inc;
 				
-				if (!$ispage && file_exists(bigtree_path("admin/modules/".$path[1]."/_footer.php"))) {
-					include bigtree_path("admin/modules/".$path[1]."/_footer.php");
+				if (!$ispage && file_exists(BigTree::path("admin/modules/".$path[1]."/_footer.php"))) {
+					include BigTree::path("admin/modules/".$path[1]."/_footer.php");
 				}
 				if (!$ispage && file_exists($inc_dir."_footer.php")) {
 					include $inc_dir."_footer.php";
 				}
 			} else {
-				include bigtree_path("admin/pages/_404.php");
+				include BigTree::path("admin/pages/_404.php");
 			}
 		}
 	}
 	
 	$content = ob_get_clean();
 	
-	include bigtree_path("admin/layouts/".$layout.".php");
+	include BigTree::path("admin/layouts/".$layout.".php");
 	
 	// Execute cron tab functions if they haven't been run in 24 hours
 	if (!$admin->settingExists("bigtree-internal-cron-last-run")) {

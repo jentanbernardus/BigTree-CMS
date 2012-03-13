@@ -1,10 +1,6 @@
 <?
 	$count = $_POST["count"];
-	$items = array();
-	$q = sqlquery("SELECT * FROM bigtree_callouts ORDER BY position DESC, id ASC");
-	while ($f = sqlfetch($q)) {
-		$items[] = $f;
-	}
+	$items = $admin->getCallouts();
 	
 	$type = $items[0]["id"];
 	
@@ -21,7 +17,7 @@
 	</fieldset>
 </div>
 <div id="callout_resources">
-	<? include bigtree_path("admin/ajax/pages/callout-resources.php") ?>
+	<? include BigTree::path("admin/ajax/pages/callout-resources.php") ?>
 </div>
 
 <script type="text/javascript">

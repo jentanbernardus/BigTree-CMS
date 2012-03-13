@@ -114,4 +114,4 @@
 		$("#image_uploader_options").toggle();
 	});
 </script>
-<? include bigtree_path("admin/ajax/developer/field-options/_photo-common-js.php") ?>
+<? include BigTree::path("admin/ajax/developer/field-options/_photo-common-js.php") ?>

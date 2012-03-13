@@ -4,10 +4,10 @@
 	include $root_path."core/bootstrap.php";
 	
 	if (BIGTREE_CUSTOM_ADMIN_CLASS) {
-		include bigtree_path(BIGTREE_CUSTOM_ADMIN_CLASS_PATH);
+		include BigTree::path(BIGTREE_CUSTOM_ADMIN_CLASS_PATH);
 		eval('$admin = new '.BIGTREE_CUSTOM_ADMIN_CLASS.';');
 	} else {
-		include bigtree_path("inc/bigtree/admin.php");
+		include BigTree::path("inc/bigtree/admin.php");
 		$admin = new BigTreeAdmin;
 	}
 	

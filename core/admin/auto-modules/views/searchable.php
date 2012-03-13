@@ -42,11 +42,11 @@
 		?>
 	</header>
 	<ul id="results">
-		<? include bigtree_path("admin/ajax/auto-modules/views/searchable-page.php") ?>
+		<? include BigTree::path("admin/ajax/auto-modules/views/searchable-page.php") ?>
 	</ul>
 </div>
 
-<? include bigtree_path("admin/auto-modules/views/_common-js.php") ?>
+<? include BigTree::path("admin/auto-modules/views/_common-js.php") ?>
 <script type="text/javascript">
 	var mpage = 0;
 	var sort = "<?=$view["options"]["sort_column"]?>";

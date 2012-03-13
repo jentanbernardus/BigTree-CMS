@@ -20,7 +20,7 @@
 ?>
 
 <h1><span class="icon_developer_modules"></span>Add Form</h1>
-<? include bigtree_path("admin/modules/developer/modules/_nav.php"); ?>
+<? include BigTree::path("admin/modules/developer/modules/_nav.php"); ?>
 
 <div class="form_container">
 	<form method="post" action="<?=$developer_root?>modules/forms/create/<?=$module["id"]?>/" class="module">
@@ -67,7 +67,7 @@
 		<section class="sub" id="field_area">
 			<?
 				if ($table) {
-					include bigtree_path("admin/ajax/developer/load-form.php");
+					include BigTree::path("admin/ajax/developer/load-form.php");
 				} else {
 					echo "<p>Please choose a table to populate fields.</p>";
 				}

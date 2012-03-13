@@ -1,7 +1,5 @@
 <?
-	BigTree::globalizePOSTVars(array("mysql_real_escape_string"));
-	
-	sqlquery("UPDATE bigtree_field_types SET name = '$name', pages = '$pages', modules = '$modules', callouts = '$callouts', primary_version = '$primary_version', secondary_version = '$secondary_version', tertiary_version = '$tertiary_version', description = '$description', release_notes = '$release_notes', last_updated = NOW() WHERE id = '$id'");
+	$admin->updateFieldType($_POST["id"],$_POST["name"],$_POST["pages"],$_POST["modules"],$_POST["callouts"]);
 	
 	$admin->growl("Developer","Updated Field Type");
 	header("Location: ../view/");

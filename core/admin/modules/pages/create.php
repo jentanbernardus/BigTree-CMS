@@ -16,9 +16,9 @@
 	$fails = array();
 	
 	// Parse resources
-	include bigtree_path("admin/modules/pages/_resource-parse.php");
+	include BigTree::path("admin/modules/pages/_resource-parse.php");
 	// Parse callouts
-	include bigtree_path("admin/modules/pages/_callout-parse.php");	
+	include BigTree::path("admin/modules/pages/_callout-parse.php");	
 	
 	if ($publisher && $_POST["ptype"] == "Create & Publish") {
 		// Let's make it happen.
@@ -31,9 +31,9 @@
 	
 	if (count($crops)) {
 		$retpage = $admin_root."pages/view-tree/".$_POST["parent"]."/";
-		include bigtree_path("admin/modules/pages/_crop.php");
+		include BigTree::path("admin/modules/pages/_crop.php");
 	} elseif (count($fails)) {
-		include bigtree_path("admin/modules/pages/_failed.php");
+		include BigTree::path("admin/modules/pages/_failed.php");
 	} else {
 		header("Location: ".$admin_root."pages/view-tree/".$_POST["parent"]."/");
 		die();

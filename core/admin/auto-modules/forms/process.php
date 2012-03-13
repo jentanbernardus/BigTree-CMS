@@ -15,7 +15,7 @@
 	}
 	
 	if (!$permission || $permission == "n") {
-		include bigtree_path("admin/atuo-modules/forms/_denied.php");
+		include BigTree::path("admin/atuo-modules/forms/_denied.php");
 	} else {
 		// Initiate the Upload Service class.
 		$upload_service = new BigTreeUploadService;
@@ -33,7 +33,7 @@
 		
 		foreach ($fields as $key => $options) {
 			$type = $options["type"];
-			$tpath = bigtree_path("admin/form-field-types/process/$type.php");
+			$tpath = BigTree::path("admin/form-field-types/process/$type.php");
 			
 			$no_process = false;
 			// If we have a customized handler for this data type, run it, otherwise, it's simply the post value.
@@ -173,7 +173,7 @@
 				die();
 			}
 		} else {
-			include bigtree_path("admin/auto-modules/forms/_crop.php");
+			include BigTree::path("admin/auto-modules/forms/_crop.php");
 		}
 	}
 ?>

@@ -44,8 +44,8 @@
 <?
 	}
 	
-	include bigtree_path("admin/modules/pages/_nav.php");
-	include bigtree_path("admin/modules/pages/_properties.php");
+	include BigTree::path("admin/modules/pages/_nav.php");
+	include BigTree::path("admin/modules/pages/_properties.php");
 	
 	// Force your way through the page lock
 	if (isset($_GET["force"])) {
@@ -56,7 +56,7 @@
 	// Check for a page lock
 	$f = sqlfetch(sqlquery("SELECT * FROM bigtree_locks WHERE `table` = 'bigtree_pages' AND item_id = '$page'"));
 	if ($f && $f["user"] != $_SESSION["bigtree"]["id"] && strtotime($f["last_accessed"]) > (time()-300)) {
-		include bigtree_path("admin/modules/pages/_locked.php");
+		include BigTree::path("admin/modules/pages/_locked.php");
 		$admin->stop();
 	}
 	
@@ -75,5 +75,5 @@
 	$seo_color = $seo["color"];
 	
 	$action = "update";
-	include bigtree_path("admin/modules/pages/_form.php");
+	include BigTree::path("admin/modules/pages/_form.php");
 ?>

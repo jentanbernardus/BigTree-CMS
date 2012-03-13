@@ -57,7 +57,7 @@
 			echo $options["wrapper"];
 		}
 		
-		include bigtree_path("admin/form-field-types/draw/$type.php");
+		include BigTree::path("admin/form-field-types/draw/$type.php");
 		
 		if ($options["wrapper"]) {
 			$parts = explode(" ",$options["wrapper"]);
@@ -71,13 +71,13 @@
 	$mce_height = 365;
 	
 	if (count($htmls)) {
-		include bigtree_path("admin/layouts/_tinymce_specific.php");
+		include BigTree::path("admin/layouts/_tinymce_specific.php");
 	}
 	if (count($small_htmls)) {
-		include bigtree_path("admin/layouts/_tinymce_block_small.php");
+		include BigTree::path("admin/layouts/_tinymce_block_small.php");
 	}
 	if (count($simplehtmls)) {
-		include bigtree_path("admin/layouts/_tinymce_specific_simple.php");
+		include BigTree::path("admin/layouts/_tinymce_specific_simple.php");
 	}
 	
 	if ($tdata["callouts_enabled"]) {

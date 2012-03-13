@@ -13,32 +13,31 @@
 	}
 	
 	if (isset($_POST["count"])) {
-		$bigtree_sidelet_count = $_POST["count"];
+		$bigtree_callout_count = $_POST["count"];
 	}
 	
 	$type = isset($_POST["type"]) ? $_POST["type"] : $type;
 	
-	$s = sqlfetch(sqlquery("SELECT * FROM bigtree_callouts WHERE id = '$type'"));
-	$fields = json_decode($s["resources"],true);
+	$callout = $admin->getCallout($type);
 	
-	if ($s["description"]) {
+	if ($callout["description"]) {
 ?>
-<p><?=htmlspecialchars($s["description"])?></p>
+<p><?=htmlspecialchars($callout["description"])?></p>
 <?
 	}
 	
 	$tabindex = 1000;
 	
-	if (count($fields) > 0) {
-		foreach ($fields as $options) {
+	if (count($callout["resources"])) {
+		foreach ($callout["resources"] as $options) {
 			$key = "callouts[$count][".$options["id"]."]";
 			$type = $options["type"];
 			$title = $options["name"];
 			$subtitle = $options["subtitle"];
 			$options["directory"] = "files/pages/";
 			$value = $resources[$options["id"]];
-			$currently_key = "callouts[$bigtree_sidelet_count][currently_".$options["id"]."]";
-			include bigtree_path("admin/form-field-types/draw/$type.php");
+			$currently_key = "callouts[$bigtree_callout_count][currently_".$options["id"]."]";
+			include BigTree::path("admin/form-field-types/draw/$type.php");
 			$tabindex++;
 		}
 	}
@@ -58,9 +57,9 @@
 	$mce_height = 150;
 	
 	if (count($htmls)) {
-		include bigtree_path("admin/layouts/_tinymce_specific.php");
+		include BigTree::path("admin/layouts/_tinymce_specific.php");
 	}
 	if (count($simplehtmls)) {
-		include bigtree_path("admin/layouts/_tinymce_specific_simple.php");
+		include BigTree::path("admin/layouts/_tinymce_specific_simple.php");
 	}
 ?>

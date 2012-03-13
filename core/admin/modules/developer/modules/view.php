@@ -8,7 +8,7 @@
 ?>
 <h1><span class="icon_developer_modules"></span>Modules</h1>
 <?
-	include bigtree_path("admin/modules/developer/modules/_nav.php");
+	include BigTree::path("admin/modules/developer/modules/_nav.php");
 	foreach ($groups as $g) {
 ?>
 <div class="table">

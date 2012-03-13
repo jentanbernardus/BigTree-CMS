@@ -1,12 +1,12 @@
 <h1><span class="modules"></span>Edit <?=$form["title"]?></h1>
 <?
-	include bigtree_path("admin/auto-modules/_nav.php");
+	include BigTree::path("admin/auto-modules/_nav.php");
 	$item_id = end($path);
 
 	// Check for a lock on this module, if it exists, tell us, if not, create one.
 	$f = sqlfetch(sqlquery("SELECT * FROM bigtree_locks WHERE `table` = '".$form["table"]."' AND item_id = '$item_id'"));
 	if ($f && $f["user"] != $_SESSION["bigtree"]["id"] && strtotime($f["last_accessed"]) > (time()-300)) {
-		include bigtree_path("admin/auto-modules/forms/_locked.php");
+		include BigTree::path("admin/auto-modules/forms/_locked.php");
 	// We're not locked, load the form.
 	} else {
 		if ($f) {
@@ -31,7 +31,7 @@
 			$permission_level = $admin->getAccessLevel($module,$item,$form["table"]);
 			
 			if (!$permission_level || $permission_level == "n") {
-				include bigtree_path("admin/auto-modules/forms/_denied.php");
+				include BigTree::path("admin/auto-modules/forms/_denied.php");
 			} else {
 				$many_to_many = $data["mtm"];
 				$status = $data["status"];
@@ -39,7 +39,7 @@
 				
 				$tags = $data["tags"];
 					
-				include bigtree_path("admin/auto-modules/forms/_form.php");
+				include BigTree::path("admin/auto-modules/forms/_form.php");
 			}
 		}
 	}

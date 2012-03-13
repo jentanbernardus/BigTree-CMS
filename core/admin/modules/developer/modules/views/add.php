@@ -10,7 +10,7 @@
 	$breadcrumb[] = array("title" => "Add View", "link" => "#");
 ?>
 <h1><span class="icon_developer_modules"></span>Add View</h1>
-<? include bigtree_path("admin/modules/developer/modules/_nav.php") ?>
+<? include BigTree::path("admin/modules/developer/modules/_nav.php") ?>
 <div class="form_container">
 
 	<form method="post" action="<?=$developer_root?>modules/views/create/<?=$id?>/" class="module">
@@ -73,7 +73,7 @@
 			<? if (!$table) { ?>
 			<p>Please choose a view table to populate this area.</p>
 			<? } else { ?>
-			<? include bigtree_path("admin/ajax/developer/load-view-fields.php") ?>
+			<? include BigTree::path("admin/ajax/developer/load-view-fields.php") ?>
 			<? } ?>
 		</section>
 		<footer>
@@ -82,4 +82,4 @@
 	</form>
 </div>
 
-<? include bigtree_path("admin/modules/developer/modules/views/_js.php") ?>
+<? include BigTree::path("admin/modules/developer/modules/views/_js.php") ?>

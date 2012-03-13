@@ -10,7 +10,7 @@
 	}
 ?>
 <h1><span class="users"></span>Add User</h3>
-<? include bigtree_path("admin/modules/users/_nav.php"); ?>
+<? include BigTree::path("admin/modules/users/_nav.php"); ?>
 <div class="form_container">
 	<form class="module" action="<?=$admin_root?>users/create/" method="post">	
 		<section>

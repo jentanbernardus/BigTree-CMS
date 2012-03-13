@@ -1,7 +1,7 @@
 <?
-	include bigtree_path("admin/layouts/_header.php");
+	include BigTree::path("admin/layouts/_header.php");
 	
-	$subpath = bigtree_path("admin/modules/developer/".$path[2]."/_subnav.php");
+	$subpath = BigTree::path("admin/modules/developer/".$path[2]."/_subnav.php");
 	if (file_exists($subpath)) {
 		include $subpath;
 	}
@@ -35,4 +35,4 @@
 		<?=$content?>
 	</div>
 </div>
-<? include bigtree_path("admin/layouts/_footer.php") ?>
+<? include BigTree::path("admin/layouts/_footer.php") ?>
