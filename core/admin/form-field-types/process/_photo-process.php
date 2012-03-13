@@ -92,7 +92,7 @@
 		list($iwidth,$iheight,$itype,$iattr) = getimagesize($first_copy);
 		
 		$temp_copy = $site_root."files/".uniqid("temp-").$itype_exts[$itype];
-		bigtree_copy($first_copy,$temp_copy);
+		BigTree::copyFile($first_copy,$temp_copy);
 		
 		// Upload the original to the proper place.
 		$value = $upload_service->upload($first_copy,$name,$options["directory"]);

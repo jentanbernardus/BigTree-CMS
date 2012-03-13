@@ -159,7 +159,7 @@
 			if ($remove_original) {	
 				$success = BigTree::moveFile($local_file,$GLOBALS["site_root"].$relative_path.$file_name);
 			} else {
-				$success = bigtree_copy($local_file,$GLOBALS["site_root"].$relative_path.$file_name);
+				$success = BigTree::copyFile($local_file,$GLOBALS["site_root"].$relative_path.$file_name);
 			}
 			
 			if ($success) {
@@ -306,7 +306,7 @@
 			if ($remove_original) {
 				$success = BigTree::moveFile($local_file,$GLOBALS["site_root"].$relative_path.$safe_name);
 			} else {
-				$success = bigtree_copy($local_file,$GLOBALS["site_root"].$relative_path.$safe_name);
+				$success = BigTree::copyFile($local_file,$GLOBALS["site_root"].$relative_path.$safe_name);
 			}
 			
 			if ($success) {

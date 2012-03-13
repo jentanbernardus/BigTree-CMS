@@ -60,7 +60,7 @@ DROP TABLE IF EXISTS `bigtree_resource_folders`;
 CREATE TABLE `bigtree_resource_folders` ( `id` int(11) unsigned NOT NULL AUTO_INCREMENT, `name` varchar(255) DEFAULT NULL, `parent` int(11) DEFAULT NULL, PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 DROP TABLE IF EXISTS `bigtree_resources`;
-CREATE TABLE `bigtree_resources` ( `id` int(11) NOT NULL AUTO_INCREMENT, `file` varchar(255) NOT NULL, `date` datetime NOT NULL, `name` varchar(255) NOT NULL DEFAULT '', `type` varchar(255) NOT NULL DEFAULT '', `is_image` char(2) NOT NULL DEFAULT '', `height` int(11) NOT NULL DEFAULT '0', `width` int(11) NOT NULL DEFAULT '0', `crops` text NOT NULL, `thumbs` text NOT NULL, `list_thumb_margin` int(11) NOT NULL, PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+CREATE TABLE `bigtree_resources` ( `id` int(11) NOT NULL AUTO_INCREMENT, `folder` int(11) NOT NULL DEFAULT '0', `file` varchar(255) NOT NULL, `date` datetime NOT NULL, `name` varchar(255) NOT NULL DEFAULT '', `type` varchar(255) NOT NULL DEFAULT '', `is_image` char(2) NOT NULL DEFAULT '', `height` int(11) NOT NULL DEFAULT '0', `width` int(11) NOT NULL DEFAULT '0', `crops` text NOT NULL, `thumbs` text NOT NULL, `list_thumb_margin` int(11) NOT NULL, PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 DROP TABLE IF EXISTS `bigtree_route_history`;
 CREATE TABLE `bigtree_route_history` ( `id` int(11) NOT NULL AUTO_INCREMENT, `old_route` varchar(255) NOT NULL, `new_route` varchar(255) NOT NULL, PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
