@@ -14,7 +14,7 @@
 		exec("mysql --user=".$config["db"]["user"]." --password=".$config["db"]["password"]." ".$config["db"]["name"]." < ".$cache_dir."changed_tables.sql");
 	$files_to_copy = explode("\n",file_get_contents($cache_dir."files.txt"));
 	foreach ($files_to_copy as $file) {
-		bigtree_copy($cache_dir."changes/$file",$server_root.$file);
+		BigTree::copyFile($cache_dir."changes/$file",$server_root.$file);
 	}
 	if (file_exists($cache_dir."run_after.php"));
 		include $cache_dir."run_after.php";

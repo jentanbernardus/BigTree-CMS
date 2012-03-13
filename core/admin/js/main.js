@@ -5,15 +5,19 @@ $(document).ready(function() {
 	BigTreeCustomControls();
 	
 	// !BigTree Quick Search
-	$('nav.main form input[type="search"]').keyup(function() {
+	$('nav.main form input[type="search"]').keyup(function(ev) {
 		v = $(this).val();
-		if (v) {
+		if (v && ev.keyCode != 9) { //no tabs!
 			$("#quick_search_results").load("admin_root/ajax/quick-search-results/", { query: v }, function() {
 				$("#quick_search_results").show();
 			});
 		} else {
 			$("#quick_search_results").hide().html("");
 		}
+	}).focus(function() {
+		$(this).addClass("focus");
+	}).blur(function() {
+		setTimeout("$('nav.main form input[type=\"search\"]').removeClass(\"focus\").val(\"\"); $(\"#quick_search_results\").hide().html(\"\");", 100);
 	});
 	
 	// !BigTree Link Finder
@@ -966,7 +970,7 @@ var BigTreeFileManager = {
 	
 	fileBrowser: function() {
 		$("#file_browser_type_icon").addClass("icon_suitcase");
-		$("#file_browser_type").html("File Browser");
+		$("#file_browser_type .title").html("File Browser");
 		this.openFileFolder(0);
 	},
 	
@@ -1023,7 +1027,7 @@ var BigTreeFileManager = {
 	
 	imageBrowser: function() {
 		$("#file_browser_type_icon").addClass("icon_images");
-		$("#file_browser_type").html("Image Library");
+		$("#file_browser_type .title").html("Image Library");
 		this.openImageFolder(0);
 	},
 	
@@ -1083,7 +1087,7 @@ var BigTreeFileManager = {
 	<a href="#" class="button add_file">Upload File</a>\
 	<a href="#" class="button add_folder">New Folder</a>\
 	<span id="file_browser_type_icon"></span>\
-	<h2 id="file_browser_type"></h2>\
+	<h2 id="file_browser_type"><em class="title"></em><em class="suffix"></em></h2>\
 </header>\
 <ul id="file_browser_breadcrumb"><li><a href="#0">Home</a></li></ul>\
 <section id="file_browser_upload_window" style="display: none;">\
@@ -1178,6 +1182,10 @@ var BigTreeFileManager = {
 	
 	setBreadcrumb: function(contents) {
 		$("#file_browser_breadcrumb").html(contents);
+	},
+	
+	setTitleSuffix: function(suffix) {
+		$("#file_browser_type .suffix").html(suffix);
 	},
 	
 	submitSelectedFile: function() {

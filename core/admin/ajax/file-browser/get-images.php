@@ -3,7 +3,7 @@
 		if ($_POST["query"]) {
 			$items = $admin->getResourceSearchResults($_POST["query"]);
 			$perm = "e";
-			$bc = array(array("name" => "Search Results","id" => ""));
+			$bc = array(array("name" => "Clear Results","id" => ""));
 		} else {
 			$perm = $admin->getResourceFolderPermission($_POST["folder"]);
 			$items = $admin->getContentsOfResourceFolder($_POST["folder"]);
@@ -13,7 +13,7 @@
 		if (!$_POST["query"] && $_POST["folder"] > 0) {
 			$folder = sqlfetch(sqlquery("SELECT * FROM bigtree_resource_folders WHERE id = '".mysql_real_escape_string($_POST["folder"])."'"));
 	?>
-	<a href="#<?=$folder["parent"]?>" class="file folder"><span class="file_type file_type_folder"></span> ..</a>
+	<a href="#<?=$folder["parent"]?>" class="file folder"><span class="file_type file_type_folder file_type_folder_back"></span> Back</a>
 	<?	
 		}
 	
@@ -71,6 +71,10 @@
 	<? } else { ?>
 	BigTreeFileManager.disableCreate();
 	<? } ?>
-	
+	<? if ($_POST["query"]) { ?>
+	BigTreeFileManager.setTitleSuffix(": Search Results");
+	<? } else { ?>
+	BigTreeFileManager.setTitleSuffix("");
+	<? } ?>
 	BigTreeFileManager.setBreadcrumb("<?=str_replace('"','\"',$crumb_contents)?>");
 </script>
