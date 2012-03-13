@@ -114,7 +114,7 @@
 					} elseif ($field["type"] == "many_to_many") {
 						$mtm_count++;
 				?>
-				Many to Many
+				<span class="resource_name">Many to Many</span>
 				<input type="hidden" name="type[mtm_<?=$mtm_count?>]" value="many_to_many" id="type_mtm_<?=$mtm_count?>" />
 				<?
 					} else {
