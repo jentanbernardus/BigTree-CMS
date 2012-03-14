@@ -430,6 +430,39 @@
 		}
 		
 		/*
+			Function: getGroupsForView
+				Returns all groups in the view cache for a view.
+			
+			Parameters:
+				view - The view entry.
+			
+			Returns:
+				An array of groups.
+		*/
+		
+		static function getGroupsForView($view) {
+			$groups = array();
+			$query = "SELECT DISTINCT(group_field) FROM bigtree_module_view_cache WHERE view = '".$view["id"]."'";
+			if ($view["options"]["ot_sort_field"]) {
+				$query .= " ORDER BY group_sort_field ".$view["options"]["ot_sort_direction"];
+			} else {
+				$query .= " ORDER BY group_field";
+			}
+			$q = sqlquery($query);
+			while ($f = sqlfetch($q)) {
+				if ($view["options"]["other_table"]) {
+					$g = sqlfetch(sqlquery("SELECT `".$view["options"]["title_field"]."` AS `title` FROM `".$view["options"]["other_table"]."` WHERE id = '".$f["group_field"]."'"));
+					$title = $g["title"];
+				} else {
+					$title = $f["group_field"];
+				}
+				$groups[$f["group_field"]] = $title;
+			}
+			
+			return $groups;
+		}
+		
+		/*
 			Function: getModuleForForm
 				Returns the associated module id for the given form.
 			

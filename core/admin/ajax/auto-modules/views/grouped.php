@@ -21,12 +21,7 @@
 	// Cache the data in case it's not there.
 	BigTreeAutoModule::cacheViewData($view);
 	
-	$query = "SELECT DISTINCT(group_field) FROM bigtree_module_view_cache WHERE view = '".$view["id"]."'";
-	if ($o["ot_sort_field"]) {
-		$query .= " ORDER BY group_sort_field ".$o["ot_sort_direction"];
-	} else {
-		$query .= " ORDER BY group_field";
-	}
+	$groups = BigTreeAutoModule::getGroupsForView($view);
 ?>
 <header>
 	<?
@@ -48,18 +43,11 @@
 <?	
 	$q = sqlquery($query);
 	$gc = 0;
-	while ($f = sqlfetch($q)) {
-		if ($o["other_table"]) {
-			$g = sqlfetch(sqlquery("SELECT `".$o["title_field"]."` AS `title` FROM `".$o["other_table"]."` WHERE id = '".$f["group_field"]."'"));
-			$title = $g["title"];
-		} else {
-			$title = $f["group_field"];
-		}
-		
+	foreach ($groups as $group => $title) {		
 		if ($o["draggable"]) {
-			$r = BigTreeAutoModule::getSearchResults($view,0,$_POST["search"],"position DESC, id ASC","",$f["group_field"],$module);
+			$r = BigTreeAutoModule::getSearchResults($view,0,$_POST["search"],"position DESC, id ASC","",$group,$module);
 		} else {
-			$r = BigTreeAutoModule::getSearchResults($view,0,$_POST["search"],$o["sort_field"],$o["sort_direction"],$f["group_field"],$module);
+			$r = BigTreeAutoModule::getSearchResults($view,0,$_POST["search"],$o["sort_field"],$o["sort_direction"],$group,$module);
 		}
 		
 		if (count($r["results"])) {

@@ -18,11 +18,7 @@
 		$order = "`$table`.id DESC";
 	}
 	
-	$groups = array();
-	$q = sqlquery("SELECT DISTINCT(`group_field`) FROM bigtree_module_view_cache WHERE view = '".$view["id"]."' ORDER BY `group_field`");
-	while ($f = sqlfetch($q)) {
-		$groups[] = $f["group_field"];
-	}
+	$groups = BigTreeAutoModule::getGroupsForView($view);
 ?>
 <div class="table auto_modules">
 	<summary>
@@ -30,15 +26,8 @@
 	</summary>
 	<?
 		$y = 0;
-		foreach ($groups as $group) {
+		foreach ($groups as $group => $title) {
 			$y++;
-			
-			if ($o["other_table"]) {
-				$g = sqlfetch(sqlquery("SELECT `".$o["title_field"]."` AS `title` FROM `".$o["other_table"]."` WHERE id = '".$group."'"));
-				$title = $g["title"];
-			} else {
-				$title = $group;
-			}
 			
 			if ($o["draggable"]) {
 				$items = BigTreeAutoModule::getViewDataForGroup($view,$group,"position DESC, id ASC","active");
