@@ -679,6 +679,60 @@
 		}
 		
 		/*
+			Function: createModuleAction
+				Creates a module action.
+			
+			Parameters:
+				module - The module to create an action for.
+				name - The name of the action.
+				route - The action route.
+				in_nav - Whether the action is in the navigation.
+				icon - The icon class for the action.
+				form - Optional auto module form id.
+				view - Optional auto module view id.
+		*/
+		
+		function createModuleAction($module,$name,$route,$in_nav,$icon,$form = 0,$view = 0) {
+			$module = mysql_real_escape_string($module);
+			$route = mysql_real_escape_string(htmlspecialchars($route));
+			$in_nav = mysql_real_escape_string($in_nav);
+			$icon = mysql_real_escape_string($icon);
+			$name = mysql_real_escape_string(htmlspecialchars($name));
+			$form = mysql_real_escape_string($form);
+			$view = mysql_real_escape_string($view);
+		
+			$oroute = $route;
+			$x = 2;
+			while ($f = sqlfetch(sqlquery("SELECT * FROM bigtree_module_actions WHERE module = '$module' AND route = '$route'"))) {
+				$route = $oroute."-".$x;
+				$x++;
+			}
+			
+			sqlquery("INSERT INTO bigtree_module_actions (`module`,`name`,`route`,`in_nav`,`class`,`form`,`view`) VALUES ('$module','$name','$route','$in_nav','$icon','$form','$view')");
+		}
+		
+		/*
+			Function: createModuleForm
+				Creates a module form.
+			
+			Parameters:
+				title - The title of the form.
+				table - The table for the form data.
+				fields - The form fields.
+				
+			Returns:
+				The new form id.
+		*/
+		
+		function createModuleForm($title,$table,$fields) {
+			$title = mysql_real_escape_string(htmlspecialchars($title));
+			$table = mysql_real_escape_string($table);
+			$field = mysql_real_escape_string(json_encode($fields));
+			sqlquery("INSERT INTO bigtree_module_forms (`title`,`table`,`fields`) VALUES ('$title','$table','$fields')");
+			return sqlid();
+		}
+		
+		/*
 			Function: createModuleGroup
 				Creates a module group.
 			
@@ -710,35 +764,6 @@
 			
 			sqlquery("INSERT INTO bigtree_module_groups (`name`,`route`,`package`) VALUES ('$name','$route','$package')");
 			return sqlid();
-		}
-		
-		/*
-			Function: createModuleAction
-				Creates a module action.
-			
-			Parameters:
-				module - The module to create an action for.
-				name - The name of the action.
-				route - The action route.
-				in_nav - Whether the action is in the navigation.
-				icon - The icon class for the action.
-		*/
-		
-		function createModuleAction($module,$name,$route,$in_nav,$icon) {
-			$module = mysql_real_escape_string($module);
-			$route = mysql_real_escape_string(htmlspecialchars($route));
-			$in_nav = mysql_real_escape_string($in_nav);
-			$icon = mysql_real_escape_string($icon);
-			$name = mysql_real_escape_string(htmlspecialchars($name));
-		
-			$oroute = $route;
-			$x = 2;
-			while ($f = sqlfetch(sqlquery("SELECT * FROM bigtree_module_actions WHERE module = '$module' AND route = '$route'"))) {
-				$route = $oroute."-".$x;
-				$x++;
-			}
-			
-			sqlquery("INSERT INTO bigtree_module_actions (`module`,`name`,`route`,`in_nav`,`class`) VALUES ('$module','$name','$route','$in_nav','$icon')");
 		}
 		
 		/*
@@ -1070,6 +1095,48 @@
 		}
 		
 		/*
+			Function: deleteModuleAction
+				Deletes a module action.
+				Also deletes the related form or view if no other action is using it.
+			
+			Parameters:
+				id - The id of the action to delete.
+		*/
+		
+		function deleteModuleAction($id) {
+			$id = mysql_real_escape_string($id);
+			
+			$a = $this->getModuleAction($id);
+			if ($a["form"]) {
+				// Only delete the auto-ness if it's the only one using it.
+				if (sqlrows(sqlquery("SELECT * FROM bigtree_module_actions WHERE form = '".$a["form"]."'")) == 1) {
+					sqlquery("DELETE FROM bigtree_module_forms WHERE id = '".$a["form"]."'");
+				}
+			}
+			if ($a["view"]) {
+				// Only delete the auto-ness if it's the only one using it.
+				if (sqlrows(sqlquery("SELECT * FROM bigtree_module_actions WHERE view = '".$a["view"]."'")) == 1) {
+					sqlquery("DELETE FROM bigtree_module_views WHERE id = '".$a["view"]."'");
+				}
+			}
+			sqlquery("DELETE FROM bigtree_module_actions WHERE id = '$id'");
+		}
+		
+		/*
+			Function: deleteModuleForm
+				Deletes a module form and its related actions.
+			
+			Parameters:
+				id - The id of the module form.
+		*/
+		
+		function deleteModuleForm($id) {
+			$id = mysql_real_escape_string($id);
+			sqlquery("DELETE FROM bigtree_module_forms WHERE id = '$id'");
+			sqlquery("DELETE FROM bigtree_module_actions WHERE form = '$id'");
+		}
+		
+		/*
 			Function: deleteModuleGroup
 				Deletes a module group. Sets modules in the group to Misc.
 			
@@ -1081,6 +1148,20 @@
 			$id = mysql_real_escape_string($id);
 			sqlquery("DELETE FROM bigtree_module_groups WHERE id = '$id'");
 			sqlquery("UPDATE bigtree_modules SET `group` = '0' WHERE `group` = '$id'");
+		}
+		
+		/*
+			Function: deleteModuleView
+				Deletes a module view and its related actions.
+			
+			Parameters:
+				id - The id of the module view.
+		*/
+		
+		function deleteModuleView($id) {
+			$id = mysql_real_escape_string($id);
+			sqlquery("DELETE FROM bigtree_module_views WHERE id = '$id'");
+			sqlquery("DELETE FROM bigtree_module_actions WHERE view = '$id'");
 		}
 		
 		/*
@@ -1164,6 +1245,36 @@
 			$this->track("bigtree_users",$id,"deleted");
 
 			return true;
+		}
+		
+		/*
+			Function: doesModuleEditActionExist
+				Determines whether there is already an edit action for a module.
+			
+			Parameters:
+				module - The module id to check.
+		
+			Returns:
+				1 or 0, for true or false.
+		*/
+		
+		function doesModuleEditActionExist($module) {
+			return sqlrows(sqlquery("SELECT * FROM bigtree_module_actions WHERE module = '".mysql_real_escape_string($module)."' AND route = 'edit'"));
+		}
+		
+		/*
+			Function: doesModuleLandingActionExist
+				Determines whether there is already a landing action for a module.
+			
+			Parameters:
+				module - The module id to check.
+		
+			Returns:
+				1 or 0, for true or false.
+		*/
+		
+		function doesModuleLandingActionExist($module) {
+			return sqlrows(sqlquery("SELECT * FROM bigtree_module_actions WHERE module = '".mysql_real_escape_string($module)."' AND route = ''"));
 		}
 		
 		/*
@@ -1950,6 +2061,24 @@
 		function getModuleAction($id) {
 			$id = mysql_real_escape_string($id);
 			return sqlfetch(sqlquery("SELECT * FROM bigtree_module_actions WHERE id = '$id'"));
+		}
+		
+		/*
+			Function: getModuleActionByRoute
+				Returns an entry from the bigtree_module_actions table for the given module and route.
+			
+			Parameters:
+				module - The module to lookup an action for.
+				route - The route of the action.
+			
+			Returns:
+				A module action entry.
+		*/
+
+		function getModuleActionByRoute($module,$route) {
+			$module = mysql_real_escape_string($module);
+			$route = mysql_real_escape_string($route);
+			return sqlfetch(sqlquery("SELECT * FROM bigtree_module_actions WHERE module = '$module' AND route = '$route'"));
 		}
 		
 		/*
@@ -4276,6 +4405,37 @@
 		
 			// Remove cached class list.
 			unlink($GLOBALS["server_root"]."cache/module-class-list.btc");
+		}
+		
+		/*
+			Function: updateModuleAction
+				Updates a module action.
+			
+			Parameters:
+				id - The id of the module action to update.
+				name - The name of the action.
+				route - The action route.
+				in_nav - Whether the action is in the navigation.
+				icon - The icon class for the action.
+		*/
+		
+		function updateModuleAction($id,$name,$route,$in_nav,$icon) {
+			$id = mysql_real_escape_string($id);
+			$route = mysql_real_escape_string(htmlspecialchars($route));
+			$in_nav = mysql_real_escape_string($in_nav);
+			$icon = mysql_real_escape_string($icon);
+			$name = mysql_real_escape_string(htmlspecialchars($name));
+			
+			$item = $this->getModuleAction($id);
+
+			$oroute = $route;
+			$x = 2;
+			while ($f = sqlfetch(sqlquery("SELECT * FROM bigtree_module_actions WHERE module = '".$item["module"]."' AND route = '$route' AND id != '$id'"))) {
+				$route = $oroute."-".$x;
+				$x++;
+			}
+			
+			sqlquery("UPDATE bigtree_module_actions SET name = '$name', route = '$route', class = '$icon', in_nav = '$in_nav' WHERE id = '$id'");
 		}
 		
 		/*

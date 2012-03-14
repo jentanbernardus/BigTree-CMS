@@ -1,6 +1,8 @@
 <?
 	BigTree::globalizePOSTVars(array("htmlspecialchars","mysql_real_escape_string"));
 
+	$module = end($path);
+
 	$subroute = $suffix ? mysql_real_escape_string($_POST["suffix"]) : "";
 			
 	if ($subroute) {
@@ -24,12 +26,12 @@
 	
 	sqlquery("INSERT INTO bigtree_module_forms (`title`,`javascript`,`css`,`callback`,`table`,`fields`,`default_position`) VALUES ('$title','$javascript','$css','$callback','$table','$fields','$default_position')");
 	
-	$aid = sqlid();
+	$form_id = sqlid();
 
-	sqlquery("INSERT INTO bigtree_module_actions (`module`,`in_nav`,`name`,`route`,`form`,`class`) VALUES ('".end($path)."','on','Add $title','$addroute','$aid','icon_small_add')");
-	sqlquery("INSERT INTO bigtree_module_actions (`module`,`in_nav`,`name`,`route`,`form`,`class`) VALUES ('".end($path)."','','Edit $title','$editroute','$aid','icon_small_edit')");
+	$admin->createModuleAction($module,"Add $title",$addroute,"on","icon_small_add",$form_id);
+	$admin->createModuleAction($module,"Edit $title",$editroute,"","icon_small_edit",$form_id);
 			
-	$mod = $admin->getModule(end($path));
+	$mod = $admin->getModule($module);
 ?>
 <h1><span class="icon_developer_modules"></span>Created Form</h1>
 <? include BigTree::path("admin/modules/developer/modules/_nav.php"); ?>

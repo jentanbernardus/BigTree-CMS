@@ -15,10 +15,11 @@
 	$edit = "edit";
 	$view = $autoModule->getView($_POST["view"]);
 	$module = $autoModule->getModuleForView($view);
-	if ($view["suffix"])
+	if ($view["suffix"]) {
 		$edit .= "-".$view["suffix"];
+	}
 	
-	$e = sqlfetch(sqlquery("SELECT * FROM bigtree_module_actions WHERE module = '$module' AND route = '$edit'"));
+	$e = $admin->getModuleActionByRoute($module,$edit);
 	if ($e["form"]) {
 		$form = $autoModule->getForm($e["form"]);
 		

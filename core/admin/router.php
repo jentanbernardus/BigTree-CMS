@@ -250,7 +250,8 @@
 			if (!isset($path[2])) {
 				$path[2] = "";
 			}
-			$action = sqlfetch(sqlquery("SELECT * FROM bigtree_module_actions WHERE module = '".$module["id"]."' AND route = '".$path[2]."'"));
+			
+			$action = $admin->getModuleActionByRoute($module["id"],$path[2]);
 			
 			$inc_dir = str_replace("../",$server_root,$inc_dir);
 			

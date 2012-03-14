@@ -24,9 +24,9 @@
 	
 	sqlquery("INSERT INTO bigtree_module_views (`title`,`description`,`type`,`fields`,`actions`,`table`,`options`,`suffix`) VALUES ('$title','$description','$type','$fields','$actions','$table','$options','$suffix')");
 		
-	$vid = sqlid();
-		
-	sqlquery("INSERT INTO bigtree_module_actions (`module`,`in_nav`,`name`,`route`,`view`,`class`,`position`) VALUES ('$module','on','". mysql_real_escape_string("View $title")."','$route','$vid','icon_small_home','1')");
+	$view_id = sqlid();
+	
+	$admin->createModuleAction($module,"View $title",$route,"on","icon_small_home",0,$view_id);
 		
 	header("Location: ../complete/$module/");
 	die();

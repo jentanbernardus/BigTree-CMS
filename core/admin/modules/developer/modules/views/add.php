@@ -4,7 +4,7 @@
 	$title = $commands[2];
 	
 	$mod = $admin->getModule($id);
-	$r = sqlrows(sqlquery("SELECT * FROM bigtree_module_actions WHERE module = '$id' AND route = ''"));
+	$landing_exists = $admin->doesModuleLandingActionExist($id);
 
 	$breadcrumb[] = array("title" => $mod["name"], "link" => "developer/modules/edit/".$module["id"]."/");
 	$breadcrumb[] = array("title" => "Add View", "link" => "#");
@@ -15,7 +15,7 @@
 
 	<form method="post" action="<?=$developer_root?>modules/views/create/<?=$id?>/" class="module">
 		<section>
-			<? if ($r > 0) { ?>
+			<? if ($landing_exists) { ?>
 			<div class="alert">
 				<img src="<?=$admin_root?>images/alert.png" alt="" />
 				<p><strong>Default View Taken:</strong> If this view is for a different edit action, please specify the suffix below (i.e. edit-group's suffix is "group").</p>

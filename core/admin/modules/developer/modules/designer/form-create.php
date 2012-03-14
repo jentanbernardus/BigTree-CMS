@@ -2,7 +2,6 @@
 	$reserved = array("id","position");
 	$fields = array();
 	$adds = array();
-	$title = mysql_real_escape_string(htmlspecialchars($_POST["title"]));
 	$module = mysql_real_escape_string($_POST["module"]);
 	$table = "`".$_POST["table"]."`";
 	
@@ -53,11 +52,12 @@
 	sqlquery("ALTER TABLE $table ".implode(", ",$adds));
 	
 	// Add the module form
-	sqlquery("INSERT INTO bigtree_module_forms (`title`,`table`,`fields`) VALUES ('$title','".mysql_real_escape_string($_POST["table"])."','".mysql_real_escape_string(json_encode($fields))."')");
-	$form_id = sqlid();
+	
+	$form_id = $admin->createModuleForm($_POST["title"],$_POST["table"],$fields);
+	
 	// Add module actions
-	sqlquery("INSERT INTO bigtree_module_actions (`module`,`name`,`route`,`in_nav`,`form`,`class`) VALUES ('$module','Add $title','add','on','$form_id','icon_small_add')");
-	sqlquery("INSERT INTO bigtree_module_actions (`module`,`name`,`route`,`in_nav`,`form`,`class`) VALUES ('$module','Edit $title','edit','','$form_id','icon_small_edit')");
+	$admin->createModuleAction($module,"Add ".$_POST["title"],"add","on","icon_small_add",$form_id);
+	$admin->createModuleAction($module,"Edit ".$_POST["title"],"edit","","icon_small_edit",$form_id);
 	
 	header("Location: ../view/$module/".$_POST["table"]."/".urlencode(htmlspecialchars($_POST["title"]))."/");
 	die();

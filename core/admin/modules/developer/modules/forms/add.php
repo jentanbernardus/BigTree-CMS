@@ -2,7 +2,7 @@
 	$table = isset($commands[1]) ? $commands[1] : "";
 
 	$module = $admin->getModule($commands[0]);
-	$r = sqlrows(sqlquery("SELECT * FROM bigtree_module_actions WHERE module = '".$module["id"]."' AND route = 'edit'"));
+	$edit_action_exists = $admin->doesModuleEditActionExist($module["id"]);
 	
 	if (isset($commands[2])) {
 		$title = $commands[2];
@@ -31,7 +31,7 @@
 					<input type="text" class="required" name="title" value="<?=$title?>" />
 				</fieldset>
 				
-				<? if ($r > 0) { ?>
+				<? if ($edit_action_exists) { ?>
 				<fieldset>
 					<label>Action Suffix <small>(for when there is more than one set of forms in a module)</small></label>
 					<input type="text" name="suffix" <? if (isset($commands[3])) { echo 'value="'.$commands[3].'" '; } ?>/>

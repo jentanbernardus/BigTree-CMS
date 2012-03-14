@@ -2,34 +2,6 @@
 	BigTree::globalizePOSTVars(array("htmlspecialchars","mysql_real_escape_string"));
 
 	$breadcrumb[] = array("title" => "Created View", "href" => "#");
-	
-	// Clean up actions
-	$clean_actions = array();
-	foreach ($actions as $key => $val) {
-		if ($val) {
-			$clean_actions[$key] = $val;
-		}
-	}
-	$actions = $clean_actions;
-	
-	// Check to see if there's a default view for the module.  If not our route is going to be blank.
-	$r = sqlrows(sqlquery("SELECT * FROM bigtree_module_actions WHERE module = '".end($path)."' AND route = ''"));
-	if ($r > 0) {
-		if ($suffix) {
-			$route = "view-$suffix";
-		} else {
-			$route = $cms->urlify("view $title");
-		}
-	} else {
-		$route = "";
-	}
-	
-	$oroute = $route;
-	$x = 2;
-	while ($f = sqlfetch(sqlquery("SELECT * FROM bigtree_module_actions WHERE module = '".end($path)."' AND route = '$route'"))) {
-		$route = $oroute."-".$x;
-		$x++;
-	}
 
 	$columns = sqlcolumns($table);
 	$errors = array();
@@ -47,12 +19,6 @@
 		$errors[] = "Sorry, but you must have a column named 'featured' that is char(2) in order to use the feature function.";
 	}
 	
-	// Let's create the view
-
-	$actions = mysql_real_escape_string(json_encode($actions));
-	$fields = mysql_real_escape_string(json_encode($fields));
-	$options = mysql_real_escape_string($_POST["options"]);
-	
 	if (count($errors)) {	
 ?>
 <h1><span class="icon_developer_modules"></span>View Error</h1>
@@ -68,13 +34,42 @@
 </div>
 <?
 	} else {
+		// Clean up actions
+		$clean_actions = array();
+		foreach ($actions as $key => $val) {
+			if ($val) {
+				$clean_actions[$key] = $val;
+			}
+		}
+		$actions = $clean_actions;
+		
+		$module = end($path);
+		
+		// Check to see if there's a default view for the module.  If not our route is going to be blank.
+		$landing_exists = $admin->doesModuleLandingActionExist($module);
+		if ($landing_exists) {
+			if ($suffix) {
+				$route = "view-$suffix";
+			} else {
+				$route = $cms->urlify("view $title");
+			}
+		} else {
+			$route = "";
+		}
+		
+		// Let's create the view
+
+		$actions = mysql_real_escape_string(json_encode($actions));
+		$fields = mysql_real_escape_string(json_encode($fields));
+		$options = mysql_real_escape_string($_POST["options"]);
+		
 		sqlquery("INSERT INTO bigtree_module_views (`title`,`description`,`type`,`fields`,`actions`,`table`,`options`,`suffix`,`uncached`,`preview_url`) VALUES ('$title','$description','$type','$fields','$actions','$table','$options','$suffix','$uncached','$preview_url')");
 		
-		$vid = sqlid();
+		$view_id = sqlid();
 		
-		sqlquery("INSERT INTO bigtree_module_actions (`module`,`in_nav`,`name`,`route`,`view`,`class`) VALUES ('".end($path)."','on','". mysql_real_escape_string("View $title")."','$route','$vid','icon_small_home')");
+		$admin->createModuleAction($module,"View $title",$route,"on","icon_small_home",0,$view_id);
 		
-		$mod = $admin->getModule(end($path));
+		$mod = $admin->getModule($module);
 ?>
 <h1><span class="icon_developer_modules"></span>Created View</h1>
 <? include BigTree::path("admin/modules/developer/modules/_nav.php"); ?>

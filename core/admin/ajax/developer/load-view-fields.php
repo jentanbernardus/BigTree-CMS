@@ -151,10 +151,10 @@
 	$(".developer_action_list .action").click(function() {
 		if ($(this).hasClass("active")) {
 			$(this).removeClass("active");
-			$(this).prev("input").val("");
+			$(this).prev("input").attr("checked",false);
 		} else {
 			$(this).addClass("active");
-			$(this).prev("input").val("on");
+			$(this).prev("input").attr("checked","checked");
 		}
 		
 		return false;
