@@ -713,6 +713,35 @@
 		}
 		
 		/*
+			Function: createModuleAction
+				Creates a module action.
+			
+			Parameters:
+				module - The module to create an action for.
+				name - The name of the action.
+				route - The action route.
+				in_nav - Whether the action is in the navigation.
+				icon - The icon class for the action.
+		*/
+		
+		function createModuleAction($module,$name,$route,$in_nav,$icon) {
+			$module = mysql_real_escape_string($module);
+			$route = mysql_real_escape_string(htmlspecialchars($route));
+			$in_nav = mysql_real_escape_string($in_nav);
+			$icon = mysql_real_escape_string($icon);
+			$name = mysql_real_escape_string(htmlspecialchars($name));
+		
+			$oroute = $route;
+			$x = 2;
+			while ($f = sqlfetch(sqlquery("SELECT * FROM bigtree_module_actions WHERE module = '$module' AND route = '$route'"))) {
+				$route = $oroute."-".$x;
+				$x++;
+			}
+			
+			sqlquery("INSERT INTO bigtree_module_actions (`module`,`name`,`route`,`in_nav`,`class`) VALUES ('$module','$name','$route','$in_nav','$icon')");
+		}
+		
+		/*
 			Function: createPage
 				Creates a page.
 				Does not check permissions.
@@ -3753,6 +3782,21 @@
 			$id = mysql_real_escape_string($id);
 			$position = mysql_real_escape_string($position);
 			sqlquery("UPDATE bigtree_callouts SET position = '$position' WHERE id = '$id'");
+		}
+		
+		/*
+			Function: setModuleActionPosition
+				Sets the position of a module action.
+			
+			Parameters:
+				id - The id of the module action.
+				position - The position to set.
+		*/
+		
+		function setModuleActionPosition($id,$position) {
+			$id = mysql_real_escape_string($id);
+			$position = mysql_real_escape_string($position);
+			sqlquery("UPDATE bigtree_module_actions SET position = '$position' WHERE id = '$id'");
 		}
 		
 		/*

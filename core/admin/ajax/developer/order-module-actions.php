@@ -3,6 +3,6 @@
 	$max = count($row);
 	
 	foreach ($row as $pos => $id) {
-		sqlquery("UPDATE bigtree_module_actions SET position = '".($max-$pos)."' WHERE id = '$id'");
+		$admin->setModuleActionPosition($id,$max - $pos);
 	}
 ?>
