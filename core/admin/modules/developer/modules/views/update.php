@@ -1,41 +1,7 @@
 <?	
-	BigTree::globalizePOSTVars(array("htmlspecialchars","mysql_real_escape_string"));
-	
-	// Clean up actions
-	$clean_actions = array();
-	foreach ($actions as $key => $val) {
-		if ($val) {
-			$clean_actions[$key] = $val;
-		}
-	}
-	$actions = $clean_actions;
-	
-	$old_view = BigTreeAutoModule::getView(end($path));
+	BigTree::globalizePOSTVars();
 	
 	$columns = sqlcolumns($table);
-	
-	// If we've switched from searchable -> anything else or vice versa, wipe the width columns.
-	// Also wipe them if we have added or removed a column.
-	$keys_match = true;
-	foreach ($old_view["fields"] as $key => $field) {
-		if (!$fields[$key]) {
-			$keys_match = false;
-		}
-	}
-	foreach ($fields as $key => $field) {
-		if (!$old_view["fields"][$key]) {
-			$keys_match = false;
-		}
-	}
-	// Check actions
-	if (count($old_view["actions"]) != count($actions)) {
-		$keys_match = false;
-	}
-	if (!$keys_match || ($old_view["type"] == "searchable" && $type != "searchable") || ($type == "searchable" && $old_view["type"] != "searchable")) {
-		foreach ($fields as $key => $field) {
-			unset($fields[$key]["width"]);
-		}
-	}
 	
 	$errors = array();
 	// Check for errors
@@ -59,15 +25,46 @@
 			echo "<p>".$error."</p>";
 		}
 	} else {
-		// Let's update the view
-		$actions = mysql_real_escape_string(json_encode($actions));
-		$fields = mysql_real_escape_string(json_encode($fields));
-		$options = mysql_real_escape_string($_POST["options"]);
+		// Clean up actions
+		$clean_actions = array();
+		foreach ($actions as $key => $val) {
+			if ($val) {
+				$clean_actions[$key] = $val;
+			}
+		}
+		$actions = $clean_actions;
 		
-		sqlquery("UPDATE bigtree_module_views SET `table` = '$table', `title` = '$title', `description` = '$description', `type` = '$type', `options` = '$options', `actions` = '$actions', `fields` = '$fields', `suffix` = '$suffix', `uncached` = '$uncached', `preview_url` = '$preview_url' WHERE id = '".end($path)."'");
+		// If we've switched from searchable -> anything else or vice versa, wipe the width columns.
+		// Also wipe them if we have added or removed a column.
+		$old_view = BigTreeAutoModule::getView(end($path));
+		$keys_match = true;
+		foreach ($old_view["fields"] as $key => $field) {
+			if (!$fields[$key]) {
+				$keys_match = false;
+			}
+		}
+		
+		foreach ($fields as $key => $field) {
+			if (!$old_view["fields"][$key]) {
+				$keys_match = false;
+			}
+		}
+
+		// Check actions
+		if (count($old_view["actions"]) != count($actions)) {
+			$keys_match = false;
+		}
+		
+		if (!$keys_match || ($old_view["type"] == "searchable" && $type != "searchable") || ($type == "searchable" && $old_view["type"] != "searchable")) {
+			foreach ($fields as $key => $field) {
+				unset($fields[$key]["width"]);
+			}
+		}
+	
+		// Let's update the view
+		$admin->updateModuleView(end($path),$title,$description,$table,$type,json_decode($options,true),$fields,$actions,$suffix,$preview_url);
 		
 		$action = $admin->getModuleActionForView(end($path));
-		
 		$admin->growl("Developer","Updated View");
 		header("Location: ".$developer_root."modules/edit/".$action["module"]."/");
 		BigTreeAutoModule::clearCache($view);

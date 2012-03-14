@@ -6,10 +6,8 @@
 		$fields[$key]["width"] = 0;
 	}
 		
-	// Let's create the view
-	$fields = mysql_real_escape_string(json_encode($fields));
-	
-	sqlquery("UPDATE bigtree_module_views SET `fields` = '$fields' WHERE id = '".end($path)."'");
+	// Update the view
+	$admin->updateModuleViewFields(end($path),$fields);
 
 	$action = $admin->getModuleActionForView(end($path));
 

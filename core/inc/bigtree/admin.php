@@ -776,6 +776,43 @@
 		}
 		
 		/*
+			Function: createModuleView
+				Creates a module view.
+			
+			Parameters:
+				title - View title.
+				description - Description.
+				table - Data table.
+				type - View type.
+				options - View options array.
+				fields - Field array.
+				actions - Actions array.
+				suffix - Add/Edit suffix.
+				uncached - Don't cache the view.
+				preview_url - Optional preview URL.
+				
+			Returns:
+				The id for view.
+		*/
+		
+		function createModuleView($title,$description,$table,$type,$options,$fields,$actions,$suffix,$uncached = "",$preview_url = "") {
+			$title = mysql_real_escape_string(htmlspecialchars($title));
+			$description = mysql_real_escape_string(htmlspecialchars($description));
+			$table = mysql_real_escape_string($table);
+			$type = mysql_real_escape_string($type);
+			$options = mysql_real_escape_string(json_encode($options));
+			$fields = mysql_real_escape_string(json_encode($fields));
+			$actions = mysql_real_escape_string(json_encode($actions));
+			$suffix = mysql_real_escape_string($suffix);
+			$uncached = mysql_real_escape_string($uncached);
+			$preview_url = mysql_real_escape_string(htmlspecialchars($preview_url));
+			
+			sqlquery("INSERT INTO bigtree_module_views (`title`,`description`,`type`,`fields`,`actions`,`table`,`options`,`suffix`,`uncached`,`preview_url`) VALUES ('$title','$description','$type','$fields','$actions','$table','$options','$suffix','$uncached')");
+			
+			return sqlid();
+		}
+		
+		/*
 			Function: createPage
 				Creates a page.
 				Does not check permissions.
@@ -1226,6 +1263,27 @@
 			}
 			sqlquery("DELETE FROM bigtree_pages WHERE parent = '$id'");
 			$this->track("bigtree_pages",$id,"deleted");
+		}
+		
+		/*
+			Function: deletePageRevision
+				Deletes a page revision.
+				Checks permissions.
+			
+			Parameters:
+				id - The page version id.
+		*/
+		
+		function deletePageRevision($id) {
+			// Get the version, check if the user has access to the page the version refers to.
+			$revision = $this->getPageRevision($id);
+			$access = $this->getPageAccessLevelByUser($revision["page"],$this->ID);
+			if ($access != "p") {
+				$this->stop("You must be a publisher to manage revisions.");
+			}
+			
+			// Delete the revision
+			sqlquery("DELETE FROM bigtree_page_revisions WHERE id = '".$revision["id"]."'");
 		}
 		
 		/*
@@ -2029,7 +2087,7 @@
 		function getMessage($id) {
 			$message = sqlfetch(sqlquery("SELECT * FROM bigtree_messages WHERE id = '".mysql_real_escape_string($id)."'"));
 			if ($message["sender"] != $this->ID && strpos("|".$this->ID."|",$message["recipients"]) === false) {
-				$admin->stop("This message was not sent by you, or to you.");
+				$this->stop("This message was not sent by you, or to you.");
 			}
 			return $message;
 		}
@@ -2612,6 +2670,52 @@
 		}
 		
 		/*
+			Function: getPageRevision
+				Returns a version of a page from the bigtree_page_revisions table.
+			
+			Parameters:
+				id - The id of the page version.
+			
+			Returns:
+				A page version entry from the table.
+		*/
+
+		function getPageRevision($id) {
+			$id = mysql_real_escape_string($id);
+			$item = sqlfetch(sqlquery("SELECT * FROM bigtree_page_revisions WHERE id = '$id'"));
+			return $item;
+		}
+		
+		/*
+			Function: getPageRevisions
+				Get all revisions for a page.
+			
+			Parameters:
+				page - The page id to get revisions for.
+			
+			Returns:
+				An array of "saved" revisions and "unsaved" revisions.
+		*/
+		
+		function getPageRevisions($page) {
+			$page = mysql_real_escape_string($page);
+			
+			// Get all previous revisions, add them to the saved or unsaved list
+			$unsaved = array();
+			$saved = array();
+			$q = sqlquery("SELECT bigtree_users.name, bigtree_page_revisions.saved, bigtree_page_revisions.saved_description, bigtree_page_revisions.updated_at, bigtree_page_revisions.id FROM bigtree_page_revisions JOIN bigtree_users ON bigtree_page_revisions.author = bigtree_users.id WHERE page = '$page' ORDER BY updated_at DESC");
+			while ($f = sqlfetch($q)) {
+			    if ($f["saved"]) {
+			    	$saved[] = $f;
+			    } else {
+			    	$unsaved[] = $f;
+			    }
+			}
+			
+			return array("saved" => $saved, "unsaved" => $unsaved);
+		}
+		
+		/*
 			Function: getPageSEORating
 				Returns the SEO rating for a page.
 			
@@ -2796,23 +2900,6 @@
 			}
 
 			return array("score" => $score, "recommendations" => $recommendations, "color" => $color);
-		}
-		
-		/*
-			Function: getPageVersion
-				Returns a version of a page from the bigtree_page_versions table.
-			
-			Parameters:
-				id - The id of the page version.
-			
-			Returns:
-				A page version entry from the table.
-		*/
-
-		function getPageVersion($id) {
-			$id = mysql_real_escape_string($id);
-			$item = sqlfetch(sqlquery("SELECT * FROM bigtree_page_versions WHERE id = '$id'"));
-			return $item;
 		}
 		
 		/*
@@ -3594,7 +3681,7 @@
 			if ($f && $f["user"] != $this->ID && strtotime($f["last_accessed"]) > (time()-300) && !$force) {
 				include BigTree::path($include);
 				if ($in_admin) {
-					$admin->stop();
+					$this->stop();
 				}
 				return false;
 			}
@@ -4534,6 +4621,58 @@
 		}
 		
 		/*
+			Function: updateModuleView
+				Updates a module view.
+			
+			Parameters:
+				id - The view id.
+				title - View title.
+				description - Description.
+				table - Data table.
+				type - View type.
+				options - View options array.
+				fields - Field array.
+				actions - Actions array.
+				suffix - Add/Edit suffix.
+				uncached - Don't cache the view.
+				preview_url - Optional preview URL.
+				
+			Returns:
+				The id for view.
+		*/
+		
+		function updateModuleView($title,$description,$table,$type,$options,$fields,$actions,$suffix,$uncached = "",$preview_url = "") {
+			$id = mysql_real_escape_string($id);
+			$title = mysql_real_escape_string(htmlspecialchars($title));
+			$description = mysql_real_escape_string(htmlspecialchars($description));
+			$table = mysql_real_escape_string($table);
+			$type = mysql_real_escape_string($type);
+			$options = mysql_real_escape_string(json_encode($options));
+			$fields = mysql_real_escape_string(json_encode($fields));
+			$actions = mysql_real_escape_string(json_encode($actions));
+			$suffix = mysql_real_escape_string($suffix);
+			$uncached = mysql_real_escape_string($uncached);
+			$preview_url = mysql_real_escape_string(htmlspecialchars($preview_url));
+			
+			sqlquery("UPDATE bigtree_module_views SET title = '$title', description = '$description', `table` = '$table', type = '$type', options = '$options', fields = '$fields', actions = '$actions', suffix = '$suffix', uncached = '$uncached', preview_url = '$preview_url' WHERE id = '$id'");
+		}
+		
+		/*
+			Function: updateModuleViewFields
+				Updates the fields for a module view.
+			
+			Paramters:
+				view - The view id.
+				fields - A fields array.
+		*/
+		
+		function updateModuleViewFields($view,$fields) {
+			$view = mysql_real_escape_string($view);
+			$fields = mysql_real_escape_string(json_encode($fields));
+			sqlquery("UPDATE bigtree_module_views SET `fields` = '$fields' WHERE id = '$view'");
+		}
+		
+		/*
 			Function: updatePage
 				Updates a page.
 				Does not check permissions.
@@ -4549,14 +4688,14 @@
 			$page = mysql_real_escape_string($page);
 
 			// Save the existing copy as a draft, remove drafts for this page that are one month old or older.
-			sqlquery("DELETE FROM bigtree_page_versions WHERE page = '$page' AND updated_at < '".date("Y-m-d",strtotime("-31 days"))."' AND saved != 'on'");
+			sqlquery("DELETE FROM bigtree_page_revisions WHERE page = '$page' AND updated_at < '".date("Y-m-d",strtotime("-31 days"))."' AND saved != 'on'");
 			// Get the current copy
 			$current = sqlfetch(sqlquery("SELECT * FROM bigtree_pages WHERE id = '$page'"));
 			foreach ($current as $key => $val) {
 				$$key = mysql_real_escape_string($val);
 			}
 			// Copy it to the saved versions
-			sqlquery("INSERT INTO bigtree_page_versions (`page`,`title`,`meta_keywords`,`meta_description`,`template`,`external`,`new_window`,`resources`,`callouts`,`author`,`updated_at`) VALUES ('$page','$title','$meta_keywords','$meta_description','$template','$external','$new_window','$resources','$callouts','$last_edited_by','$updated_at')");
+			sqlquery("INSERT INTO bigtree_page_revisions (`page`,`title`,`meta_keywords`,`meta_description`,`template`,`external`,`new_window`,`resources`,`callouts`,`author`,`updated_at`) VALUES ('$page','$title','$meta_keywords','$meta_description','$template','$external','$new_window','$resources','$callouts','$last_edited_by','$updated_at')");
 
 			// Remove this page from the cache
 			$this->unCache($page);
@@ -4674,7 +4813,28 @@
 			return $page;
 		}
 		
+		/*
+			Function: updatePageRevision
+				Updates a page revision to save it as a favorite.
+				Checks permissions.
+			
+			Parameters:
+				id - The page revision id.
+				description - Saved description.
+		*/
 		
+		function updatePageRevision($id,$description) {
+			// Get the version, check if the user has access to the page the version refers to.
+			$revision = $this->getPageRevision($id);
+			$access = $this->getPageAccessLevelByUser($revision["page"],$this->ID);
+			if ($access != "p") {
+				$this->stop("You must be a publisher to manage revisions.");
+			}
+			
+			// Save the version's description and saved status
+			$description = mysql_real_escape_string(htmlspecialchars($description));
+			sqlquery("UPDATE bigtree_page_revisions SET saved = 'on', saved_description = '$description' WHERE id = '".$revision["id"]."'");
+		}
 
 		/*
 			Function: updateProfile

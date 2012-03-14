@@ -389,26 +389,9 @@
 		die();
 	} else {
 		// Let's check if it's in the old routing table.
-		$found = false;
-		$x = count($path);
-		while ($x) {
-			$f = sqlfetch(sqlquery("SELECT * FROM bigtree_route_history WHERE old_route = '".implode("/",array_slice($path,0,$x))."'"));
-			if ($f) {
-				$old = $f["old_route"];
-				$new = $f["new_route"];
-				$found = true;
-				break;
-			}
-			$x--;
-		}
-		// If it's in the old routing table, send them to the new page.
-		if ($found) {
-			header("HTTP/1.1 301 Moved Permanently");
-			header("Location: ".$www_root.str_replace($old,$new,$_GET["bigtree_htaccess_url"]));
-			die();
-		} else {
-			$cms->handle404($_GET["bigtree_htaccess_url"]);		
-		}
+		$cms->checkOldRoutes($path);
+		// It's not, it's a 404.
+		$cms->handle404($_GET["bigtree_htaccess_url"]);		
 	}
 	
 	$content = ob_get_clean();

@@ -1,5 +1,5 @@
 <?
-	BigTree::globalizePOSTVars(array("htmlspecialchars","mysql_real_escape_string"));
+	BigTree::globalizePOSTVars();
 	
 	foreach ($actions as $action => $state) {
 		if ($action == "approve") {
@@ -11,21 +11,12 @@
 		}
 	}
 	
-	
 	if ($type == "draggable") {
 		sqlquery("ALTER TABLE `$table` ADD COLUMN position INT(11) NOT NULL");
 	}	
 	
-	// Let's create the view
-
-	$actions = mysql_real_escape_string(json_encode($actions));
-	$fields = mysql_real_escape_string(json_encode($fields));
-	$options = mysql_real_escape_string($_POST["options"]);
-	
-	sqlquery("INSERT INTO bigtree_module_views (`title`,`description`,`type`,`fields`,`actions`,`table`,`options`,`suffix`) VALUES ('$title','$description','$type','$fields','$actions','$table','$options','$suffix')");
-		
-	$view_id = sqlid();
-	
+	// Let's create the view - we're decoding options here because it's already encoded but that'd be weird to assume in the class.
+	$view_id = $admin->createModuleView($title,$description,$table,$type,json_decode($options,true),$fields,$actions,$suffix);
 	$admin->createModuleAction($module,"View $title",$route,"on","icon_small_home",0,$view_id);
 		
 	header("Location: ../complete/$module/");

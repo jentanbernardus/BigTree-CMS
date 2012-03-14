@@ -1,5 +1,5 @@
 <?
-	BigTree::globalizePOSTVars(array("htmlspecialchars","mysql_real_escape_string"));
+	BigTree::globalizePOSTVars();
 
 	$breadcrumb[] = array("title" => "Created View", "href" => "#");
 
@@ -45,7 +45,7 @@
 		
 		$module = end($path);
 		
-		// Check to see if there's a default view for the module.  If not our route is going to be blank.
+		// Check to see if there's a default view for the module. If not our route is going to be blank.
 		$landing_exists = $admin->doesModuleLandingActionExist($module);
 		if ($landing_exists) {
 			if ($suffix) {
@@ -58,15 +58,7 @@
 		}
 		
 		// Let's create the view
-
-		$actions = mysql_real_escape_string(json_encode($actions));
-		$fields = mysql_real_escape_string(json_encode($fields));
-		$options = mysql_real_escape_string($_POST["options"]);
-		
-		sqlquery("INSERT INTO bigtree_module_views (`title`,`description`,`type`,`fields`,`actions`,`table`,`options`,`suffix`,`uncached`,`preview_url`) VALUES ('$title','$description','$type','$fields','$actions','$table','$options','$suffix','$uncached','$preview_url')");
-		
-		$view_id = sqlid();
-		
+		$view_id = $admin->createModuleView($title,$description,$table,$type,json_decode($options,true),$fields,$actions,$suffix,$preview_url);
 		$admin->createModuleAction($module,"View $title",$route,"on","icon_small_home",0,$view_id);
 		
 		$mod = $admin->getModule($module);

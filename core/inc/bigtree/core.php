@@ -34,6 +34,35 @@
 		}
 		
 		/*
+			Function: checkOldRoutes
+				Checks the old route table, redirects if the page is found.
+			
+			Parameters:
+				path - An array of routes
+		*/
+		
+		function checkOldRoutes($path) {
+			$found = false;
+			$x = count($path);
+			while ($x) {
+				$f = sqlfetch(sqlquery("SELECT * FROM bigtree_route_history WHERE old_route = '".implode("/",array_slice($path,0,$x))."'"));
+				if ($f) {
+					$old = $f["old_route"];
+					$new = $f["new_route"];
+					$found = true;
+					break;
+				}
+				$x--;
+			}
+			// If it's in the old routing table, send them to the new page.
+			if ($found) {
+				header("HTTP/1.1 301 Moved Permanently");
+				header("Location: ".$GLOBALS["www_root"].str_replace($old,$new,$_GET["bigtree_htaccess_url"]));
+				die();
+			}
+		}
+		
+		/*
 			Function: decodeCallouts
 				Turns the JSON callout data into a PHP array of callouts with links being translated into front-end readable links.
 				This function is called by BigTree's router and is generally not a function needed to end users.

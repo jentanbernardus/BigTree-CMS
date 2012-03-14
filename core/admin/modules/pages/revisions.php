@@ -28,17 +28,8 @@
 	$current = sqlfetch(sqlquery("SELECT updated_at,last_edited_by FROM bigtree_pages WHERE id = '".$pdata["id"]."'"));
 	$current_author = $admin->getUser($current["last_edited_by"]);
 	
-	// Get all previous revisions, add them to the saved or unsaved list
-	$revisions = array();
-	$saved = array();
-	$q = sqlquery("SELECT bigtree_users.name, bigtree_page_versions.saved, bigtree_page_versions.saved_description, bigtree_page_versions.updated_at, bigtree_page_versions.id FROM bigtree_page_versions JOIN bigtree_users ON bigtree_page_versions.author = bigtree_users.id WHERE page = '".$pdata["id"]."' ORDER BY updated_at DESC");
-	while ($f = sqlfetch($q)) {
-		if ($f["saved"]) {
-			$saved[] = $f;
-		} else {
-			$revisions[] = $f;
-		}
-	}
+	// Get all revisions
+	$revisions = $admin->getPageRevisions($page);
 ?>
 <div class="table">
 	<summary><h2><span class="visible"></span>Unpublished Drafts</h2></summary>
@@ -83,7 +74,7 @@
 			<section class="pages_publish"><a href="#" class="icon_draft"></a></section>
 			<section class="pages_edit"></span>
 		</li>
-		<? foreach ($revisions as $r) { ?>
+		<? foreach ($revisions["unsaved"] as $r) { ?>
 		<li>
 			<section class="pages_last_edited"><?=date("F j, Y @ g:ia",strtotime($r["updated_at"]))?></section>
 			<section class="pages_draft_author"><?=$r["name"]?></section>
@@ -103,7 +94,7 @@
 		<span class="pages_edit">Delete</span>
 	</header>
 	<ul>
-		<? foreach ($saved as $r) { ?>
+		<? foreach ($revisions["saved"] as $r) { ?>
 		<li>
 			<section class="pages_last_edited"><?=date("F j, Y @ g:ia",strtotime($r["updated_at"]))?></section>
 			<section class="pages_draft_description"><?=$r["saved_description"]?></section>
