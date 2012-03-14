@@ -9,7 +9,7 @@
 		$group = $group_existing;
 	}
 	
-	$admin->createModule($name,$group,$class,$table,$gbp);
+	$id = $admin->createModule($name,$group,$class,$table,$gbp);
 ?>
 <h1><span class="icon_developer_modules"></span>Module Created</h1>
 <div class="form_container">
