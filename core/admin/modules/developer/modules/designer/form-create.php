@@ -2,7 +2,7 @@
 	$reserved = array("id","position");
 	$fields = array();
 	$adds = array();
-	$module = mysql_real_escape_string($_POST["module"]);
+	$module = $_POST["module"];
 	$table = "`".$_POST["table"]."`";
 	
 	if (!count($_POST["titles"]) || empty($_POST["titles"])) {

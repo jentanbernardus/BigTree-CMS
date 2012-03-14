@@ -26,10 +26,9 @@
 	);
 	
 	// Go through every module form and look for uploads, make sure the directories exist and are writable.
-	$q = sqlquery("SELECT * FROM bigtree_module_forms");
-	while ($f = sqlfetch($q)) {
-		$fields = json_decode($f["fields"],true);
-		foreach ($fields as $key => $data) {
+	$forms = $admin->getModuleForms();
+	foreach ($forms as $form) {
+		foreach ($form["fields"] as $key => $data) {
 			if ($data["directory"]) {
 				if (!BigTree::isDirectoryWritable($site_root.$data["directory"])) {
 					$warnings[] = array(

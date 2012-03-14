@@ -1,19 +1,13 @@
 <?
-	BigTree::globalizePOSTVars(array("htmlspecialchars","mysql_real_escape_string"));
+	BigTree::globalizePOSTVars();
 
 	$module = end($path);
 
-	$subroute = $suffix ? mysql_real_escape_string($_POST["suffix"]) : "";
-			
-	if ($subroute) {
-		$editroute = "edit-".$subroute;
-		$addroute = "add-".$subroute;
-	} else {
-		$editroute = "edit";
-		$addroute = "add";
+	if ($suffix) {
+		$suffix = "-".$suffix;
 	}
 	
-	
+	$fields = array();
 	foreach ($_POST["type"] as $key => $val) {
 		$field = json_decode($_POST["options"][$key],true);
 		$field["type"] = $val;
@@ -22,14 +16,9 @@
 		$fields[$key] = $field;
 	}
 	
-	$fields = mysql_real_escape_string(json_encode($fields));
-	
-	sqlquery("INSERT INTO bigtree_module_forms (`title`,`javascript`,`css`,`callback`,`table`,`fields`,`default_position`) VALUES ('$title','$javascript','$css','$callback','$table','$fields','$default_position')");
-	
-	$form_id = sqlid();
-
-	$admin->createModuleAction($module,"Add $title",$addroute,"on","icon_small_add",$form_id);
-	$admin->createModuleAction($module,"Edit $title",$editroute,"","icon_small_edit",$form_id);
+	$form_id = $admin->createModuleForm($title,$table,$fields,$javascript,$css,$callback,$default_position);
+	$admin->createModuleAction($module,"Add $title","add".$suffix,"on","icon_small_add",$form_id);
+	$admin->createModuleAction($module,"Edit $title","edit".$suffix,"","icon_small_edit",$form_id);
 			
 	$mod = $admin->getModule($module);
 ?>

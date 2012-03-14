@@ -719,16 +719,25 @@
 				title - The title of the form.
 				table - The table for the form data.
 				fields - The form fields.
+				javascript - Optional Javascript file to include in the form.
+				css - Optional CSS file to include in the form.
+				callback - Optional callback function to run after the form processes.
+				default_position - Default position for entries to the form (if the view is positioned).
 				
 			Returns:
 				The new form id.
 		*/
 		
-		function createModuleForm($title,$table,$fields) {
+		function createModuleForm($title,$table,$fields,$javascript = "",$css = "",$callback = "",$default_position = "") {
 			$title = mysql_real_escape_string(htmlspecialchars($title));
 			$table = mysql_real_escape_string($table);
 			$field = mysql_real_escape_string(json_encode($fields));
-			sqlquery("INSERT INTO bigtree_module_forms (`title`,`table`,`fields`) VALUES ('$title','$table','$fields')");
+			$javascript - mysql_real_escape_string(htmlspecialchars($javascript));
+			$css - mysql_real_escape_string(htmlspecialchars($css));
+			$callback - mysql_real_escape_string($callback);
+			$default_position - mysql_real_escape_string($default_position);
+			
+			sqlquery("INSERT INTO bigtree_module_forms (`title`,`table`,`fields`,`javascript`,`css`,`callback`,`default_position`) VALUES ('$title','$table','$fields','$javascript','$css','$callback','$default_position')");
 			return sqlid();
 		}
 		
@@ -2166,6 +2175,24 @@
 
 			$module["gbp"] = json_decode($module["gbp"],true);
 			return $module;
+		}
+		
+		/*
+			Function: getModuleForms
+				Gets all module forms.
+			
+			Returns:
+				An array of entries from bigtree_module_forms with "fields" decoded.
+		*/
+		
+		function getModuleForms() {
+			$items = array();
+			$q = sqlquery("SELECT * FROM bigtree_module_forms");
+			while ($f = sqlfetch($q)) {
+				$f["fields"] = json_decode($f["fields"],true);
+				$items[] = $f;
+			}
+			return $items;
 		}
 		
 		/*
@@ -4436,6 +4463,42 @@
 			}
 			
 			sqlquery("UPDATE bigtree_module_actions SET name = '$name', route = '$route', class = '$icon', in_nav = '$in_nav' WHERE id = '$id'");
+		}
+		
+		/*
+			Function: updateModuleForm
+				Updates a module form.
+			
+			Parameters:
+				id - The id of the form.
+				title - The title of the form.
+				table - The table for the form data.
+				fields - The form fields.
+				javascript - Optional Javascript file to include in the form.
+				css - Optional CSS file to include in the form.
+				callback - Optional callback function to run after the form processes.
+				default_position - Default position for entries to the form (if the view is positioned).
+				suffix - Optional add/edit suffix for the form.
+		*/
+		
+		function updateModuleForm($id,$title,$table,$fields,$javascript = "",$css = "",$callback = "",$default_position = "",$suffix = "") {
+			$id = mysql_real_escape_string($id);
+			$title = mysql_real_escape_string(htmlspecialchars($title));
+			$table = mysql_real_escape_string($table);
+			$field = mysql_real_escape_string(json_encode($fields));
+			$javascript - mysql_real_escape_string(htmlspecialchars($javascript));
+			$css - mysql_real_escape_string(htmlspecialchars($css));
+			$callback - mysql_real_escape_string($callback);
+			$default_position - mysql_real_escape_string($default_position);
+			
+			sqlquery("UPDATE bigtree_module_forms SET title = '$title', `table` = '$table', fields = '$fields', javascript = '$javascript', css = '$css', callback = '$callback', default_position = '$default_position' WHERE id = '$id'");
+			
+			$action = $this->getModuleActionForForm(end($path));	
+			$oroute = str_replace(array("add-","edit-","add","edit"),"",$action["route"]);
+			if ($suffix != $oroute) {
+				sqlquery("UPDATE bigtree_module_actions SET route = 'add-$suffix' WHERE module = '".$action["module"]."' AND route = 'add-$oroute'");
+				sqlquery("UPDATE bigtree_module_actions SET route = 'edit-$suffix' WHERE module = '".$action["module"]."' AND route = 'edit-$oroute'");
+			}
 		}
 		
 		/*

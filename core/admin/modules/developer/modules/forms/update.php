@@ -1,8 +1,7 @@
 <?
-	BigTree::globalizePOSTVars(array("htmlspecialchars","mysql_real_escape_string"));
+	BigTree::globalizePOSTVars();
 
 	$fields = array();	
-	
 	foreach ($_POST["type"] as $key => $val) {
 		$field = json_decode($_POST["options"][$key],true);
 		$field["type"] = $val;
@@ -11,16 +10,7 @@
 		$fields[$key] = $field;
 	}
 	
-	$fields = mysql_real_escape_string(json_encode($fields));	
-	
-	sqlquery("UPDATE bigtree_module_forms SET `fields` = '$fields', `table` = '$table', title = '$title', javascript = '$javascript', css = '$css', callback = '$callback', default_position = '$default_position' WHERE id = '".end($path)."'");
-	
-	$action = $admin->getModuleActionForForm(end($path));	
-	$oroute = str_replace(array("add-","edit-","add","edit"),"",$action["route"]);
-	if ($suffix != $oroute) {
-		sqlquery("UPDATE bigtree_module_actions SET route = 'add-$suffix' WHERE module = '".$action["module"]."' AND route = 'add-$oroute'");
-		sqlquery("UPDATE bigtree_module_actions SET route = 'edit-$suffix' WHERE module = '".$action["module"]."' AND route = 'edit-$oroute'");
-	}
+	$admin->updateModuleForm(end($path),$title,$table,$fields,$javascript,$css,$callback,$default_position,$suffix);
 	
 	$admin->growl("Developer","Updated Module Form");
 	header("Location: ".$developer_root."modules/edit/".$action["module"]."/");
