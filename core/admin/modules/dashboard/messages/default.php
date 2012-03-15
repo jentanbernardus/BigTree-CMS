@@ -128,7 +128,7 @@
 					$recipients = explode("|",trim($item["recipients"],"|"));
 					$r_names = array();
 					foreach ($recipients as $r) {
-						$u = sqlfetch(sqlquery("SELECT name FROM bigtree_users WHERE id = '".mysql_real_escape_string($r)."'"));
+						$u = $admin->getUser($r);
 						$r_names[] = $u["name"];
 					}
 		?>

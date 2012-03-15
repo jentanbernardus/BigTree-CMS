@@ -7,7 +7,7 @@
 		die();
 	}
 	
-	sqlquery("DELETE FROM bigtree_settings WHERE id = 'bigtree-internal-google-analytics-email'");
+	$admin->deleteSetting("bigtree-internal-google-analytics-email");
 	$setting = array(
 		"id" => "bigtree-internal-google-analytics-email",
 		"title" => "Google Analytics Email Address",
@@ -18,7 +18,7 @@
 	$admin->createSetting($setting);
 	$admin->updateSettingValue("bigtree-internal-google-analytics-email",$_POST["email"]);
 	
-	sqlquery("DELETE FROM bigtree_settings WHERE id = 'bigtree-internal-google-analytics-password'");
+	$admin->deleteSetting("bigtree-internal-google-analytics-password");
 	$setting = array(
 		"id" => "bigtree-internal-google-analytics-password",
 		"title" => "Google Analytics Password",

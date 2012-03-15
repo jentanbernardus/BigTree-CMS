@@ -428,8 +428,8 @@
 			$cached_types = $this->getCachedFieldTypes();
 			$types = $cached_types["callout"];
 			
-			$resources = array();
-			foreach ($_POST["resources"] as $resource) {
+			$clean_resources = array();
+			foreach ($resources as $resource) {
 				if ($resource["id"] && $resource["id"] != "type") {
 					$options = json_decode($resource["options"],true);
 					foreach ($options as $key => $val) {
@@ -444,7 +444,7 @@
 					$resource["name"] = htmlspecialchars($resource["name"]);
 					$resource["subtitle"] = htmlspecialchars($resource["subtitle"]);
 					unset($resource["options"]);
-					$resources[] = $resource;
+					$clean_resources[] = $resource;
 				}
 			}
 			
@@ -456,7 +456,7 @@
 			$name = mysql_real_escape_string(htmlspecialchars($name));
 			$description = mysql_real_escape_string(htmlspecialchars($description));
 			$level = mysql_real_escape_string($level);
-			$resources = mysql_real_escape_string(json_encode($resources));
+			$resources = mysql_real_escape_string(json_encode($clean_resources));
 			
 			if (!file_exists($GLOBALS["server_root"]."templates/callouts/".$id.".php")) {
 				file_put_contents($GLOBALS["server_root"]."templates/callouts/".$id.".php",$file_contents);
@@ -1092,6 +1092,113 @@
 		}
 		
 		/*
+			Function: createTag
+				Creates a new tag, or returns the id of an existing one.
+			
+			Parameters:
+				tag - The tag.
+			
+			Returns:
+				If the tag exists, returns the existing tag's id.
+				Otherwise, returns the new tag id.
+		*/
+		
+		function createTag($tag) {
+			$tag = strtolower(html_entity_decode($tag));
+			// Check if the tag exists already.
+			$f = sqlfetch(sqlquery("SELECT * FROM bigtree_tags WHERE tag = '".mysql_real_escape_string($tag)."'"));
+			
+			if (!$f) {
+				$meta = metaphone($tag);
+				$route = $cms->urlify($tag);
+				$oroute = $route;
+				$x = 2;
+				while ($f = sqlfetch(sqlquery("SELECT * FROM bigtree_tags WHERE route = '$route'"))) {
+					$route = $oroute."-".$x;
+					$x++;
+				}
+				sqlquery("INSERT INTO bigtree_tags (`tag`,`metaphone`,`route`) VALUES ('".mysql_real_escape_string($tag)."','$meta','$route')");
+				$id = sqlid();
+			} else {
+				$id = $f["id"];
+			}
+			
+			return $id;
+		}
+		
+		/*
+			Function: createTemplate
+				Creates a template and its default files/directories.
+		
+			Paremeters:
+				id - Id for the template.
+				name - Name
+				description - Description
+				routed - Basic ("") or Routed ("on")
+				level - Access level (0 for everyone, 1 for administrators, 2 for developers)
+				module - Related module id
+				image - Image
+				callouts_enabled - "on" for yes
+				resources - An array of resources
+		*/
+		
+		function createTemplate($id,$name,$description,$routed,$level,$module,$image,$callouts_enabled,$resources) {
+			// If we're creating a new file, let's populate it with some convenience things to show what resources are available.
+			$file_contents = "<?\n	/*\n		Resources Available:\n";
+		
+			$clean_resources = array();
+			foreach ($resources as $resource) {
+			    if ($resource["id"]) {
+			    	$options = json_decode($resource["options"],true);
+			    	foreach ($options as $key => $val) {
+			    		if ($key != "name" && $key != "id" && $key != "type")
+			    			$resource[$key] = $val;
+			    	}
+			    	
+			    	$file_contents .= '		$'.$resource["id"].' = '.$resource["name"].' - '.$types[$resource["type"]]."\n";
+			    	
+			    	$resource["id"] = htmlspecialchars($resource["id"]);
+			    	$resource["name"] = htmlspecialchars($resource["name"]);
+			    	$resource["subtitle"] = htmlspecialchars($resource["subtitle"]);
+			    	unset($resource["options"]);
+			    	$clean_resources[] = $resource;
+			    }
+			}
+						
+			
+			$file_contents .= '	*/
+?>';		
+			
+			if ($routed == "on") {
+				if (!file_exists($GLOBALS["server_root"]."templates/modules/".$id)) {
+					mkdir($GLOBALS["server_root"]."templates/modules/".$id);
+					chmod($GLOBALS["server_root"]."templates/modules/".$id,0777);
+				}
+				if (!file_exists($GLOBALS["server_root"]."templates/modules/".$id."/default.php")) {
+					file_put_contents($GLOBALS["server_root"]."templates/modules/".$id."/default.php",$file_contents);
+					chmod($GLOBALS["server_root"]."templates/modules/".$id."/default.php",0777);
+				}
+			} else {
+				if (!file_exists($GLOBALS["server_root"]."templates/pages/".$id.".php")) {
+					file_put_contents($GLOBALS["server_root"]."templates/pages/".$id.".php",$file_contents);
+					chmod($GLOBALS["server_root"]."templates/pages/".$id.".php",0777);
+				}
+			}
+			
+			$id = mysql_real_escape_string($id);
+			$name = mysql_real_escape_string(htmlspecialchars($name));
+			$description = mysql_real_escape_string(htmlspecialchars($description));
+			$module = mysql_real_escape_string($module);
+			$resources = mysql_real_escape_string(json_encode($clean_resources));
+			$image = mysql_real_escape_string($image);
+			$level = mysql_real_escape_string($level);
+			$callouts_enabled = mysql_real_escape_string($callouts_enabled);
+			$routed = mysql_real_escape_string($routed);
+			
+			sqlquery("INSERT INTO bigtree_templates (`id`,`name`,`module`,`resources`,`image`,`description`,`level`,`callouts_enabled`,`routed`) VALUES ('$id','$name','$module','$resources','$image','$description','$level','$callouts_enabled','$routed')");
+		}
+		
+		/*
 			Function: createUser
 				Creates a user.
 				Checks for developer access.
@@ -1365,9 +1472,9 @@
 		function deletePageDraft($id) {
 			$id = mysql_real_escape_string($id);
 			// Get the version, check if the user has access to the page the version refers to.
-			$access = $admin->getPageAccessLevelByUser($id,$admin->ID);
+			$access = $this->getPageAccessLevelByUser($id,$this->ID);
 			if ($access != "p") {
-				$admin->stop("You must be a publisher to manage revisions.");
+				$this->stop("You must be a publisher to manage revisions.");
 			}
 			
 			// Delete draft copy
@@ -1406,6 +1513,32 @@
 		function deletePendingChange($id) {
 			$id = mysql_real_escape_string($id);
 			sqlquery("DELETE FROM bigtree_pending_changes WHERE id = '$id'");
+		}
+		
+		/*
+			Function: deleteSetting
+				Deletes a setting.
+			
+			Parameters:
+				id - The id of the setting.
+		*/
+		
+		function deleteSetting($id) {
+			$id = mysql_real_escape_string($id);
+			sqlquery("DELETE FROM bigtree_settings WHERE id = '$id'");
+		}
+		
+		/*
+			Function: deleteTemplate
+				Deletes a template.
+			
+			Parameters:
+				id - The id of the template.
+		*/
+		
+		function deleteTemplate($id) {
+			$id = mysql_real_escape_string($id);
+			sqlquery("DELETE FROM bigtree_templates WHERE id = '$id'");
 		}
 		
 		/*
@@ -3623,6 +3756,22 @@
 		}
 		
 		/*
+			Function: getTag
+				Returns a tag for the given id.
+			
+			Parameters:
+				id - The id of the tag.
+			
+			Returns:
+				A bigtree_tags entry.
+		*/
+		
+		function getTag($id) {
+			$id = mysql_real_escape_string($id);
+			return sqlfetch(sqlquery("SELECT * FROM bigtree_tags WHERE id = '$id'"));
+		}
+		
+		/*
 			Function: getTagsForPage
 				Returns a list of tags a page is tagged with.
 			
@@ -3706,6 +3855,23 @@
 		}
 		
 		/*
+			Function: getTokenUsers
+				Gets a list of users available to make a token for.
+			
+			Returns:
+				An array of users with access level at or below the logged in user, ordered by email.
+		*/
+		
+		function getTokenUsers() {
+			$items = array();
+			$q = sqlquery("SELECT * FROM bigtree_users WHERE level <= '".$this->Level."' ORDER BY email");
+			while ($f = sqlfetch($q)) {
+				$items[] = $f;
+			}
+			return $items;
+		}
+		
+		/*
 			Function: getUnreadMessageCount
 				Returns the number of unread messages for the logged in user.
 			
@@ -3743,6 +3909,38 @@
 			}
 			$item["alerts"] = json_decode($item["alerts"],true);
 			return $item;
+		}
+		
+		/*
+			Function: getUserByEmail
+				Gets a user entry for a given email.
+			
+			Parameters:
+				email - The email to find.
+			
+			Returns:
+				A user entry from bigtree_users.
+		*/
+		
+		function getUserByEmail($email) {
+			$email = mysql_real_escape_string($email);
+			return sqlfetch(sqlquery("SELECT * FROM bigtree_users WHERE email = '$email'"));
+		}
+		
+		/*
+			Function: getUserByHash
+				Gets a user entry for a change password hash.
+			
+			Parameters:
+				hash - The hash to find.
+			
+			Returns:
+				A user entry from bigtree_users.
+		*/
+		
+		function getUserByHash($hash) {
+			$hash = mysql_real_escape_string($hash);
+			return sqlfetch(sqlquery("SELECT * FROM bigtree_users WHERE change_password_hash = '$hash'"));
 		}
 		
 		/*
@@ -4244,7 +4442,7 @@
 		
 		function searchPages($query,$fields = array("nav_title"),$max = 10) {
 			$results = array();
-			$terms = explode(" ",$_POST["query"]);
+			$terms = explode(" ",$query);
 	
 			foreach ($terms as $term) {
 				$term = mysql_real_escape_string(strtolower($term));
@@ -4303,6 +4501,40 @@
 			}
 
 			return array("folders" => $folders, "resources" => $resources);
+		}
+		
+		/*
+			Function: searchTags
+				Finds existing tags that are similar.
+			
+			Parameters:
+				tag - A tag to find similar tags for.
+			
+			Returns:
+				An array of up to 8 similar tags.
+		*/
+		
+		function searchTags($tag) {
+			$tags = array();
+			$meta = metaphone($tag);
+			$close_tags = array();
+			$dist = array();
+			$q = sqlquery("SELECT * FROM bigtree_tags");
+			while ($f = sqlfetch($q)) {
+				$distance = levenshtein($f["metaphone"],$meta);
+				if ($distance < 2) {
+					$tags[] = $f["tag"];
+					$dist[] = $distance;
+				}
+			}
+			
+			array_multisort($dist,SORT_ASC,$tags);
+			
+			if (count($tags) > 8) {
+				$tags = array_slice($tags,0,8);
+			}
+			
+			return $tags;
 		}
 		
 		/*
@@ -4395,6 +4627,37 @@
 			$id = mysql_real_escape_string($id);
 			$position = mysql_real_escape_string($position);
 			sqlquery("UPDATE bigtree_pages SET position = '$position' WHERE id = '$id'");
+		}
+		
+		/*
+			Function: setPasswordHashForUser
+				Creates a change password hash for a user.
+			
+			Parameters:
+				user - A user entry.
+			
+			Returns:
+				A change password hash.
+		*/
+		
+		function setPasswordHashForUser($user) {
+			$hash = md5(microtime().$user["password"]);
+			sqlquery("UPDATE bigtree_users SET change_password_hash = '$hash' WHERE id = '".$user["id"]."'");
+		}
+		
+		/*
+			Function: setTemplatePosition
+				Sets the position of a template.
+			
+			Parameters:
+				id - The id of the template.
+				position - The position to set.
+		*/
+		
+		function setTemplatePosition($id,$position) {
+			$id = mysql_real_escape_string($id);
+			$position = mysql_real_escape_string($position);
+			sqlquery("UPDATE bigtree_templates SET position = '$position' WHERE id = '$id'");
 		}
 		
 		/*
@@ -4718,6 +4981,7 @@
 		*/
 		
 		function updateCallout($id,$name,$description,$level,$resources) {
+			$r = array();
 			foreach ($resources as $resource) {
 				if ($resource["id"] && $resource["id"] != "type") {
 					$options = json_decode($resource["options"],true);
@@ -5323,6 +5587,51 @@
 			// Audit trail
 			$this->track("bigtree_settings",$id,"updated-value");
 		}
+		
+		/*
+			Function: updateTemplate
+				Updates a template.
+		
+			Paremeters:
+				id - The id of the template to update.
+				name - Name
+				description - Description
+				level - Access level (0 for everyone, 1 for administrators, 2 for developers)
+				module - Related module id
+				image - Image
+				callouts_enabled - "on" for yes
+				resources - An array of resources
+		*/
+		
+		function updateTemplate($id,$name,$description,$level,$module,$image,$callouts_enabled,$resources) {
+			$clean_resources = array();
+			foreach ($resources as $resource) {
+			    if ($resource["id"]) {
+			    	$options = json_decode($resource["options"],true);
+			    	foreach ($options as $key => $val) {
+			    		if ($key != "name" && $key != "id" && $key != "type")
+			    			$resource[$key] = $val;
+			    	}
+			    	
+			    	$resource["id"] = htmlspecialchars($resource["id"]);
+			    	$resource["name"] = htmlspecialchars($resource["name"]);
+			    	$resource["subtitle"] = htmlspecialchars($resource["subtitle"]);
+			    	unset($resource["options"]);
+			    	$clean_resources[] = $resource;
+			    }
+			}
+			
+			$id = mysql_real_escape_string($id);
+			$name = mysql_real_escape_string(htmlspecialchars($name));
+			$description = mysql_real_escape_string(htmlspecialchars($description));
+			$module = mysql_real_escape_string($module);
+			$resources = mysql_real_escape_string(json_encode($clean_resources));
+			$image = mysql_real_escape_string($image);
+			$level = mysql_real_escape_string($level);
+			$callouts_enabled = mysql_real_escape_string($callouts_enabled);
+			
+			sqlquery("UPDATE bigtree_templates SET resources = '$resources', image = '$image', name = '$name', module = '$module', description = '$description', level = '$level', callouts_enabled = '$callouts_enabled' WHERE id = '$id'");
+		}
 
 		/*
 			Function: updateUser
@@ -5378,6 +5687,24 @@
 			$this->track("bigtree_users",$id,"updated");
 
 			return true;
+		}
+		
+		/*
+			Function: updateUserPassword
+				Updates a user's password.
+			
+			Parameters:
+				id - The user's id.
+				password - The new password.
+		*/
+		
+		function updateUserPassword($id,$password) {
+			global $config;
+			
+			$id = mysql_real_escape_string($id);
+			$phpass = new PasswordHash($config["password_depth"], TRUE);
+			$password = mysql_real_escape_string($phpass->HashPassword($password));
+			sqlquery("UPDATE bigtree_users SET password = '$password' WHERE id = '$id'");
 		}
 		
 		/*

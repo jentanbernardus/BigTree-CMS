@@ -1,22 +1,6 @@
 <?
-	BigTree::globalizePOSTVars(array("htmlspecialchars","mysql_real_escape_string"));
+	BigTree::globalizePOSTVars();
 
-	$resources = array();
-	foreach ($_POST["resources"] as $resource) {
-		if ($resource["id"]) {
-			$options = json_decode($resource["options"],true);
-			foreach ($options as $key => $val) {
-				if ($key != "name" && $key != "id" && $key != "type")
-					$resource[$key] = $val;
-			}
-			$resource["id"] = htmlspecialchars($resource["id"]);
-			$resource["name"] = htmlspecialchars($resource["name"]);
-			$resource["subtitle"] = htmlspecialchars($resource["subtitle"]);
-			unset($resource["options"]);
-			$resources[] = $resource;
-		}
-	}
-	
 	$template = $cms->getTemplate($id);
 
 	if ($_FILES["image"]["tmp_name"]) {
@@ -28,14 +12,9 @@
 		$image = $existing_image;
 	} else {
 		$image = $template["image"];
-	}
+	}	
 	
-	$resources = mysql_real_escape_string(json_encode($resources));
-
-	$name = mysql_real_escape_string(htmlspecialchars($_POST["name"]));
-	$description = mysql_real_escape_string(htmlspecialchars($_POST["description"]));
-
-	sqlquery("UPDATE bigtree_templates SET resources = '$resources', image = '$image', name = '$name', module = '$module', description = '$description', level = '$level', callouts_enabled = '$callouts_enabled' WHERE id = '$id'");
+	$admin->updateTemplate($id,$name,$description,$level,$module,$image,$callouts_enabled,$resources);
 	
 	$admin->growl("Developer","Updated Template");
 	header("Location: ".$developer_root."templates/view/");

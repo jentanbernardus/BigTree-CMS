@@ -2,12 +2,11 @@
 	$error = false;
 	if (count($_POST)) {
 		$f = $admin->getUser($admin->ID);
+		
 		$phpass = new PasswordHash($config["password_depth"], TRUE);
 		$ok = $phpass->CheckPassword($_POST["current_password"],$f["password"]);
 		if ($ok) {
-			$phpass = new PasswordHash($config["password_depth"], TRUE);
-			$password = mysql_real_escape_string($phpass->HashPassword($_POST["new_password"]));
-			sqlquery("UPDATE bigtree_users SET password = '$password' WHERE id = '".$admin->ID."'");
+			$admin->updateUserPassword($admin->ID,$_POST["new_password"]);
 			$admin->growl("Users","Updated Password");
 			header("Location: $admin_root");
 			die();

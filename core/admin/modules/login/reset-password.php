@@ -1,6 +1,5 @@
 <?
-	$hash = mysql_real_escape_string(end($path));
-	$user = sqlfetch(sqlquery("SELECT * FROM bigtree_users WHERE change_password_hash = '$hash'"));
+	$user = $admin->getUserByHash(end($path));
 	$failure = false;
 	
 	if ($_POST["password"]) {

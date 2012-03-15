@@ -1,5 +1,4 @@
 <?
-	$autoModule = new BigTreeAutoModule;
 	BigTree::globalizeArray($view);	
 	
 	$fields = json_decode($fields,true);
@@ -19,7 +18,7 @@
 		$fields[$key]["width"] = $percol - 20;
 	}
 	
-	$items = $autoModule->parseViewData($view["id"],$items);
+	$items = BigTreeAutoModule::parseViewData($view["id"],$items);
 ?>
 <div class="table" style="margin: 0;">
 	<header>

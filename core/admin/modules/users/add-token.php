@@ -1,8 +1,9 @@
 <?
 	$breadcrumb[] = array("link" => "users/view-tokens/", "title" => "API Tokens");
 	$breadcrumb[] = array("link" => "users/add-token/", "title" => "Add Token");
-
+	
 	$admin->requireLevel(1);
+	$users = $admin->getTokenUsers();
 ?>
 <h1><span class="users"></span>Add Token</h1>
 <? include BigTree::path("admin/modules/users/_nav.php"); ?>
@@ -13,14 +14,9 @@
 				<fieldset>
 					<label>Associated User</label>
 					<select name="user" tabindex="1">
-						<?
-							$q = sqlquery("SELECT * FROM bigtree_users WHERE level <= '".$admin->Level."' ORDER BY email");
-							while ($f = sqlfetch($q)) {
-						?>
-						<option value="<?=$f["id"]?>"><?=htmlspecialchars($f["email"])?></option>
-						<?
-							}
-						?>
+						<? foreach ($users as $u) { ?>
+						<option value="<?=$u["id"]?>"><?=htmlspecialchars($u["email"])?></option>
+						<? } ?>
 					</select>
 				</fieldset>
 			</div>

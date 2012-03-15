@@ -252,7 +252,7 @@
 	}
 	
 	if (!$navid) {
-		list($navid,$commands) = $cms->getNavId($path);
+		list($navid,$commands,$routed) = $cms->getNavId($path);
 	}
 	
 	// Pre-init a bunch of vars to keep away notices.
@@ -289,7 +289,7 @@
 		}
 		
 		// If the template is a module, do its routing for it, otherwise just include the template.
-		if (substr($page["template"],0,7) == "module-") {
+		if ($routed) {
 			// We need to figure out how far down the directory structure to route the,.	
 			$inc = "../templates/modules/".substr($page["template"],7)."/";
 			$inc_dir = $inc;

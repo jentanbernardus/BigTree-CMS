@@ -3,7 +3,7 @@
 	$breadcrumb[] = array("link" => "#", "title" => "Edit Token");
 	
 	$admin->requireLevel(1);
-	
+	$users = $admin->getTokenUsers();
 	$token = $admin->getToken(end($path));
 ?>
 <h1><span class="users"></span>Edit Token</h1>
@@ -19,14 +19,9 @@
 				<fieldset>
 					<label>Associated User</label>
 					<select name="user">
-						<?
-							$q = sqlquery("SELECT * FROM bigtree_users WHERE level <= '".$admin->Level."' ORDER BY email");
-							while ($f = sqlfetch($q)) {
-						?>
-						<option value="<?=$f["id"]?>"<? if ($token["user"] == $f["id"]) { ?> selected="selected"<? } ?>><?=htmlspecialchars($f["email"])?></option>
-						<?
-							}
-						?>
+						<? foreach ($users as $u) { ?>
+						<option value="<?=$u["id"]?>"<? if ($token["user"] == $u["id"]) { ?> selected="selected"<? } ?>><?=htmlspecialchars($u["email"])?></option>
+						<? } ?>
 					</select>
 				</fieldset>
 			</div>

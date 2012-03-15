@@ -25,15 +25,6 @@
 		</fieldset>
 	</div>
 	<div class="right">
-		<fieldset>
-			<label>Access Level</label>
-			<select name="level">
-				<option value="0">Normal User</option>
-				<option value="1"<? if ($level == 1) { ?> selected="selected"<? } ?>>Administrator</option>
-				<option value="2"<? if ($level == 2) { ?> selected="selected"<? } ?>>Developer</option>
-			</select>
-		</fieldset>
-		
 		<? if (!$template) { ?>
 		<fieldset>
 			<label>Type</label>
@@ -43,6 +34,15 @@
 			</select>
 		</fieldset>
 		<? } ?>
+		
+		<fieldset>
+			<label>Access Level</label>
+			<select name="level">
+				<option value="0">Normal User</option>
+				<option value="1"<? if ($level == 1) { ?> selected="selected"<? } ?>>Administrator</option>
+				<option value="2"<? if ($level == 2) { ?> selected="selected"<? } ?>>Developer</option>
+			</select>
+		</fieldset>
 		
 		<fieldset>
 			<label>Related Module</label>

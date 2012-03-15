@@ -17,7 +17,7 @@
 			$temp_tags = json_decode($f["tags_changes"],true);
 			if (is_array($temp_tags)) {
 				foreach ($temp_tags as $tag) {
-					$tags[] = sqlfetch(sqlquery("SELECT * FROM bigtree_tags WHERE id = '$tag'"));
+					$tags[] = $admin->getTag($tag);
 				}
 			}
 			$presources = json_decode($f["resources_changes"],true);

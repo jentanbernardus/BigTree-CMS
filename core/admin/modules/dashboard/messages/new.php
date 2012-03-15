@@ -1,9 +1,5 @@
 <?
-	$users = array();
-	$q = sqlquery("SELECT id,name FROM bigtree_users ORDER BY name");
-	while ($f = sqlfetch($q)) {
-		$users[$f["id"]] = $f;
-	}
+	$users = $admin->getUsers();
 	
 	$send_to = array();
 	$subject = "";

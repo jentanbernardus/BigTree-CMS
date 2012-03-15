@@ -1,7 +1,7 @@
 <?
 	$admin->requireLevel(1);
 	
-	sqlquery("DELETE FROM bigtree_settings WHERE id = 'bigtree-internal-google-analytics-profile'");
+	$admin->deleteSetting("bigtree-internal-google-analytics-profile");
 	$setting = array(
 		"id" => "bigtree-internal-google-analytics-profile",
 		"title" => "Google Analytics Profile ID",

@@ -1,17 +1,18 @@
 <?
 	if ($_POST["password"]) {
-		$f = sqlfetch(sqlquery("SELECT * FROM bigtree_users WHERE change_password_hash = '".end($path)."'"));
+		$user = $admin->getUserByHash(end($path));
+		if (!$user) {
+			$admin->stop("Sorry, your password change code has expired. Please try recovering your password again.");
+		}
 		
-		$phpass = new PasswordHash($config["password_depth"], TRUE);
-		$password = mysql_real_escape_string($phpass->HashPassword($_POST["password"]));
-		sqlquery("UPDATE bigtree_users SET password = '$password' WHERE id = '".$f["id"]."'");
+		$admin->updateUserPassword($user["id"],$_POST["password"]);
 		
 		$admin->growl("Change Password","Password changed, ready to login!");
 		header("Location: $admin_root");
 		die();
 	}
 	
-	$f = sqlfetch(sqlquery("SELECT * FROM bigtree_users WHERE change_password_hash = '".end($path)."'"));
+	$user = $admin->getUserByHash(end($path));
 ?>
 <div id="login">
 	<form method="post" action="" id="cpass" class="module">
@@ -19,7 +20,7 @@
 			<h3>Change Password</h3>
 
 			<label>Email</label>
-			<input type="text" name="email" disabled="disabled" value="<?=htmlspecialchars($f["email"])?>" />
+			<input type="text" name="email" disabled="disabled" value="<?=htmlspecialchars($user["email"])?>" />
 
 			<label>New Password</label>
 			<input type="password" name="password" />
