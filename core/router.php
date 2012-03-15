@@ -234,12 +234,11 @@
 	
 	// Sitemap setup
 	$sitemap = false;
-	$sitemap_xml = false;
 	if ($path[0] == "sitemap") {
 		$sitemap = true;
 	}
 	if ($path[0] == "sitemap.xml") {
-		$sitemap_xml = true;
+		$cms->drawXMLSitemap();
 	}
 	if ($path[0] == "feeds") {
 		$route = $path[1];
@@ -365,28 +364,6 @@
 		include "../templates/pages/" . $page["template"] . ".php";
 	} elseif ($sitemap) {
 		include "../templates/pages/_sitemap.php";
-	} elseif ($sitemap_xml) {
-		header("Content-type: text/xml");
-		echo '<?xml version="1.0" encoding="UTF-8"?>';
-		echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">';
-		$q = sqlquery("SELECT template,external,path FROM bigtree_pages WHERE archived = '' AND (publish_at >= NOW() OR publish_at IS NULL)");
-		while ($f = sqlfetch($q)) {
-			if ($f["template"] || strpos($f["external"],$GLOBALS["domain"])) {	
-				if (!$f["template"]) {
-					if (substr($f["external"],0,6) == "ipl://") {
-						$link = $this->getInternalPageLink($f["external"]);
-					} else {
-						$link = str_replace("{wwwroot}",$GLOBALS["www_root"],$f["external"]);
-					}
-				} else {
-					$link = $GLOBALS["www_root"].$f["path"]."/";
-				}
-				
-				echo "<url><loc>".$link."</loc></url>";
-			}
-		}
-		echo '</urlset>';
-		die();
 	} else {
 		// Let's check if it's in the old routing table.
 		$cms->checkOldRoutes($path);

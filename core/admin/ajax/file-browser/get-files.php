@@ -1,6 +1,6 @@
 <?
 	if ($_POST["query"]) {
-		$items = $admin->getResourceSearchResults($_POST["query"]);
+		$items = $admin->searchResources($_POST["query"]);
 		$perm = "e";
 		$bc = array(array("name" => "Clear Results","id" => ""));
 	} else {
@@ -10,7 +10,7 @@
 	}
 	
 	if (!$_POST["query"] && $_POST["folder"] > 0) {
-		$folder = sqlfetch(sqlquery("SELECT * FROM bigtree_resource_folders WHERE id = '".mysql_real_escape_string($_POST["folder"])."'"));
+		$folder = $admin->getResourceFolder($_POST["folder"]);
 ?>
 <a href="#<?=$folder["parent"]?>" class="file folder"><span class="file_type file_type_folder file_type_folder_back"></span> Back</a>
 <?	

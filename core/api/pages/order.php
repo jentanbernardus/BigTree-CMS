@@ -13,14 +13,15 @@
 	$admin->requireAPILevel(1);
 
 	$page_array = $_POST["pages"];
-	if (!is_array($page_array))
+	if (!is_array($page_array)) {
 		$page_array = explode(",",$_POST["pages"]);
+	}
 		
 	$max = count($page_array);
 	
 	$x = 0;
 	while ($x < $max) {
-		sqlquery("UPDATE bigtree_pages SET position = '".($max-$x)."' WHERE id = '".mysql_real_escape_string($page_array[$x])."'");
+		$admin->setPagePosition($page_array[$x],$max - $x);
 		$x++;
 	}	
 	

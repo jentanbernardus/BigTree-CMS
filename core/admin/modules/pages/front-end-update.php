@@ -39,8 +39,7 @@
 		if ($page[0] == "p") {
 			// It's a pending page, so let's create one.
 			$page = $admin->createPage($pdata);
-			
-			sqlquery("DELETE FROM bigtree_pending_changes WHERE id = '$change_id'");
+			$admin->deletePendingChange($change_id);
 		} else {
 			// It's an existing page.
 			$admin->updatePage($page,$pdata);

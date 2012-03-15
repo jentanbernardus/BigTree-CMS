@@ -1,8 +1,4 @@
 <?
-	$page = end($path);
-	$r = $admin->getPageAccessLevelByUser($page,$admin->ID);
-	if ($r) {
-		sqlquery("DELETE FROM bigtree_pending_changes WHERE `table` = 'bigtree_pages' AND item_id = '$page'");
-	}
+	$admin->deletePageDraft(end($path));
 	header("Location: ".$admin_root."pages/edit/".$page."/");
 ?>

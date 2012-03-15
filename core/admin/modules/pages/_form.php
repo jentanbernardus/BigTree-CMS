@@ -7,9 +7,6 @@
 					<a href="#template_tab">Template</a>
 					<a href="#content_tab"<? if ($action == "update") { ?> class="active"<? } ?>>Content</a>
 					<a href="#seo_tab">SEO</a>
-					<? if ($admin->Level > 0 && $action == "update") { ?>
-					<a href="#move_tab">Move</a>
-					<? } ?>
 				</nav>
 				<div id="link_finder_results" style="display: none;"></div>
 				<input type="search" id="link_finder" class="form_search" autocomplete="off" placeholder="Link Finder" />
@@ -69,11 +66,6 @@
 		<section id="seo_tab" style="display: none;">
 			<? include BigTree::path("admin/modules/pages/tabs/seo.php") ?>
 		</section>
-		<? if ($admin->Level > 0 && $action == "update") { ?>
-		<section id="move_tab" style="display: none;">
-			<? include BigTree::path("admin/modules/pages/tabs/move.php") ?>
-		</section>
-		<? } ?>
 		<footer>
 			<a href="#" class="next button">Next Step &raquo;</a>
 

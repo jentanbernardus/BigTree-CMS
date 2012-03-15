@@ -1,5 +1,5 @@
 <?
-	$site = sqlfetch(sqlquery("SELECT nav_title FROM bigtree_pages WHERE id = '0'"));
+	$site = $cms->getPage(0);
 	$layout = "login";
 	
 	// Check if we're forcing HTTPS

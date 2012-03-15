@@ -928,6 +928,34 @@
 		}
 		
 		/*
+			Function: createPendingChange
+				Creates a pending change.
+			
+			Parameters:
+				table - The table the change applies to.
+				item_id - The entry the change applies to's id.
+				changes - The changes to the fields in the entry.
+				mtm_changes - Many to Many changes.
+				tags_changes - Tags changes.
+				module - The module id for the change.
+				
+			Returns:
+				The change id.
+		*/
+		
+		function createPendingChange($table,$item_id,$changes,$mtm_changes = array(),$tags_changes = array(),$module = 0) {
+			$table = mysql_real_escape_string($table);
+			$item_id = mysql_real_escape_string($item_id);
+			$changes = mysql_real_escape_string(json_encode($changes));
+			$mtm_changes = mysql_real_escape_string(json_encode($mtm_changes));
+			$tags_changes = mysql_real_escape_string(json_encode($tags_changes));
+			$module = mysql_real_escape_string($module);
+			
+			sqlquery("INSERT INTO bigtree_pending_changes (`user`,`date`,`table`,`item_id`,`changes`,`mtm_changes`,`tags_changes`,`module`) VALUES ('".$this->ID."',NOW(),'$table','$item_id','$changes','$mtm_changes','$tags_changes','$module')");
+			return sqlid();
+		}
+		
+		/*
 			Function: createPendingPage
 				Creates a pending page entry in bigtree_pending_changes
 			
@@ -966,6 +994,66 @@
 			$this->track("bigtree_pages","p$id","created-pending");
 
 			return $id;
+		}
+		
+		/*
+			Function: createResource
+				Creates a resource.
+			
+			Parameters:
+				folder - The folder to place it in.
+				file - The file path.
+				name - The file name.
+				type - The file type.
+				is_image - Whether the resource is an image.
+				height - The image height (if it's an image).
+				width - The image width (if it's an image).
+				thumbnails - An array of thumbnails (if it's an image).
+				list_thumb_margin - The margin for the list thumbnail (if it's an image).
+			
+			Returns:
+				The new resource id.
+		*/
+		
+		function createResource($folder,$file,$name,$type,$is_image = "",$height = 0,$width = 0,$thumbnails = array(),$list_thumb_margin = 0) {
+			$folder = mysql_real_escape_string($folder);
+			$file = mysql_real_escape_string($file);
+			$name = mysql_real_escape_string(htmlspecialchars($name));
+			$type = mysql_real_escape_string($type);
+			$is_image = mysql_real_escape_string($is_image);
+			$height = intval($height);
+			$width = intval($width);
+			$thumbnails = mysql_real_escape_string(json_encode($thumbnails));
+			$list_thumb_margin = intval($list_thumb_margin);
+			
+			sqlquery("INSERT INTO bigtree_resources (`file`,`date`,`name`,`type`,`folder`,`is_image`,`height`,`width`,`thumbnails`,`list_thumb_margin`) VALUES ('$file',NOW(),'$name','$type','$folder','$is_image','$height','$width','$thumbnails','$list_thumb_margin')");	
+			return sqlid();
+		}
+		
+		/*
+			Function: createResourceFolder
+				Creates a resource folder.
+				Checks permissions.
+			
+			Paremeters:
+				parent - The parent folder.
+				name - The name of the new folder.
+			
+			Returns:
+				The new folder id.
+		*/
+		
+		function createResourceFolder($parent,$name) {
+			$perm = $this->getResourceFolderPermission($parent);
+			if ($perm != "p") {
+				die("You don't have permission to make a folder here.");
+			}
+			
+			$parent = mysql_real_escape_string($parent);
+			$name = mysql_real_escape_string(htmlspecialchars($name));
+			
+			sqlquery("INSERT INTO bigtree_resource_folders (`name`,`parent`) VALUES ('$name','$parent')");
+			return sqlid();
 		}
 		
 		/*
@@ -1266,6 +1354,27 @@
 		}
 		
 		/*
+			Function: deletePageDraft
+				Deletes a page draft.
+				Checks permissions.
+			
+			Parameters:
+				id - The page id to delete the draft for.
+		*/
+		
+		function deletePageDraft($id) {
+			$id = mysql_real_escape_string($id);
+			// Get the version, check if the user has access to the page the version refers to.
+			$access = $admin->getPageAccessLevelByUser($id,$admin->ID);
+			if ($access != "p") {
+				$admin->stop("You must be a publisher to manage revisions.");
+			}
+			
+			// Delete draft copy
+			sqlquery("DELETE FROM bigtree_pending_changes WHERE `table` = 'bigtree_pages' AND `item_id` = '$id'");
+		}
+		
+		/*
 			Function: deletePageRevision
 				Deletes a page revision.
 				Checks permissions.
@@ -1284,6 +1393,19 @@
 			
 			// Delete the revision
 			sqlquery("DELETE FROM bigtree_page_revisions WHERE id = '".$revision["id"]."'");
+		}
+		
+		/*
+			Function: deletePendingChange
+				Deletes a pending change.
+			
+			Parameters:
+				id - The id of the change.
+		*/
+		
+		function deletePendingChange($id) {
+			$id = mysql_real_escape_string($id);
+			sqlquery("DELETE FROM bigtree_pending_changes WHERE id = '$id'");
 		}
 		
 		/*
@@ -2549,6 +2671,83 @@
 		}
 		
 		/*
+			Function: getPageAdminLinks
+				Gets a list of pages that link back to the admin.
+			
+			Returns:
+				An array of pages that link to the admin.
+		*/
+		
+		function getPageAdminLinks() {
+			$pages = array();
+			$q = sqlquery("SELECT * FROM bigtree_pages WHERE resources LIKE '%".$admin_root."%' OR resources LIKE '%".str_replace($www_root,"{wwwroot}",$admin_root)."%'");
+			while ($f = sqlfetch($q)) {
+				$pages[] = $f;
+			}
+			return $pages;
+		}
+		
+		/*
+			Function: getPageChanges
+				Returns pending changes for a given page.
+			
+			Parameters:
+				page - The page id.
+		
+			Returns:
+				An entry from bigtree_pending_changes with changes decoded.
+		*/
+		
+		function getPageChanges($page) {
+			$page = mysql_real_escape_string($page);
+			$c = sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE `table` = 'bigtree_pages' AND item_id = '$page'"));
+			if (!$c) {
+				return false;
+			}
+			$c["changes"] = json_decode($c["changes"],true);
+			return $c;
+		}
+		
+		/*
+			Function: getPageChildren
+				Returns all non-archived children of a given page.
+			
+			Parameters:
+				page - The page id to pull children for.
+				sort - The way to sort results. Defaults to nav_title ASC.
+		
+			Returns:
+				An array of pages.
+		*/
+		
+		function getPageChildren($page,$sort = "nav_title ASC") {
+			$page = mysql_real_escape_string($page);
+			$items = array();
+			$q = sqlquery("SELECT * FROM bigtree_pages WHERE parent = '$page' AND archived != 'on' ORDER BY $sort");
+			while ($f = sqlfetch($q)) {
+				$items[] = $f;
+			}
+			return $items;
+		}
+		
+		/*
+			Function: getPageIds
+				Returns all page ids in bigtree_pages.
+			
+			Returns:
+				An array of page ids.
+		*/
+		
+		function getPageIds() {
+			$ids = array();
+			$q = sqlquery("SELECT id FROM bigtree_pages ORDER BY id ASC");
+			while ($f = sqlfetch($q)) {
+				$ids[] = $f["id"];
+			}
+			return $ids;
+		}
+		
+		/*
 			Function: getPageOfSettings
 				Returns a page of settings.
 			
@@ -2713,6 +2912,23 @@
 			}
 			
 			return array("saved" => $saved, "unsaved" => $unsaved);
+		}
+		
+		/*
+			Function: getPages
+				Returns all pages from the database.
+			
+			Returns:
+				Array of unmodified entries from bigtree_pages.
+		*/
+		
+		function getPages() {
+			$items = array();
+			$q = sqlquery("SELECT * FROM bigtree_pages ORDER BY id ASC");
+			while ($f = sqlfetch($q)) {
+				$items[] = $f;
+			}
+			return $items;
 		}
 		
 		/*
@@ -3137,6 +3353,46 @@
 
 			return array("folders" => $folders, "resources" => $resources);
 		}
+		
+		/*
+			Function: getResourceByFile
+				Returns a resource with the given file name.
+			
+			Parameters:
+				file - The file name.
+			
+			Returns:
+				An entry from bigtree_resources with file and thumbs decoded.
+		*/
+		
+		function getResourceByFile($file) {
+			$item = sqlfetch(sqlquery("SELECT * FROM bigtree_resources WHERE file = '".mysql_real_escape_string($file)."'"));
+			if (!$item) {
+				return false;
+			}
+			$item["file"] = str_replace("{wwwroot}",$GLOBALS["www_root"],$item["file"]);
+			$item["thumbs"] = json_decode($item["thumbs"],true);
+			foreach ($item["thumbs"] as &$thumb) {
+				$thumb = str_replace("{wwwroot}",$GLOBALS["www_root"],$thumb);
+			}
+			return $item;
+		}
+		
+		/*
+			Function: getResourceFolder
+				Returns a resource folder.
+			
+			Parameters:
+				id - The id of the folder.
+			
+			Returns:
+				A resource folder entry.
+		*/
+		
+		function getResourceFolder($id) {
+			$id = mysql_real_escape_string($id);
+			return sqlfetch(sqlquery("SELECT * FROM bigtree_resource_folders WHERE id = '$id'"));
+		}
 
 		/*
 			Function: getResourceFolderBreadcrumb
@@ -3164,6 +3420,27 @@
 				$crumb[] = array("id" => 0, "name" => "Home");
 				return array_reverse($crumb);
 			}
+		}
+		
+		/*
+			Function: getResourceFolderChildren
+				Returns the child folders of a resource folder.
+			
+			Parameters:
+				id - The id of the parent folder.
+			
+			Returns:
+				An array of resource folder entries.
+		*/
+		
+		function getResourceFolderChildren($id) {
+			$items = array();
+			$id = mysql_real_escape_string($id);
+			$q = sqlquery("SELECT * FROM bigtree_resource_folders WHERE parent = '$id' ORDER BY name ASC");
+			while ($f = sqlfetch($q)) {
+				$items[] = $f;
+			}
+			return $items;
 		}
 
 		/*
@@ -3212,49 +3489,6 @@
 				// Return the parent's permissions
 				return $this->getResourceFolderPermission($folder["parent"]);
 			}
-		}
-
-		/*
-			Function: getResourceSearchResults
-				Returns a list of folders and files that match the given query string.
-
-			Parameters:
-				query - A string of text to search folders' and files' names to.
-				sort - The column to sort the files on (default: date DESC).
-
-			Returns:
-				An array of two arrays - folders and files - with permission levels.
-		*/
-
-		function getResourceSearchResults($query, $sort = "date DESC") {
-			$query = mysql_real_escape_string($query);
-			$folders = array();
-			$resources = array();
-			$permission_cache = array();
-
-			$q = sqlquery("SELECT * FROM bigtree_resource_folders WHERE name LIKE '%$query%' ORDER BY name");
-			while ($f = sqlfetch($q)) {
-				$f["permission"] = $this->getResourceFolderPermission($f);
-				// We're going to cache the folder permissions so we don't have to fetch them a bunch of times if many files have the same folder.
-				$permission_cache[$f["id"]] = $f["permission"];
-
-				$folders[] = $f;
-			}
-
-			$q = sqlquery("SELECT * FROM bigtree_resources WHERE name LIKE '%$query%' ORDER BY $sort");
-			while ($f = sqlfetch($q)) {
-				// If we've already got the permission cahced, use it.  Otherwise, fetch it and cache it.
-				if ($permission_cache[$f["folder"]]) {
-					$f["permission"] = $permission_cache[$f["folder"]];
-				} else {
-					$f["permission"] = $this->getResourceFolderPermission($f["folder"]);
-					$permission_cache[$f["folder"]] = $f["permission"];
-				}
-
-				$resources[] = $f;
-			}
-
-			return array("folders" => $folders, "resources" => $resources);
 		}
 		
 		/*
@@ -3996,6 +4230,82 @@
 		}
 		
 		/*
+			Function: searchPages
+				Searches for pages.
+			
+			Parameters:
+				query - Query string to search against.
+				fields - Fields to search.
+				max - Maximum number of results to return.
+				
+			Returns:
+				An array of pages.
+		*/
+		
+		function searchPages($query,$fields = array("nav_title"),$max = 10) {
+			$results = array();
+			$terms = explode(" ",$_POST["query"]);
+	
+			foreach ($terms as $term) {
+				$term = mysql_real_escape_string(strtolower($term));
+				$or_parts = array();
+				foreach ($fields as $field) {
+					$or_parts[] = "LOWER(`$field`) LIKE '%$term%'";				
+				}
+				$qpart[] = "(".implode(" OR ",$or_parts).")";
+			}
+			
+			$q = sqlquery("SELECT * FROM bigtree_pages WHERE ".implode(" AND ",$qpart)." ORDER BY nav_title LIMIT $max");
+			while ($f = sqlfetch($q)) {
+				$results[] = $f;
+			}
+			return $results;
+		}
+		
+		/*
+			Function: searchResources
+				Returns a list of folders and files that match the given query string.
+
+			Parameters:
+				query - A string of text to search folders' and files' names to.
+				sort - The column to sort the files on (default: date DESC).
+
+			Returns:
+				An array of two arrays - folders and files - with permission levels.
+		*/
+
+		function searchResources($query, $sort = "date DESC") {
+			$query = mysql_real_escape_string($query);
+			$folders = array();
+			$resources = array();
+			$permission_cache = array();
+
+			$q = sqlquery("SELECT * FROM bigtree_resource_folders WHERE name LIKE '%$query%' ORDER BY name");
+			while ($f = sqlfetch($q)) {
+				$f["permission"] = $this->getResourceFolderPermission($f);
+				// We're going to cache the folder permissions so we don't have to fetch them a bunch of times if many files have the same folder.
+				$permission_cache[$f["id"]] = $f["permission"];
+
+				$folders[] = $f;
+			}
+
+			$q = sqlquery("SELECT * FROM bigtree_resources WHERE name LIKE '%$query%' ORDER BY $sort");
+			while ($f = sqlfetch($q)) {
+				// If we've already got the permission cahced, use it.  Otherwise, fetch it and cache it.
+				if ($permission_cache[$f["folder"]]) {
+					$f["permission"] = $permission_cache[$f["folder"]];
+				} else {
+					$f["permission"] = $this->getResourceFolderPermission($f["folder"]);
+					$permission_cache[$f["folder"]] = $f["permission"];
+				}
+
+				$resources[] = $f;
+			}
+
+			return array("folders" => $folders, "resources" => $resources);
+		}
+		
+		/*
 			Function: set404Redirect
 				Sets the redirect address for a 404.
 				Checks permissions.
@@ -4070,6 +4380,21 @@
 			$id = mysql_real_escape_string($id);
 			$position = mysql_real_escape_string($position);
 			sqlquery("UPDATE bigtree_modules SET position = '$position' WHERE id = '$id'");
+		}
+		
+		/*
+			Function: setPagePosition
+				Sets the position of a page.
+			
+			Parameters:
+				id - The id of the page.
+				position - The position to set.
+		*/
+		
+		function setPagePosition($id,$position) {
+			$id = mysql_real_escape_string($id);
+			$position = mysql_real_escape_string($position);
+			sqlquery("UPDATE bigtree_pages SET position = '$position' WHERE id = '$id'");
 		}
 		
 		/*
@@ -4814,6 +5139,30 @@
 		}
 		
 		/*
+			Function: updatePageParent
+				Changes a page's parent.
+				Checks permissions.
+			
+			Parameters:
+				page - The page to update.
+				parent - The parent to switch to.
+		*/
+		
+		function updatePageParent($page,$parent) {
+			$page = mysql_real_escape_string($page);
+			$parent = mysql_real_escape_string($parent);
+			
+			if ($this->Level < 1) {
+				$this->stop("You are not allowed to move pages.");
+			}
+			
+			sqlquery("UPDATE bigtree_pages SET parent = '$parent' WHERE id = '$page'");
+			$path = $this->getFullNavigationPath($page);
+			sqlquery("UPDATE bigtree_pages SET path = '".mysql_real_escape_string($path)."' WHERE id = '$page'");
+			$this->updateChildPagePaths($page);
+		}
+		
+		/*
 			Function: updatePageRevision
 				Updates a page revision to save it as a favorite.
 				Checks permissions.
@@ -4834,6 +5183,26 @@
 			// Save the version's description and saved status
 			$description = mysql_real_escape_string(htmlspecialchars($description));
 			sqlquery("UPDATE bigtree_page_revisions SET saved = 'on', saved_description = '$description' WHERE id = '".$revision["id"]."'");
+		}
+		
+		/*
+			Function: updatePendingChange
+				Updated a pending change.
+			
+			Parameters:
+				id - The id of the pending change.
+				changes - The changes to the fields in the entry.
+				mtm_changes - Many to Many changes.
+				tags_changes - Tags changes.
+		*/
+		
+		function updatePendingChange($id,$changes,$mtm_changes = array(),$tags_changes = array()) {
+			$id = mysql_real_escape_string($id);
+			$changes = mysql_real_escape_string(json_encode($changes));
+			$mtm_changes = mysql_real_escape_string(json_encode($mtm_changes));
+			$tags_changes = mysql_real_escape_string(json_encode($tags_changes));
+			
+			sqlquery("UPDATE bigtree_pending_changes SET changes = '$changes', mtm_changes = '$mtm_changes', tags_changes = '$tags_changes', date = NOW(), author = '".$this->ID."' WHERE id = '$id'");
 		}
 
 		/*
@@ -4862,6 +5231,21 @@
 			} else {
 				sqlquery("UPDATE bigtree_users SET `name` = '$name', `company` = '$company', `daily_digest` = '$daily_digest' WHERE id = '$id'");
 			}
+		}
+		
+		/*
+			Function: updateResource
+				Updates a resource.
+			
+			Parameters:
+				id - The id of the resource.
+				name - The name of the resource.
+		*/
+		
+		function updateResource($id,$name) {
+			$id = mysql_real_escape_string($id);
+			$name = mysql_real_escape_string(htmlspecialchars($title));
+			sqlquery("UPDATE bigtree_resources SET name = '$name' WHERE id = '$id'");
 		}
 		
 		/*

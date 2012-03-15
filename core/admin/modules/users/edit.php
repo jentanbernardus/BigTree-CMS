@@ -11,62 +11,60 @@
 		);
 	}
 	
-	function _local_userDrawNavLevel($parent,$depth,$alert_above = false) {
-		global $permissions,$alerts;
-		$q = sqlquery("SELECT * FROM bigtree_pages WHERE parent = '$parent' AND archived != 'on' ORDER BY nav_title ASC");
-		$r = sqlrows($q);
-		if ($r) {
+	function _local_userDrawNavLevel($parent,$depth,$alert_above = false,$children = false) {
+		global $permissions,$alerts,$admin;
+		if (!$children) {
+			$children = $admin->getPageChildren($parent);
+		}
+		if (count($children)) {
 ?>
 <ul class="depth_<?=$depth?>"<? if ($depth > 2) { ?> style="display: none;"<? } ?>>
 	<?
-		$x = 0;
-		while ($f = sqlfetch($q)) {
-			$x++;
-			$r = sqlrows(sqlquery("SELECT id FROM bigtree_pages WHERE parent = '".$f["id"]."' AND archived != 'on'"));
-			$alert_below = ($alert_above || $alerts[$f["id"]]) ? true : false;
+			foreach ($children as $f) {
+				$grandchildren = $admin->getPageChildren($f["id"]);
+				$alert_below = ($alert_above || $alerts[$f["id"]]) ? true : false;
 	?>
 	<li>
 		<span class="depth"></span>
-		<a class="permission_label<? if (!$r) { ?> disabled<? } ?>" href="#"><?=$f["nav_title"]?></a>
+		<a class="permission_label<? if (!$grandchildren) { ?> disabled<? } ?>" href="#"><?=$f["nav_title"]?></a>
 		<span class="permission_alerts"><input type="checkbox" name="alerts[<?=$f["id"]?>]"<? if ($alerts[$f["id"]] == "on" || $alert_above) { ?> checked="checked"<? } ?><? if ($alert_above) { ?> disabled="disabled"<? } ?>/></span>
 		<span class="permission_level"><input type="radio" name="permissions[page][<?=$f["id"]?>]" value="p" <? if ($permissions["page"][$f["id"]] == "p") { ?>checked="checked" <? } ?>/></span>
 		<span class="permission_level"><input type="radio" name="permissions[page][<?=$f["id"]?>]" value="e" <? if ($permissions["page"][$f["id"]] == "e") { ?>checked="checked" <? } ?>/></span>
 		<span class="permission_level"><input type="radio" name="permissions[page][<?=$f["id"]?>]" value="n" <? if ($permissions["page"][$f["id"]] == "n") { ?>checked="checked" <? } ?>/></span>
 		<span class="permission_level"><input type="radio" name="permissions[page][<?=$f["id"]?>]" value="i" <? if (!$permissions["page"][$f["id"]] || $permissions["page"][$f["id"]] == "i") { ?>checked="checked" <? } ?>/></span>
-		<? _local_userDrawNavLevel($f["id"],$depth + 1,$alert_below) ?>
+		<? _local_userDrawNavLevel($f["id"],$depth + 1,$alert_below,$grandchildren) ?>
 	</li>
 	<?
-		}
+			}
 	?>
 </ul>
 <?
 		}
 	}
 	
-	function _local_userDrawFolderLevel($parent,$depth) {
-		global $permissions,$alerts;
-		$q = sqlquery("SELECT * FROM bigtree_resource_folders WHERE parent = '$parent' ORDER BY name ASC");
-		$r = sqlrows($q);
-		if ($r) {
+	function _local_userDrawFolderLevel($parent,$depth,$children = false) {
+		global $permissions,$alerts,$admin;
+		if (!$children) {
+			$children = $admin->getResourceFolderChildren($parent);
+		}
+		if (count($children)) {
 ?>
 <ul class="depth_<?=$depth?>"<? if ($depth > 2) { ?> style="display: none;"<? } ?>>
 	<?
-		$x = 0;
-		while ($f = sqlfetch($q)) {
-			$x++;
-			$r = sqlrows(sqlquery("SELECT id FROM bigtree_resource_folders WHERE parent = '".$f["id"]."'"));
+			foreach ($children as $f) {
+				$grandchildren = $admin->getResourceFolderChildren($f["id"]);
 	?>
 	<li>
 		<span class="depth"></span>
-		<a class="permission_label folder_label<? if (!$r) { ?> disabled<? } ?>" href="#"><?=$f["name"]?></a>
+		<a class="permission_label folder_label<? if (!count($grandchildren)) { ?> disabled<? } ?>" href="#"><?=$f["name"]?></a>
 		<span class="permission_level"><input type="radio" name="permissions[resources][<?=$f["id"]?>]" value="p" <? if ($permissions["resources"][$f["id"]] == "p") { ?>checked="checked" <? } ?>/></span>
 		<span class="permission_level"><input type="radio" name="permissions[resources][<?=$f["id"]?>]" value="e" <? if ($permissions["resources"][$f["id"]] == "e") { ?>checked="checked" <? } ?>/></span>
 		<span class="permission_level"><input type="radio" name="permissions[resources][<?=$f["id"]?>]" value="n" <? if ($permissions["resources"][$f["id"]] == "n") { ?>checked="checked" <? } ?>/></span>
 		<span class="permission_level"><input type="radio" name="permissions[resources][<?=$f["id"]?>]" value="i" <? if (!$permissions["resources"][$f["id"]] || $permissions["resources"][$f["id"]] == "i") { ?>checked="checked" <? } ?>/></span>
-		<? _local_userDrawFolderLevel($f["id"],$depth + 1) ?>
+		<? _local_userDrawFolderLevel($f["id"],$depth + 1,$grandchildren) ?>
 	</li>
 	<?
-		}
+			}
 	?>
 </ul>
 <?

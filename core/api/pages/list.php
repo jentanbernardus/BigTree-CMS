@@ -9,10 +9,7 @@
 		pages: Array of Entries from the bigtree_pages table.|
 	*/
 	
-	$pages = array();
-	$q = sqlquery("SELECT * FROM bigtree_pages ORDER BY id ASC");
-	while ($f = sqlfetch($q))
-		$pages[] = $f;
+	$pages = $admin->getPages();
 	
 	echo BigTree::apiEncode(array("success" => true,"pages" => $pages));
 ?>

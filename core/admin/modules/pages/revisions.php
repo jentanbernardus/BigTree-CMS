@@ -22,11 +22,10 @@
 	$admin->lockCheck("bigtree_pages",$page,"admin/modules/pages/_locked.php",$_GET["force"]);
 	
 	// See if there's a draft copy.
-	$draft = sqlfetch(sqlquery("SELECT date,user,id FROM bigtree_pending_changes WHERE `table` = 'bigtree_pages' AND item_id = '".$pdata["id"]."'"));
+	$draft = $admin->getPageChanges($pdata["id"]);
 	
 	// Get the current published copy.  We're going to just pull a few columns or I'd use getPage here.
-	$current = sqlfetch(sqlquery("SELECT updated_at,last_edited_by FROM bigtree_pages WHERE id = '".$pdata["id"]."'"));
-	$current_author = $admin->getUser($current["last_edited_by"]);
+	$current_author = $admin->getUser($pdata["last_edited_by"]);
 	
 	// Get all revisions
 	$revisions = $admin->getPageRevisions($page);
@@ -68,7 +67,7 @@
 	</header>
 	<ul>
 		<li class="active">
-			<section class="pages_last_edited"><?=date("F j, Y @ g:ia",strtotime($current["updated_at"]))?></section>
+			<section class="pages_last_edited"><?=date("F j, Y @ g:ia",strtotime($pdata["updated_at"]))?></section>
 			<section class="pages_draft_author"><?=$current_author["name"]?><span class="active_draft">Active</span></section>
 			<section class="pages_delete"><a href="#" class="icon_save"></a></section>
 			<section class="pages_publish"><a href="#" class="icon_draft"></a></section>

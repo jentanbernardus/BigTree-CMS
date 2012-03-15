@@ -1,15 +1,10 @@
 <?
-	$file = sqlfetch(sqlquery("SELECT * FROM bigtree_resources WHERE file = '".mysql_real_escape_string($_POST["file"])."'"));
-	$file["file"] = str_replace("{wwwroot}",$www_root,$file["file"]);
-	$thumbs = json_decode($file["thumbs"],true);
+	$file = $admin->getResourceByFile($_POST["file"]);
 	$pinfo = BigTree::pathInfo($file["file"]);
-	foreach ($thumbs as &$thumb) {
-		$thumb = str_replace("{wwwroot}",$www_root,$thumb);
-	}
 ?>
 <? if ($file["is_image"]) { ?>
 <div class="file_browser_detail_thumb">
-	<img src="<?=$thumbs["bigtree_internal_detail"]?>" alt="" />
+	<img src="<?=$file["thumbs"]["bigtree_internal_detail"]?>" alt="" />
 </div>
 <? } ?>
 <div class="file_browser_detail_title">

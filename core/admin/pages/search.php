@@ -12,9 +12,9 @@
 	$w = "'%".mysql_real_escape_string(end($path))."%'";
 	
 	// Get the "Pages" results.
-	$q = sqlquery("SELECT * FROM bigtree_pages WHERE (title LIKE $w OR resources LIKE $w OR meta_keywords LIKE $w OR meta_description LIKE $w OR nav_title LIKE $w) AND id != '0'");
+	$results = $admin->searchPages(end($path),array("title","resources","meta_keywords","meta_description","nav_title"),"50");
 	$pages = array();
-	while ($f = sqlfetch($q)) {
+	foreach ($results as $f) {
 		$res = json_decode($f["resources"],true);
 		$bc = $cms->getBreadcrumbByPage($f);
 		$bc_parts = array();

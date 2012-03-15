@@ -1,9 +1,5 @@
 <?
-	$q = sqlquery("SELECT * FROM bigtree_pages WHERE parent = '0'");
-	while ($f = sqlfetch($q)) {
-		$pages[] = $f["id"];
-		_local_build_tree($f["id"]);
-	}
+	$pages = $admin->getPageIds();
 	
 	$external = false;
 ?>

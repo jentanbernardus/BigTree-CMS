@@ -44,7 +44,7 @@
 					// It's technically a new file now, but we pulled it from resources so we might need to crop it.
 					$resource = mysql_real_escape_string(substr($value,11));
 					
-					$r = sqlfetch(sqlquery("SELECT * FROM bigtree_resources WHERE file = '".$resource."'"));
+					$r = $admin->getResourceByFile($resource);
 					$pinfo = BigTree::pathInfo($r["file"]);					
 					
 					// We're going to need to create a local copy if we need more 

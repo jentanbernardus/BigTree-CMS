@@ -24,7 +24,8 @@
 			
 			$n = strrev($f["name"]);
 			$ext = strtolower(strrev(substr($n,0,strpos($n,".")-1)));
-			sqlquery("INSERT INTO bigtree_resources (`file`,`date`,`name`,`type`,`folder`) VALUES ('".mysql_real_escape_string($file)."',NOW(),'".mysql_real_escape_string($f["name"])."','".mysql_real_escape_string($ext)."','$folder')");
+			
+			$admin->createResource($folder,$file,$f["name"],$ext);
 		// It's an image
 		} else {
 			$type = "image";
@@ -102,7 +103,7 @@
 			// Upload the original to the proper place.
 			$file = $upload_service->upload($first_copy,$f["name"],"files/resources/");
 			
-			sqlquery("INSERT INTO bigtree_resources (`file`,`date`,`name`,`is_image`,`height`,`width`,`thumbs`,`list_thumb_margin`,`folder`) VALUES ('".mysql_real_escape_string($file)."',NOW(),'".mysql_real_escape_string($f["name"])."','on','$iheight','$iwidth','".mysql_real_escape_string(json_encode($thumbs))."','$margin','$folder')");
+			$admin->createResource($folder,$file,$f["name"],"","on",$iheight,$iwidth,$thumbs,$margin);
 		}
 	}
 ?>

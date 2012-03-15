@@ -57,7 +57,7 @@
 				if ($item["bigtree_pending"]) {
 					$status = '<a href="'.$www_root.'_preview-pending/'.$item["id"].'/" target="_blank">Pending</a>';
 					$status_class = "pending";
-				} elseif (sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE `table` = 'bigtree_pages' AND item_id = '".$item["id"]."'"))) {
+				} elseif ($admin->getPageChanges($item["id"])) {
 					$status = '<a href="'.$www_root.'_preview/'.$item["path"].'/" target="_blank">Changed</a>';
 					$status_class = "pending";
 				} elseif (strtotime($item["publish_at"]) > time()) {

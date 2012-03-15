@@ -2,12 +2,11 @@
 	$page = end($path);
 	
 	if (is_numeric($page)) {
-		$f = sqlfetch(sqlquery("SELECT parent FROM bigtree_pages WHERE id = '$page'"));
+		$f = $cms->getPage($page);
 		$parent = $f["parent"];
 	} else {
-		$f = sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE id = '".substr($page,1)."'"));
-		$changes = json_decode($f["changes"],true);
-		$parent = $changes["parent"];
+		$f = $cms->getPendingChange(substr($page,1));
+		$parent = $f["changes"]["parent"];
 	}
 	
 	$admin->deletePage($page);

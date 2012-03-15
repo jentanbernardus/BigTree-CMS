@@ -27,7 +27,7 @@
 			$r = $admin->getPageAccessLevelByUser($page,$admin->ID);
 			$pdata = $admin->getPendingPage($page);
 			$tags = $pdata["tags"];
-			if (sqlrows(sqlquery("SELECT * FROM bigtree_pending_changes WHERE `table` = 'bigtree_pages' AND item_id = '$page'"))) {
+			if ($admin->getPageChanges($page)) {
 				$show_revert = true;
 			}
 		}

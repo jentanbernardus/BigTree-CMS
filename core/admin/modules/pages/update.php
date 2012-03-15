@@ -41,8 +41,8 @@
 			}
 			
 			$page = $admin->createPage($_POST);
+			$admin->deletePendingChange($change_id);
 			$admin->growl("Pages","Created & Published Page");
-			sqlquery("DELETE FROM bigtree_pending_changes WHERE id = '$change_id'");
 		} else {
 			// It's an existing page.
 			$admin->updatePage($page,$_POST);

@@ -36,7 +36,7 @@
 			} elseif ($d["existing"]) {
 				$resource = mysql_real_escape_string($d["existing"]);
 				
-				$r = sqlfetch(sqlquery("SELECT * FROM bigtree_resources WHERE file = '".$resource."'"));
+				$r = $admin->getResourceByFile($resource);
 				$pinfo = BigTree::pathInfo($r["file"]);					
 				
 				// We're going to need to create a local copy if we need more 
