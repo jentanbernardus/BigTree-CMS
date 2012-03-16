@@ -21,7 +21,7 @@
 		<section>
 			<p<? if (!$error) { ?> style="display: none;"<? } ?> class="error_message">Errors found! Please fix the highlighted fields before submitting.</p>
 			<fieldset id="send_to"<? if ($error && !count($send_to)) { ?> class="form_error"<? } ?>>
-				<label class="required">Send To<? if ($error && !count($send_to)) { ?><span class="form_error_reason">This Field Is Required</span><? } ?></label>
+				<label class="required">Send To<? if ($error && !count($send_to)) { ?><span class="form_error_reason">Required</span><? } ?></label>
 				<? if(count($users) > 1) { ?>
 				<div class="multi_widget many_to_many">
 					<ul>
@@ -61,11 +61,11 @@
 				<? } ?>
 			</fieldset>
 			<fieldset<? if ($error && !$subject) { ?> class="form_error"<? } ?>>
-				<label class="required">Subject<? if ($error && !$subject) { ?><span class="form_error_reason">This Field Is Required</span><? } ?></label>
+				<label class="required">Subject<? if ($error && !$subject) { ?><span class="form_error_reason">Required</span><? } ?></label>
 				<input type="text" name="subject"  class="required" value="<?=$subject?>" />
 			</fieldset>
 			<fieldset<? if ($error && !$message) { ?> class="form_error"<? } ?>>
-				<label class="required">Message<? if ($error && !$message) { ?><span class="form_error_reason">This Field Is Required</span><? } ?></label>
+				<label class="required">Message<? if ($error && !$message) { ?><span class="form_error_reason">Required</span><? } ?></label>
 				<textarea name="message" id="message" class="required"><?=$message?></textarea>
 			</fieldset>
 		</section>

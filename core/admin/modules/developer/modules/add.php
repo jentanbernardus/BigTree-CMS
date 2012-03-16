@@ -28,8 +28,8 @@
 			</fieldset>
 			<div class="left">
 				<fieldset>
-					<label class="required">Related Table</label>
-					<select name="table" id="rel_table" class="required">
+					<label>Related Table</label>
+					<select name="table" id="rel_table">
 						<option></option>
 						<? BigTree::getTableSelectOptions($table) ?>
 					</select>

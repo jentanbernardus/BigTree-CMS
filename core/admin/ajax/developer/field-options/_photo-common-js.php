@@ -40,8 +40,17 @@
 		
 		return false;
 	});
+
+	$("#pop_crop_list input").on("keydown",function(e) {
+		if (e.keyCode == 13) {
+			_local_addCrop();
+			return false;
+		}
+	});
+
+	$(".add_crop").click(_local_addCrop);
 	
-	$(".add_crop").click(function() {
+	function _local_addCrop() {
 		crop_count++;
 		ul = $('<ul>');
 		
@@ -68,9 +77,18 @@
 		$("#pop_crop_list").append(ul);
 		
 		return false;
+	}
+	
+	$("#pop_thumb_list input").on("keydown",function(e) {
+		if (e.keyCode == 13) {
+			_local_addThumb();
+			return false;
+		}
 	});
 	
-	$(".add_thumb").click(function() {
+	$(".add_thumb").click(_local_addThumb);
+	
+	function _local_addThumb() {
 		thumb_count++;
 		ul = $('<ul>');
 		
@@ -93,5 +111,5 @@
 		$("#pop_thumb_list").append(ul);
 		
 		return false;
-	});
+	}
 </script>

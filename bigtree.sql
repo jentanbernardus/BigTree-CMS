@@ -67,6 +67,7 @@ CREATE TABLE `bigtree_route_history` ( `id` int(11) NOT NULL AUTO_INCREMENT, `ol
 
 DROP TABLE IF EXISTS `bigtree_settings`;
 CREATE TABLE `bigtree_settings` ( `id` varchar(255) NOT NULL DEFAULT '', `value` text NOT NULL, `type` varchar(255) NOT NULL, `name` varchar(255) NOT NULL DEFAULT '', `description` text NOT NULL, `locked` char(2) NOT NULL, `module` int(11) NOT NULL, `system` char(2) NOT NULL, `encrypted` char(2) NOT NULL, `package` int(11) NOT NULL, PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+INSERT INTO `bigtree_settings` ('id','value','system') VALUES ('bigtree-internal-upload-service','{"service":"local"}','on');
 
 DROP TABLE IF EXISTS `bigtree_tags`;
 CREATE TABLE `bigtree_tags` ( `id` int(11) NOT NULL AUTO_INCREMENT, `tag` varchar(255) NOT NULL, `metaphone` varchar(255) NOT NULL, `route` varchar(255) DEFAULT NULL, PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;

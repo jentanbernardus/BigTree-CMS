@@ -811,6 +811,7 @@ var BigTreeDialog = Class.extend({
 	onCancel: false,
 
 	init: function(title,content,oncomplete,icon,noSave,altSaveText,altOnComplete,altOnCancel) {
+		$("body").on("keyup",$.proxy(this.CheckForEsc,this));
 		$("#bigtree_dialog_overlay, #bigtree_dialog_window").remove();
 		this.onComplete = oncomplete;
 		overlay = $('<div id="bigtree_dialog_overlay">');
@@ -851,9 +852,16 @@ var BigTreeDialog = Class.extend({
 			$("#bigtree_dialog_form").submit($.proxy(this.DialogSubmit,this));
 		}
 	},
+	
+	CheckForEsc: function(e) {
+		if (e.keyCode == 27) {
+			this.DialogClose();
+		}
+	},
 
 	DialogClose: function() {
 		$("#bigtree_dialog_overlay, #bigtree_dialog_window").remove();
+		$("body").off("keyup");
 		return false;
 	},
 
@@ -1437,7 +1445,7 @@ var BigTreeFormValidator = Class.extend({
 			}
 			if (!val) {
 				$(this).parents("fieldset").addClass("form_error");
-				$(this).prevAll("label").append($('<span class="form_error_reason">This Field Is Required</span>'));
+				$(this).prevAll("label").append($('<span class="form_error_reason">Required</span>'));
 				$(this).parents("div").prevAll("label").append($('<span class="form_error_reason">This Field Is Required</span>'));
 			}
 		});

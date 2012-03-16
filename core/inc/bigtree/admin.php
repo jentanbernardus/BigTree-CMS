@@ -5230,7 +5230,7 @@
 				The id for view.
 		*/
 		
-		function updateModuleView($title,$description,$table,$type,$options,$fields,$actions,$suffix,$uncached = "",$preview_url = "") {
+		function updateModuleView($id,$title,$description,$table,$type,$options,$fields,$actions,$suffix,$uncached = "",$preview_url = "") {
 			$id = mysql_real_escape_string($id);
 			$title = mysql_real_escape_string(htmlspecialchars($title));
 			$description = mysql_real_escape_string(htmlspecialchars($description));
