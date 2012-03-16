@@ -100,6 +100,8 @@
 		*/
 
 		function archivePage($page) {
+			global $cms;
+			
 			if (is_array($page)) {
 				$page = mysql_real_escape_string($page["id"]);
 			} else {
@@ -107,7 +109,7 @@
 			}
 
 			$access = $this->getPageAccessLevel($page);
-			if ($access == "p") {
+			if ($access == "p" && $this->canModifyChildren($cms->getPage($page))) {
 				sqlquery("UPDATE bigtree_pages SET archived = 'on' WHERE id = '$page'");
 				$this->archivePageChildren($page);
 				$this->growl("Pages","Archived Page");
@@ -208,6 +210,34 @@
 			}
 
 			return false;
+		}
+		
+		/*
+			Function: canModifyChildren
+				Checks whether the logged in user can modify all child pages or a page.
+				Assumes we already know that we're a publisher of the parent.
+			
+			Parameters:
+				page - The page entry to check children for.
+			
+			Returns:
+				true if the user can modify all the page children, otherwise false.
+		*/
+		
+		function canModifyChildren($page) {
+			if ($this->Level > 0) {
+				return true;
+			}
+			
+			$q = sqlquery("SELECT id FROM bigtree_pages WHERE path LIKE '".mysql_real_escape_string($page["path"])."%'");
+			while ($f = sqlfetch($q)) {
+				$perm = $this->Permissions["page"][$f["id"]];
+				if ($perm == "n" || $perm == "e") {
+					return false;
+				}
+			}
+			
+			return true;
 		}
 		
 		/*
@@ -731,7 +761,7 @@
 		function createModuleForm($title,$table,$fields,$javascript = "",$css = "",$callback = "",$default_position = "") {
 			$title = mysql_real_escape_string(htmlspecialchars($title));
 			$table = mysql_real_escape_string($table);
-			$field = mysql_real_escape_string(json_encode($fields));
+			$fields = mysql_real_escape_string(json_encode($fields));
 			$javascript - mysql_real_escape_string(htmlspecialchars($javascript));
 			$css - mysql_real_escape_string(htmlspecialchars($css));
 			$callback - mysql_real_escape_string($callback);
@@ -807,7 +837,7 @@
 			$uncached = mysql_real_escape_string($uncached);
 			$preview_url = mysql_real_escape_string(htmlspecialchars($preview_url));
 			
-			sqlquery("INSERT INTO bigtree_module_views (`title`,`description`,`type`,`fields`,`actions`,`table`,`options`,`suffix`,`uncached`,`preview_url`) VALUES ('$title','$description','$type','$fields','$actions','$table','$options','$suffix','$uncached')");
+			sqlquery("INSERT INTO bigtree_module_views (`title`,`description`,`type`,`fields`,`actions`,`table`,`options`,`suffix`,`uncached`,`preview_url`) VALUES ('$title','$description','$type','$fields','$actions','$table','$options','$suffix','$uncached','$preview_url')");
 			
 			return sqlid();
 		}
@@ -1423,7 +1453,7 @@
 			$page = mysql_real_escape_string($page);
 
 			$r = $this->getPageAccessLevelByUser($page,$this->ID);
-			if ($r == "p") {
+			if ($r == "p" && $this->canModifyChildren($cms->getPage($page))) {
 				// If the page isn't numeric it's most likely prefixed by the "p" so it's pending.
 				if (!is_numeric($page)) {
 					sqlquery("DELETE FROM bigtree_pending_changes WHERE id = '".mysql_real_escape_string(substr($page,1))."'");
@@ -1770,7 +1800,7 @@
 			if (!$item || !$module["gbp"]["enabled"] || $perm == "p" || $table != $module["gbp"]["table"]) {
 				return $perm;
 			}
-
+			
 			if (is_array($this->Permissions["module_gbp"][$id])) {
 				$gv = $item[$module["gbp"]["group_field"]];
 				$gp = $this->Permissions["module_gbp"][$id][$gv];
@@ -2790,10 +2820,10 @@
 			}
 
 			$parent = sqlfetch(sqlquery("SELECT parent FROM bigtree_pages WHERE id = '".mysql_real_escape_string($page)."'"),true);
-			$pp = $this->Permissions["page"][$parent];
+			$pp = $u["permissions"]["page"][$parent];
 			while ((!$pp || $pp == "i") && $parent) {
 				$parent = sqlfetch(sqlquery("SELECT parent FROM bigtree_pages WHERE id = '$parent'"),true);
-				$pp = $this->Permissions["page"][$parent];
+				$pp = $u["permissions"]["page"][$parent];
 			}
 
 			if (!$pp || $pp == "i" || $pp == "n") {
@@ -3301,9 +3331,10 @@
 					}
 				}
 			}
+			
 			// Add module group based permissions as well
-			if (is_array($user["permissions"]["gbp"])) {
-				foreach ($user["permissions"]["gbp"] as $module => $groups) {
+			if (is_array($user["permissions"]["module_gbp"])) {
+				foreach ($user["permissions"]["module_gbp"] as $module => $groups) {
 					foreach ($groups as $group => $permission) {
 						if ($permission == "p") {
 							$search[] = "`module` = '$module'";
@@ -3313,21 +3344,22 @@
 			}
 
 			$q = sqlquery("SELECT * FROM bigtree_pending_changes WHERE ".implode(" OR ",$search)." ORDER BY date DESC");
-
+			
 			while ($f = sqlfetch($q)) {
 				$ok = false;
-
+				
+				if (!$f["item_id"]) {
+					$id = "p".$f["id"];
+				} else {
+					$id = $f["item_id"];
+				}
+				
 				// If they're an admin, they've got it.
 				if ($user["level"] > 0) {
 					$ok = true;
 				// Check permissions on a page if it's a page.
 				} elseif ($f["table"] == "bigtree_pages") {
-					if (!$f["item_id"]) {
-						$id = "p".$f["id"];
-					} else {
-						$id = $f["item_id"];
-					}
-					$r = $this->getPageAccessLevelByUser($f["item_id"],$this->ID);
+					$r = $this->getPageAccessLevelByUser($id,$this->ID);
 					// If we're a publisher, this is ours!
 					if ($r == "p") {
 						$ok = true;
@@ -3338,6 +3370,11 @@
 						$ok = true;
 					} else {
 						// Check our group based permissions
+						$item = BigTreeAutoModule::getPendingItem($f["table"],$id);
+						$level = $this->getAccessLevel($this->getModule($f["module"]),$item["item"],$f["table"]);
+						if ($level == "p") {
+							$ok = true;
+						}
 					}
 				}
 
@@ -4835,7 +4872,7 @@
 				$page = mysql_real_escape_string($page);
 			}
 			$access = $this->getPageAccessLevel($page);
-			if ($access == "p") {
+			if ($access == "p" && $this->canModifyChildren($cms->getPage($page))) {
 				sqlquery("UPDATE bigtree_pages SET archived = '' WHERE id = '$page'");
 				$this->track("bigtree_pages",$page,"unarchived");
 				$this->unarchivePageChildren($page);
@@ -5161,7 +5198,7 @@
 			$id = mysql_real_escape_string($id);
 			$title = mysql_real_escape_string(htmlspecialchars($title));
 			$table = mysql_real_escape_string($table);
-			$field = mysql_real_escape_string(json_encode($fields));
+			$fields = mysql_real_escape_string(json_encode($fields));
 			$javascript - mysql_real_escape_string(htmlspecialchars($javascript));
 			$css - mysql_real_escape_string(htmlspecialchars($css));
 			$callback - mysql_real_escape_string($callback);
@@ -5169,7 +5206,6 @@
 			
 			sqlquery("UPDATE bigtree_module_forms SET title = '$title', `table` = '$table', fields = '$fields', javascript = '$javascript', css = '$css', callback = '$callback', default_position = '$default_position' WHERE id = '$id'");
 			
-			$action = $this->getModuleActionForForm(end($path));	
 			$oroute = str_replace(array("add-","edit-","add","edit"),"",$action["route"]);
 			if ($suffix != $oroute) {
 				sqlquery("UPDATE bigtree_module_actions SET route = 'add-$suffix' WHERE module = '".$action["module"]."' AND route = 'add-$oroute'");

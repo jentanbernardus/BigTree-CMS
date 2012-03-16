@@ -1058,7 +1058,7 @@ var BigTreeFileManager = {
 		
 		data = eval('(' + $(this).attr("href") + ')');
 		BigTreeFileManager.availableThumbs = data.thumbs;
-		$("#file_browser_selected_file").val(data.file);
+		$("#file_browser_selected_file").val(data.file.replace("{wwwroot}","www_root/"));
 		
 		$("#file_browser_info_pane").html("<spinner></spinner>");
 		$("#file_browser_info_pane").load("admin_root/ajax/file-browser/file-info/",
@@ -1213,7 +1213,8 @@ var BigTreeFileManager = {
 				img.attr("src",$("#file_browser_selected_file").val());
 				container = $(document.getElementById(this.currentlyName));
 				container.find("img, input").remove();
-				container.append(input).append(img).show();
+				container.append(input).find(".currently_wrapper").append(img);
+				container.show();
 			} else if (this.type == "photo-gallery") {
 				this.callback($("#file_browser_selected_file").val(),$("#file_browser_detail_title_input").val(),$(".file_browser_images .selected img").attr("src"));
 			}

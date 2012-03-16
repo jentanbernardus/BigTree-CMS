@@ -4,13 +4,6 @@
 			<section>
 				<article class="bigtree">
 					<a href="http://www.bigtreecms.com/" target="_blank" class="logo"></a>				
-<!--
-					<div class="links">
-						<a href="http://support.bigtreecms.com/4/" target="_blank">Support</a>
-						<span></span>
-						<a href="http://developer.bigtreecms.com/" target="_blank">Developer</a>
-					</div>
--->
 				</article>
 				<article class="fastspot">
 					<p>

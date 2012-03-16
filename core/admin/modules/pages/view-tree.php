@@ -83,14 +83,14 @@
 				if ($class == "archived") {
 			?>
 			<section class="pages_restore">
-				<? if ($perm == "p") { ?>
+				<? if ($perm == "p" && $admin->canModifyChildren($item)) { ?>
 				<a href="<?=$proot?>restore/<?=$item["id"]?>/" title="Restore Page" class="icon_restore"></a>
 				<? } else { ?>
 				<span class="icon_restore disabled_icon"></span>
 				<? } ?>
 			</section>
 			<section class="pages_delete">
-				<? if ($perm == "p") { ?>
+				<? if ($perm == "p" && $admin->canModifyChildren($item)) { ?>
 				<a href="<?=$proot?>delete/<?=$item["id"]?>/" title="Delete Page" class="icon_delete"></a>
 				<? } else { ?>
 				<span class="icon_delete disabled_icon"></span>
@@ -110,7 +110,7 @@
 				<?=$status?>
 			</section>
 			<section class="pages_archive">
-				<? if (!$item["bigtree_pending"] && $perm == "p" && ($parent != 0 || $admin->Level > 1)) { ?>
+				<? if (!$item["bigtree_pending"] && $perm == "p" && ($parent != 0 || $admin->Level > 1) && $admin->canModifyChildren($item)) { ?>
 				<a href="<?=$proot?>archive/<?=$item["id"]?>/" title="Archive Page" class="icon_archive"></a>
 				<? } elseif ($item["bigtree_pending"] && $perm == "p") { ?>
 				<a href="<?=$proot?>delete/<?=$item["id"]?>/" title="Delete Pending Page" class="icon_delete"></a>

@@ -11,6 +11,7 @@
 	}
 	
 	$admin->updateModuleForm(end($path),$title,$table,$fields,$javascript,$css,$callback,$default_position,$suffix);
+	$action = $admin->getModuleActionForForm(end($path));
 	
 	$admin->growl("Developer","Updated Module Form");
 	header("Location: ".$developer_root."modules/edit/".$action["module"]."/");

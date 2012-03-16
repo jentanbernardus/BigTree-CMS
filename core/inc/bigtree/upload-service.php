@@ -137,6 +137,9 @@
 		
 		function replace($local_file,$file_name,$relative_path,$remove_original = true) {
 			if ($this->Service == "local") {
+				if (!$relative_path) {
+					$relative_path = "files/";
+				}
 				return $this->replaceLocal($local_file,$file_name,$relative_path,$remove_original);
 			} elseif ($this->Service == "s3") {
 				return $this->replaceS3($local_file,$file_name,$relative_path,$remove_original);
@@ -282,6 +285,9 @@
 		
 		function upload($local_file,$file_name,$relative_path,$remove_original = true) {
 			if ($this->Service == "local") {
+				if (!$relative_path) {
+					$relative_path = "files/";
+				}
 				return $this->uploadLocal($local_file,$file_name,$relative_path,$remove_original);
 			} elseif ($this->Service == "s3") {
 				return $this->uploadS3($local_file,$file_name,$relative_path,$remove_original);

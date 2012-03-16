@@ -39,10 +39,9 @@
 				$fails[] = array("field" => $options["title"], "error" => "The file upload failed ($name).");		
 			// Maybe we used an existing file?
 			} else {
-			
 				if (substr($value,0,11) == "resource://") {
 					// It's technically a new file now, but we pulled it from resources so we might need to crop it.
-					$resource = mysql_real_escape_string(substr($value,11));
+					$resource = mysql_real_escape_string(str_replace($www_root,"{wwwroot}",substr($value,11)));
 					
 					$r = $admin->getResourceByFile($resource);
 					$pinfo = BigTree::pathInfo($r["file"]);					

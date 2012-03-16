@@ -31,6 +31,6 @@
 	</section>
 	<footer>
 		<a href="<?=$admin_root?><?=$mod["route"]?>/" class="button white">View Module</a>
-		<a href="<?=$admin_root?><?=$mod["route"]?>/<?=$addroute?>/" class="button blue">View Form</a>
+		<a href="<?=$admin_root?><?=$mod["route"]?>/add<?=$suffix?>/" class="button blue">View Form</a>
 	</footer>
 </div>

@@ -71,7 +71,7 @@
 		<p>Your view for <?=$mod["name"]?> has been created. You may continue to create a form for this view or choose to test the view instead.</p>
 	</section>
 	<footer>
-		<a href="<?=$admin_root?><?=$mod["route"]?>/<?=$route?>/" class="button white">Test View</a> &nbsp; 
+		<a href="<?=$admin_root?><?=$mod["route"]?>/<? if ($route) { echo $route."/"; } ?>" class="button white">Test View</a> &nbsp; 
 		<a href="<?=$developer_root?>modules/forms/add/<?=end($path)?>/<?=urlencode($table)?>/<?=urlencode($title)?>/<?=urlencode($suffix)?>/" class="button blue">Add Form</a></p>
 	</footer>
 </div>

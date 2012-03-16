@@ -8,6 +8,8 @@
 	include BigTree::path("inc/bigtree/forms.php");
 
 	class BigTreeCMS {
+	
+		var $iplCache = array();
 
 		/*
 			Constructor:
@@ -348,9 +350,16 @@
 				$commands .= "/";
 			}
 			
-			// Get the page's path
-			$f = sqlfetch(sqlquery("SELECT path FROM bigtree_pages WHERE id = '".mysql_real_escape_string($navid)."'"));
-			return $GLOBALS["www_root"].$f["path"]."/".$commands;
+			// See if it's in the cache.
+			if (isset($this->iplCache[$navid])) {
+				return $this->iplCache[$navid].$commands;
+			} else {
+				// Get the page's path
+				$f = sqlfetch(sqlquery("SELECT path FROM bigtree_pages WHERE id = '".mysql_real_escape_string($navid)."'"));
+				// Set the cache
+				$this->iplCache[$navid] = $GLOBALS["www_root"].$f["path"]."/";
+				return $GLOBALS["www_root"].$f["path"]."/".$commands;
+			}
 		}
 		
 		/*

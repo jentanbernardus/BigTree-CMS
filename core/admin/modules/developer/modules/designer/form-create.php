@@ -34,9 +34,9 @@
 		
 		// Figure out what to make the MySQL field.
 		$a = "ADD COLUMN $field_name ";
-		if ($t == "text" || $t == "list" || $t == "poplist" || $t == "upload" || $t == "image" || $t == "state" || $t == "country" || $t == "route") {
+		if ($t == "text" || $t == "list" || $t == "upload" || $t == "route") {
 			$a .= "VARCHAR(255)";
-		} elseif ($t == "textarea" || $t == "html" || $t == "simplehtml" || $t == "photo-gallery" || $t == "array" || $t == "custom") {
+		} elseif ($t == "textarea" || $t == "html" || $t == "photo-gallery" || $t == "array" || $t == "custom") {
 			$a .= "TEXT";
 		} elseif ($t == "checkbox") {
 			$a .= "CHAR(2)";

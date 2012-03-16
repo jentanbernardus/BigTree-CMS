@@ -33,11 +33,14 @@
 			$poplists = array();
 			
 			foreach ($view["fields"] as $key => $field) {
+				// Get the form field
+				$ff = $form["fields"][$key];
+				
 				$value = $item[$key];
 				if ($field["parser"]) {
 					$parsers[$key] = $field["parser"];
-				} elseif ($form["fields"][$key]["type"] == "poplist") {
-					$poplists[$key] = array("description" => $form["fields"][$key]["pop-description"], "table" => $form["fields"][$key]["pop-table"]);
+				} elseif ($ff["type"] == "list" && $ff["list_type"] == "db") {
+					$poplists[$key] = array("description" => $ff["pop-description"], "table" => $ff["pop-table"]);
 				}
 			}
 			
@@ -335,8 +338,7 @@
 			$data = mysql_real_escape_string(json_encode($data));
 			$many_data = mysql_real_escape_string(json_encode($many_to_many));
 			$tags_data = mysql_real_escape_string(json_encode($tags));
-			$resources_data = mysql_real_escape_string(json_encode($resources));
-			sqlquery("INSERT INTO bigtree_pending_changes (`user`,`date`,`table`,`changes`,`mtm_changes`,`tags_changes`,`resources_changes`,`module`,`type`) VALUES (".$admin->ID.",NOW(),'$table','$data','$many_data','$tags_data','$resources_data','$module','NEW')");
+			sqlquery("INSERT INTO bigtree_pending_changes (`user`,`date`,`table`,`changes`,`mtm_changes`,`tags_changes`,`module`,`type`) VALUES (".$admin->ID.",NOW(),'$table','$data','$many_data','$tags_data','$module','NEW')");
 			
 			$id = sqlid();
 
@@ -376,6 +378,8 @@
 		*/
 		
 		static function deletePendingItem($table,$id) {
+			global $admin;
+			
 			$id = mysql_real_escape_string($id);
 			sqlquery("DELETE FROM bigtree_pending_changes WHERE `table` = '$table' AND id = '$id'");
 			self::uncacheItem("p$id",$table);

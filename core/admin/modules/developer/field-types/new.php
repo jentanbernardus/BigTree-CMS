@@ -12,7 +12,6 @@
 			<li><?=$server_root?>custom/admin/form-field-types/process/<?=$file?> &mdash; Your processing file.</li>
 			<li><?=$server_root?>custom/admin/ajax/developer/field-options/<?=$file?> &mdash; Your field options file.</li>
 		</ul>
-		<p>For more information on what variables are available to you in these files, please see the <a href="http://developer.bigtreecms.com/advanced/field-types/" target="_blank">Field Types</a> documentation.</p>
 	</section>
 </div>
 
