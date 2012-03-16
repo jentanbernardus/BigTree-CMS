@@ -291,7 +291,7 @@
 		// If the template is a module, do its routing for it, otherwise just include the template.
 		if ($routed) {
 			// We need to figure out how far down the directory structure to route the,.	
-			$inc = "../templates/modules/".substr($page["template"],7)."/";
+			$inc = "../templates/routed/".$page["template"]."/";
 			$inc_dir = $inc;
 			$module_commands = array();
 			$ended = false;
@@ -319,8 +319,8 @@
 			$commands = $module_commands;
 			
 			// Include the module's header
-			if (file_exists("../templates/modules/".substr($page["template"],7)."/_header.php")) {
-				include_once "../templates/modules/".substr($page["template"],7)."/_header.php";
+			if (file_exists("../templates/routed/".substr($page["template"],7)."/_header.php")) {
+				include_once "../templates/routed/".substr($page["template"],7)."/_header.php";
 			}
 			
 			// Include the sub-module's header if it exists.
@@ -336,12 +336,12 @@
 			}
 			
 			// Include the module's footer
-			if (file_exists("../templates/modules/".substr($page["template"],7)."/_footer.php")) {
-				include_once "../templates/modules/".substr($page["template"],7)."/_footer.php";
+			if (file_exists("../templates/routed/".substr($page["template"],7)."/_footer.php")) {
+				include_once "../templates/routed/".substr($page["template"],7)."/_footer.php";
 			}
 
 		} elseif ($page["template"]) {
-			include "../templates/pages/".$page["template"].".php";
+			include "../templates/basic/".$page["template"].".php";
 		} else {
 			header("Location: ".$page["external"]);
 		}
@@ -360,10 +360,9 @@
 			}
 		}
 		
-		//include "../templates/pages/_home.php";
-		include "../templates/pages/" . $page["template"] . ".php";
+		include "../templates/basic/".$page["template"].".php";
 	} elseif ($sitemap) {
-		include "../templates/pages/_sitemap.php";
+		include "../templates/basic/_sitemap.php";
 	} else {
 		// Let's check if it's in the old routing table.
 		$cms->checkOldRoutes($path);

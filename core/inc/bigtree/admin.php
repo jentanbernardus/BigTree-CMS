@@ -1170,18 +1170,18 @@
 ?>';		
 			
 			if ($routed == "on") {
-				if (!file_exists($GLOBALS["server_root"]."templates/modules/".$id)) {
-					mkdir($GLOBALS["server_root"]."templates/modules/".$id);
-					chmod($GLOBALS["server_root"]."templates/modules/".$id,0777);
+				if (!file_exists($GLOBALS["server_root"]."templates/routed/".$id)) {
+					mkdir($GLOBALS["server_root"]."templates/routed/".$id);
+					chmod($GLOBALS["server_root"]."templates/routed/".$id,0777);
 				}
-				if (!file_exists($GLOBALS["server_root"]."templates/modules/".$id."/default.php")) {
-					file_put_contents($GLOBALS["server_root"]."templates/modules/".$id."/default.php",$file_contents);
-					chmod($GLOBALS["server_root"]."templates/modules/".$id."/default.php",0777);
+				if (!file_exists($GLOBALS["server_root"]."templates/routed/".$id."/default.php")) {
+					file_put_contents($GLOBALS["server_root"]."templates/routed/".$id."/default.php",$file_contents);
+					chmod($GLOBALS["server_root"]."templates/routed/".$id."/default.php",0777);
 				}
 			} else {
-				if (!file_exists($GLOBALS["server_root"]."templates/pages/".$id.".php")) {
-					file_put_contents($GLOBALS["server_root"]."templates/pages/".$id.".php",$file_contents);
-					chmod($GLOBALS["server_root"]."templates/pages/".$id.".php",0777);
+				if (!file_exists($GLOBALS["server_root"]."templates/basic/".$id.".php")) {
+					file_put_contents($GLOBALS["server_root"]."templates/basic/".$id.".php",$file_contents);
+					chmod($GLOBALS["server_root"]."templates/basic/".$id.".php",0777);
 				}
 			}
 			

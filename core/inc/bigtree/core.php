@@ -799,7 +799,7 @@
 				} else {
 					sqlquery("INSERT INTO bigtree_404s (`broken_url`,`requests`) VALUES ('".mysql_real_escape_string(rtrim($_GET["bigtree_htaccess_url"],"/"))."','1')");
 				}
-				include "../templates/pages/_404.php";
+				include "../templates/basic/_404.php";
 				define("BIGTREE_DO_NOT_CACHE",true);
 			}
 		}

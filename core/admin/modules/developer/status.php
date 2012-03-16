@@ -19,8 +19,8 @@
 	$writable_directors = array(
 		"cache/",
 		"custom/inc/modules/",
-		"templates/modules/",
-		"templates/pages/",
+		"templates/routed/",
+		"templates/basic/",
 		"templates/callouts/",
 		"site/files/"
 	);
