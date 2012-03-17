@@ -118,9 +118,12 @@ $(document).ready(function() {
 				skipped_first = false;
 				$("#bigtree_dialog_form input, #bigtree_dialog_form textarea, #bigtree_dialog_form select").each(function() {
 					if ($(this).attr("type") != "submit") {
-						if ($(this).css("display") == "none") {
-							tinyMCE.get($(this).attr("id")).save();
-							tinyMCE.execCommand('mceRemoveControl',false,$(this).attr("id"));
+						if ($(this).css("display") == "none" && $(this).attr("type") != "file" && $(this).attr("type") != "hidden") {
+							var mce = tinyMCE.get($(this).attr("id"));
+							if (mce) {
+								mce.save();
+								tinyMCE.execCommand('mceRemoveControl',false,$(this).attr("id"));
+							}
 						}
 						if (skipped_first && !callout_desc && $(this).val()) {
 							callout_desc = $(this).val();
@@ -157,8 +160,11 @@ $(document).ready(function() {
 				$("#bigtree_dialog_form input, #bigtree_dialog_form textarea, #bigtree_dialog_form select").each(function() {
 					if ($(this).attr("type") != "submit") {
 						if ($(this).css("display") == "none" && $(this).attr("type") != "file" && $(this).attr("type") != "hidden") {
-							tinyMCE.get($(this).attr("id")).save();
-							tinyMCE.execCommand('mceRemoveControl',false,$(this).attr("id"));
+							var mce = tinyMCE.get($(this).attr("id"));
+							if (mce) {
+								mce.save();
+								tinyMCE.execCommand('mceRemoveControl',false,$(this).attr("id"));
+							}
 						}
 						if (skipped_first && !callout_desc && $(this).val()) {
 							callout_desc = $(this).val();
