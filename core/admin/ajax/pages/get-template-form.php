@@ -9,7 +9,7 @@
 		$page = $cms->getPendingPage($_POST["page"]);
 		$resources = $page["resources"];
 		$callouts = $page["callouts"];
-	} elseif (!$resources) {
+	} elseif (!$resources && !$callouts) {
 		$resources = array();
 		$callouts = array();
 	}

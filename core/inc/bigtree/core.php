@@ -688,6 +688,44 @@
 			}
 		}
 		
+		
+		/*
+			Function: getSettings
+				Gets the value of multiple settings.
+			
+			Parameters:
+				id - Array containing the ID of the settings.
+			
+			Returns:				
+				Array containing the string or array of each setting's value.
+		*/
+		
+		function getSettings($ids) {
+			global $config;
+			if (!is_array($ids)) {
+				$ids = array($ids);
+			}
+			$parts = array();
+			foreach ($ids as $id) {
+				$parts[] = "id = '".mysql_real_escape_string($id)."'";
+			}
+			$settings = array();
+			$q = sqlquery("SELECT * FROM bigtree_settings WHERE (".implode(" OR ",$parts).") ORDER BY id ASC");
+			while ($f = sqlfetch($q)) {
+				// If the setting is encrypted, we need to re-pull just the value.
+				if ($f["encrypted"]) {
+					$f = sqlfetch(sqlquery("SELECT AES_DECRYPT(`value`,'".mysql_real_escape_string($config["settings_key"])."') AS `value` FROM bigtree_settings WHERE id = '".$f["id"]."'"));
+				}
+				$value = json_decode($f["value"],true);
+				if (is_array($value)) {
+					$settings[$f["id"]] = BigTree::untranslateArray($value);
+				} else {
+					$settings[$f["id"]] = $this->replaceInternalPageLinks($value);
+				}
+			}
+			return $settings;
+		}
+		
 		/*
 			Function: getTagsForPage
 				Returns a list of tags the page was tagged with.
