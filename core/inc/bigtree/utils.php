@@ -381,13 +381,18 @@
 				The string response from the URL.
 		*/
 		
-		static function cURL($url,$post = array()) {
+		static function cURL($url,$post = array(),$options = array()) {
 			$ch = curl_init();
 			curl_setopt($ch, CURLOPT_URL, $url);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 			if (count($post)) {
 				curl_setopt($ch, CURLOPT_POST, true);
 				curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+			}
+			if (count($options)) {
+				foreach ($options as $key => $opt) {
+					curl_setopt($ch, $key, $opt);
+				}
 			}
 			$output = curl_exec($ch);
 			curl_close($ch);
