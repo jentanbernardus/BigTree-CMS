@@ -12,9 +12,9 @@
 	$w = "'%".mysql_real_escape_string(end($path))."%'";
 	
 	// Get the "Pages" results.
-	$results = $admin->searchPages(end($path),array("title","resources","meta_keywords","meta_description","nav_title"),"50");
+	$r = $admin->searchPages(end($path),array("title","resources","meta_keywords","meta_description","nav_title"),"50");
 	$pages = array();
-	foreach ($results as $f) {
+	foreach ($r as $f) {
 		$res = json_decode($f["resources"],true);
 		$bc = $cms->getBreadcrumbByPage($f);
 		$bc_parts = array();
@@ -37,7 +37,7 @@
 	$modules = $admin->getModules("name ASC");
 	foreach ($modules as $m) {
 		// Get all auto module view actions for this module.
-		$actions = $admin->getModuleActions($module);
+		$actions = $admin->getModuleActions($m);
 		foreach ($actions as $action) {
 			if ($action["view"]) {
 				$view = BigTreeAutoModule::getView($action["view"]);

@@ -1,8 +1,5 @@
 <?
-/*
-	header("Location: ".$admin_root."dashboard/vitals-statistics/analytics/");
-	die();
-*/
+	$breadcrumb[] = array("link" => "dashboard/vitals-statistics/", "title" => "Vitals &amp; Statistics");
 ?>
 <h1><span class="vitals"></span>Vitals &amp; Statistics</h1>
 

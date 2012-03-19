@@ -159,7 +159,7 @@
 				$html = $this->makeIPL($html);
 			// Otherwise, switch all the image srcs and javascripts srcs and whatnot to {wwwroot}.
 			} else {
-				$html = preg_replace_callback('^href="([a-zA-Z0-9\:\/\.\?\=\-]*)"^',create_function('$matches','
+				$html = preg_replace_callback('/href="([^"]*)"/',create_function('$matches','
 					global $cms;
 					$href = str_replace("{wwwroot}",$GLOBALS["www_root"],$matches[1]);
 					if (strpos($href,$GLOBALS["www_root"]) !== false) {
@@ -1015,9 +1015,14 @@
 			$data["meta_keywords"] = htmlspecialchars($data["meta_keywords"]);
 			$data["meta_description"] = htmlspecialchars($data["meta_description"]);
 			
+			$parent = mysql_real_escape_string($data["parent"]);
+
 			// JSON encode the changes and stick them in the database.
+			unset($data["MAX_FILE_SIZE"]);
+			unset($data["ptype"]);
 			$data = mysql_real_escape_string(json_encode($data));
-			sqlquery("INSERT INTO bigtree_pending_changes (`user`,`date`,`title`,`table`,`changes`,`tags_changes`,`type`,`module`,`pending_page_parent`) VALUES ('".$this->ID."',NOW(),'New Page Created','bigtree_pages','$data','$tags','NEW','','".mysql_real_escape_string($data["parent"])."')");
+			
+			sqlquery("INSERT INTO bigtree_pending_changes (`user`,`date`,`title`,`table`,`changes`,`tags_changes`,`type`,`module`,`pending_page_parent`) VALUES ('".$this->ID."',NOW(),'New Page Created','bigtree_pages','$data','$tags','NEW','','$parent')");
 			$id = sqlid();
 			
 			// Audit trail
@@ -3442,6 +3447,8 @@
 		*/
 
 		function getPendingPage($id) {
+			global $cms;
+			
 			// Get the live page.
 			if (is_numeric($id)) {
 				global $cms;
@@ -4735,12 +4742,13 @@
 				Does not check permissions.
 			
 			Parameters:
-				page - The page id or pending page id
+				page - The page id or pending page id (prefixed with a "p")
 				changes - An array of changes
 		*/
 
 		function submitPageChange($page,$changes) {
 			global $cms;
+			
 			if ($page[0] == "p") {
 				// It's still pending...
 				$existing_page = array();
@@ -4805,7 +4813,7 @@
 				}
 
 				$comments = mysql_real_escape_string(json_encode($comments));
-				sqlquery("UPDATE bigtree_pending_changes SET comments = '$comments', changes = '$changes', tags_changes = '$tags', date = NOW(), user = '".$this->ID."', type = '$type' WHERE id = '".$f["id"]."'");
+				sqlquery("UPDATE bigtree_pending_changes SET comments = '$comments', changes = '$changes', tags_changes = '$tags', date = NOW(), user = '".$this->ID."', type = '$type' WHERE id = '".$existing_pending_change["id"]."'");
 				
 				$this->track("bigtree_pages",$page,"updated-draft");
 
@@ -4850,7 +4858,7 @@
 			$table = mysql_real_escape_string($table);
 			$entry = mysql_real_escape_string($entry);
 			$type = mysql_real_escape_string($type);
-			sqlquery("INSERT INTO bigtree_audit_trail VALUES (`table`,`user`,`entry`,`date`,`type`) VALUES ('$table','".$this->ID."','$entry',NOW(),'$type')");
+			sqlquery("INSERT INTO bigtree_audit_trail (`table`,`user`,`entry`,`date`,`type`) VALUES ('$table','".$this->ID."','$entry',NOW(),'$type')");
 		}
 		
 		/*

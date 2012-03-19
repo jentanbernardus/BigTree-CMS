@@ -2,8 +2,10 @@
 	$page = end($path);
 	
 	$pdata = $admin->getPendingPage($page);
+	
 	if ($page[0] == "p") {
 		$r = $admin->getPageAccessLevelByUser($pdata["parent"],$admin->ID);
+		$pdata["id"] = $page;
 	} else {
 		$r = $admin->getPageAccessLevelByUser($page,$admin->ID);
 		if ($pdata["changed_applied"]) {
