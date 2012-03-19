@@ -376,6 +376,7 @@
 			Parameters:
 				url - The URL to retrieve / POST to.
 				post - A key/value pair array of things to POST (optional).
+				options - A key/value pair of extra cURL options (optional).
 			
 			Returns:
 				The string response from the URL.
