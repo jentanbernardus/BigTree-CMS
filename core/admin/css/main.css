@@ -435,6 +435,7 @@
 	.table > summary.taller p { line-height: 45px; }
 	.table > summary .add { background: #DDD url(../images/button-bg.png) repeat-x; border: 1px solid #CCC; border-radius: 3px; color: #333; display: block; float: right; font-size: 11px; height: 21px; line-height: 21px; margin: 6px -10px 0 0; padding: 0 10px; transition: background-color 0.2s, border-color 0.2s; }
 	.table > summary .add:hover { background-color: #F3F3F3; }
+	.table > summary .export { background: url(../images/icons-16x16.png) no-repeat -48px 0px; float: right; height: 16px; margin: 10px 0 0 0; width: 16px; }
 	.table > summary .more { background: #F4F4F4; border-radius: 11px; box-shadow: 0px 1px 0 #AFAFAF; color: #666; float: right; font-size: 12px; height: 22px; line-height: 22px; margin: 2px -8px 0 0; padding: 0 15px; text-shadow: 0 1px 0 #FFF; transition: background 0.2s; }
 	.table > summary .more:hover { background: #fff; }
 	.table > summary h2.full { float: none; user-select: none; }
@@ -705,14 +706,20 @@
 	.developer h1 { line-height: 32px; }
 
 	.table .developer_templates_name { font-size: 15px; padding: 0 0 0 15px; text-align: left; width: 819px; }
+	.table .developer_templates_name a { display: block; width: 802px; color: #333; }
+	.table .developer_modules_name { font-size: 15px; padding: 0 0 0 15px; text-align: left; width: 757px; }
+	.table .developer_modules_name a { display: block; width: 740px; color: #333; }
 	.table .developer_view_name { padding: 0 0 0 15px; text-align: left; width: 757px; }
-	.table .developer_field_types_name { padding: 0 0 0 15px; text-align: left; width: 819px; }
+	.table .developer_field_types_name { font-size: 15px; padding: 0 0 0 15px; text-align: left; width: 819px; }
+	.table .developer_field_types_name a { display: block; color: #333; }
 	.table .developer_field_types_version { padding: 0 0 0 15px; text-align: left; width: 150px; }
 	.table .developer_field_types_author { padding: 0 0 0 15px; text-align: left; width: 319px; }
 	.table .developer_feeds_name { padding: 0 0 0 15px; text-align: left; width: 220px; }
+	.table .developer_feeds_name a { color: #333; display: block; }
 	.table .developer_feeds_url { padding: 0 0 0 15px; text-align: left; width: 420px; }
 	.table .developer_feeds_type { padding: 0 0 0 15px; text-align: left; width: 149px; }
 	.table .developer_settings_name { padding: 0 0 0 15px; text-align: left; width: 385px; }
+	.table .developer_settings_name a { color: #333; display: block; }
 	.table .developer_settings_id { padding: 0 0 0 15px; text-align: left; width: 259px; }
 	.table .developer_settings_type { padding: 0 0 0 15px; text-align: left; width: 145px; }
 

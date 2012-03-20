@@ -9,7 +9,8 @@
 		array("route" => "add", "class" => "add", "title" => "Add Module"),
 		array("route" => "designer", "class" => "edit", "title" => "Module Designer"),
 		array("route" => "groups/view", "class" => "list", "title" => "View Groups"),
-		array("route" => "groups/add", "class" => "add", "title" => "Add Group")
+		array("route" => "groups/add", "class" => "add", "title" => "Add Group"),
+		array("route" => "import", "class" => "truck", "title" => "Import Module")
 	);
 ?>
 <nav class="sub">

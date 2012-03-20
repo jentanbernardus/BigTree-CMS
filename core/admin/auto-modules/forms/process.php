@@ -75,7 +75,7 @@
 				BigTreeAutoModule::submitChange($module["id"],$table,$edit_id,$item,$many_to_many,$tags);
 				$admin->growl($module["name"],"Saved ".$form["title"]." Draft");
 			} else {
-				$edit_id = "p".BigTreeAutoModule::createPendingItem($module["id"],$table,$item,$many_to_many,$tags,$resources);
+				$edit_id = "p".BigTreeAutoModule::createPendingItem($module["id"],$table,$item,$many_to_many,$tags);
 				$admin->growl($module["name"],"Created ".$form["title"]." Draft");
 			}
 			
@@ -88,14 +88,14 @@
 			// We're a publisher
 			if ($edit_id) {
 				if (substr($edit_id,0,1) == "p") {
-					$edit_id = BigTreeAutoModule::publishPendingItem($table,substr($edit_id,1),$item,$many_to_many,$tags,$resources);
+					$edit_id = BigTreeAutoModule::publishPendingItem($table,substr($edit_id,1),$item,$many_to_many,$tags);
 					$admin->growl($module["name"],"Updated & Published ".$form["title"]);
 				} else {
 					BigTreeAutoModule::updateItem($table,$edit_id,$item,$many_to_many,$tags);
 					$admin->growl($module["name"],"Updated ".$form["title"]);
 				}
 			} else {
-				$edit_id = BigTreeAutoModule::createItem($table,$item,$many_to_many,$tags,$resources);
+				$edit_id = BigTreeAutoModule::createItem($table,$item,$many_to_many,$tags);
 				$admin->growl($module["name"],"Created ".$form["title"]);
 			}
 			$published = true;

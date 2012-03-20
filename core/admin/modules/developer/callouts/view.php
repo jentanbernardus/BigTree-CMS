@@ -24,7 +24,7 @@
 		<li id="row_<?=$x?>">
 			<section class="developer_templates_name">
 				<span class="icon_sort"></span>
-				<?=$callout["name"]?>
+				<a href="<?=$section_root?>edit/<?=$callout["id"]?>/"><?=$callout["name"]?></a>
 			</section>
 			<section class="view_action">
 				<a href="<?=$section_root?>edit/<?=$callout["id"]?>/" class="icon_edit"></a>

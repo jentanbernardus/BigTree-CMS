@@ -12,24 +12,26 @@
 		status: "APPROVED" for immediate change or "PENDING"|
 	*/
 	
+	$admin->requireAPIWrite();
+	
 	$form = $autoModule->getForm($_POST["form"]);
 	$module = $autoModule->getModuleForForm($form);
 	$parser = new BigTreeForms($form["table"]);
-	$a = $admin->checkAccess($module);
+	$permission = $admin->getAccessLevel($module,$_POST["item"],$form["table"]);
 	
 	$data = $parser->sanitizeFormDataForDB($_POST["item"]);
 	
-	if (!$a) {
-		echo BigTree::apiEncode(array("success" => false,"error" => "User does not have access to this module."));
+	if (!$permission || $permission == "n") {
+		echo BigTree::apiEncode(array("success" => false,"error" => "Permission denied."));
 		die();
 	}
 	
-	if ($a == "e") {
+	if ($permission == "e") {
 		$id = $autoModule->createPendingItem($module,$form["table"],$data);
 		$status = "PENDING";
 	}
 	
-	if ($a == "p") {
+	if ($permission == "p") {
 		$id = $autoModule->createItem($form["table"],$data);
 		$status = "APPROVED";
 	}

@@ -16,7 +16,9 @@
 	<ul>
 		<? foreach ($settings as $setting) { ?>
 		<li>
-			<section class="developer_settings_name"><?=$setting["name"]?></section>
+			<section class="developer_settings_name">
+				<a href="<?=$section_root?>edit/<?=$setting["id"]?>/"><?=$setting["name"]?></a>
+			</section>
 			<section class="developer_settings_id"><?=$setting["id"]?></section>
 			<section class="developer_settings_type"><?=$setting["type"]?></section>
 			<section class="view_action">

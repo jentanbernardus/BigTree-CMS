@@ -13,19 +13,24 @@
 ?>
 <div class="table">
 	<summary>
+		<a href="<?=$section_root?>export/group/<?=$g["id"]?>/" class="export"></a>
 		<h2><?=$g["name"]?></h2>
 	</summary>
 	<header>
-		<span class="developer_templates_name">Module Name</span>
+		<span class="developer_modules_name">Module Name</span>
+		<span class="view_action">Export</span>
 		<span class="view_action">Edit</span>
 		<span class="view_action">Delete</span>
 	</header>
 	<ul id="group_<?=$g["id"]?>">
 		<? foreach ($g["modules"] as $item) { ?>
 		<li id="row_<?=$item["id"]?>">
-			<section class="developer_templates_name">
+			<section class="developer_modules_name">
 				<span class="icon_sort"></span>
-				<?=$item["name"]?>
+				<a href="<?=$section_root?>edit/<?=$item["id"]?>/"><?=$item["name"]?></a>
+			</section>
+			<section class="view_action">
+				<a href="<?=$section_root?>export/<?=$item["id"]?>/" class="icon_export"></a>
 			</section>
 			<section class="view_action">
 				<a href="<?=$section_root?>edit/<?=$item["id"]?>/" class="icon_edit"></a>
@@ -52,16 +57,20 @@
 		<h2>Ungrouped Modules</h2>
 	</summary>
 	<header>
-		<span class="developer_templates_name">Module Name</span>
+		<span class="developer_modules_name">Module Name</span>
+		<span class="view_action">Export</span>
 		<span class="view_action">Edit</span>
 		<span class="view_action">Delete</span>
 	</header>
 	<ul id="group_0">
 		<? foreach ($ungrouped_modules as $item) { ?>
 		<li id="row_<?=$item["id"]?>">
-			<section class="developer_templates_name">
+			<section class="developer_modules_name">
 				<span class="icon_sort"></span>
-				<?=$item["name"]?>
+				<a href="<?=$section_root?>edit/<?=$item["id"]?>/"><?=$item["name"]?></a>
+			</section>
+			<section class="view_action">
+				<a href="<?=$section_root?>export/<?=$item["id"]?>/" class="icon_export"></a>
 			</section>
 			<section class="view_action">
 				<a href="<?=$section_root?>edit/<?=$item["id"]?>/" class="icon_edit"></a>

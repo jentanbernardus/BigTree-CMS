@@ -14,7 +14,9 @@
 	<ul>
 		<? foreach ($types as $type) { ?>
 		<li>
-			<section class="developer_field_types_name"><?=$type["name"]?></section>
+			<section class="developer_field_types_name">
+				<a href="<?=$section_root?>edit/<?=$type["id"]?>/"><?=$type["name"]?></a>
+			</section>
 			<section class="view_action">
 				<a href="<?=$section_root?>edit/<?=$type["id"]?>/" class="icon_edit"></a>
 			</section>
