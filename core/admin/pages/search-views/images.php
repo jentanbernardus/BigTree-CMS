@@ -2,37 +2,24 @@
 	$mpage = $admin_root.$module["route"]."/";
 	BigTree::globalizeArray($view);
 
-	$options = json_decode($options,true);
-	$fields = json_decode($fields,true);
-	$actions = json_decode($actions,true);
-	
 	$suffix = $suffix ? "-".$suffix : "";
 ?>
 <div class="table" id="" class="image_list">
-	<summary>
-		<p>Click an image to edit it.</p>
-	</summary>
+	<header>
+		<span class="view_column">Click an image to edit it.</span>
+	</header>
 	<section>
 		<ul id="image_list_<?=$view["id"]?>" class="image_list">
 			<?
 				foreach ($items as $item) {
-					$style = "";
-					if (file_exists($site_root.$options["directory"].$options["prefix"].$item[$options["image"]])) {
-						list($w,$h) = getimagesize($site_root.$options["directory"].$options["prefix"].$item[$options["image"]]);
-
-						if ($w > $h) {
-							$perc = 108 / $w;
-							$h = $perc * $h;
-							$style = "margin: ".floor((108 - $h) / 2)."px 0 0 0;";
-						} else {
-							$perc = 108 / $h;
-							$w = $perc * $w;
-							$style = "margin: 0 0 0 ".floor((108 - $w) / 2).";";
-						}
+					if ($options["preview_prefix"]) {
+						$preview_image = BigTree::prefixFile($item[$options["image"]],$options["preview_prefix"]);
+					} else {
+						$preview_image = $item[$options["image"]];
 					}
 			?>
 			<li id="row_<?=$item["id"]?>">
-				<a class="image" href="<?=$mpage?>edit<?=$suffix?>/<?=$item["id"]?>/"><img src="<?=$www_root.$options["directory"].$options["prefix"].$item[$options["image"]]?>" alt="" style="<?=$style?>" /></a>
+				<a class="image" href="<?=$mpage?>edit<?=$suffix?>/<?=$item["id"]?>/"><img src="<?=$preview_image?>" alt="" /></a>
 				<?
 					foreach ($actions as $action => $data) {
 						if ($action != "edit") {
@@ -93,5 +80,21 @@
 		$.ajax("<?=$admin_root?>ajax/auto-modules/views/archive/?view=<?=$view["id"]?>&id=" + $(this).attr("href").substr(1));
 		$(this).toggleClass("icon_archive_on");
 		return false;
+	});
+	
+	$("#image_list_<?=$view["id"]?> img").load(function() {
+		w = $(this).width();
+		h = $(this).height();
+		if (w > h) {
+			perc = 108 / w;
+			h = perc * h;
+			style = { margin: Math.floor((108 - h) / 2) + "px 0 0 0" };
+		} else {
+			perc = 108 / h;
+			w = perc * w;
+			style = { margin: "0 0 0 " + Math.floor((108 - w) / 2) + "px" };
+		}
+		
+		$(this).css(style);
 	});
 </script>

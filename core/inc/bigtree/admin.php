@@ -159,7 +159,7 @@
 				$html = $this->makeIPL($html);
 			// Otherwise, switch all the image srcs and javascripts srcs and whatnot to {wwwroot}.
 			} else {
-				$html = preg_replace_callback('^href="([a-zA-Z0-9\:\/\.\?\=\-]*)"^',create_function('$matches','
+				$html = preg_replace_callback('/href="([^"]*)"/',create_function('$matches','
 					global $cms;
 					$href = str_replace("{wwwroot}",$GLOBALS["www_root"],$matches[1]);
 					if (strpos($href,$GLOBALS["www_root"]) !== false) {
@@ -1015,9 +1015,14 @@
 			$data["meta_keywords"] = htmlspecialchars($data["meta_keywords"]);
 			$data["meta_description"] = htmlspecialchars($data["meta_description"]);
 			
+			$parent = mysql_real_escape_string($data["parent"]);
+
 			// JSON encode the changes and stick them in the database.
+			unset($data["MAX_FILE_SIZE"]);
+			unset($data["ptype"]);
 			$data = mysql_real_escape_string(json_encode($data));
-			sqlquery("INSERT INTO bigtree_pending_changes (`user`,`date`,`title`,`table`,`changes`,`tags_changes`,`type`,`module`,`pending_page_parent`) VALUES ('".$this->ID."',NOW(),'New Page Created','bigtree_pages','$data','$tags','NEW','','".mysql_real_escape_string($data["parent"])."')");
+			
+			sqlquery("INSERT INTO bigtree_pending_changes (`user`,`date`,`title`,`table`,`changes`,`tags_changes`,`type`,`module`,`pending_page_parent`) VALUES ('".$this->ID."',NOW(),'New Page Created','bigtree_pages','$data','$tags','NEW','','$parent')");
 			$id = sqlid();
 			
 			// Audit trail
@@ -1452,7 +1457,7 @@
 
 			$page = mysql_real_escape_string($page);
 
-			$r = $this->getPageAccessLevelByUser($page,$this->ID);
+			$r = $this->getPageAccessLevel($page);
 			if ($r == "p" && $this->canModifyChildren($cms->getPage($page))) {
 				// If the page isn't numeric it's most likely prefixed by the "p" so it's pending.
 				if (!is_numeric($page)) {
@@ -1502,7 +1507,7 @@
 		function deletePageDraft($id) {
 			$id = mysql_real_escape_string($id);
 			// Get the version, check if the user has access to the page the version refers to.
-			$access = $this->getPageAccessLevelByUser($id,$this->ID);
+			$access = $this->getPageAccessLevel($id);
 			if ($access != "p") {
 				$this->stop("You must be a publisher to manage revisions.");
 			}
@@ -1523,7 +1528,7 @@
 		function deletePageRevision($id) {
 			// Get the version, check if the user has access to the page the version refers to.
 			$revision = $this->getPageRevision($id);
-			$access = $this->getPageAccessLevelByUser($revision["page"],$this->ID);
+			$access = $this->getPageAccessLevel($revision["page"]);
 			if ($access != "p") {
 				$this->stop("You must be a publisher to manage revisions.");
 			}
@@ -2807,7 +2812,7 @@
 					return "p";
 				}
 				$pdata = json_decode($f["changes"],true);
-				return $this->getPageAccessLevelByUser($pdata["parent"],$this->ID);
+				return $this->getPageAccessLevelByUser($pdata["parent"],$user);
 			}
 
 			$pp = $this->Permissions["page"][$page];
@@ -3359,7 +3364,7 @@
 					$ok = true;
 				// Check permissions on a page if it's a page.
 				} elseif ($f["table"] == "bigtree_pages") {
-					$r = $this->getPageAccessLevelByUser($id,$this->ID);
+					$r = $this->getPageAccessLevelByUser($id);
 					// If we're a publisher, this is ours!
 					if ($r == "p") {
 						$ok = true;
@@ -3442,6 +3447,8 @@
 		*/
 
 		function getPendingPage($id) {
+			global $cms;
+			
 			// Get the live page.
 			if (is_numeric($id)) {
 				global $cms;
@@ -4735,12 +4742,13 @@
 				Does not check permissions.
 			
 			Parameters:
-				page - The page id or pending page id
+				page - The page id or pending page id (prefixed with a "p")
 				changes - An array of changes
 		*/
 
 		function submitPageChange($page,$changes) {
 			global $cms;
+			
 			if ($page[0] == "p") {
 				// It's still pending...
 				$existing_page = array();
@@ -4805,7 +4813,7 @@
 				}
 
 				$comments = mysql_real_escape_string(json_encode($comments));
-				sqlquery("UPDATE bigtree_pending_changes SET comments = '$comments', changes = '$changes', tags_changes = '$tags', date = NOW(), user = '".$this->ID."', type = '$type' WHERE id = '".$f["id"]."'");
+				sqlquery("UPDATE bigtree_pending_changes SET comments = '$comments', changes = '$changes', tags_changes = '$tags', date = NOW(), user = '".$this->ID."', type = '$type' WHERE id = '".$existing_pending_change["id"]."'");
 				
 				$this->track("bigtree_pages",$page,"updated-draft");
 
@@ -4850,7 +4858,7 @@
 			$table = mysql_real_escape_string($table);
 			$entry = mysql_real_escape_string($entry);
 			$type = mysql_real_escape_string($type);
-			sqlquery("INSERT INTO bigtree_audit_trail VALUES (`table`,`user`,`entry`,`date`,`type`) VALUES ('$table','".$this->ID."','$entry',NOW(),'$type')");
+			sqlquery("INSERT INTO bigtree_audit_trail (`table`,`user`,`entry`,`date`,`type`) VALUES ('$table','".$this->ID."','$entry',NOW(),'$type')");
 		}
 		
 		/*
@@ -5475,7 +5483,7 @@
 		function updatePageRevision($id,$description) {
 			// Get the version, check if the user has access to the page the version refers to.
 			$revision = $this->getPageRevision($id);
-			$access = $this->getPageAccessLevelByUser($revision["page"],$this->ID);
+			$access = $this->getPageAccessLevelByUser($revision["page"]);
 			if ($access != "p") {
 				$this->stop("You must be a publisher to manage revisions.");
 			}

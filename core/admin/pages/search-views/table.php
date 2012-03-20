@@ -1,10 +1,6 @@
 <?
 	BigTree::globalizeArray($view);	
 	
-	$fields = json_decode($fields,true);
-	$options = json_decode($options,true);
-	$actions = json_decode($actions,true);
-					
 	$mpage = $admin_root.$module["route"]."/";
 	// If this is a second view inside a module, we might need a suffix for edits.
 	$suffix = $suffix ? "-".$suffix : "";

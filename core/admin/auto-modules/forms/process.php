@@ -88,7 +88,7 @@
 			// We're a publisher
 			if ($edit_id) {
 				if (substr($edit_id,0,1) == "p") {
-					$edit_id = BigTreeAutoModule::publishPendingItem($table,$edit_id,$item,$many_to_many,$tags,$resources);
+					$edit_id = BigTreeAutoModule::publishPendingItem($table,substr($edit_id,1),$item,$many_to_many,$tags,$resources);
 					$admin->growl($module["name"],"Updated & Published ".$form["title"]);
 				} else {
 					BigTreeAutoModule::updateItem($table,$edit_id,$item,$many_to_many,$tags);

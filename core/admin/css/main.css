@@ -503,9 +503,8 @@
 	.table .messages_date_time { padding: 0 20px 0 0; text-align: right; width: 65px; }
 	.table .messages_view { padding: 0 20px 0 0; text-align: center; width: 45px; }
 	
-	.table .changes_name { padding: 0 0 0 20px; text-align: left; width: 420px; }
-	.table .changes_author { padding: 0 0 0 20px; text-align: left; width: 183px; }
-	.table .changes_date { padding: 0 30px 0 0; text-align: right; width: 65px; }
+	.table .changes_page { padding: 0 0 0 20px; text-align: left; width: 558px; }
+	.table .changes_author { padding: 0 0 0 20px; text-align: left; width: 140px; }
 	.table .changes_action { padding: 0 20px 0 0; text-align: center; width: 35px; }
 
 	.form_container .save_and_preview span { background: url(../images/icon-preview-small.png) no-repeat 0px center; float: left; height: 35px; margin: 0; width: 22px; }

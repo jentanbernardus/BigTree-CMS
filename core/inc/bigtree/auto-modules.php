@@ -757,6 +757,71 @@
 		}
 		
 		/*
+			Function: getUncachedFilterQuery
+				Returns a query string that is used for searching views based on group permissions.
+				This query is used on the table itself instead of the view cache.
+			
+			Parameters:
+				view - The view to create a filter for.
+			
+			Returns:
+				A set of MySQL statements that filter out information the user cannot access.
+		*/
+		
+		static function getUncachedFilterQuery($view) {
+			global $admin;
+			$module = $admin->getModule(self::getModuleForView($view));
+			if ($module["gbp"]["enabled"] && $module["gbp"]["table"] == $view["table"]) {
+				$groups = $admin->getAccessGroups($module["id"]);
+				if (is_array($groups)) {
+					$gfl = array();
+					foreach ($groups as $g) {
+						$gfl[] = "`".$module["gbp"]["group_field"]."` = '".mysql_real_escape_string($g)."'";
+					}
+					return " AND (".implode(" OR ",$gfl).")";
+				}
+			}
+			return "";
+		}
+		
+		/*
+			Function: getView
+				Returns a view.
+			
+			Parameters:
+				id - The id of the view.
+				
+			Returns:
+				A view entry with actions, options, and fields decoded.  fields also receive a width column for the view.
+		*/
+
+		static function getView($id) {
+			if (is_array($id)) {
+				$id = $id["id"];
+			}
+			
+			$f = sqlfetch(sqlquery("SELECT * FROM bigtree_module_views WHERE id = '$id'"));
+			$f["actions"] = json_decode($f["actions"],true);
+			$f["options"] = json_decode($f["options"],true);
+			
+			$actions = $f["preview_url"] ? ($f["actions"] + array("preview" => "on")) : $f["actions"];
+			$fields = json_decode($f["fields"],true);
+			$first = current($fields);
+			if (!$first["width"]) {
+				$awidth = count($actions) * 62;
+				$available = 958 - $awidth;
+				$percol = floor($available / count($fields));
+			
+				foreach ($fields as $key => $field) {
+					$fields[$key]["width"] = $percol - 20;
+				}
+			}
+			$f["fields"] = $fields;
+
+			return $f;
+		}
+		
+		/*
 			Function: getViewData
 				Gets a list of data for a view.
 			
@@ -811,7 +876,6 @@
 				An array of items from bigtree_module_view_cache.
 		*/
 		
-		// Same as getViewData only you can choose a group.
 		static function getViewDataForGroup($view,$group,$sort,$type = "both") {
 			// Check to see if we've cached this table before.
 			self::cacheViewData($view);
@@ -833,66 +897,32 @@
 		}
 		
 		/*
-			Function: getUncachedFilterQuery
-				Returns a query string that is used for searching views based on group permissions.
-				This query is used on the table itself instead of the view cache.
+			Function: getViewForTableChanges
+				Gets a view for a given table for showing change lists in Pending Changes.
 			
 			Parameters:
-				view - The view to create a filter for.
+				table - Table name.
 			
 			Returns:
-				A set of MySQL statements that filter out information the user cannot access.
+				A view entry with options, and fields decoded and field widths set for Pending Changes.
 		*/
 		
-		static function getUncachedFilterQuery($view) {
-			global $admin;
-			$module = $admin->getModule(self::getModuleForView($view));
-			if ($module["gbp"]["enabled"] && $module["gbp"]["table"] == $view["table"]) {
-				$groups = $admin->getAccessGroups($module["id"]);
-				if (is_array($groups)) {
-					$gfl = array();
-					foreach ($groups as $g) {
-						$gfl[] = "`".$module["gbp"]["group_field"]."` = '".mysql_real_escape_string($g)."'";
-					}
-					return " AND (".implode(" OR ",$gfl).")";
-				}
-			}
-			return "";
-		}
-		
-		
-		
-		/*
-			Function: getView
-				Returns a view.
-			
-			Parameters:
-				id - The id of the view.
-				
-			Returns:
-				A view entry with actions, options, and fields decoded.  fields also receive a width column for the view.
-		*/
-
-		static function getView($id) {
-			if (is_array($id)) {
-				$id = $id["id"];
-			}
-			
-			$f = sqlfetch(sqlquery("SELECT * FROM bigtree_module_views WHERE id = '$id'"));
-			$f["actions"] = json_decode($f["actions"],true);
+		function getViewForTable($table) {
+			$table = mysql_real_escape_string($table);
+			$f = sqlfetch(sqlquery("SELECT * FROM bigtree_module_views WHERE `table` = '$table'"));
 			$f["options"] = json_decode($f["options"],true);
 			
-			$actions = $f["preview_url"] ? ($f["actions"] + array("preview" => "on")) : $f["actions"];
 			$fields = json_decode($f["fields"],true);
 			$first = current($fields);
-			if (!$first["width"]) {
-				$awidth = count($actions) * 62;
-				$available = 958 - $awidth;
-				$percol = floor($available / count($fields));
-			
-				foreach ($fields as $key => $field) {
-					$fields[$key]["width"] = $percol - 20;
-				}
+			// Three or four actions, depending on preview availability.
+			if ($f["preview_url"]) {
+				$available = 578;
+			} else {
+				$available = 633;
+			}
+			$percol = floor($available / count($fields));
+			foreach ($fields as $key => $field) {
+				$fields[$key]["width"] = $percol - 20;
 			}
 			$f["fields"] = $fields;
 
@@ -945,7 +975,7 @@
 				
 			Parameters:
 				table - The table to store the entry in.
-				id - The id of the pending entry (prefixed with a p)
+				id - The id of the pending entry.
 				data - The form data to create an entry with.
 				many_to_many - Many to Many information
 				tags - Tag information
@@ -961,12 +991,16 @@
 			
 			$query_fields = array();
 			$query_vals = array();
+			$columns = sqlcolumns($table);
+			
 			foreach ($data as $key => $val) {
-				$query_fields[] = "`".$key."`";
-				if ($val === "NULL" || $val == "NOW()") {
-					$query_vals[] = $val;
-				} else {
-					$query_vals[] = "'".mysql_real_escape_string($val)."'";
+				if (isset($columns[$key])) {
+					$query_fields[] = "`".$key."`";
+					if ($val === "NULL" || $val == "NOW()") {
+						$query_vals[] = $val;
+					} else {
+						$query_vals[] = "'".mysql_real_escape_string($val)."'";
+					}
 				}
 			}
 			sqlquery("INSERT INTO $table (".implode(",",$query_fields).") VALUES (".implode(",",$query_vals).")");
@@ -1156,8 +1190,11 @@
 			
 			// Clear out any pending changes.
 			sqlquery("DELETE FROM bigtree_pending_changes WHERE item_id = '$id' AND `table` = '$table'");
-
-			self::recacheItem($id,$table);
+			
+			if ($table != "bigtree_pages") {
+				self::recacheItem($id,$table);
+			}
+			
 			$admin->track($table,$id,"updated");
 		}
 

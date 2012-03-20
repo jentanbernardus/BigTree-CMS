@@ -3,7 +3,7 @@
 	
 	$parent = is_array($commands) ? end($commands) : 0;
 	$page = $cms->getPage($parent,false);
-	$parent_access = $admin->getPageAccessLevelByUser($parent,$admin->ID);
+	$parent_access = $admin->getPageAccessLevel($parent);
 	
 	// Setup the page breadcrumb
 	if ($parent && $page) {
@@ -52,7 +52,7 @@
 	<ul id="pages_<?=$class?>">
 		<?
 			foreach ($nav as $item) {
-				$perm = $admin->getPageAccessLevelByUser($item["id"],$admin->ID);
+				$perm = $admin->getPageAccessLevel($item["id"]);
 				
 				if ($item["bigtree_pending"]) {
 					$status = '<a href="'.$www_root.'_preview-pending/'.$item["id"].'/" target="_blank">Pending</a>';

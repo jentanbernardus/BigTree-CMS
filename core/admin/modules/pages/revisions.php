@@ -1,6 +1,6 @@
 <?
 	$page = end($path);
-	$access = $admin->getPageAccessLevelByUser($page,$admin->ID);
+	$access = $admin->getPageAccessLevel($page);
 	if ($access != "p") {
 		$admin->stop("You must be a publisher to manage revisions.");
 	}

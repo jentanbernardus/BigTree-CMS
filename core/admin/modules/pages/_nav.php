@@ -1,5 +1,5 @@
 <?
-	$access = $admin->getPageAccessLevelByUser(end($path),$admin->ID);
+	$access = $admin->getPageAccessLevel(end($path));
 	$available_actions = array(
 		array("route" => "view-tree", "name" => "View Subpages", "icon" => "list")
 	);

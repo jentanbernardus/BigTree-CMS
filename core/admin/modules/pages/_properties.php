@@ -4,7 +4,7 @@
 	$page_data = $admin->getPendingPage(is_array($page) ? $page["id"] : $page);
 	$age = floor((time() - strtotime($page_data["updated_at"])) / (60 * 60 * 24));
 	$seo = $admin->getPageSEORating($page_data,$page_data["resources"]);
-	if (is_numeric($page_data["id"])) {
+	if (isset($page_data["id"]) && is_numeric($page_data["id"])) {
 		if ($page_data["id"] == 0) {
 			$live_url = $www_root;
 		} else {
@@ -17,7 +17,7 @@
 			$status = "Published";
 		}
 	} else {
-		$preview_url = $www_root."_preview-pending/".substr($page_data["id"],1)."/";
+		$preview_url = $www_root."_preview-pending/".$page."/";
 		$status = "Unpublished";
 	}
 	

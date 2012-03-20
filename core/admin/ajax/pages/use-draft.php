@@ -1,7 +1,7 @@
 <?
 	// Get the version, check if the user has access to the page the version refers to.
 	$revision = $admin->getPageRevision($_GET["id"]);
-	$access = $admin->getPageAccessLevelByUser($revision["page"],$admin->ID);
+	$access = $admin->getPageAccessLevel($revision["page"]);
 	if ($access != "p") {
 		$admin->stop("You must be a publisher to manage revisions.");
 	}

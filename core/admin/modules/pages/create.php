@@ -2,7 +2,7 @@
 	// Initiate the Upload Service class.
 	$upload_service = new BigTreeUploadService;
 	
-	$r = $admin->getPageAccessLevelByUser($_POST["parent"],$admin->ID); 
+	$r = $admin->getPageAccessLevel($_POST["parent"]); 
 	if ($r == "p") {
 		$publisher = true;
 	} elseif ($r == "e") {
