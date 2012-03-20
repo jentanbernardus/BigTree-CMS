@@ -1,7 +1,7 @@
 <?
 	$parent = end($path);
 
-	$r = $admin->getPageAccessLevelByUser($parent,$admin->ID); 
+	$r = $admin->getPageAccessLevel($parent); 
 	if ($r == "p") {
 		$publisher = true;
 	} elseif ($r == "e") {

@@ -975,7 +975,7 @@
 				
 			Parameters:
 				table - The table to store the entry in.
-				id - The id of the pending entry (prefixed with a p)
+				id - The id of the pending entry.
 				data - The form data to create an entry with.
 				many_to_many - Many to Many information
 				tags - Tag information
@@ -991,12 +991,16 @@
 			
 			$query_fields = array();
 			$query_vals = array();
+			$columns = sqlcolumns($table);
+			
 			foreach ($data as $key => $val) {
-				$query_fields[] = "`".$key."`";
-				if ($val === "NULL" || $val == "NOW()") {
-					$query_vals[] = $val;
-				} else {
-					$query_vals[] = "'".mysql_real_escape_string($val)."'";
+				if (isset($columns[$key])) {
+					$query_fields[] = "`".$key."`";
+					if ($val === "NULL" || $val == "NOW()") {
+						$query_vals[] = $val;
+					} else {
+						$query_vals[] = "'".mysql_real_escape_string($val)."'";
+					}
 				}
 			}
 			sqlquery("INSERT INTO $table (".implode(",",$query_fields).") VALUES (".implode(",",$query_vals).")");
@@ -1186,8 +1190,11 @@
 			
 			// Clear out any pending changes.
 			sqlquery("DELETE FROM bigtree_pending_changes WHERE item_id = '$id' AND `table` = '$table'");
-
-			self::recacheItem($id,$table);
+			
+			if ($table != "bigtree_pages") {
+				self::recacheItem($id,$table);
+			}
+			
 			$admin->track($table,$id,"updated");
 		}
 

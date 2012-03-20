@@ -1457,7 +1457,7 @@
 
 			$page = mysql_real_escape_string($page);
 
-			$r = $this->getPageAccessLevelByUser($page,$this->ID);
+			$r = $this->getPageAccessLevel($page);
 			if ($r == "p" && $this->canModifyChildren($cms->getPage($page))) {
 				// If the page isn't numeric it's most likely prefixed by the "p" so it's pending.
 				if (!is_numeric($page)) {
@@ -1507,7 +1507,7 @@
 		function deletePageDraft($id) {
 			$id = mysql_real_escape_string($id);
 			// Get the version, check if the user has access to the page the version refers to.
-			$access = $this->getPageAccessLevelByUser($id,$this->ID);
+			$access = $this->getPageAccessLevel($id);
 			if ($access != "p") {
 				$this->stop("You must be a publisher to manage revisions.");
 			}
@@ -1528,7 +1528,7 @@
 		function deletePageRevision($id) {
 			// Get the version, check if the user has access to the page the version refers to.
 			$revision = $this->getPageRevision($id);
-			$access = $this->getPageAccessLevelByUser($revision["page"],$this->ID);
+			$access = $this->getPageAccessLevel($revision["page"]);
 			if ($access != "p") {
 				$this->stop("You must be a publisher to manage revisions.");
 			}
@@ -2812,7 +2812,7 @@
 					return "p";
 				}
 				$pdata = json_decode($f["changes"],true);
-				return $this->getPageAccessLevelByUser($pdata["parent"],$this->ID);
+				return $this->getPageAccessLevelByUser($pdata["parent"],$user);
 			}
 
 			$pp = $this->Permissions["page"][$page];
@@ -3364,7 +3364,7 @@
 					$ok = true;
 				// Check permissions on a page if it's a page.
 				} elseif ($f["table"] == "bigtree_pages") {
-					$r = $this->getPageAccessLevelByUser($id,$this->ID);
+					$r = $this->getPageAccessLevelByUser($id);
 					// If we're a publisher, this is ours!
 					if ($r == "p") {
 						$ok = true;
@@ -5483,7 +5483,7 @@
 		function updatePageRevision($id,$description) {
 			// Get the version, check if the user has access to the page the version refers to.
 			$revision = $this->getPageRevision($id);
-			$access = $this->getPageAccessLevelByUser($revision["page"],$this->ID);
+			$access = $this->getPageAccessLevelByUser($revision["page"]);
 			if ($access != "p") {
 				$this->stop("You must be a publisher to manage revisions.");
 			}

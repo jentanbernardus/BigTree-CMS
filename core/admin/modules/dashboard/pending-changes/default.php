@@ -145,3 +145,19 @@
 <?
 	}
 ?>
+
+<script type="text/javascript">
+	$(".icon_approve").click(function() {
+		$.ajax("<?=$admin_root?>ajax/dashboard/approve-change/", { data: { id: $(this).attr("href").substr(1) }, type: "POST" });
+		$(this).parents("li").remove();
+		BigTree.growl("Pending Changes","Approved Change");
+		return false;
+	});
+	
+	$(".icon_deny").click(function() {
+		$.ajax("<?=$admin_root?>ajax/dashboard/reject-change/", { data: { id: $(this).attr("href").substr(1) }, type: "POST" });
+		$(this).parents("li").remove();
+		BigTree.growl("Pending Changes","Rejected Change");
+		return false;
+	});
+</script>

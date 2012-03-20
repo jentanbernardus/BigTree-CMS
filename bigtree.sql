@@ -5,7 +5,7 @@ DROP TABLE IF EXISTS `bigtree_api_tokens`;
 CREATE TABLE `bigtree_api_tokens` (`id` int(11) NOT NULL AUTO_INCREMENT, `token` varchar(255) NOT NULL, `user` int(11) NOT NULL, `expires` datetime NOT NULL, `temporary` char(2) NOT NULL, `readonly` char(2) NOT NULL, PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 DROP TABLE IF EXISTS `bigtree_audit_trail`;
-CREATE TABLE `bigtree_audit_trail` ( `id` int(11) unsigned NOT NULL AUTO_INCREMENT, `table` varchar(255) NOT NULL, `user` int(11) NOT NULL, `entry` int(11) NOT NULL, `date` datetime NOT NULL, `type` varchar(255) NOT NULL, PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+CREATE TABLE `bigtree_audit_trail` ( `id` int(11) unsigned NOT NULL AUTO_INCREMENT, `table` varchar(255) NOT NULL, `user` int(11) NOT NULL, `entry` varchar(255) NOT NULL, `date` datetime NOT NULL, `type` varchar(255) NOT NULL, PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 DROP TABLE IF EXISTS `bigtree_callouts`;
 CREATE TABLE `bigtree_callouts` ( `id` varchar(255) NOT NULL, `name` varchar(255) NOT NULL DEFAULT '', `description` text NOT NULL, `resources` text NOT NULL, `position` int(11) NOT NULL, `package` int(11) NOT NULL, `level` int(11) NOT NULL, PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;

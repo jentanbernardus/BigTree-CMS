@@ -8,9 +8,9 @@
 		$change_id = substr($page,1);
 		$f = $admin->getPendingChange($change_id);
 		$pdata = $f["changes"];
-		$r = $admin->getPageAccessLevelByUser($pdata["parent"],$admin->ID);
+		$r = $admin->getPageAccessLevel($pdata["parent"]);
 	} else {
-		$r = $admin->getPageAccessLevelByUser($page,$admin->ID);
+		$r = $admin->getPageAccessLevel($page);
 		$pdata = $admin->getPendingPage($page);
 	}
 	

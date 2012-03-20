@@ -1,59 +1,37 @@
 <?
-	header("Content-type: text/javascript");
-	$cid = mysql_real_escape_string($_GET["change"]);
-	
-	$f = sqlfetch(sqlquery("SELECT * FROM bigtree_pending_changes WHERE id = '$cid'"));
-	$table = $f["table"];
-	$changes = json_decode($f["changes"],true);
-	$mtm_changes = json_decode($f["mtm_changes"],true);
-	$type = $f["type"];
-	$id = $f["item_id"];
-	$module = $f["module"];
-	
+	$change = $admin->getPendingChange($_POST["id"]);
+
 	// See if we have permission.
-	$ok = false;	
-	if ($module) {
-		$perm = $admin->getAccessLevel($module,$changes,$table);
+	$item_id = $change["item_id"] ? $change["item_id"] : "p".$change["id"];
+	
+	if ($change["module"]) {
+		// It's a module. Check permissions on this.
+		$data = BigTreeAutoModule::getPendingItem($change["table"],$item_id);
+		$permission_level = $admin->getAccessLevel($admin->getModule($change["module"]),$data["item"],$change["table"]);
 	} else {
-		if ($type == "EDIT" || $type == "DELETE") {
-			$perm = $admin->getPageAccessLevelByUser($id,$admin->ID);
+		if ($change["item_id"]) {
+			$permission_level = $admin->getPageAccessLevel($page);
 		} else {
-			$perm = $admin->getPageAccessLevelByUser($changes["parent"],$admin->ID);
+			$f = $admin->getPendingChange($change["id"]);
+			$permission_level = $admin->getPageAccessLevel($f["changes"]["parent"]);
 		}
 	}
 	
-	if ($perm != "p") {
-?>
-BigTree.growl("Pending Changes","You do not have permission to approve this change.");
-<?
+	// If they're not a publisher, they have no business here.
+	if ($permission_level != "p") {
+		die("Not going to happen.");
+	}
+
+	// This is an update to an existing entry.
+	if ($change["item_id"]) {
+		BigTreeAutoModule::updateItem($change["table"],$change["item_id"],$change["changes"],$changes["mtm_changes"],$changes["tags_changes"]);
+	// It's a new entry, let's publish it.
 	} else {
-		// Actually do something.
-		if ($type == "DELETE") {
-			sqlquery("DELETE FROM $table WHERE id = '$id'");
+		if ($change["table"] == "bigtree_pages") {
+			$page = $admin->createPage($change["changes"]);
+			$admin->deletePendingChange($change["id"]);
+		} else {
+			BigTreeAutoModule::publishPendingItem($change["table"],$change["id"],$change["changes"],$changes["mtm_changes"],$changes["tags_changes"]);
 		}
-		if ($type == "EDIT") {
-			$ustring = array();
-			$columns = sqlcolumns($table);
-			foreach ($changes as $key => $val) {
-				if (is_array($val))
-					$val = json_encode($val);
-				if (isset($columns[$key]))
-					$ustring[] = "`$key` = '".mysql_real_escape_string($val)."'";
-			}
-			sqlquery("UPDATE $table SET ".implode(", ",$ustring)." WHERE id = '$id'");
-			BigTreeAutoModule::recacheItem($id,$table);
-		}
-		if ($type == "NEW") {			
-			if ($table == "bigtree_pages") {
-				$admin->createPage($changes);
-			} else {
-				BigTreeAutoModule::createItem($table,$changes,$mtm_changes);
-			}
-		}
-		
-		BigTreeAutoModule::deletePendingItem($table,$cid);
-?>
-BigTree.growl("Pending Changes","Change request approved.");
-<?
 	}
 ?>

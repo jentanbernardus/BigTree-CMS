@@ -11,7 +11,7 @@
 			$f = $admin->getPendingChange($cid);
 			$pdata = $f["changes"];
 			$pdata["updated_at"] = $f["date"];
-			$r = $admin->getPageAccessLevelByUser($pdata["parent"],$admin->ID);
+			$r = $admin->getPageAccessLevel($pdata["parent"]);
 		
 			$tags = array();
 			$temp_tags = json_decode($f["tags_changes"],true);
@@ -24,7 +24,7 @@
 			
 			$pdata["id"] = $page;
 		} else {
-			$r = $admin->getPageAccessLevelByUser($page,$admin->ID);
+			$r = $admin->getPageAccessLevel($page);
 			$pdata = $admin->getPendingPage($page);
 			$tags = $pdata["tags"];
 			if ($admin->getPageChanges($page)) {

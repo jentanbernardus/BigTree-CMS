@@ -81,16 +81,21 @@
 		function sanitizeFormDataForDB($data) {
 			foreach ($data as $key => $val) {
 				$type = $this->Fields[$key];
-				if ($type == "tinyint" || $type == "smallint" || $type == "mediumint" || $type == "int" || $type == "bigint")
+				if ($type == "tinyint" || $type == "smallint" || $type == "mediumint" || $type == "int" || $type == "bigint") {
 					$data[$key] = $this->sanitizeInteger($val);
-				if ($type == "float" || $type == "double" || $type == "decimal")
+				}
+				if ($type == "float" || $type == "double" || $type == "decimal") {
 					$data[$key] = $this->sanitizeFloat($val);
-				if ($type == "datetime" || $type == "timestamp")
+				}
+				if ($type == "datetime" || $type == "timestamp") {
 					$data[$key] = $this->sanitizeDateTime($val,$this->Columns[$key]["null"]);
-				if ($type == "date" || $type == "year")
+				}
+				if ($type == "date" || $type == "year") {
 					$data[$key] = $this->sanitizeDate($val,$this->Columns[$key]["null"]);
-				if ($type == "time")
+				}
+				if ($type == "time") {
 					$data[$key] = $this->sanitizeTime($val,$this->Columns[$key]["null"]);
+				}
 			}
 			return $data;
 		}
