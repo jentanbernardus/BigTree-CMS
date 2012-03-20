@@ -132,6 +132,7 @@
 	
 	// Handle AJAX calls.
 	if ($path[0] == "ajax") {
+		bigtree_setup_sql_connection();
 		$x = 1;
 		$ajpath = "";
 		while ($x < count($path) - 1) {
