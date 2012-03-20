@@ -263,20 +263,27 @@
 					include BigTree::path("admin/auto-modules/view.php");
 				}
 			} elseif (file_exists($inc)) {
+				// Include the top level module header.
 				if (!$ispage && file_exists(BigTree::path("admin/modules/".$path[1]."/_header.php"))) {
 					include BigTree::path("admin/modules/".$path[1]."/_header.php");
 				}
+				
+				// Include the routed directory's module header if it's not the same one.
 				if (!$ispage && file_exists($inc_dir."_header.php") && BigTree::path("admin/modules/".$path[1]."/_header.php") != ($inc_dir."_header.php")) {
 					include $inc_dir."_header.php";
 				}
 				
+				// Include the routed file.
 				include $inc;
 				
+				// Include the routed directory's footer if it's not the same as the top level footer.
+				if (!$ispage && file_exists($inc_dir."_footer.php") && BigTree::path("admin/modules/".$path[1]."/_footer.php") != ($inc_dir."_footer.php")) {
+					include $inc_dir."_footer.php";
+				}
+				
+				// Include the top level module footer.
 				if (!$ispage && file_exists(BigTree::path("admin/modules/".$path[1]."/_footer.php"))) {
 					include BigTree::path("admin/modules/".$path[1]."/_footer.php");
-				}
-				if (!$ispage && file_exists($inc_dir."_footer.php")) {
-					include $inc_dir."_footer.php";
 				}
 			} else {
 				include BigTree::path("admin/pages/_404.php");
