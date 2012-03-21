@@ -103,7 +103,7 @@
 	// Get the feeds
 	if (is_array($feeds)) {
 		foreach ($feeds as $feed) {
-			$item = $cms->getFeedById($feed);
+			$item = $cms->getFeed($feed);
 			$index .= "Feed::||BTX||::".json_encode($item)."\n";
 		}
 	}
@@ -111,8 +111,16 @@
 	// Get the settings
 	if (is_array($settings)) {
 		foreach ($settings as $setting) {
-			$item = $admin->getSettingById($setting);
+			$item = $admin->getSetting($setting);
 			$index .= "Setting::||BTX||::".json_encode($item)."\n";
+		}
+	}
+	
+	// Get the field types
+	if (is_array($field_types)) {
+		foreach ($field_types as $type) {
+			$item = $admin->getFieldType($type);
+			$index .= "FieldType::||BTX||::".json_encode($item)."\n";
 		}
 	}
 	
