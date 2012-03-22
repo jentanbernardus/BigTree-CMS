@@ -46,9 +46,6 @@
 		</select>
 	</fieldset>
 </div>
-<script type="text/javascript">
-	$("#publish_at, #expire_at").datepicker({ durration: 200, showAnim: "slideDown" });
-</script>
 <fieldset class="visible clear">
 	<? if ($parent_to_check > 0 || $admin->Level > 1) { ?>
 	<input type="checkbox" name="in_nav" <? if (!$pdata || $pdata["in_nav"]) { ?>checked="checked" <? } ?>class="checkbox" tabindex="6" /> <label class="for_checkbox">Visible In Navigation</label>

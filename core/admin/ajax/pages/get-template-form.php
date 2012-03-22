@@ -131,6 +131,8 @@
 	<? if (is_array($times)) { foreach ($times as $id) { ?>
 	$(document.getElementById("<?=$id?>")).timepicker({ durration: 200, showAnim: "slideDown", ampm: true, hourGrid: 6,	minuteGrid: 10 });
 	<? } } ?>
-			
+	
+	<? if ($_POST["template"]) { ?>
 	BigTreeCustomControls();
+	<? } ?>
 </script>

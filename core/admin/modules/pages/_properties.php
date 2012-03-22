@@ -69,5 +69,7 @@
 <hr <? if ($open) { ?>style="display: none;" <? } ?>/>
 
 <script type="text/javascript">
-	new BigTreeToolTip(".seo .icon_small_help","<p><strong>SEO Goals</strong></p><?=$seo_recs?>","below","seo",true);
+	$.ready(function() {
+		new BigTreeToolTip(".seo .icon_small_help","<p><strong>SEO Goals</strong></p><?=$seo_recs?>","below","seo",true);
+	});
 </script>

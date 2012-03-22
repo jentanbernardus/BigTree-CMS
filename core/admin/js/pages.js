@@ -87,6 +87,12 @@ $(document).ready(function() {
 		return false;
 	});
 	
+	// Setup the date pickers
+	$("#publish_at, #expire_at").datepicker({ duration: 200, showAnim: "slideDown" });
+	
+	// Tagger
+	BigTreeTagAdder.init(0,false,"bigtree_tag_browser");
+	
 	// Watch for changes in the template, update the Content tab.
 	checkTimer = setInterval(checkTemplate,500);
 	
@@ -197,30 +203,6 @@ $(document).ready(function() {
 	
 	$("#bigtree_callouts ul").sortable({ axis: "y", containment: "parent", handle: ".icon_sort", items: "li", placeholder: "ui-sortable-placeholder", tolerance: "pointer" });
 });
-
-/*
-function updateSEOScore() {
-	data = $$("form.module")[0].json_encode(true);
-	try {
-		data.content = tinyMCE.get("field_resources[page_content]").getContent();
-	} catch (er) {
-	}
-	data.updated_at = page_updated_at;
-	if (!last_seo_data) {
-		new_data = true;
-	} else {
-		new_data = false;
-		for (i in last_seo_data) {
-			if (last_seo_data[i] != data[i]) {
-				new_data = true;
-			}
-		}
-	}
-	if (new_data) {
-		last_seo_data = data;
-		new Ajax.Updater("seo_recommendations","admin_root/ajax/pages/get-seo-score/", { parameters: data, evalScripts: true });
-	}
-} */
 
 function checkTemplate() {
 	tval = $("input[name=template]");

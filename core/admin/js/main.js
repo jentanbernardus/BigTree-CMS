@@ -1676,7 +1676,7 @@ var BigTree = {
 			end_page = pages;
 		}
 		
-		content = '<li><a href="#' + prev_page + '">&laquo;</a></li>';
+		content = '<li class="first"><a href="#' + prev_page + '">&laquo;</a></li>';
 		for (i = start_page; i < end_page; i++) {
 			content += '<li><a href="#' + i + '"';
 			if (i == current_page) {
@@ -1684,7 +1684,7 @@ var BigTree = {
 			}
 			content += '>' + (i + 1) + '</a></li>';
 		}
-		content += '<li><a href="#' + next_page + '">&raquo;</a></li>';
+		content += '<li class="last"><a href="#' + next_page + '">&raquo;</a></li>';
 		
 		$(selector).html(content);
 	},
