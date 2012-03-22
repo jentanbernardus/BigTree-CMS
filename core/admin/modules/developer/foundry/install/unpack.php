@@ -31,6 +31,10 @@
 	if (!file_exists($cache_root)) {
 		mkdir($cache_root);
 	}
+	$uniq_dir = uniqid();
+	$cache_root .= $uniq_dir."/";
+	mkdir($cache_root);
+	chmod($cache_root,0777);
 
 	// Move the uploaded file into the cache root.	
 	$local_copy = BigTree::getAvailableFileName($cache_root,$_FILES["file"]["name"]);
@@ -38,6 +42,7 @@
 	
 	// Go through the file.
 	if (!function_exists("exec")) {
+		BigTree::deleteDirectory($cache_root);
 		$_SESSION["upload_error"] = "PHP does not allow exec(). Packages can not be installed.";
 		header("Location: ".$developer_root."foundry/install/");
 		die();
@@ -45,6 +50,7 @@
 	
 	exec("cd $cache_root; tar zxvf $local_copy");
 	if (!file_exists($cache_root."index.btx")) {
+		BigTree::deleteDirectory($cache_root);
 		$_SESSION["upload_error"] = "The uploaded file is not a valid BigTree Package or is corrupt.";
 		header("Location: ".$developer_root."foundry/install/");
 		die();
@@ -115,49 +121,47 @@
 ?>
 <h1>Unpacked Package</h1>
 <div class="form_container">
-	<form method="post" action="../install/">
-		<header>
-			<h2>
-				<?=$package_name?>
-				<small><?=$package_info?></small>
-			</h2>
-		</header>
-		<section>
-			<?
-				if (count($warnings)) {
-			?>
-			<strong class="import_warnings">Warnings</strong>
-			<ul class="import_warnings">
-				<? foreach ($warnings as $w) { ?>
-				<li>&raquo; <?=$w?></li>
-				<? } ?>
-			</ul>
-			<?
-				}
-				
-				if (count($errors)) {
-			?>
-			<strong class="import_errors">Errors</strong>
-			<ul class="import_errors">
-				<? foreach ($errors as $e) { ?>
-				<li>&raquo; <?=$e?></li>
-				<? } ?>
-			</ul>
-			<p><strong>ERRORS OCCURRED!</strong> &mdash; Please correct all errors.  You may not import this module while errors persist.</p>
-			<?
-				}
-				
-				if (!count($warnings) && !count($errors)) {
-			?>
-			<p>Package is ready to be installed. No problems found.</p>
-			<?
-				}
-			?>
-		</section>
-		<? if (!count($errors)) { ?>
-		<footer>
-			<a href="../install/" class="button blue">Install</a>
-		</footer>
-		<? } ?>	
-	</form>
+	<header>
+	    <h2>
+	    	<?=$package_name?>
+	    	<small><?=$package_info?></small>
+	    </h2>
+	</header>
+	<section>
+	    <?
+	    	if (count($warnings)) {
+	    ?>
+	    <strong class="import_warnings">Warnings</strong>
+	    <ul class="import_warnings">
+	    	<? foreach ($warnings as $w) { ?>
+	    	<li>&raquo; <?=$w?></li>
+	    	<? } ?>
+	    </ul>
+	    <?
+	    	}
+	    	
+	    	if (count($errors)) {
+	    ?>
+	    <strong class="import_errors">Errors</strong>
+	    <ul class="import_errors">
+	    	<? foreach ($errors as $e) { ?>
+	    	<li>&raquo; <?=$e?></li>
+	    	<? } ?>
+	    </ul>
+	    <p><strong>ERRORS OCCURRED!</strong> &mdash; Please correct all errors.  You may not import this module while errors persist.</p>
+	    <?
+	    	}
+	    	
+	    	if (!count($warnings) && !count($errors)) {
+	    ?>
+	    <p>Package is ready to be installed. No problems found.</p>
+	    <?
+	    	}
+	    ?>
+	</section>
+	<? if (!count($errors)) { ?>
+	<footer>
+	    <a href="../process/<?=$uniq_dir?>/" class="button blue">Install</a>
+	</footer>
+	<? } ?>
 </div>

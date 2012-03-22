@@ -399,6 +399,30 @@
 			curl_close($ch);
 			return $output;
 		}
+		
+		/*
+			Function: deleteDirectory
+				Deletes a directory including everything in it.
+			
+			Parameters:
+				dir - The directory to delete.
+		*/
+		
+		static function deleteDirectory($dir) {
+			// Make sure it has a trailing /
+			$dir = rtrim($dir,"/")."/";
+			$r = opendir($dir);
+			while ($file = readdir($r)) {
+				if ($file != "." && $file != "..") {
+					if (is_dir($dir.$file)) {
+						self::deleteDirectory($dir.$file);
+					} else {
+						unlink($dir.$file);
+					}
+				}
+			}
+			rmdir($dir);
+		}
 
 		/*
 			Function: formatBytes
@@ -410,6 +434,7 @@
 			Returns:
 				A string with the number of bytes in kilobytes, megabytes, or gigabytes.
 		*/
+		
 		static function formatBytes($size) {
 			$units = array(' B', ' KB', ' MB', ' GB', ' TB');
 			for ($i = 0; $size >= 1024 && $i < 4; $i++) {

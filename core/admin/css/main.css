@@ -295,8 +295,8 @@
 	nav.sub span { float: left; margin: 7px 6px 6px 0; }
 
 /* Main Content Area */
-	.body { background: #ededed url(../images/bg.png); min-width: 960px; min-height: 400px; padding: 0 0 20px; }
-	.body .wrapper { margin: 0 auto; overflow: hidden; padding: 15px 5px; width: 960px; }
+	.body { background: #ededed url(../images/bg.png); min-width: 960px; }
+	.body .wrapper { margin: 0 auto; overflow: hidden; padding: 15px 5px; width: 960px; min-height: 400px; }
 
 	.breadcrumb { margin: 0 0 15px 0; overflow: hidden; user-select: none; }
 	.breadcrumb li { color: #777; float: left; font-size: 11px; margin: 0 5px 0 0; }
