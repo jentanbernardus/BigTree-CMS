@@ -49,15 +49,10 @@
 			<select name="module">
 				<option></option>
 				<?
-					$groups = $admin->getModuleGroups();
-					foreach ($groups as $group) {
-						$modules = $admin->getModulesByGroup($group["id"]);
+					$modules = $admin->getModules("name ASC");
+					foreach ($modules as $m) {
 				?>
-				<optgroup label="<?=$group["name"]?>">
-					<? foreach ($modules as $m) { ?>
-					<option value="<?=$m["id"]?>"<? if ($m["id"] == $module) { ?> selected="selected"<? } ?>><?=$m["name"]?></option>
-					<? } ?>
-				</optgroup>
+				<option value="<?=$m["id"]?>"<? if ($m["id"] == $module) { ?> selected="selected"<? } ?>><?=$m["name"]?></option>
 				<?
 					}
 				?>
