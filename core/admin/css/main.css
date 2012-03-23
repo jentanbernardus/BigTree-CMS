@@ -289,10 +289,10 @@
 /* Sub Navigation */
 	.nav_shadow { background: url(../images/nav-shadow.png) repeat-x; display: none; height: 4px; }
 
-	nav.sub  { background: #CCC url(../images/button-bg.png) repeat-x; border: 1px solid #CCC; border-radius: 3px; display: block; height: 30px; margin: 0 0 20px 0; overflow: hidden; user-select: none; }
-	nav.sub a { border-right: 1px solid #CCC; color: #333; float: left; font-size: 13px; height: 30px; line-height: 31px; padding: 0 15px 0 13px; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8); }
-	nav.sub a:hover { background: #DDD url(../images/button-bg.png) repeat-x; }
-	nav.sub a.active { background: #EEE url(../images/button-bg.png) repeat-x; }
+	nav.sub  { background: #DADADA url(../images/toolbar-bg.png) repeat-x left top; border: 1px solid #CCC; border-radius: 3px; display: block; height: 30px; margin: 0 0 20px 0; overflow: hidden; user-select: none; }
+	nav.sub a { border-right: 1px solid #CCC; color: #555; float: left; font-size: 13px; height: 30px; line-height: 31px; padding: 0 15px 0 13px; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8); }
+	nav.sub a:hover { background: #E8E8E8 url(../images/toolbar-bg.png) repeat-x; color: #333; }
+	nav.sub a.active { background: #EEE url(../images/toolbar-bg.png) repeat-x; color: #333; }
 	nav.sub span { float: left; margin: 7px 6px 6px 0; }
 
 /* Main Content Area */
@@ -461,8 +461,11 @@
 	.table > ul li.scheduled { background: #fff url(../images/bg_pattern_scheduled.png); }
 	.table > ul li.expired { background: #fff url(../images/bg_pattern_expired.png); }
 	
+	.table > ul li section { text-shadow: 0 1px 0 #fff; }
+	.table > ul li section.view_status { text-transform: uppercase; }
 	.table > ul li.pending section, .table > ul li.scheduled section, .table > ul li.expired section { opacity: 0.5; }
-	/* .table > ul li.pending:hover section, .table > ul li.scheduled:hover section, .table > ul li.expired:hover section { opacity: 0.75; } */
+	.table > ul li.pending section.view_status, .table > ul li.scheduled section.view_status, .table > ul li.expired section.view_status,
+	.table > ul li.pending section.pages_status, .table > ul li.scheduled section.pages_status, .table > ul li.expired section.pages_status { opacity: 1 !important; }
 	
 	.table .no_content { width: 938px; text-align: left; padding: 0 0 0 20px; user-select: none; }
 	.table .no_content p { line-height: 35px; }
@@ -499,7 +502,7 @@
 	.table .site_status_status.bad { background: red; }
 
 	.table .status_published { color: green; font-size: 9px; }
-	.table .status_pending a, .table .status_pending { color: #999; font-size: 9px; }
+	.table .status_pending a, .table .status_pending { color: #838383; font-size: 9px; }
 	
 	.table .status_scheduled { color: #436D86; font-size: 9px; }
 	.table .status_expired { color: #CC3B46; font-size: 9px; }
@@ -616,6 +619,10 @@
 	.table p.module:nth-child(even) { margin-right: 0; }
 	.table p.module a { color: #333; display: block; font-size: 15px; height: 35px; line-height: 35px; padding: 0 0 0 10px; }
 	.table p.module a.add { float: right; height: 16px; padding: 9px 10px 10px; width: 16px; }
+	
+	.table p.module { background: #fff; border-color: #D7D7D7; box-shadow: 0 0 2px rgba(0, 0, 0, 0.1); text-shadow: 0 1px 0 rgba(255, 255, 255, 1); }
+	.table p.module:hover { background-gradient: #eaf5fc #ffffff; border-color: #D4D4D4; box-shadow: 0 0 2px rgba(0, 0, 0, 0.2); }
+	
 
 	.table .view_column { overflow: hidden; padding: 0 0 0 20px; text-align: left; text-overflow: ellipsis; white-space: nowrap; }
 	.table .view_column a { color: #FFF; display: block; }
