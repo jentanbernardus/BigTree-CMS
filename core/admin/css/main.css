@@ -7,7 +7,7 @@
 -----------------------------------------------------------------------------------*/
  	html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, code, em, img, small, strike, strong, sub, sup, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td { background: transparent; border: 0; font-size: 100%; margin: 0; outline: 0; padding: 0; }
  	img { vertical-align: middle; }
-	body { background: #16252D; color: #666; font-family: Helvetica, sans-serif; font-size: 12px; line-height: 1; }
+	body { background: #222; color: #666; font-family: Helvetica, sans-serif; font-size: 12px; line-height: 1; }
 	ul { list-style: none; }
 	ol { margin-bottom: 10px; margin-left: 18px; }
 	ol li { font-size: 12px; line-height: 18px; }
@@ -50,6 +50,7 @@
 	h1 .add_message { background-position: 0px -31px; width: 27px; }
 	h1 .reply_message { background-position: -54px -31px; width: 28px; }
 	h1 .vitals { background-position: -83px -32px; width: 28px; }
+	h1 .package { background-position: -112px -32px; width: 26px; }
 
 	h2 { color: rgba(51,51,51,0.9); float: left; font-size: 18px; font-weight: normal; height: 32px; line-height: 30px; padding: 5px 0 0 0; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.75); user-select: none; }
 	h2 small { color: #999999; display: inline-block; font-size: 13px; padding: 0 0 0 10px; }
@@ -217,7 +218,7 @@
 	.login_wrapper .forgot_password { color: #666; float: right; line-height: 36px; user-select: none; }
 	.login_wrapper .forgot_password:hover { color: #3E667D; }
 	.login_wrapper .error_message { background: #990000; border-radius: 2px; box-shadow: 0 1px 0 rgba(0, 0, 0, 0.5); color: #FFF; font-size: 12px; line-height: 18px; margin: 0 30px 20px 30px; padding: 5px 10px; text-shadow: 0px -1px 0 rgba(0,0,0,0.25); }
-	.login_logo { background: url(../images/logo.png) no-repeat center; display: block; height: 32px; margin: 40px auto 0; width: 123px; text-indent: -99999px; }
+	.login_logo { background: url(../images/logo.png) no-repeat center; display: block; height: 36px; margin: 40px auto 0; width: 151px; text-indent: -99999px; }
 	.login_copyright { color: #777; display: block; margin: 25px auto 0; text-align: center; text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5); width: 300px; user-select: none; }
 	.login_copyright a { color: #777; }
 	.login_copyright a:hover { color: #ccc; }
@@ -305,18 +306,18 @@
 	.breadcrumb li.first a { color: #777; }
 
 /* Footer */
-	footer.main { background: #16252D; border-top: 3px solid #fff; box-shadow: 0 -2px 2px rgba(0, 0, 0, 0.25); padding: 20px 0; min-width: 960px; user-select: none; }
+	footer.main { background: #222; border-top: 3px solid #fff; box-shadow: 0 -2px 2px rgba(0, 0, 0, 0.25); padding: 20px 0; min-width: 960px; user-select: none; }
 	footer.main section { margin: 0 auto; overflow: hidden; width: 960px; }
 	footer.main .bigtree { float: left; }
-	footer.main .bigtree .logo { background: url(../images/logo.png); display: block; float: left; height: 32px; margin: 0; width: 123px; }
+	footer.main .bigtree .logo { background: url(../images/logo.png); display: block; float: left; height: 36px; margin: 0; width: 151px; }
 	footer.main .bigtree .links { float: left; padding: 14px 0 0 0; }
 	footer.main .bigtree .links a { color: #CCC; float: left; font-size: 12px; height: 12px; text-transform: uppercase; }
 	footer.main .bigtree .links a:hover { color: #FFF; }
 	footer.main .bigtree .links span { background: url(../images/header-icons.png) -18px 0px; display: block; float: left; height: 10px; margin: 0 7px; width: 5px; }
 	footer.main .fastspot { background: url(../images/footer-fs.png) no-repeat; color: #6C7679; float: right; font-size: 10px; height: 25px; padding: 0 0 0 50px; width: 245px; text-align: right; text-shadow: 0 1px 0 rgba(0, 0, 0, 1); }
 	footer.main .fastspot p { color: #DADADA; font-size: 12px; line-height: 12px; margin: 0 0 7px 0; }
-	footer.main .fastspot a { color: #6C7679; }
-	footer.main .fastspot a:hover { color: #DADADA; }
+	footer.main .fastspot a { color: #666; }
+	footer.main .fastspot a:hover { color: #999; }
 	
 /* Form Container Styles */
 	.form_container { background: #FFF; border: 1px solid #CCC; border-radius: 5px; box-shadow: 0px 0px 3px #CCC; margin: 0 0 25px 0; overflow: hidden; }
@@ -435,7 +436,7 @@
 	.table > summary.taller p { line-height: 45px; }
 	.table > summary .add { background: #DDD url(../images/button-bg.png) repeat-x; border: 1px solid #CCC; border-radius: 3px; color: #333; display: block; float: right; font-size: 11px; height: 21px; line-height: 21px; margin: 6px -10px 0 0; padding: 0 10px; transition: background-color 0.2s, border-color 0.2s; }
 	.table > summary .add:hover { background-color: #F3F3F3; }
-	.table > summary .export { background: url(../images/icons-16x16.png) no-repeat -48px 0px; float: right; height: 16px; margin: 10px 0 0 0; width: 16px; }
+	.table > summary .export { background: url(../images/icons-16x16.png) no-repeat -111px -16px; float: right; height: 16px; margin: 10px 0 0 0; width: 18px; }
 	.table > summary .more { background: #F4F4F4; border-radius: 11px; box-shadow: 0px 1px 0 #AFAFAF; color: #666; float: right; font-size: 12px; height: 22px; line-height: 22px; margin: 2px -8px 0 0; padding: 0 15px; text-shadow: 0 1px 0 #FFF; transition: background 0.2s; }
 	.table > summary .more:hover { background: #fff; }
 	.table > summary h2.full { float: none; user-select: none; }
@@ -544,11 +545,13 @@
 	.page_url img { float: left; margin: 0 7px 0 0; }
 	
 /* Box Select Styles */
-	.box_select { background: #fff; border: 1px solid #D4D4D4; box-shadow: 0 0 2px rgba(0, 0, 0, 0.1); border-radius: 5px; color: #333; float: left; height: 75px; margin: 0 23px 23px 0; padding: 20px 10px 5px 10px; text-align: center; transition: background-color 0.2s, border-color 0.2s; width: 80px; text-shadow: 0 1px 0 rgba(255, 255, 255, 1); user-select: none; }
+	.box_select { background: #fff; border: 1px solid #D4D4D4; box-shadow: 0 0 2px rgba(0, 0, 0, 0.1); border-radius: 5px; color: #333; float: left; height: 75px; margin: 0 20px 23px 0; padding: 20px 10px 5px 10px; text-align: center; transition: background-color 0.2s, border-color 0.2s; width: 80px; text-shadow: 0 1px 0 rgba(255, 255, 255, 1); user-select: none; }
 	.box_select:hover { background-gradient: #eaf5fc #ffffff; color: #222; box-shadow: 0 0 2px rgba(0, 0, 0, 0.2); }
 	.box_select.active { background-gradient: #d6eefc #eaf5fc; box-shadow: 0 0 2px rgba(0, 0, 0, 0.3); }
 	.box_select img { margin: 0 0 10px 0; }
 	.box_select p { font-size: 11px; line-height: 15px; }
+	
+	.box_select.last { margin-right: 0; }
 
 /* Form Control Widget Styles */
 	.photo_gallery_widget { background: #FFF; border: 1px solid #CCC; border-radius: 3px; overflow: hidden; }
@@ -981,8 +984,10 @@
 	.icon_developer_settings { background: url(../images/developer-icons-sprite.png) no-repeat -160px 0px; display: inline-block; height: 32px; width: 32px; }
 	.icon_developer_feeds { background: url(../images/developer-icons-sprite.png) no-repeat -192px 0px; display: inline-block; height: 32px; width: 32px; }
 	.icon_developer_upload_service { background: url(../images/developer-icons-sprite.png) no-repeat -224px 0px; display: inline-block; height: 32px; width: 32px; }
+	.icon_developer_upload_local { background: url(../images/developer-icons-sprite.png) no-repeat -320px 1px; display: inline-block; height: 32px; width: 32px; }
 	.icon_developer_upload_rackspace { background: url(../images/developer-icons-sprite.png) no-repeat -256px 0px; display: inline-block; height: 32px; width: 32px; }
 	.icon_developer_upload_amazon { background: url(../images/developer-icons-sprite.png) no-repeat -288px 0px; display: inline-block; height: 32px; width: 32px; }
+	.icon_developer_package { background: url(../images/developer-icons-sprite.png) no-repeat -349px 2px; display: inline-block; height: 32px; width: 30px; }
 	
 	.developer .box_select span.icon_developer_templates { margin: 2px 0 8px; }
 	.developer .box_select span.icon_developer_modules { margin: 3px 0 7px; }
