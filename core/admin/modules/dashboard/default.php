@@ -10,6 +10,22 @@
 	
 	// Get pending changes.
 	$changes = $admin->getPendingChanges();
+	// Figure out what module each of the changes is for.
+	$change_modules = array();
+	foreach ($changes as $c) {
+		// If we didn't get the info for this module already, get it.
+		if (!isset($change_modules[$c["module"]])) {
+			// Pages
+			if ($c["module"] == 0) {
+				$change_modules[0] = array("title" => "Pages", "count" => 1);
+			} else {
+				$module = $admin->getModule($c["module"]);
+				$change_modules[$c["module"]] = array("title" => $module["name"], "count" => 1);
+			}
+		} else {
+			$change_modules[$c["module"]]["count"]++;
+		}
+	}
 	
 	// Get Google Analytics Traffic
 	$ga_cache = $cms->getSetting("bigtree-internal-google-analytics-cache");
@@ -75,15 +91,6 @@
 			<a href="<?=$admin_root?>dashboard/pending-changes/" class="more">View All Pending Changes</a>
 		</h2>
 	</summary>
-	<header>
-		<span class="changes_name">Change</span>
-		<span class="changes_author">Author</span>
-		<span class="changes_date">Date</span>
-		<span class="changes_action">Preview</a></span>
-		<span class="changes_action">Edit</a></span>
-		<span class="changes_action">Approve</span>
-		<span class="changes_action">Deny</span>
-	</header>
 	<ul>
 		<?
 			if (count($changes) == 0) {
@@ -91,23 +98,16 @@
 		<li><section class="no_content"><p>No changes awaiting approval</p></section></li>
 		<?	
 			} else {
-				$changes = array_slice($changes,0,10);
-				foreach ($changes as $item) {
-					if (!$item["title"]) {
-						$item["title"] = $item["mod"]["name"];
-					}
 		?>
 		<li>
-			<section class="changes_name"><?=$item["title"]?></section>
-			<section class="changes_author"><?=$item["user"]["name"]?></section>
-			<section class="changes_date"><?=date("n/j/y",strtotime($item["date"]))?></section>
-			<section class="changes_action"><a href="#" class="icon_preview"></a></section>
-			<section class="changes_action"><a href="<?=$admin->getChangeEditLink($item)?>" class="icon_edit"></a></section>
-			<section class="changes_action"><a href="#" class="icon_approve icon_approve_on"></a></section>
-			<section class="changes_action"><a href="#" class="icon_deny"></a></section>
+			<section class="changes_awaiting">
+				<p>You have the following changes pending your approval:</p>
+				<? foreach ($change_modules as $m => $cm) { ?>
+				<p>&mdash; <?=$cm["count"]?> change<? if ($cm["count"] != 1) { ?>s<? } ?> for <a href="<?=$admin_root?>dashboard/pending-changes/#<?=$m?>"><?=$cm["title"]?></a></p>
+				<? } ?>
+			</section>
 		</li>
-		<?		
-				}
+		<?
 			}
 		?>
 	</ul>
