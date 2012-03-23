@@ -3,6 +3,10 @@
 	$breadcrumb[] = array("link" => "dashboard/analytics/vitals-statistics/keywords/", "title" => "Keywords");
 
 	$cache = $cms->getSetting("bigtree-internal-google-analytics-cache"); 
+	
+	if (!$cache) {
+		header("Location: setup/");
+	}
 ?>
 <h1>
 	<span class="analytics"></span>Keywords

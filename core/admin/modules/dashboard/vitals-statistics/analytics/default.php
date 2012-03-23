@@ -5,6 +5,10 @@
 	
 	$cache = $cms->getSetting("bigtree-internal-google-analytics-cache");
 	
+	if (!$cache) {
+		header("Location: setup/");
+	}
+	
 	$two_week_visits = $cache["two_week"];
 	$graph_min = min($two_week_visits);
 	$graph_max = max($two_week_visits) - $graph_min;
