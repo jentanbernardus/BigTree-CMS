@@ -15,8 +15,15 @@
 ?>
 <h1><span class="<?=$class?>"></span>Upload Service</h1>
 
+<br class="clear" />
+<div class="form_container" id="instagram_api">
+	<section>
+		<h2>Currently Using: <strong><?=$currently?></strong></h2>
+	</section>
+</div>
+
 <a class="box_select" href="local/">
-	<span class="icon_developer_upload_service"></span>
+	<span class="icon_developer_upload_local"></span>
 	<p>Local Storage</p>
 </a>
 <a class="box_select" href="amazon/">
@@ -29,6 +36,3 @@
 	<p>Rackspace Cloud Files</p>
 </a>
 <? } ?>
-
-<br class="clear" />
-<p><strong>Currently Using:</strong> <?=$currently?></p>

@@ -119,7 +119,7 @@
 	}
 	
 ?>
-<h1>Unpacked Package</h1>
+<h1><span class="package"></span>Unpacked Package</h1>
 <div class="form_container">
 	<header>
 	    <h2>
