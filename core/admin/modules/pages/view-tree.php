@@ -63,12 +63,15 @@
 				} elseif (strtotime($item["publish_at"]) > time()) {
 					$status = "Scheduled";
 					$status_class = "scheduled";
+				} elseif ($item["expire_at"] != "" && strtotime($item["expire_at"]) < time()) {
+					$status = "Expired";
+					$status_class = "expired";
 				} else {
 					$status = "Published";
 					$status_class = "published";
 				}
 		?>
-		<li id="row_<?=$item["id"]?>">
+		<li id="row_<?=$item["id"]?>" class="<?=$status_class?>">
 			<section class="pages_title<? if ($class == "archived") { ?>_widest<? } elseif (!$ga_on) { ?>_wider<? } ?>">
 				<? if ($parent_access == "p" && !$item["bigtree_pending"] && $draggable) { ?>
 				<span class="icon_sort"></span>

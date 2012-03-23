@@ -36,20 +36,34 @@
 	$items = $data["results"];
 	
 	foreach ($items as $item) {
+		if ($item["status"] == "c") {
+			$status = 'Changed';
+			$status_class = "pending";
+		} elseif ($item["status"] == "p") {
+			$status = 'Pending';
+			$status_class = "pending";
+		} else {
+			$status = 'Published';
+			$status_class = "published";
+		}
 ?>
-<li id="row_<?=$item["id"]?>"<? if ($item["bigtree_pending"]) { ?> class="pending"<? } ?><? if ($item["bigtree_changes"]) { ?> class="changes"<? } ?>>
+<li id="row_<?=$item["id"]?>" class="<?=$status_class?><? if ($item["bigtree_pending"]) { ?> pending<? } ?><? if ($item["bigtree_changes"]) { ?> changes<? } ?>">
 	<?
 		$x = 0;
 		foreach ($fields as $key => $field) {
 			$x++;
 			$value = $item["column$x"];
 	?>
-	<section class="view_column" style="width: <?=$field["width"]?>px;">
+	<section class="view_column <?=$status_class?>" style="width: <?=$field["width"]?>px;">
 		<?=$value?>
 	</section>
 	<?
 		}
-		
+/*
+	?>
+	<section class="view_status"><?=$status?></section>
+	<?	
+*/
 		$iperm = ($perm == "p") ? "p" : $admin->getCachedAccessLevel($module,$item,$view["table"]);
 		foreach ($actions as $action => $data) {
 			if ($data == "on") {

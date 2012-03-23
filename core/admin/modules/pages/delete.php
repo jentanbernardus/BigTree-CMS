@@ -5,7 +5,7 @@
 		$f = $cms->getPage($page);
 		$parent = $f["parent"];
 	} else {
-		$f = $cms->getPendingChange(substr($page,1));
+		$f = $cms->getPendingPage(substr($page,1));
 		$parent = $f["changes"]["parent"];
 	}
 	
