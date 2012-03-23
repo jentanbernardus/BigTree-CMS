@@ -170,12 +170,12 @@
 <?php echo $content?>
 <? include "_footer.php" ?>');
 		dtouch("templates/layouts/_footer.php");
-		dwrite("templates/modules/");
-		dwrite("templates/pages/");
-		dtouch("templates/pages/_404.php");
-		dtouch("templates/pages/_sitemap.php");
-		dtouch("templates/pages/home.php");
-		dtouch("templates/pages/content.php",'<h1><?php echo $page_header?></h1>
+		dwrite("templates/routed/");
+		dwrite("templates/basic/");
+		dtouch("templates/basic/_404.php");
+		dtouch("templates/basic/_sitemap.php");
+		dtouch("templates/basic/home.php");
+		dtouch("templates/basic/content.php",'<h1><?php echo $page_header?></h1>
 <?php echo $page_content?>');
 		dwrite("templates/callouts/");
 		
