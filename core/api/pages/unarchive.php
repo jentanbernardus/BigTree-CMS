@@ -11,14 +11,10 @@
 	*/
 	
 	$p = $admin->getPageAccessLevel($_POST["id"]);
-	if (!$p) {
+	if ($p != "p") {
 		echo BigTree::apiEncode(array("success" => false,"error" => "You do not have permission to edit this page."));
 	} else {
 		$admin->unarchivePage($_POST["id"]);
-		if ($p == "e")
-			$status = "PENDING";
-		else
-			$status = "APPROVED";
-		echo BigTree::apiEncode(array("success" => true,"status" => $status));
+		echo BigTree::apiEncode(array("success" => true));
 	}
 ?>

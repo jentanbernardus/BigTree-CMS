@@ -8,20 +8,23 @@
 		$ancestors[] = $item["id"];
 	}
 	
-	function _local_drawNavLevel($parent,$depth,$ancestors) {
+	function _local_drawNavLevel($parent,$depth,$ancestors,$children = false) {
 		global $permissions,$page,$admin;
-		$children = $admin->getPageChildren($parent);
+		if (!$children) {
+			$children = $admin->getPageChildren($parent);
+		}
 		if (count($children)) {
 ?>
 <ul class="depth_<?=$depth?>"<? if ($depth > 2 && !in_array($parent,$ancestors)) { ?> style="display: none;"<? } ?>>
 	<?
 			foreach ($children as $f) {
 				if ($f["id"] != $page["id"]) {
+					$grandchildren = $admin->getPageChildren($f["id"]);
 	?>
 	<li>
 		<span class="depth"></span>
-		<a class="title<? if ($f["id"] == $page["parent"]) { ?> active<? } ?><? if (in_array($f["id"],$ancestors)) { ?> expanded<? } ?>" href="#<?=$f["id"]?>"><?=$f["nav_title"]?></a>
-		<? _local_drawNavLevel($f["id"],$depth + 1,$ancestors) ?>
+		<a class="title<? if (!$grandchildren) { ?> disabled<? } ?><? if ($f["id"] == $page["parent"]) { ?> active<? } ?><? if (in_array($f["id"],$ancestors)) { ?> expanded<? } ?>" href="#<?=$f["id"]?>"><?=$f["nav_title"]?></a>
+		<? _local_drawNavLevel($f["id"],$depth + 1,$ancestors,$grandchildren) ?>
 	</li>
 	<?
 				}
@@ -63,11 +66,7 @@
 </div>
 
 <script type="text/javascript">
-	$(".move_page .title").click(function() {
-		if ($(this).hasClass("disabled")) {
-			return false;
-		}
-		
+	$(".move_page .title").click(function() {		
 		$(".move_page .title").removeClass("active");
 		$(this).addClass("active");
 		
@@ -75,6 +74,10 @@
 		$("#page_parent").val(id);
 		
 		if (id == 0) {
+			return false;
+		}
+
+		if ($(this).hasClass("disabled")) {
 			return false;
 		}
 			

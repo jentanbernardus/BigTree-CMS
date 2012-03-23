@@ -466,6 +466,7 @@
 	
 	.table .no_content { width: 938px; text-align: left; padding: 0 0 0 20px; user-select: none; }
 	.table .no_content p { line-height: 35px; }
+	.table .changes_awaiting { width: 938px; text-align: left; padding: 10px 0 10px 20px; user-select: none; height: auto; line-height: 15px; }
 	
 	/* Pages Specific */
 	.table .pages_title { font-size: 15px; padding: 0 0 0 15px; text-align: left; width: 712px; }
@@ -620,7 +621,10 @@
 	.table .view_column a { color: #FFF; display: block; }
 	.table .view_column a em { font-size: 7px; padding: 0 0 0 5px; }
 	.table .view_action { width: 62px; }
+<<<<<<< HEAD
 	
+=======
+>>>>>>> fc9cd7b8cc2d09d3b9970e0f21739560df0b8573
 	.table .view_status { width: 70px; }
 
 	.view_paging { background: #F4F4F4; border-radius: 11px; box-shadow: 0 1px 0 #AFAFAF; float: right; height: 22px; margin: 7px -10px 0 0; user-select: none; }

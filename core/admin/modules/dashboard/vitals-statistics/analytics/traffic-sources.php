@@ -2,7 +2,11 @@
 	include BigTree::path($relative_path."_check.php");
 	$breadcrumb[] = array("link" => "dashboard/vitals-statistics/analytics/traffic-sources/", "title" => "Traffic Sources");
 
-	$cache = $cms->getSetting("bigtree-internal-google-analytics-cache"); 
+	$cache = $cms->getSetting("bigtree-internal-google-analytics-cache");
+	
+	if (!$cache) {
+		header("Location: setup/");
+	}
 ?>
 <h1>
 	<span class="analytics"></span>Traffic Sources

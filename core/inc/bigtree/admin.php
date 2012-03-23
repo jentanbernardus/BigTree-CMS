@@ -4877,6 +4877,8 @@
 		*/
 
 		function unarchivePage($page) {
+			global $cms;
+			
 			if (is_array($page)) {
 				$page = mysql_real_escape_string($page["id"]);
 			} else {

@@ -27,6 +27,7 @@
 <?
 	if (count($pages)) {
 ?>
+<a name="0"></a>
 <div class="table">
 	<summary>
 		<h2 class="full">
@@ -79,6 +80,7 @@
 		}
 		$edit_link .= "/";
 ?>
+<a name="<?=$mod["id"]?>"></a>
 <div class="table">
 	<summary>
 		<h2 class="full">

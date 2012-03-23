@@ -26,7 +26,9 @@
 		<span class="view_column" style="width: <?=$field["width"]?>px; cursor: move;" name="<?=$key?>"><?=$field["title"]?></span>
 		<?
 			}
-			
+		?>
+		<span class="view_status">Status</span>
+		<?	
 			foreach ($actions as $action => $on) {
 		?>
 		<span class="view_action"><?=ucwords($action)?></span>

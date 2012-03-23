@@ -32,7 +32,9 @@
 	<span class="view_column" style="width: <?=$field["width"]?>px;"><?=$field["title"]?></span>
 	<?
 			}
-			
+	?>
+	<span class="view_status">Status</span>
+	<?	
 			foreach ($actions as $action => $status) {
 	?>
 	<span class="view_action"><?=$action?></span>
@@ -56,7 +58,7 @@
 <header class="group"><?=$title?></header>
 <ul id="sort_table_<?=$gc?>">
 	<? foreach ($r["results"] as $item) { ?>
-	<li id="row_<?=$item["id"]?>"<? if ($item["bigtree_pending"]) { ?> class="pending"<? } ?><? if ($item["bigtree_changes"]) { ?> class="changes"<? } ?>>
+	<li id="row_<?=$item["id"]?>"<? if ($item["status"] == "p") { ?> class="pending"<? } ?><? if ($item["status"] == "c") { ?> class="changes"<? } ?>>
 		<?
 			$x = 0;
 			foreach ($fields as $key => $field) {
@@ -71,7 +73,17 @@
 		</section>
 		<?
 			}
-
+		?>
+		<section class="view_status">
+			<? if ($item["status"] == "p") { ?>
+			Pending
+			<? } elseif ($item["status"] == "c") { ?>
+			Changed
+			<? } else { ?>
+			Published
+			<? } ?>
+		</section>
+		<?
 			$iperm = ($perm == "p") ? "p" : $admin->getCachedAccessLevel($module,$item,$view["table"]);
 			foreach ($actions as $action => $data) {
 				if ($data == "on") {

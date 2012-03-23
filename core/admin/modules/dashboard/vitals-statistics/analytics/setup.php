@@ -5,7 +5,6 @@
 	<span class="analytics"></span>Analytics: Access Denied
 	<? include BigTree::path("admin/modules/dashboard/vitals-statistics/_jump.php"); ?>
 </h1>
-<p>Analytics is not presently setup.  Please contact an administrator to setup Analytics before proceeding.</p>
 <?
 	} else {
 		$breadcrumb[] = array("link" => "dashboard/analytics/setup/", "title" => "Setup");
@@ -17,6 +16,9 @@
 <div class="form_container">
 	<form method="post" action="<?=$mroot?>authenticate/" class="module">
 		<section>
+			<? if ($user) { ?>
+			<p class="error_message">Your Google Analytics password has changed, please login again.</p>
+			<? } ?>
 			<p>Please enter your Google Analytics email address and password below.</p>
 			<br />
 			<? if (end($path) == "error") { ?>
