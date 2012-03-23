@@ -297,7 +297,7 @@
 
 /* Main Content Area */
 	.body { background: #ededed url(../images/bg.png); min-width: 960px; }
-	.body .wrapper { margin: 0 auto; overflow: hidden; padding: 15px 5px; width: 960px; min-height: 400px; }
+	.body .wrapper { margin: 0 auto; overflow: hidden; padding: 15px 5px 30px; width: 960px; min-height: 400px; }
 
 	.breadcrumb { margin: 0 0 15px 0; overflow: hidden; user-select: none; }
 	.breadcrumb li { color: #777; float: left; font-size: 11px; margin: 0 5px 0 0; }
@@ -621,10 +621,6 @@
 	.table .view_column a { color: #FFF; display: block; }
 	.table .view_column a em { font-size: 7px; padding: 0 0 0 5px; }
 	.table .view_action { width: 62px; }
-<<<<<<< HEAD
-	
-=======
->>>>>>> fc9cd7b8cc2d09d3b9970e0f21739560df0b8573
 	.table .view_status { width: 70px; }
 
 	.view_paging { background: #F4F4F4; border-radius: 11px; box-shadow: 0 1px 0 #AFAFAF; float: right; height: 22px; margin: 7px -10px 0 0; user-select: none; }
@@ -729,7 +725,7 @@
 	.table .developer_templates_name a { display: block; width: 802px; color: #333; }
 	.table .developer_modules_name { font-size: 15px; padding: 0 0 0 15px; text-align: left; width: 757px; }
 	.table .developer_modules_name a { display: block; width: 740px; color: #333; }
-	.table .developer_view_name { padding: 0 0 0 15px; text-align: left; width: 757px; }
+	.table .developer_view_name { font-size: 15px; padding: 0 0 0 15px; text-align: left; width: 757px; }
 	.table .developer_field_types_name { font-size: 15px; padding: 0 0 0 15px; text-align: left; width: 819px; }
 	.table .developer_field_types_name a { display: block; color: #333; }
 	.table .developer_field_types_version { padding: 0 0 0 15px; text-align: left; width: 150px; }
@@ -951,7 +947,9 @@
 	.icon_email { background: url(../images/icons.png) no-repeat -377px 9px; display: inline-block; height: 35px; width: 24px; }
 	.icon_message { background: url(../images/icons.png) no-repeat -401px 6px; display: inline-block; height: 35px; width: 20px; }
 	.icon_deny { background: url(../images/icons.png) no-repeat -454px 5px; display: inline-block; height: 35px; width: 21px; }
-
+	
+	.icon_export { background: url(../images/icons.png) no-repeat -477px 5px; display: inline-block; height: 35px; width: 27px; }
+	
 	.icon_edit_small { background: url(../images/icons-smaller.png) no-repeat -53px 0; display: inline-block; height: 17px; width: 16px; }
 	.icon_delete_small { background: url(../images/icons-smaller.png) no-repeat -28px 3px; display: inline-block; height: 17px; width: 12px; }
 
