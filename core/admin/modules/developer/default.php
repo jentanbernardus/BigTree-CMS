@@ -34,3 +34,8 @@
 	<span class="icon_developer_upload_service"></span>
 	<p>Upload Service</p>
 </a>
+
+<a class="box_select" href="foundry/install/">
+	<span class="icon_developer_foundry"></span>
+	<p>Install Package</p>
+</a>

@@ -16,7 +16,9 @@
 <div class="table">
 	<summary>
 		<h2><span class="unread"></span>Unread Messages</h2>
+		<? if (count($unread)) { ?>
 		<ul id="unread_paging" class="view_paging"></ul>
+		<? } ?>
 	</summary>
 	<header>
 		<span class="messages_from_to">From</span>
@@ -58,7 +60,9 @@
 <div class="table">
 	<summary>
 		<h2><span class="read"></span>Read Messages</h2>
+		<? if (count($read)) { ?>
 		<ul id="read_paging" class="view_paging"></ul>
+		<? } ?>
 	</summary>
 	<header>
 		<span class="messages_from_to">From</span>
@@ -69,7 +73,7 @@
 	</header>
 	<ul>
 		<?
-			if (count($unread) == 0) {
+			if (count($read) == 0) {
 		?>
 		<li><section class="no_content">You have no read messages.</section></li>
 		<?	
@@ -100,7 +104,9 @@
 <div class="table">
 	<summary>
 		<h2><span class="sent"></span>Sent Messages</h2>
+		<? if (count($sent)) { ?>
 		<ul id="sent_paging" class="view_paging"></ul>
+		<? } ?>
 	</summary>
 	<header>
 		<span class="messages_from_to">To</span>

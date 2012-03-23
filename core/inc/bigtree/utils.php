@@ -399,6 +399,30 @@
 			curl_close($ch);
 			return $output;
 		}
+		
+		/*
+			Function: deleteDirectory
+				Deletes a directory including everything in it.
+			
+			Parameters:
+				dir - The directory to delete.
+		*/
+		
+		static function deleteDirectory($dir) {
+			// Make sure it has a trailing /
+			$dir = rtrim($dir,"/")."/";
+			$r = opendir($dir);
+			while ($file = readdir($r)) {
+				if ($file != "." && $file != "..") {
+					if (is_dir($dir.$file)) {
+						self::deleteDirectory($dir.$file);
+					} else {
+						unlink($dir.$file);
+					}
+				}
+			}
+			rmdir($dir);
+		}
 
 		/*
 			Function: formatBytes
@@ -410,6 +434,7 @@
 			Returns:
 				A string with the number of bytes in kilobytes, megabytes, or gigabytes.
 		*/
+		
 		static function formatBytes($size) {
 			$units = array(' B', ' KB', ' MB', ' GB', ' TB');
 			for ($i = 0; $size >= 1024 && $i < 4; $i++) {
@@ -460,7 +485,7 @@
 				list($stop,$start) = explode(" ",$d);
 				$start_rgb = "rgb(".hexdec(substr($start,1,2)).",".hexdec(substr($start,3,2)).",".hexdec(substr($start,5,2)).")";
 				$stop_rgb = "rgb(".hexdec(substr($stop,1,2)).",".hexdec(substr($stop,3,2)).",".hexdec(substr($stop,5,2)).")";
-				return "background-image: -webkit-gradient(linear,left top,left bottom, color-stop(0, $start_rgb), color-stop(1, $stop_rgb)); background-image: -moz-linear-gradient(center top, $start_rgb 0%, $stop_rgb 100%); filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=$stop, endColorstr=$start);-ms-filter: \"progid:DXImageTransform.Microsoft.gradient(startColorstr=$stop, endColorstr=$start)\"; zoom:1;";
+				return "background-image: -webkit-gradient(linear,left top,left bottom, color-stop(0, $start_rgb), color-stop(1, $stop_rgb)); background-image: -moz-linear-gradient(center top, $start_rgb 0%, $stop_rgb 100%); filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=$start, endColorstr=$stop);-ms-filter: \"progid:DXImageTransform.Microsoft.gradient(startColorstr=$start, endColorstr=$stop)\"; zoom:1;";
 			'),$css);
 			
 			// Border Radius - border-radius: 0px 0px 0px 0px

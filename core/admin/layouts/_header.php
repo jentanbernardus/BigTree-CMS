@@ -36,10 +36,10 @@
 	$site = $cms->getPage(0,false);
 ?>
 <!doctype html> 
-<!--[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif]-->
-<!--[if IE 7 ]>	<html lang="en" class="no-js ie7"> <![endif]-->
-<!--[if IE 8 ]>	<html lang="en" class="no-js ie8"> <![endif]-->
-<!--[if IE 9 ]>	<html lang="en" class="no-js ie9"> <![endif]-->
+<!--[if lt IE 7 ]> <html lang="en" class="no-js ie ie6"> <![endif]-->
+<!--[if IE 7 ]>	<html lang="en" class="no-js ie ie7"> <![endif]-->
+<!--[if IE 8 ]>	<html lang="en" class="no-js ie ie8"> <![endif]-->
+<!--[if IE 9 ]>	<html lang="en" class="no-js ie ie9"> <![endif]-->
 <!--[if (gt IE 9)|!(IE)]><!--> <html lang="en" class="no-js"> <!--<![endif]-->
 	<head>
 		<meta charset="utf-8">
@@ -56,6 +56,9 @@
 		<? if (is_array($js)) { foreach ($js as $script) { ?>
 		<script type="text/javascript" src="<?=$admin_root?>js/<?=$script?>"></script>
 		<? } } ?>
+		<!--[if lt IE 9]>
+		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
 	</head>
 	<body class="bigtree">
 		<header class="main">
@@ -98,8 +101,8 @@
 					?>
 				</ul>
 				<form method="post" action="<?=$admin_root?>search/">
-					<input type="image" src="<?=$admin_root?>images/quick-search-icon.png" />
-					<input type="search" name="query" autocomplete="off" placeholder="Quick Search" />
+					<input type="image" src="<?=$admin_root?>images/quick-search-icon.png" class="qs_image" />
+					<input type="search" name="query" autocomplete="off" placeholder="Quick Search" class="qs_query" />
 					<div id="quick_search_results" style="display: none;"></div>
 				</form>
 			</section>

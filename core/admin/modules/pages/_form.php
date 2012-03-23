@@ -12,37 +12,6 @@
 				<input type="search" id="link_finder" class="form_search" autocomplete="off" placeholder="Link Finder" />
 			</div>
 		</div>
-		<script type="text/javascript">
-			$(".form_container nav a").click(function() {
-				if ($(this).hasClass("active")) {
-					return;
-				}
-				
-				t = $(".form_container").offset().top;
-				if (window.scrollY > t) {
-					$('html, body').animate({
-						scrollTop: $(".form_container").offset().top
-					}, 200);
-				}
-				
-				href = $(this).attr("href").substr(1);
-				$(".form_container > form > section").hide();
-				$(".form_container nav a").removeClass("active");
-				$(this).addClass("active");
-				$("#" + href).show();
-				
-				// Manage the "Next" buttons
-				nav = $(".form_container nav a");
-				index = nav.index(this);
-				if (index == nav.length - 1) {
-					$(".next").hide();
-				} else {
-					$(".next").show();				
-				}
-				
-				return false;
-			});
-		</script>
 	</header>
 	<? include BigTree::path("admin/layouts/_tinymce.php"); ?>
 	<form method="post" class="module" action="<?=$admin_root?>pages/<?=$action?>/" enctype="multipart/form-data" id="page_form">
@@ -96,6 +65,36 @@
 </div>
 
 <script type="text/javascript">
+	$(".form_container nav a").click(function() {
+	    if ($(this).hasClass("active")) {
+	    	return;
+	    }
+	    
+	    t = $(".form_container").offset().top;
+	    if (window.scrollY > t) {
+	    	$('html, body').animate({
+	    		scrollTop: $(".form_container").offset().top
+	    	}, 200);
+	    }
+	    
+	    href = $(this).attr("href").substr(1);
+	    $(".form_container > form > section").hide();
+	    $(".form_container nav a").removeClass("active");
+	    $(this).addClass("active");
+	    $("#" + href).show();
+	    
+	    // Manage the "Next" buttons
+	    nav = $(".form_container nav a");
+	    index = nav.index(this);
+	    if (index == nav.length - 1) {
+	    	$(".next").hide();
+	    } else {
+	    	$(".next").show();				
+	    }
+	    
+	    return false;
+	});
+
 	var template = "<?=$default_template?>";
 	<? if ($action == "create") { ?>
 	var page = false;
@@ -103,7 +102,6 @@
 	var page = "<?=$pdata["id"]?>";
 	var page_updated_at = "<?=$pdata["updated_at"]?>";
 	lockTimer = setInterval("$.ajax('<?=$admin_root?>ajax/pages/refresh-lock/', { type: 'POST', data: { id: '<?=$lockid?>' } });",60000);
-	//seoTimer = setInterval("updateSEOScore();",5000);
 	<? } ?>
 	
 	new BigTreeFormValidator("#page_form");

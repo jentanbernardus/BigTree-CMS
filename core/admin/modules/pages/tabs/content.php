@@ -23,6 +23,3 @@
 		<ul id="tag_results" style="display: none;"></ul>
 	</fieldset>
 </div>
-<script type="text/javascript">
-	BigTreeTagAdder.init(0,false,"bigtree_tag_browser");
-</script>

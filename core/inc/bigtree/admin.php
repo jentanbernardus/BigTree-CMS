@@ -3843,15 +3843,18 @@
 		
 		/*
 			Function: getTemplates
-				Returns a list of templates ordered by position.
+				Returns a list of templates.
+			
+			Parameters:
+				sort - Sort order, defaults to positioned.
 			
 			Returns:
 				An array of template entries.
 		*/
 
-		function getTemplates() {
+		function getTemplates($sort = "position DESC, id ASC") {
 			$items = array();
-			$q = sqlquery("SELECT * FROM bigtree_templates ORDER BY position DESC, id ASC");
+			$q = sqlquery("SELECT * FROM bigtree_templates ORDER BY $sort");
 			while ($f = sqlfetch($q)) {
 				$items[] = $f;
 			}
@@ -4394,7 +4397,7 @@
 		*/
 
 		function requireLevel($level) {
-			global $cms,$admin_root,$css,$js,$site;
+			global $admin,$cms,$admin_root,$css,$js,$site;
 			if (!isset($this->Level) || $this->Level < $level) {
 				ob_clean();
 				include BigTree::path("admin/pages/_denied.php");

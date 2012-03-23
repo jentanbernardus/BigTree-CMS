@@ -295,8 +295,8 @@
 	nav.sub span { float: left; margin: 7px 6px 6px 0; }
 
 /* Main Content Area */
-	.body { background: #ededed url(../images/bg.png); min-width: 960px; min-height: 400px; padding: 0 0 20px; }
-	.body .wrapper { margin: 0 auto; overflow: hidden; padding: 15px 5px; width: 960px; }
+	.body { background: #ededed url(../images/bg.png); min-width: 960px; }
+	.body .wrapper { margin: 0 auto; overflow: hidden; padding: 15px 5px; width: 960px; min-height: 400px; }
 
 	.breadcrumb { margin: 0 0 15px 0; overflow: hidden; user-select: none; }
 	.breadcrumb li { color: #777; float: left; font-size: 11px; margin: 0 5px 0 0; }
@@ -948,7 +948,7 @@
 	.icon_small { background: url(../images/icons-16x16.png) no-repeat; float: left; height: 16px; margin: 0 5px 0 0; width: 16px; }
 	.icon_small_add { background-position: 0px 0px; }
 	.icon_small_token { background-position: -16px 0px; }
-	.icon_small_list, .icon_small_icon_small_home { background-position: -32px 0px; }
+	.icon_small_list, .icon_small_home { background-position: -32px 0px; }
 	.icon_small_export { background-position: -48px 0px; }
 	.icon_small_truck { background-position: -64px 0; }
 	.icon_small_refresh { background-position: -80px 0px; }
@@ -967,6 +967,8 @@
 	.icon_small_help { background-position: -32px -16px; cursor: help; }
 	.icon_small_caret_down { background-position: -48px -16px; }
 	.icon_small_caret_right { background-position: -64px -16px; }
+	.icon_small_delete { background-position: -80px -16px; }
+	.icon_small_folder { background-position: -96px -16px; }
 	
 	a.button .icon_small_world { background-position: -160px 9px; }
 	a.button .icon_small_server { background-position: -176px 9px; }
@@ -1133,6 +1135,74 @@
 	.jump_group .dropdown strong { color: #666; }
 	.jump_group .dropdown a:hover { background: #c0c0c0; box-shadow: 0 1px 0 rgba(0,0,0,0.25); text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5); }
 */
+
+/*---------------------------
+	Module Packager Styles
+---------------------------*/
+
+	.package_column { float: left; width: 284px; margin: 20px 20px 20px 0; border: 1px solid #CCC;  border-radius: 3px; }
+	.package_column_last { margin-right: 0; }
+	.package_column strong { display: block; background: #F0F0F0; padding: 5px 8px; font-weight: bold; background-gradient: #E1E1E1 #F7F7F7; border-radius: 3px 3px 0 0; }
+	.package_column ul li { padding: 3px 8px; font-size: 10px; line-height: 16px; border-bottom: 1px solid #EEE; }
+	.package_column ul li:last-child { border-bottom: none; }
+	.package_column a { float: right; display: block; width: 16px; height: 16px; margin: 0 0 0 5px; }
+	
+	.package_column .adder { padding: 3px 0 3px 3px; border-top: 1px solid #EEE; }
+	.package_column .adder a { margin: 4px 8px 0 0; }
+	
+	.package_column .add_file a { float: none; width: auto; margin: 3px; color: #333; font-size: 10px; line-height: 20px; }
+	.package_column .add_file a:hover { background-color: #FCFCFC; }
+	
+	.package_files li { overflow: hidden; height: 16px; }
+	.package_files span { float: left; height: 16px; white-space: nowrap; width: 245px; overflow: hidden; cursor: help; }
+	.package_files span:hover { position: absolute; width: auto; background: #EEE; padding: 0 5px; margin: 0 0 0 -5px; }
+	
+	form.module .package_column select { width: 250px; margin: 3px 3px 3px 3px; }
+
+/*---------------------------
+	BigTree Foundry Browser
+---------------------------*/
+
+	#bigtree_foundry_browser_window { background: #FFF; border: 1px solid #333; width: 600px; height: 400px; overflow: hidden; position: fixed; z-index: 50001; border-radius: 5px; box-shadow: 0 0 20px rgba(30,30,30,0.7); z-index: 400001; }
+	#bigtree_foundry_browser_window h2 { background: #CCC url(../images/button-bg.png) repeat-x; border-radius-top-left: 5px; border-radius-top-right: 5px; float: none; font-family: Helvetica; font-size: 16px; height: 27px; line-height: 29px; padding: 5px 0 5px 10px; text-shadow: 0 1px 0 #FFF; }
+	#bigtree_foundry_browser_close { float: right; display: block; margin: -2px 3px 0 0; background: url(../images/icons/cross.png); width: 16px; height: 16px; }
+	#bigtree_foundry_browser_form { clear: both; margin: 0; }
+	#bigtree_foundry_browser_window .directory { background-gradient: #436D86 #578FB1; color: #FFF; padding: 0px 10px; height: 24px; line-height: 24px; font-size: 11px; }
+	#bigtree_foundry_browser_window .navigation_pane { float: left; width: 150px; height: 352px; background: #F6F6F6; border-radius-bottom-left: 5px; padding: 5px 0; }
+	#bigtree_foundry_browser_window .navigation_pane li a { color: #333; display: block; font-size: 10px; line-height: 20px; margin: 0 0 3px 0; padding: 0px 5px; }
+	#bigtree_foundry_browser_window .navigation_pane li a:hover { background: #FFF; }
+	#bigtree_foundry_browser_window .browser_pane { float: left; width: 450px; height: 342px; background: #FFF; overflow: hidden; border-radius-bottom-right: 5px; }
+	#bigtree_foundry_browser_window .browser_pane .files { background: url(../images/icons/page_white_text.png) no-repeat 2px 2px; border: 1px solid #FFF; float: right; height: 16px; margin: 0 3px 0 0; padding: 2px; width: 16px; }
+	#bigtree_foundry_browser_window .browser_pane .images { background: url(../images/icons/images.png) no-repeat 2px 2px; border: 1px solid #FFF; float: right; height: 16px; margin: 0; padding: 2px; width: 16px; }
+	#bigtree_foundry_browser_window .browser_pane ul { height: 292px; width: 450px; overflow: auto; }
+	#bigtree_foundry_browser_window .browser_pane li { cursor: pointer; padding: 3px 5px; font-size: 12px; line-height: 20px; border-bottom: 1px solid #EEE; }
+	#bigtree_foundry_browser_window .browser_pane li:hover { background-gradient: #eaf5fc #ffffff; }
+	#bigtree_foundry_browser_window .browser_pane li div { height: 48px; overflow: hidden; text-align: center; padding: 11px 0 12px 0; }
+	#bigtree_foundry_browser_window .browser_pane li span { background: #EEE; color: #333; font-size: 9px; padding: 1px 5px; display: block; overflow: hidden; text-align: center; height: 15px; background-gradient: #E1E1E1 #F7F7F7; }
+	#bigtree_foundry_browser_window .browser_pane li img { max-height: 48px; }
+	#bigtree_foundry_browser_window .browser_pane li.selected { background-gradient: #d6eefc #eaf5fc; }
+	#bigtree_foundry_browser_window .browser_pane .button { float: right; margin: 5px 5px 0 0; }
 	
 	
-	
+/*
+	-----------------------
+	Internet Explorer Fixes
+	-----------------------
+*/
+
+.ie nav.main li:hover a { filter: none; -ms-filter: none; background: #243D4C; }
+.ie nav.main li li a:hover { background: #406980; }
+.ie6 body.login { background: #333; }
+.ie7 body.login { background: #333; }
+.ie8 body.login { background: #333 url(../images/login-bg.png) repeat-x bottom left; }
+.ie8 input[type=text], .ie8 input[type=password], .ie8 input[type=email], .ie8 input[type=url] { height: 18px; padding: 7px 10px; }
+.ie7 input[type=text], .ie7 input[type=password], .ie7 input[type=email], .ie7 input[type=url] { height: 18px; padding: 7px 10px; }
+.ie7 .nav_shadow, .ie8 .nav_shadow { display: block; }
+.ie8 nav.main form input[type=search] { padding: 3px 34px 9px 13px; height: 12px; }
+.ie6 nav.main form .qs_query, .ie7 nav.main form .qs_query { background: #FFF; border: 1px solid #DCDCDC; border-radius: 13px; height: 12px; margin: 5px 0; padding: 3px 34px 6px 13px; width: 175px; }
+.ie6 nav.main form .qs_image, .ie7 nav.main form .qs_image { height: 16px; margin: 10px 0 0 195px; position: absolute; width: 16px; user-select: none; }
+.ie8 .form_search { height: 12px; padding-top: 3px; padding-bottom: 9px; }
+.ie7 .form_search { background: #FFF url(../images/quick-search-icon.png) no-repeat 195px 5px; border: 1px solid #DCDCDC; float: left; height: 14px; margin: 5px 25px 0 -10px; padding: 3px 34px 3px 13px !important; width: 173px; line-height: 14px; }
+.ie7 nav.sub li { float: left; }
+.ie .view_paging li.first a { background: url(../images/caret-left.png) no-repeat center center; border-radius: 11px 0 0 11px; text-indent: -1000px; width: 6px; }
+.ie .view_paging li.last a { background: url(../images/caret-right.png) no-repeat center center; border-radius: 0 11px 11px 0; border-right: none; text-indent: -1000px; width: 6px; }

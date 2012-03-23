@@ -13,7 +13,7 @@
 ?>
 <div class="table">
 	<summary>
-		<a href="<?=$section_root?>export/group/<?=$g["id"]?>/" class="export"></a>
+		<a href="<?=$developer_root?>foundry/package/choose-files/group/<?=$g["id"]?>/" class="export"></a>
 		<h2><?=$g["name"]?></h2>
 	</summary>
 	<header>
@@ -30,7 +30,7 @@
 				<a href="<?=$section_root?>edit/<?=$item["id"]?>/"><?=$item["name"]?></a>
 			</section>
 			<section class="view_action">
-				<a href="<?=$section_root?>export/<?=$item["id"]?>/" class="icon_export"></a>
+				<a href="<?=$developer_root?>foundry/package/choose-files/module/<?=$item["id"]?>/" class="icon_export"></a>
 			</section>
 			<section class="view_action">
 				<a href="<?=$section_root?>edit/<?=$item["id"]?>/" class="icon_edit"></a>
@@ -70,7 +70,7 @@
 				<a href="<?=$section_root?>edit/<?=$item["id"]?>/"><?=$item["name"]?></a>
 			</section>
 			<section class="view_action">
-				<a href="<?=$section_root?>export/<?=$item["id"]?>/" class="icon_export"></a>
+				<a href="<?=$developer_root?>foundry/package/choose-files/module/<?=$item["id"]?>/" class="icon_export"></a>
 			</section>
 			<section class="view_action">
 				<a href="<?=$section_root?>edit/<?=$item["id"]?>/" class="icon_edit"></a>

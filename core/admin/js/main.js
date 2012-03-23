@@ -1568,6 +1568,35 @@ var BigTreeToolTip = Class.extend({
 	}
 });
 
+// !BigTree Foundry Browser Class
+var BigTreeFoundryBrowser = Class.extend({
+
+	onComplete: false,
+
+	init: function(directory,oncomplete) {
+		this.onComplete = oncomplete;
+		overlay = $('<div id="bigtree_dialog_overlay">');
+		browserwindow = $('<div id="bigtree_foundry_browser_window">');
+		browserwindow.html('<h2>File Browser</h2><form id="bigtree_foundry_browser_form" method="post" action="">Please Wait...</form>');
+		$("body").append(overlay).append(browserwindow);
+		$("#bigtree_foundry_browser_form").load("admin_root/ajax/foundry/file-browser/", { directory: directory });
+
+		leftd = parseInt((BigTree.WindowWidth() - 602) / 2);
+		topd = parseInt((BigTree.WindowHeight() - 402) / 2);
+
+		$("#bigtree_foundry_browser_window").css({ "top": topd + "px", "left": leftd + "px" });
+		$("#bigtree_foundry_browser_form").submit($.proxy(this.BrowserSubmit,this));
+	},
+
+	BrowserSubmit: function(ev) {
+		data = { file: $("#bigtree_foundry_selected_file").val(), directory: $("#bigtree_foundry_directory").val() };
+		this.onComplete(data);
+		$("#bigtree_dialog_overlay, #bigtree_foundry_browser_window").remove();
+		return false;
+
+	}
+});
+
 // !BigTree Object
 var BigTree = {
 
@@ -1647,7 +1676,7 @@ var BigTree = {
 			end_page = pages;
 		}
 		
-		content = '<li><a href="#' + prev_page + '">&laquo;</a></li>';
+		content = '<li class="first"><a href="#' + prev_page + '">&laquo;</a></li>';
 		for (i = start_page; i < end_page; i++) {
 			content += '<li><a href="#' + i + '"';
 			if (i == current_page) {
@@ -1655,7 +1684,7 @@ var BigTree = {
 			}
 			content += '>' + (i + 1) + '</a></li>';
 		}
-		content += '<li><a href="#' + next_page + '">&raquo;</a></li>';
+		content += '<li class="last"><a href="#' + next_page + '">&raquo;</a></li>';
 		
 		$(selector).html(content);
 	},
@@ -1687,5 +1716,4 @@ var BigTree = {
 		}
 		return windowHeight;
 	}
-
 }
