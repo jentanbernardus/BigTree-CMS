@@ -458,6 +458,7 @@
 	
 	.table .no_content { width: 938px; text-align: left; padding: 0 0 0 20px; user-select: none; }
 	.table .no_content p { line-height: 35px; }
+	.table .changes_awaiting { width: 938px; text-align: left; padding: 10px 0 10px 20px; user-select: none; height: auto; line-height: 15px; }
 	
 	/* Pages Specific */
 	.table .pages_title { font-size: 15px; padding: 0 0 0 15px; text-align: left; width: 712px; }
