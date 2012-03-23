@@ -19,6 +19,9 @@
 		<span class="view_column" style="width: <?=$field["width"]?>px;"><?=$field["title"]?></span>
 		<?
 			}
+		?>
+		<span class="view_status">Status</span>		
+		<?
 			foreach ($actions as $action => $status) {
 		?>
 		<span class="view_action"><?=$action?></span>

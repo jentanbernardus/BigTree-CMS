@@ -809,7 +809,7 @@
 			$first = current($fields);
 			if (!$first["width"]) {
 				$awidth = count($actions) * 62;
-				$available = 958 - $awidth;
+				$available = 888 - $awidth;
 				$percol = floor($available / count($fields));
 			
 				foreach ($fields as $key => $field) {
