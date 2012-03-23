@@ -36,40 +36,19 @@
 	$items = $data["results"];
 	
 	foreach ($items as $item) {
-		if ($item["status"] == "c") {
-			$status = 'Changed';
-			$status_class = "pending";
-		} elseif ($item["status"] == "p") {
-			$status = 'Pending';
-			$status_class = "pending";
-		} else {
-			$status = 'Published';
-			$status_class = "published";
-		}
 ?>
-<<<<<<< HEAD
-<li id="row_<?=$item["id"]?>" class="<?=$status_class?><? if ($item["bigtree_pending"]) { ?> pending<? } ?><? if ($item["bigtree_changes"]) { ?> changes<? } ?>">
-=======
 <li id="row_<?=$item["id"]?>"<? if ($item["status"] == "p") { ?> class="pending"<? } ?><? if ($item["status"] == "c") { ?> class="changes"<? } ?>>
->>>>>>> fc9cd7b8cc2d09d3b9970e0f21739560df0b8573
 	<?
 		$x = 0;
 		foreach ($fields as $key => $field) {
 			$x++;
 			$value = $item["column$x"];
 	?>
-	<section class="view_column <?=$status_class?>" style="width: <?=$field["width"]?>px;">
+	<section class="view_column" style="width: <?=$field["width"]?>px;">
 		<?=$value?>
 	</section>
 	<?
 		}
-<<<<<<< HEAD
-/*
-	?>
-	<section class="view_status"><?=$status?></section>
-	<?	
-*/
-=======
 	?>
 	<section class="view_status">
 		<? if ($item["status"] == "p") { ?>
@@ -81,7 +60,6 @@
 		<? } ?>
 	</section>
 	<?	
->>>>>>> fc9cd7b8cc2d09d3b9970e0f21739560df0b8573
 		$iperm = ($perm == "p") ? "p" : $admin->getCachedAccessLevel($module,$item,$view["table"]);
 		foreach ($actions as $action => $data) {
 			if ($data == "on") {
