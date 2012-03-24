@@ -1,442 +1,81 @@
 <?
-	// Handle Javascript Minifying and Caching
-	if ($path[0] == "js") {
-		clearstatcache();
-		// Get the latest mod time on any included js files.
-		$mtime = 0;
-		$js_file = str_replace(".js","",$path[1]);
-		$cfile = $server_root."cache/".$js_file.".js";
-		$last_modified = file_exists($cfile) ? filemtime($cfile) : 0;
-		if (is_array($config["js"][$js_file])) {
-			foreach ($config["js"][$js_file] as $script) {
-				$m = file_exists($site_root."js/$script") ? filemtime($site_root."js/$script") : 0;
-				if ($m > $mtime) {
-					$mtime = $m;
-				}
-			}
-		}
-		// If we have a newer Javascript file to include or we haven't cached yet, do it now.
-		if (!file_exists($cfile) || $mtime > $last_modified) {
-			$data = "";
-			if (is_array($config["js"][$js_file])) {
-				foreach ($config["js"][$js_file] as $script) {
-					$data .= file_get_contents($site_root."js/$script")."\n";
-				}
-			}
-			// Replace www_root/ and Minify
-			$data = str_replace(array('$www_root',"www_root/"),$www_root,$data);
-			if (is_array($_GET)) {
-				foreach ($_GET as $key => $val) {
-					if ($key != "bigtree_htaccess_url") {
-						$data = str_replace('$'.$key,$val,$data);
-					}
-				}
-			}
-			if (is_array($config["js"]["vars"])) {
-				foreach ($config["js"]["vars"] as $key => $val) {
-					$data = str_replace('$'.$key,$val,$data);
-				}
-			}
-			$data = JSMin::minify($data);
-			file_put_contents($cfile,$data);
-			header("Content-type: text/javascript");
-			die($data);
-		} else {
-			// Added a line to .htaccess to hopefully give us IF_MODIFIED_SINCE when running as CGI
-			if (function_exists("apache_request_headers")) {
-				$headers = apache_request_headers();
-				$lms = $headers["If-Modified-Since"];
-			} else {
-				$lms = $_SERVER["HTTP_IF_MODIFIED_SINCE"];
-			}
-			
-			if (!$lms) {
-				header("Content-type: text/javascript");
-				die(file_get_contents($cfile));
-			} elseif (strtotime($lms) == $last_modified) {
-				header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_modified).' GMT', true, 304);
-				die();
-			} else {
-				header("Content-type: text/javascript");
-				header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_modified).' GMT', true, 200);
-				die(file_get_contents($cfile));
-			}
-		}
-	}
-
-	// Handle CSS Shortcuts and Minifying
-	if ($path[0] == "css") {
-		clearstatcache();
-		// Get the latest mod time on any included css files.
-		$mtime = 0;
-		$css_file = str_replace(".css","",$path[1]);
-		$cfile = $server_root."cache/".$css_file.".css";
-		$last_modified = file_exists($cfile) ? filemtime($cfile) : 0;
-		if (is_array($config["css"][$css_file])) {
-			foreach ($config["css"][$css_file] as $style) {
-				$m = (file_exists($site_root."css/$style")) ? filemtime($site_root."css/$style") : 0;
-				if ($m > $mtime) {
-					$mtime = $m;
-				}
-			}
-		}
-		// If we have a newer CSS file to include or we haven't cached yet, do it now.
-		if (!file_exists($cfile) || $mtime > $last_modified) {
-			$data = "";
-			if (is_array($config["css"][$css_file])) {
-				foreach ($config["css"][$css_file] as $style_file) {
-					$style = file_get_contents($site_root."css/$style_file");
-					if (strpos($style_file, "less")) {
-						// convert LESS
-						require_once($server_root."core/inc/utils/less-compiler.inc.php");
-						$less_compiler = new lessc();
-						$style = $less_compiler->parse($style);
-					} else {
-						// normal CSS
-						if ($config["css"]["prefix"]) {
-							// Replace CSS3 easymode
-							$style = BigTree::formatCSS3($style);
-						}
-					}
-					$data .= $style."\n";
-				}
-			}
-			// Should only loop once, not with every file
-			if (is_array($config["css"]["vars"])) {
-				foreach ($config["css"]["vars"] as $key => $val) {
-					$data = str_replace('$'.$key,$val,$data);
-				}
-			}
-			if ($config["css"]["minify"]) {
-				require_once($server_root."core/inc/utils/CSSMin.php");			
-				$minifier = new CSSMin;
-				$data = $minifier->run($data);
-			}	
-			file_put_contents($cfile,$data);
-			header("Content-type: text/css");
-			die($data);
-		} else {
-			// Added a line to .htaccess to hopefully give us IF_MODIFIED_SINCE when running as CGI
-			if (function_exists("apache_request_headers")) {
-				$headers = apache_request_headers();
-				$lms = $headers["If-Modified-Since"];
-			} else {
-				$lms = $_SERVER["HTTP_IF_MODIFIED_SINCE"];
-			}
-			
-			if (!$lms) {
-				header("Content-type: text/css");
-				die(file_get_contents($cfile));
-			} elseif (strtotime($lms) == $last_modified) {
-				header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_modified).' GMT', true, 304);
-				die();
-			} else {
-				header("Content-type: text/css");
-				header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_modified).' GMT', true, 200);
-				die(file_get_contents($cfile));
-			}
-		}
-	}
+	// Time Zone
+	date_default_timezone_set("America/New_York");
 	
-	// Start output buffering and sessions
-	ob_start();
-	session_start();
+	// Set to false to stop all PHP errors/warnings from showing.
+	$debug = true;
 	
-	// Handle AJAX calls.
-	if ($path[0] == "ajax") {
-		bigtree_setup_sql_connection();
-		$x = 1;
-		$ajpath = "";
-		while ($x < count($path) - 1) {
-			$ajpath .= $path[$x]."/";
-			$x++;
-		}
-		if (file_exists("../templates/ajax/".$ajpath.$path[$x].".php")) {
-			include "../templates/ajax/".$ajpath.$path[$x].".php";
-		} else {
-			$inc = "../templates/ajax/".$path[1]."/";
-			$inc_dir = $inc;
-			$x = 1;
-			$y = 1;
-			while ($x < count($path)) {
-				if (is_dir($inc.$path[$x])) {
-					$inc .= $path[$x]."/";
-					$inc_dir .= $path[$x]."/";
-					$y++;
-				} elseif (file_exists($inc.$path[$x].".php")) {
-					$inc .= $path[$x].".php";
-					$y++;
-				}
-				$x++;
-			}
-			if (substr($inc,-4,4) != ".php") {
-				if (file_exists($inc.end($path).".php")) {
-					$inc .= end($path).".php";
-				} else {
-					$inc .= "default.php";
-				}
-			}
-			$commands = array_slice($path,$y+1);
-			if (file_exists($inc)) {
-				include $inc;
-			} else {
-				include str_replace("/default.php",".php",$inc);
-			}
-		}
-		die();
-	}
+	// Database info.
+	$config["db"]["host"] = "localhost";
+	$config["db"]["name"] = "sipandbite";
+	$config["db"]["user"] = "sipandbite";
+	$config["db"]["password"] = "Kouzina21";
 	
-	// Handle API calls.
-	if ($path[0] == "api") {
-		if (!count($_POST) && count($_GET)) {
-			$_POST = $_GET;
-		}
-		include BigTree::path("inc/bigtree/admin.php");
-		include BigTree::path("inc/bigtree/auto-modules.php");
-		$admin = new BigTreeAdmin;
-		$autoModule = new BigTreeAutoModule;
-		$api_type = $path[1];
-		$x = 2;
-		$apipath = "";
-		while ($x < count($path) - 1) {
-			$apipath .= $path[$x]."/";
-			$x++;
-		}
-		if ($apipath.$path[$x] != "users/authenticate") {
-			if (isset($_POST["bigtreeapi"]["token"])) {
-				if (!$admin->validateToken($_POST["bigtreeapi"]["token"])) {
-					echo BigTree::apiEncode(array("success" => false,"error" => "Invalid token. Please login."));
-					die();
-				}			
-			} else {
-				if (!$admin->validateToken($_POST["token"])) {
-					echo BigTree::apiEncode(array("success" => false,"error" => "Invalid token. Please login."));
-					die();
-				}
-			}
-		}
-		include BigTree::path("api/".$apipath.$path[$x].".php");
-		die();	
-	}
-
-	// Tell the browser we're serving HTML
-	header("Content-type: text/html");
-
-	// See if we're previewing changes.
-	$preview = false;
-	if ($path[0] == "_preview" && $_SESSION["bigtree"]["id"]) {
-		$npath = array();
-		foreach ($path as $item) {
-			if ($item != "_preview") {
-				$npath[] = $item;
-			}
-		}
-		$path = $npath;
-		$preview = true;
-		$config["cache"] = false;
-	}
+	// Separate write database info (for load balanced setups)
+	$config["db_write"]["host"] = "";
+	$config["db_write"]["name"] = "";
+	$config["db_write"]["user"] = "";
+	$config["db_write"]["password"] = "";
 	
-	if ($path[0] == "_preview-pending" && $_SESSION["bigtree"]["id"]) {
-		$preview = true;
-		$commands = array();
-		$navid = $path[1];
-	}
+	// Setup the www_root and resource_root
+	// Resource root must be on a different domain than www_root.  Usually we just remove the www. from the domain.
+	$config["domain"] = "http://www.sipandbite.com";
+	$config["www_root"] = "http://www.sipandbite.com/dev/";
+	$config["admin_root"] = "http://www.sipandbite.com/dev/admin/";
+	//$GLOBALS["secure_root"] = str_replace("http://","https://",$config["www_root"]);
+	$GLOBALS["secure_root"] = $config["www_root"];	
 	
-	// So we don't lose this.
-	define("BIGTREE_PREVIEWING",$preview);
+	// Email used for default form mailers	
+	$config["contact_email"] = "ben@benjaminplum.com";
 	
-	// Sitemap setup
-	$sitemap = false;
-	if ($path[0] == "sitemap") {
-		$sitemap = true;
-	}
-	if ($path[0] == "sitemap.xml") {
-		$cms->drawXMLSitemap();
-	}
-	if ($path[0] == "feeds") {
-		$route = $path[1];
-		$feed = $cms->getFeedByRoute($route);
-		if ($feed) {
-			header("Content-type: text/xml");
-			echo '<?xml version="1.0"?>';
-			include BigTree::path("feeds/".$feed["type"].".php");
-			die();
-		}
-	}
+	// The amount of work for the password hashing.  Higher is more secure but more costly on your CPU.
+	$config["password_depth"] = 8;
+	// If you have HTTPS enabled, set to true to force admin logins through HTTPS
+	$config["force_secure_login"] = false;
+	// Encryption key for encrypted settings
+	$config["settings_key"] = "greentriangleboat";
 	
-	if (!$navid) {
-		list($navid,$commands,$routed) = $cms->getNavId($path);
-	}
+	// Custom Output Filter Function
+	$config["output_filter"] = false;
 	
-	// Pre-init a bunch of vars to keep away notices.
-	$module_title = "";
-	$css = array();
-	$js = array();
-	$layout = "default";
-	if ($navid) {
-		// If we're previewing, get pending data as well.
-		if ($preview) {
-			$page = $cms->getPendingPage($navid);
-		} else {
-			$page = $cms->getPage($navid);
-		}
-			
-		$resources = $page["resources"];
-		$callouts = $page["callouts"];
-
-		// Quick access to resources
-		if (is_array($resources)) {
-			foreach ($resources as $key => $val) {
-				if (substr($key,0,1) != "_") {
-					$$key = &$resources[$key];
-				}
-			}
-		}
-				
-		// Redirect lower if the template is !
-		if ($page["template"] == "!") {
-			$nav = $cms->getNavByParent($page["id"],1);
-			$first = $nav[0];
-			header("Location: ".$cms->getLink($first["id"]));
-			die();
-		}
-		
-		// If the template is a module, do its routing for it, otherwise just include the template.
-		if ($routed) {
-			// We need to figure out how far down the directory structure to route the,.	
-			$inc = "../templates/routed/".$page["template"]."/";
-			$inc_dir = $inc;
-			$module_commands = array();
-			$ended = false;
-			foreach ($commands as $command) {
-				if (!$ended && is_dir($inc.$command)) {
-					$inc = $inc.$command."/";
-				} elseif (!$ended && file_exists($inc.$command.".php")) {
-					$inc_dir = $inc;
-					$inc = $inc.$command.".php";
-					$ended = true;
-				} elseif (!$ended) {
-					$ended = true;
-					$module_commands[] = $command;
-					$inc_dir = $inc;
-					$inc = $inc."default.php";
-				} else {
-					$module_commands[] = $command;
-				}
-			}
-			if (!$ended) {
-				$inc_dir = $inc;
-				$inc = $inc."default.php";
-			}
-			
-			$commands = $module_commands;
-			
-			// Include the module's header
-			if (file_exists("../templates/routed/".substr($page["template"],7)."/_header.php")) {
-				include_once "../templates/routed/".substr($page["template"],7)."/_header.php";
-			}
-			
-			// Include the sub-module's header if it exists.
-			if (file_exists($inc_dir."_header.php")) {
-				include_once $inc_dir."_header.php";
-			}
-			
-			include $inc;
-
-			// Include the sub-module's footer if it exists.
-			if (file_exists($inc_dir."_footer.php")) {
-				include_once $inc_dir."_footer.php";
-			}
-			
-			// Include the module's footer
-			if (file_exists("../templates/routed/".substr($page["template"],7)."/_footer.php")) {
-				include_once "../templates/routed/".substr($page["template"],7)."/_footer.php";
-			}
-
-		} elseif ($page["template"]) {
-			include "../templates/basic/".$page["template"].".php";
-		} else {
-			header("Location: ".$page["external"]);
-		}
-	} elseif (!$_GET["bigtree_htaccess_url"] || empty($path[0])) {
-		$page = $cms->getPage(0);
-		
-		$resources = $page["resources"];
-		$callouts = $page["callouts"];
-
-		// Quick access to resources
-		if (is_array($resources)) {
-			foreach ($resources as $key => $val) {
-				if (substr($key,0,1) != "_") {
-					$$key = &$resources[$key];
-				}
-			}
-		}
-		
-		include "../templates/basic/".$page["template"].".php";
-	} elseif ($sitemap) {
-		include "../templates/basic/_sitemap.php";
-	} else {
-		// Let's check if it's in the old routing table.
-		$cms->checkOldRoutes($path);
-		// It's not, it's a 404.
-		$cms->handle404($_GET["bigtree_htaccess_url"]);		
-	}
+	// Enable Simple Caching (incomplete)
+	$config["cache"] = false;
+	$config["xsendfile"] = false;
 	
-	$content = ob_get_clean();
+	// ReCAPTCHA Keys
+	$config["recaptcha"]["private"] = "6LcjTrwSAAAAADnHAf1dApaNCX1ODNuEBP1YdMdJ";
+	$config["recaptcha"]["public"] = "6LcjTrwSAAAAAKvNG6n0YtCROEWGllOu-dS5M5oj";
 	
-	// Load the content again into the layout.
-	ob_start();
-	include "../templates/layouts/$layout.php";
-	$content = ob_get_clean();
+	// Base classes for BigTree.  If you want to extend / overwrite core features of the CMS, change these to your new class names
+	// Set BIGTREE_CUSTOM_BASE_CLASS_PATH to the directory path (relative to /core/) of the file that will extend BigTreeCMS
+	// Set BIGTREE_CUSTOM_ADMIN_CLASS_PATH to the directory path (relative to /core/) of the file that will extend BigTreeAdmin
+	define("BIGTREE_CUSTOM_BASE_CLASS",false);
+	define("BIGTREE_CUSTOM_ADMIN_CLASS",false);
+	define("BIGTREE_CUSTOM_BASE_CLASS_PATH",false);
+	define("BIGTREE_CUSTOM_ADMIN_CLASS_PATH",false);
 	
-	// Allow for special output filter functions.
-	$filter = false;
-	if ($config["output_filter"]) {
-		$filter = $config["output_filter"];
-	}
 	
-	ob_start($filter);
 	
-	// If we're in HTTPS, make sure all Javascript, images, and CSS are pulling from HTTPS
-	if ($cms->Secure) {
-		$content = str_replace(array('src="http://','link href="http://'),array('src="https://','link href="https://'),$content);
-	}
+	$config["static_root"] = "http://static.sipandbite.com/dev/";
+	$static_root = $config["static_root"];
 	
-	// Load the BigTree toolbar if you're logged in to the admin.
-	if ($page["id"] && !$cms->Secure && isset($_COOKIE["bigtree"]["email"]) && !$_SESSION["bigtree"]["id"]) {
-		include BigTree::path("inc/bigtree/admin.php");
-
-		if (BIGTREE_CUSTOM_ADMIN_CLASS) {
-			eval('$admin = new '.BIGTREE_CUSTOM_ADMIN_CLASS.';');
-		} else {
-			$admin = new BigTreeAdmin;
-		}
-	}
 	
-	if ($page["id"] && $_SESSION["bigtree"]["id"] && !$cms->Secure) {
-		$show_bar_default = $_COOKIE["hide_bigtree_bar"] ? "false" : "true";
-		$show_preview_bar = "false";
-		$return_link = "";
-		if ($_GET["bigtree_preview_bar"]) {
-			$show_bar_default = "false";
-			$show_preview_bar = "true";
-			$return_link = $_SERVER["HTTP_REFERER"];
-		}
-				
-		$content = str_replace('</body>','<script type="text/javascript">var bigtree_is_previewing = '.(BIGTREE_PREVIEWING ? "true" : "false").'; var bigtree_current_page_id = '.$page["id"].'; var bigtree_bar_show = '.$show_bar_default.'; var bigtree_user_name = "'.$_SESSION["bigtree"]["name"].'"; var bigtree_preview_bar_show = '.$show_preview_bar.'; var bigtree_return_link = "'.$return_link.'";</script><script type="text/javascript" src="'.$config["admin_root"].'js/bar.js"></script></body>',$content);
-		$nocache = true;
-	}
+	$config["js"]["app"] = array(
+		"jquery-1.7.1.min.js",
+		"jquery.bp.boxer.js",
+		"main.js"
+	);
+	$config["js"]["vars"] = array(
+		"static_root" => $config["static_root"]
+	);
+	$config["js"]["minify"] = true;
 	
-	echo $content;
 	
-	// Write to the cache
-	if ($config["cache"] && !defined("BIGTREE_DO_NOT_CACHE")) {
-		$cache = ob_get_flush();
-		$curl = $_GET["bigtree_htaccess_url"];
-		if (!$curl) {
-			$curl = "home";
-		}
-		file_put_contents("../cache/".base64_encode($curl),$cache);
-	}
+	$config["css"]["app"] = array(
+		"fonts.css",
+		"test.less",
+		"master.css"
+	);
+	$config["css"]["vars"] = $config["js"]["vars"];
+	$config["css"]["minify"] = true;
 ?>
