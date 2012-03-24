@@ -57,8 +57,20 @@
 ?>
 <header class="group"><?=$title?></header>
 <ul id="sort_table_<?=$gc?>">
-	<? foreach ($r["results"] as $item) { ?>
-	<li id="row_<?=$item["id"]?>"<? if ($item["status"] == "p") { ?> class="pending"<? } ?><? if ($item["status"] == "c") { ?> class="changes"<? } ?>>
+	<? 
+		foreach ($r["results"] as $item) {
+			if ($item["status"] == "p") {
+				$status = "Pending";
+				$status_class = "pending";
+			} elseif ($item["status"] == "c") {
+				$status = "Changed";
+				$status_class = "pending";
+			} else {
+				$status = "Published";
+				$status_class = "published";
+			}
+	?>
+	<li id="row_<?=$item["id"]?>" class="<?=$status_class?>">
 		<?
 			$x = 0;
 			foreach ($fields as $key => $field) {
@@ -74,15 +86,7 @@
 		<?
 			}
 		?>
-		<section class="view_status">
-			<? if ($item["status"] == "p") { ?>
-			Pending
-			<? } elseif ($item["status"] == "c") { ?>
-			Changed
-			<? } else { ?>
-			Published
-			<? } ?>
-		</section>
+		<section class="view_status status_<?=$status_class?>"><?=$status?></section>
 		<?
 			$iperm = ($perm == "p") ? "p" : $admin->getCachedAccessLevel($module,$item,$view["table"]);
 			foreach ($actions as $action => $data) {

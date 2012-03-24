@@ -47,7 +47,7 @@
 			$status_class = "published";
 		}
 ?>
-<li id="row_<?=$item["id"]?>" class="<?=$status_class?><? if ($item["status"] == "p") { ?> pending<? } ?><? if ($item["status"] == "c") { ?> changes<? } ?>">
+<li id="row_<?=$item["id"]?>" class="<?=$status_class?>">
 	<?
 		$x = 0;
 		foreach ($fields as $key => $field) {
