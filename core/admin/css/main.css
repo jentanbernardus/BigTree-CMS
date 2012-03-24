@@ -7,7 +7,7 @@
 -----------------------------------------------------------------------------------*/
  	html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, code, em, img, small, strike, strong, sub, sup, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td { background: transparent; border: 0; font-size: 100%; margin: 0; outline: 0; padding: 0; }
  	img { vertical-align: middle; }
-	body { background: #222; color: #666; font-family: Helvetica, sans-serif; font-size: 12px; line-height: 1; }
+	body { background: #111; color: #666; font-family: Helvetica, sans-serif; font-size: 12px; line-height: 1; }
 	ul { list-style: none; }
 	ol { margin-bottom: 10px; margin-left: 18px; }
 	ol li { font-size: 12px; line-height: 18px; }
@@ -306,7 +306,7 @@
 	.breadcrumb li.first a { color: #777; }
 
 /* Footer */
-	footer.main { background: #222; border-top: 3px solid #fff; box-shadow: 0 -2px 2px rgba(0, 0, 0, 0.25); padding: 20px 0; min-width: 960px; user-select: none; }
+	footer.main { background: #111; border-top: 3px solid #fff; box-shadow: 0 -2px 2px rgba(0, 0, 0, 0.25); padding: 15px 0; min-width: 960px; user-select: none; }
 	footer.main section { margin: 0 auto; overflow: hidden; width: 960px; }
 	footer.main .bigtree { float: left; }
 	footer.main .bigtree .logo { background: url(../images/logo.png); display: block; float: left; height: 36px; margin: 0; width: 151px; }
@@ -314,7 +314,7 @@
 	footer.main .bigtree .links a { color: #CCC; float: left; font-size: 12px; height: 12px; text-transform: uppercase; }
 	footer.main .bigtree .links a:hover { color: #FFF; }
 	footer.main .bigtree .links span { background: url(../images/header-icons.png) -18px 0px; display: block; float: left; height: 10px; margin: 0 7px; width: 5px; }
-	footer.main .fastspot { background: url(../images/footer-fs.png) no-repeat; color: #6C7679; float: right; font-size: 10px; height: 25px; padding: 0 0 0 50px; width: 245px; text-align: right; text-shadow: 0 1px 0 rgba(0, 0, 0, 1); }
+	footer.main .fastspot { background: url(../images/footer-fs.png) no-repeat; color: #6C7679; float: right; font-size: 10px; height: 25px; padding: 5px 0 0 50px; width: 245px; text-align: right; text-shadow: 0 -1px 0 rgba(0, 0, 0, 1); }
 	footer.main .fastspot p { color: #999; font-size: 12px; line-height: 12px; margin: 0 0 7px 0; }
 	footer.main .fastspot a { color: #666; }
 	footer.main .fastspot a:hover { color: #999; }
