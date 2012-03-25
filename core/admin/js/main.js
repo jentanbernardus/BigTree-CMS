@@ -851,6 +851,8 @@ var BigTreeDialog = Class.extend({
 		} else {
 			$("#bigtree_dialog_form").submit($.proxy(this.DialogSubmit,this));
 		}
+		
+		ddwindow.find("input[type=submit]").focus();
 	},
 	
 	CheckForEsc: function(e) {
