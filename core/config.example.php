@@ -53,4 +53,41 @@
 	define("BIGTREE_CUSTOM_ADMIN_CLASS",false);
 	define("BIGTREE_CUSTOM_BASE_CLASS_PATH",false);
 	define("BIGTREE_CUSTOM_ADMIN_CLASS_PATH",false);
+	
+	
+	// BigTree Resource Configuration
+	
+	// Array containing all JS files to minify; key = name of compiled file
+	// example: $config["js"]["site"] compiles all JS files into "site.js"
+	$config["js"]["site"] = array(
+		// "javascript_file.js"
+	);
+	
+	// Array containing variables to be replaced in compiled JS files
+	// example: "variable_name" => "Variable Value" will replace all instances of $variable_name with 'Variable Value'
+	$config["js"]["vars"] = array(
+		// "variable_name" => "Variable Value"
+	)
+	
+	// Flag for JS minification 
+	$config["js"]["minify"] = false; 
+	
+	
+	// Array containing all CSS files to minify; key = name of compiled file
+	// example: $config["css"]["site"] compiles all CSS files into "site.css"
+	$config["css"]["site"] = array( 
+		// "style_sheet.css"
+	);
+	
+	// Array containing variables to be replaced in compiled CSS files
+	// example: "variable_name" => "Variable Value" will replace all instances of $variable_name with 'Variable Value'
+	$config["css"]["vars"] = array(
+		// "variable_name" => "Variable Value"
+	)
+	
+	// Flag for BigTree CSS3 parsing - automatic vendor prefixing for standard CSS3 
+	$config["css"]["prefix"] = false;
+	
+	// Flag for CSS minification 
+	$config["css"]["minify"] = false;
 ?>
