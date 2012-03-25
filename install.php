@@ -356,7 +356,7 @@ php_flag magic_quotes_gpc Off');
 				<h2>Administration Area</h2>
 				<fieldset class="clear">
 					<p>
-						<small>URL</small><a href="<?php echo $www_root."admin/"; ?>"><?php echo $www_root."admin/"; ?>admin/</a><br />
+						<small>URL</small><a href="<?php echo $www_root."admin/"; ?>"><?php echo $www_root."admin/"; ?></a><br />
 						<small>EMAIL</small><?php echo $cms_user; ?><br />
 						<small>PASSWORD</small><?php for ($i = 0, $count = strlen($cms_pass); $i < $count; $i++) { echo "*"; } ?><br />
 					</p>

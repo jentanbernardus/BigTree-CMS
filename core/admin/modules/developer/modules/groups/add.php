@@ -13,6 +13,12 @@
 					<input type="text" name="name" value="" class="required" />
 				</fieldset>
 			</div>
+			<div class="clear left">
+				<br />
+				<fieldset class="visible clear">
+					<input type="checkbox" name="in_nav" checked="checked" class="checkbox" tabindex="6" /> <label class="for_checkbox">Visible In Dropdown</label>
+				</fieldset>
+			</div>
 		</section>
 		<footer>
 			<input type="submit" class="button blue" value="Create" />

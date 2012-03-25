@@ -2,12 +2,14 @@
 	$mgroups = array();
 	$modulegroups = $admin->getModuleGroups();
 	foreach ($modulegroups as $mg) {
-		$modules = $admin->getModulesByGroup($mg["id"]);
-		$children = array();
-		foreach ($modules as $m) {
-			$children[] = array("link" => $m["route"], "title" => $m["name"], "access" => 0);
+		if ($mg["in_nav"]) {
+			$modules = $admin->getModulesByGroup($mg["id"]);
+			$children = array();
+			foreach ($modules as $m) {
+				$children[] = array("link" => $m["route"], "title" => $m["name"], "access" => 0);
+			}
+			$mgroups[] = array("link" => $mg["route"], "title" => $mg["name"], "access" => 0, "group" => true, "children" => $children);
 		}
-		$mgroups[] = array("link" => $mg["route"], "title" => $mg["name"], "access" => 0, "group" => true, "children" => $children);
 	}
 	
 	$nav = array(

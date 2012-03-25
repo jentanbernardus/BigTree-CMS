@@ -783,7 +783,7 @@
 				The id of the newly created group.
 		*/
 		
-		function createModuleGroup($name,$package = 0) {
+		function createModuleGroup($name,$in_nav,$package = 0) {
 			global $cms;
 			
 			$name = mysql_real_escape_string($name);
@@ -801,7 +801,7 @@
 			// Just to be safe
 			$route = mysql_real_escape_string($route);
 			
-			sqlquery("INSERT INTO bigtree_module_groups (`name`,`route`,`package`) VALUES ('$name','$route','$package')");
+			sqlquery("INSERT INTO bigtree_module_groups (`name`,`route`,`in_nav`,`package`) VALUES ('$name','$route','$in_nav','$package')");
 			return sqlid();
 		}
 		
@@ -5235,7 +5235,7 @@
 				name - The name of the module group.
 		*/
 		
-		function updateModuleGroup($id,$name) {
+		function updateModuleGroup($id,$name,$in_nav) {
 			global $cms;
 			
 			$id = mysql_real_escape_string($id);
@@ -5255,7 +5255,7 @@
 			// Just to be safe
 			$route = mysql_real_escape_string($route);
 			
-			sqlquery("UPDATE bigtree_module_groups SET name = '$name', route = '$route' WHERE id = '$id'");
+			sqlquery("UPDATE bigtree_module_groups SET name = '$name', route = '$route', in_nav = '$in_nav' WHERE id = '$id'");
 		}
 		
 		/*
