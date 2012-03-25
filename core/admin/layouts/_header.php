@@ -2,7 +2,12 @@
 	$mgroups = array();
 	$modulegroups = $admin->getModuleGroups();
 	foreach ($modulegroups as $mg) {
-		$mgroups[] = array("link" => $mg["route"], "title" => $mg["name"], "access" => 0);
+		$modules = $admin->getModulesByGroup($mg["id"]);
+		$children = array();
+		foreach ($modules as $m) {
+			$children[] = array("link" => $m["route"], "title" => $m["name"], "access" => 0);
+		}
+		$mgroups[] = array("link" => $mg["route"], "title" => $mg["name"], "access" => 0, "group" => true, "children" => $children);
 	}
 	
 	$nav = array(
@@ -44,12 +49,13 @@
 <!--[if (gt IE 9)|!(IE)]><!--> <html lang="en" class="no-js"> <!--<![endif]-->
 	<head>
 		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 		<title><? if ($module_title) { ?><?=$module_title?> | <? } ?><?=$site["nav_title"]?> Admin</title>
-		<link rel="stylesheet" href="<?=$admin_root?>css/main.css" type="text/css" media="screen" />
+		<link rel="stylesheet" href="<?=$admin_root?>css/main.css" type="text/css" media="screen" charset="utf-8" />
 		<link media="only screen and (max-device-width: 480px)" href="<?=$admin_root?>css/mobile.css" type= "text/css" rel="stylesheet" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no;" />
 		<? if (is_array($css)) { foreach ($css as $style) { ?>
-		<link rel="stylesheet" href="<?=$admin_root?>css/<?=$style?>" type="text/css" media="screen" />
+		<link rel="stylesheet" href="<?=$admin_root?>css/<?=$style?>" type="text/css" media="screen" charset="utf-8" />
 		<? } } ?>
 		<script type="text/javascript" src="<?=$admin_root?>js/lib.js"></script>
 		<script type="text/javascript" src="<?=$admin_root?>js/main.js"></script>
@@ -86,9 +92,23 @@
 							<?
 								foreach ($item["children"] as $child) {
 									if ($admin->Level >= $child["access"]) {
+										if ($child["group"]) {
+							?>
+							<li class="grouper"><?=$child["title"]?>
+								<?
+											foreach ($child["children"] as $c) {
+								?>
+								<li><a href="<?=$admin_root?><?=$c["link"]?>/"><?=$c["title"]?></a></li>
+								<?
+											}
+								?>
+							</li>
+							<?
+										} else {
 							?>
 							<li><a href="<?=$admin_root?><?=$item["link"]?>/<?=$child["link"]?>/"><?=$child["title"]?></a></li>
 							<?
+										}
 									}
 								}
 							?>
@@ -101,7 +121,7 @@
 					?>
 				</ul>
 				<form method="post" action="<?=$admin_root?>search/">
-					<input type="image" src="<?=$admin_root?>images/quick-search-icon.png" class="qs_image" alt=" " />
+					<input type="image" src="<?=$admin_root?>images/quick-search-icon.png" class="qs_image" />
 					<input type="search" name="query" autocomplete="off" placeholder="Quick Search" class="qs_query" />
 					<div id="quick_search_results" style="display: none;"></div>
 				</form>

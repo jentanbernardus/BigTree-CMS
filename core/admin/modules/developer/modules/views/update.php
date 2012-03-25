@@ -60,9 +60,9 @@
 				unset($fields[$key]["width"]);
 			}
 		}
-	
+		
 		// Let's update the view
-		$admin->updateModuleView(end($path),$title,$description,$table,$type,json_decode($options,true),$fields,$actions,$suffix,$preview_url);
+		$admin->updateModuleView(end($path),$title,$description,$table,$type,json_decode($options,true),$fields,$actions,$suffix,$uncached,$preview_url);
 		
 		$action = $admin->getModuleActionForView(end($path));
 		$admin->growl("Developer","Updated View");
