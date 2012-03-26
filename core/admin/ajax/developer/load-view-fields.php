@@ -132,7 +132,7 @@
 	var current_editing_key;
 	
 	$(".form_table .icon_delete").live("click",function() {
-		new BigTreeDialog("Delete Resource",'<p class="confirm">Are you sure you want to delete this field?</p>',$.proxy(function() {
+		//new BigTreeDialog("Delete Resource",'<p class="confirm">Are you sure you want to delete this field?</p>',$.proxy(function() {
 			tf = $(this).parents("li").find("section").find("input");
 			
 			title = tf.val();
@@ -142,7 +142,7 @@
 			sel = $("#unused_field").get(0);
 			sel.options[sel.options.length] = new Option(key,title,false,false);
 			$(this).parents("li").remove();
-		},this),"delete",false,"OK");
+		//},this),"delete",false,"OK");
 		
 		return false;
 	});
