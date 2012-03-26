@@ -59,7 +59,7 @@
 	
 	// Array containing all JS files to minify; key = name of compiled file
 	// example: $config["js"]["site"] compiles all JS files into "site.js"
-	$config["js"]["site"] = array(
+	$config["js"]["files"]["site"] = array(
 		// "javascript_file.js"
 	);
 	
@@ -75,7 +75,7 @@
 	
 	// Array containing all CSS files to minify; key = name of compiled file
 	// example: $config["css"]["site"] compiles all CSS files into "site.css"
-	$config["css"]["site"] = array( 
+	$config["css"]["files"]["site"] = array( 
 		// "style_sheet.css"
 	);
 	

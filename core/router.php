@@ -7,8 +7,8 @@
 		$js_file = str_replace(".js","",$path[1]);
 		$cfile = $server_root."cache/".$js_file.".js";
 		$last_modified = file_exists($cfile) ? filemtime($cfile) : 0;
-		if (is_array($config["js"][$js_file])) {
-			foreach ($config["js"][$js_file] as $script) {
+		if (is_array($config["js"]["files"][$js_file])) {
+			foreach ($config["js"]["files"][$js_file] as $script) {
 				$m = file_exists($site_root."js/$script") ? filemtime($site_root."js/$script") : 0;
 				if ($m > $mtime) {
 					$mtime = $m;
@@ -18,8 +18,8 @@
 		// If we have a newer Javascript file to include or we haven't cached yet, do it now.
 		if (!file_exists($cfile) || $mtime > $last_modified) {
 			$data = "";
-			if (is_array($config["js"][$js_file])) {
-				foreach ($config["js"][$js_file] as $script) {
+			if (is_array($config["js"]["files"][$js_file])) {
+				foreach ($config["js"]["files"][$js_file] as $script) {
 					$data .= file_get_contents($site_root."js/$script")."\n";
 				}
 			}
@@ -74,8 +74,8 @@
 		$css_file = str_replace(".css","",$path[1]);
 		$cfile = $server_root."cache/".$css_file.".css";
 		$last_modified = file_exists($cfile) ? filemtime($cfile) : 0;
-		if (is_array($config["css"][$css_file])) {
-			foreach ($config["css"][$css_file] as $style) {
+		if (is_array($config["css"]["files"][$css_file])) {
+			foreach ($config["css"]["files"][$css_file] as $style) {
 				$m = (file_exists($site_root."css/$style")) ? filemtime($site_root."css/$style") : 0;
 				if ($m > $mtime) {
 					$mtime = $m;
@@ -85,13 +85,13 @@
 		// If we have a newer CSS file to include or we haven't cached yet, do it now.
 		if (!file_exists($cfile) || $mtime > $last_modified) {
 			$data = "";
-			if (is_array($config["css"][$css_file])) {
+			if (is_array($config["css"]["files"][$css_file])) {
 				// if we need LESS
-				if (strpos(implode(" ", $config["css"][$css_file]), "less") > -1) {
+				if (strpos(implode(" ", $config["css"]["files"][$css_file]), "less") > -1) {
 					require_once($server_root."core/inc/utils/less-compiler.inc.php");
 					$less_compiler = new lessc();
 				}
-				foreach ($config["css"][$css_file] as $style_file) {
+				foreach ($config["css"]["files"][$css_file] as $style_file) {
 					$style = file_get_contents($site_root."css/$style_file");
 					if (strpos($style_file, "less") > -1) {
 						// convert LESS

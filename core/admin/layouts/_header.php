@@ -1,7 +1,7 @@
 <?
 	$mgroups = array();
-	$modulegroups = $admin->getModuleGroups();
-	foreach ($modulegroups as $mg) {
+	$module_groups = $admin->getModuleGroups();
+	foreach ($module_groups as $mg) {
 		if ($mg["in_nav"]) {
 			$modules = $admin->getModulesByGroup($mg["id"]);
 			$children = array();
@@ -97,13 +97,9 @@
 										if ($child["group"]) {
 							?>
 							<li class="grouper"><?=$child["title"]?>
-								<?
-											foreach ($child["children"] as $c) {
-								?>
+								<? foreach ($child["children"] as $c) { ?>
 								<li><a href="<?=$admin_root?><?=$c["link"]?>/"><?=$c["title"]?></a></li>
-								<?
-											}
-								?>
+								<? } ?>
 							</li>
 							<?
 										} else {

@@ -121,69 +121,83 @@
 		$enc_pass = mysql_real_escape_string($phpass->HashPassword($cms_pass));
 		mysql_query("INSERT INTO bigtree_users (`email`,`password`,`name`,`level`) VALUES ('$cms_user','$enc_pass','Developer','2')");
 		
-		function dwrite($dir) {
+		function bt_mkdir_writable($dir) {
 			global $root;
 			mkdir($root.$dir);
 			chmod($root.$dir,0777);
 		}
 		
-		function d($dir) {
-			global $root;
-			mkdir($root.$dir);
-		}
-		
-		function dtouch($file,$contents = "") {
+		function bt_touch_writable($file,$contents = "") {
 			file_put_contents($file,$contents);
 			chmod($file,0777);
 		}
 		
+		function bt_copy_dir($from,$to) {
+			global $root;
+			$d = opendir($root.$from);
+			if (!file_exists($root.$to)) {
+				mkdir($root.$to);
+				chmod($root.$to,0777);
+			}
+			while ($f = readdir($d)) {
+				if ($f != "." && $f != "..") {
+					if (is_dir($root.$from.$f)) {
+						bt_copy_dir($from.$f."/",$to.$f."/");
+					} else {
+						copy($from.$f,$to.$f);
+						chmod($to.$f,0777);
+					}
+				}
+			}
+		}
+		
 		$root = "";
 		
-		dwrite("cache/");
-		dwrite("custom/");
-		dwrite("custom/admin/");
-		dwrite("custom/admin/ajax/");
-		dwrite("custom/admin/css/");
-		dwrite("custom/admin/images/");
-		dwrite("custom/admin/images/modules/");
-		dwrite("custom/admin/images/templates/");
-		dwrite("custom/admin/modules/");
-		dwrite("custom/admin/pages/");
-		dwrite("custom/admin/form-field-types/");
-		dwrite("custom/admin/form-field-types/draw/");
-		dwrite("custom/admin/form-field-types/process/");
-		dwrite("custom/inc/");
-		dwrite("custom/inc/modules/");
-		dwrite("custom/inc/required/");
-		dwrite("site");
-		dwrite("site/css/");
-		dwrite("site/files/");
-		dwrite("site/files/pages/");
-		dwrite("site/files/resources/");
-		dwrite("site/images/");
-		dwrite("site/js/");
-		dwrite("templates");
-		dwrite("templates/ajax/");
-		dwrite("templates/layouts/");
-		dtouch("templates/layouts/_header.php");
-		dtouch("templates/layouts/default.php",'<? include "_header.php" ?>
+		bt_mkdir_writable("cache/");
+		bt_mkdir_writable("custom/");
+		bt_mkdir_writable("custom/admin/");
+		bt_mkdir_writable("custom/admin/ajax/");
+		bt_mkdir_writable("custom/admin/css/");
+		bt_mkdir_writable("custom/admin/images/");
+		bt_mkdir_writable("custom/admin/images/modules/");
+		bt_mkdir_writable("custom/admin/images/templates/");
+		bt_mkdir_writable("custom/admin/modules/");
+		bt_mkdir_writable("custom/admin/pages/");
+		bt_mkdir_writable("custom/admin/form-field-types/");
+		bt_mkdir_writable("custom/admin/form-field-types/draw/");
+		bt_mkdir_writable("custom/admin/form-field-types/process/");
+		bt_mkdir_writable("custom/inc/");
+		bt_mkdir_writable("custom/inc/modules/");
+		bt_mkdir_writable("custom/inc/required/");
+		bt_mkdir_writable("site");
+		bt_mkdir_writable("site/css/");
+		bt_mkdir_writable("site/files/");
+		bt_mkdir_writable("site/files/pages/");
+		bt_mkdir_writable("site/files/resources/");
+		bt_mkdir_writable("site/images/");
+		bt_mkdir_writable("site/js/");
+		bt_mkdir_writable("templates");
+		bt_mkdir_writable("templates/ajax/");
+		bt_mkdir_writable("templates/layouts/");
+		bt_touch_writable("templates/layouts/_header.php");
+		bt_touch_writable("templates/layouts/default.php",'<? include "_header.php" ?>
 <?php echo $content?>
 <? include "_footer.php" ?>');
-		dtouch("templates/layouts/_footer.php");
-		dwrite("templates/routed/");
-		dwrite("templates/basic/");
-		dtouch("templates/basic/_404.php");
-		dtouch("templates/basic/_sitemap.php");
-		dtouch("templates/basic/home.php");
-		dtouch("templates/basic/content.php",'<h1><?php echo $page_header?></h1>
+		bt_touch_writable("templates/layouts/_footer.php");
+		bt_mkdir_writable("templates/routed/");
+		bt_mkdir_writable("templates/basic/");
+		bt_touch_writable("templates/basic/_404.php");
+		bt_touch_writable("templates/basic/_sitemap.php");
+		bt_touch_writable("templates/basic/home.php");
+		bt_touch_writable("templates/basic/content.php",'<h1><?php echo $page_header?></h1>
 <?php echo $page_content?>');
-		dwrite("templates/callouts/");
+		bt_mkdir_writable("templates/callouts/");
 		
-		dtouch("templates/config.php",str_replace($find,$replace,file_get_contents("core/config.example.php")));
+		bt_touch_writable("templates/config.php",str_replace($find,$replace,file_get_contents("core/config.example.php")));
 		
 		
 		// Create site/index.php, site/.htaccess, and .htaccess (masks the 'site' directory)
-		file_put_contents("site/index.php",'<?
+		bt_touch_writable("site/index.php",'<?
 	if (!isset($_GET["bigtree_htaccess_url"])) {
 		$_GET["bigtree_htaccess_url"] = "";
 	}
@@ -236,7 +250,7 @@
 	include "../core/router.php";
 ?>');
 		
-		file_put_contents("site/.htaccess",'<IfModule mod_deflate.c>
+		bt_touch_writable("site/.htaccess",'<IfModule mod_deflate.c>
   # force deflate for mangled headers developer.yahoo.com/blogs/ydn/posts/2010/12/pushing-beyond-gzipping/
   <IfModule mod_setenvif.c>
     <IfModule mod_headers.c>
@@ -302,11 +316,23 @@ RewriteRule .* - [E=HTTP_IF_MODIFIED_SINCE:%{HTTP:If-Modified-Since}]
 php_flag short_open_tag On
 php_flag magic_quotes_gpc Off');
 
-		file_put_contents(".htaccess",'<IfModule mod_rewrite.c>
+		bt_touch_writable(".htaccess",'<IfModule mod_rewrite.c>
   RewriteEngine on
   RewriteRule    ^$    site/    [L]
   RewriteRule    (.*) site/$1    [L]
 </IfModule>');
+		
+		// Install the sample site if they asked for it.
+		if ($install_example_site) {
+			bt_copy_dir("core/example-site/","");
+			$sql_queries = explode("\n",file_get_contents("example-site.sql"));
+			foreach ($sql_queries as $query) {
+				$query = trim($query);
+				if ($query != "") {
+					$q = mysql_query($query);
+				}
+			}
+		}
 
 		$installed = true;
 	}

@@ -226,7 +226,7 @@
 					$value = $item[$key];
 					if ($field["parser"]) {
 						$parsers[$key] = $field["parser"];
-					} elseif ($form["fields"][$key]["type"] == "poplist") {
+					} elseif ($form["fields"][$key]["type"] == "list" && $form["fields"][$key]["list_type"] == "db") {
 						$poplists[$key] = array("description" => $form["fields"][$key]["pop-description"], "table" => $form["fields"][$key]["pop-table"]);
 					}
 				}
@@ -954,7 +954,7 @@
 							$item[$key] = $value;
 						// If we know this field is a populated list, get the title they entered in the form.
 						} else {
-							if ($form["fields"][$key]["type"] == "poplist") {
+							if ($form["fields"][$key]["type"] == "list" && $form["fields"][$key]["list_type"] == "db") {
 								$fdata = $form["fields"][$key];
 								$f = sqlfetch(sqlquery("SELECT `".$fdata["pop-description"]."` FROM `".$fdata["pop-table"]."` WHERE `id` = '".mysql_real_escape_string($value)."'"));
 								$value = $f[$fdata["pop-description"]];

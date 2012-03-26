@@ -77,7 +77,7 @@
 			?>
 			<li id="row_<?=$key?>">
 				<section class="developer_view_title"><span class="icon_sort"></span><input type="text" name="fields[<?=$key?>][title]" value="<?=htmlspecialchars(ucwords(str_replace("_"," ",$f["Field"])))?>" /></section>
-				<section class="developer_view_parser"><input type="text" name="fields[<?=$key?>][parser]" value="" class="parser" /></section>
+				<section class="developer_view_parser"><input type="text" name="fields[<?=$key?>][parser]" value="" class="parser" placeholder="PHP code to transform $value (which contains the column value.)" /></section>
 				<section class="developer_resource_action"><a href="#" class="icon_delete"></a></section>
 			</li>
 			<?	
@@ -132,7 +132,7 @@
 	var current_editing_key;
 	
 	$(".form_table .icon_delete").live("click",function() {
-		new BigTreeDialog("Delete Resource",'<p class="confirm">Are you sure you want to delete this field?</p>',$.proxy(function() {
+		//new BigTreeDialog("Delete Resource",'<p class="confirm">Are you sure you want to delete this field?</p>',$.proxy(function() {
 			tf = $(this).parents("li").find("section").find("input");
 			
 			title = tf.val();
@@ -142,7 +142,7 @@
 			sel = $("#unused_field").get(0);
 			sel.options[sel.options.length] = new Option(key,title,false,false);
 			$(this).parents("li").remove();
-		},this),"delete",false,"OK");
+		//},this),"delete",false,"OK");
 		
 		return false;
 	});
@@ -167,7 +167,7 @@
 		
 		if (title) {
 			li = $('<li id="row_' + key + '">');
-			li.html('<section class="developer_view_title"><span class="icon_sort"></span><input type="text" name="fields[' + key + '][title]" value="' + title + '" /></section><section class="developer_view_parser"><input type="text" class="parser" name="fields[' + key + '][parser]" value="" /></section><section class="developer_resource_action"><a href="#" class="icon_delete"></a></section>');
+			li.html('<section class="developer_view_title"><span class="icon_sort"></span><input type="text" name="fields[' + key + '][title]" value="' + title + '" /></section><section class="developer_view_parser"><input type="text" class="parser" name="fields[' + key + '][parser]" value="" placeholder="PHP code to transform $value (which contains the column value.)"/></section><section class="developer_resource_action"><a href="#" class="icon_delete"></a></section>');
 		
 			un.remove(un.selectedIndex);
 			$("#sort_table").append(li);
@@ -178,7 +178,7 @@
 				title = htmlspecialchars(data.title);
 				
 				li = $('<li id="row_' + key + '">');
-				li.html('<section class="developer_view_title"><span class="icon_sort"></span><input type="text" name="fields[' + key + '][title]" value="' + title + '" /></section><section class="developer_view_parser"><input type="text" class="parser" name="fields[' + key + '][parser]" value="" /></section><section class="developer_resource_action"><a href="#" class="icon_delete"></a></section>');
+				li.html('<section class="developer_view_title"><span class="icon_sort"></span><input type="text" name="fields[' + key + '][title]" value="' + title + '" /></section><section class="developer_view_parser"><input type="text" class="parser" name="fields[' + key + '][parser]" value="" placeholder="PHP code to transform $value (which contains the column value.)" /></section><section class="developer_resource_action"><a href="#" class="icon_delete"></a></section>');
 				$("#sort_table").append(li);
 				_local_hooks();
 			});
