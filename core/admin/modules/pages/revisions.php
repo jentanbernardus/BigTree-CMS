@@ -111,8 +111,14 @@
 	
 	$(".icon_save").click(function() {
 		new BigTreeDialog("Save Revision",'<fieldset><label>Short Description <small>(quick reminder of what\'s special about this revision)</small></label><input type="text" name="description" /></fieldset>',$.proxy(function(d) {
-			$.ajax("<?=$admin_root?>ajax/pages/save-revision/", { type: "POST", data: { id: BigTree.CleanHref($(this).attr("href")), description: d.description }, complete: function() {
-				window.location.reload();
+			// If there's no href it's because it's the currently published copy we're saving.
+			if (BigTree.CleanHref($(this).attr("href"))) {
+				id = BigTree.CleanHref($(this).attr("href"));
+			} else {
+				id = "c<?=$page?>";
+			}
+			$.ajax("<?=$admin_root?>ajax/pages/save-revision/", { type: "POST", data: { id: id, description: d.description }, complete: function() {
+				//window.location.reload();
 			}});
 		},this));
 		

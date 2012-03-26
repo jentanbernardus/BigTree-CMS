@@ -142,7 +142,7 @@
 			<section class="messages_subject"><?=$item["subject"]?></section>
 			<section class="messages_date_time"><?=date("n/j/y",strtotime($item["date"]))?></section>
 			<section class="messages_date_time"><?=date("g:ia",strtotime($item["date"]))?></section>
-			<section class="messages_view"><a href="view/<?=$item["id"]?>/" class="icon_message"></a></section>
+			<section class="messages_view"><a href="<?=$admin_root?>dashboard/messages/view/<?=$item["id"]?>/" class="icon_message"></a></section>
 		</li>
 		<?
 				}

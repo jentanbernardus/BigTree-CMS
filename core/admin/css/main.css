@@ -261,7 +261,7 @@
 	nav.main li li { background: #243D4C; border: none; float: none; }
 	nav.main li li.grouper { color: rgba(255, 255, 255, 0.5); font-size: 10px; margin: 9px 7px 5px; text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.75); text-transform: uppercase; }
 	
-	nav.main li:hover li a { background: #243D4C; border: none; border-radius: 3px; color: #FFF; font-size: 12px; height: 24px; line-height: 24px; margin: 0 0 1px 0; padding: 0 7px; text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.75); }
+	nav.main li:hover li a { background: #243D4C; border: none; border-radius: 3px; color: #FFF; font-size: 12px; height: 24px; line-height: 24px; margin: 0 0 1px 0; max-width: 200px; overflow: hidden; padding: 0 7px; text-overflow: ellipsis; text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.75); white-space: nowrap; }
 	nav.main li li a:hover { background: #406980; box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25); }
 	nav.main form { float: right; }
 	nav.main form input[type=search] { background: #FFF; border: 1px solid #DCDCDC; border-radius: 13px; height: 24px; margin: 5px 0; padding: 0 34px 0 13px; transition: border-color 0.2s; width: 175px; }
@@ -377,7 +377,7 @@
 	.sticky_controls.stuck { height: 44px; overflow: hidden; padding: 0 0 5px 0; position: fixed; top: 0; width: 958px; z-index: 2; }
 	.sticky_controls.stuck .shadow { background: url(../images/top-gradient.png); border-bottom: 1px solid #CCCCCC; box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.5); height: 44px; }
 	
-	.sticky_controls.stuck nav { overflow: hidden; padding: 6px 0 5px 15px; width: 928px; }
+	.sticky_controls.stuck nav { overflow: hidden; padding: 12px 0 0 15px; width: 711px; }
 	.sticky_controls.stuck nav a { border-width: 1px; border-radius: 3px; line-height: 31px }
 
 	.move_page .labels .page_label { padding: 0 0 0 20px; text-align: left; width: 596px; }

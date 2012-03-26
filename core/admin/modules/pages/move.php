@@ -53,7 +53,7 @@
 							<li class="top">
 								<span class="depth"></span>
 								<a class="title expanded<? if ($page["parent"] == 0) { ?> active<? } ?>" href="#0">Top Level</a>
-								<? _local_drawNavLevel(0,2,$ancestors,$page["parent"]) ?>
+								<? _local_drawNavLevel(0,2,$ancestors) ?>
 							</li>
 					</section>
 				</div>

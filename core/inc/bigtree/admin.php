@@ -4434,6 +4434,34 @@
 		}
 		
 		/*
+			Function: saveCurrentPageRevision
+				Saves the currently published page as a revision.
+			
+			Parameters:
+				page - The page id.
+				description - The revision description.
+			
+			Returns:
+				The new revision id.
+		*/
+		
+		function saveCurrentPageRevision($page,$description) {
+			$page = mysql_real_escape_string($page);
+			$description = mysql_real_escape_string($description);
+			
+			// Get the current page.
+			$current = sqlfetch(sqlquery("SELECT * FROM bigtree_pages WHERE id = '$page'"));
+			foreach ($current as $key => $val) {
+				$$key = mysql_real_escape_string($val);
+			}
+			
+			// Copy it to the saved versions
+			sqlquery("INSERT INTO bigtree_page_revisions (`page`,`title`,`meta_keywords`,`meta_description`,`template`,`external`,`new_window`,`resources`,`callouts`,`author`,`updated_at`,`saved`,`saved_description`) VALUES ('$page','$title','$meta_keywords','$meta_description','$template','$external','$new_window','$resources','$callouts','$last_edited_by','$updated_at','on','$description')");
+			
+			return sqlid();
+		}
+		
+		/*
 			Function: search404s
 				Searches 404s, returns results.
 			
@@ -5489,7 +5517,7 @@
 		function updatePageRevision($id,$description) {
 			// Get the version, check if the user has access to the page the version refers to.
 			$revision = $this->getPageRevision($id);
-			$access = $this->getPageAccessLevelByUser($revision["page"]);
+			$access = $this->getPageAccessLevel($revision["page"]);
 			if ($access != "p") {
 				$this->stop("You must be a publisher to manage revisions.");
 			}
