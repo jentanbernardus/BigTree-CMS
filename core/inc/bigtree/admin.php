@@ -1043,14 +1043,14 @@
 				is_image - Whether the resource is an image.
 				height - The image height (if it's an image).
 				width - The image width (if it's an image).
-				thumbnails - An array of thumbnails (if it's an image).
+				thumbs - An array of thumbnails (if it's an image).
 				list_thumb_margin - The margin for the list thumbnail (if it's an image).
 			
 			Returns:
 				The new resource id.
 		*/
 		
-		function createResource($folder,$file,$name,$type,$is_image = "",$height = 0,$width = 0,$thumbnails = array(),$list_thumb_margin = 0) {
+		function createResource($folder,$file,$name,$type,$is_image = "",$height = 0,$width = 0,$thumbs = array(),$list_thumb_margin = 0) {
 			$folder = mysql_real_escape_string($folder);
 			$file = mysql_real_escape_string($file);
 			$name = mysql_real_escape_string(htmlspecialchars($name));
@@ -1058,10 +1058,10 @@
 			$is_image = mysql_real_escape_string($is_image);
 			$height = intval($height);
 			$width = intval($width);
-			$thumbnails = mysql_real_escape_string(json_encode($thumbnails));
+			$thumbs = mysql_real_escape_string(json_encode($thumbs));
 			$list_thumb_margin = intval($list_thumb_margin);
 			
-			sqlquery("INSERT INTO bigtree_resources (`file`,`date`,`name`,`type`,`folder`,`is_image`,`height`,`width`,`thumbnails`,`list_thumb_margin`) VALUES ('$file',NOW(),'$name','$type','$folder','$is_image','$height','$width','$thumbnails','$list_thumb_margin')");	
+			sqlquery("INSERT INTO bigtree_resources (`file`,`date`,`name`,`type`,`folder`,`is_image`,`height`,`width`,`thumbs`,`list_thumb_margin`) VALUES ('$file',NOW(),'$name','$type','$folder','$is_image','$height','$width','$thumbs','$list_thumb_margin')");	
 			return sqlid();
 		}
 		
