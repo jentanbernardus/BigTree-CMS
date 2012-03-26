@@ -5245,7 +5245,8 @@
 			$x = 2;
 			$route = $cms->urlify($name);
 			$oroute = $route;
-			while ($g = $this->getModuleGroupByRoute($route)) {
+			$q = sqlquery("SELECT * FROM bigtree_module_groups WHERE route = '" . mysql_real_escape_string($route) . "'");
+			while ($g = sqlfetch($q)) {
 				if ($g["id"] != $id) {
 					$route = $oroute."-".$x;
 					$x++;
