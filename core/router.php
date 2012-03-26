@@ -37,7 +37,9 @@
 					$data = str_replace('$'.$key,$val,$data);
 				}
 			}
-			$data = JSMin::minify($data);
+			if ($config["js"]["minify"]) {
+				$data = JSMin::minify($data);
+			}
 			file_put_contents($cfile,$data);
 			header("Content-type: text/javascript");
 			die($data);
@@ -63,7 +65,7 @@
 			}
 		}
 	}
-	
+
 	// Handle CSS Shortcuts and Minifying
 	if ($path[0] == "css") {
 		clearstatcache();
@@ -84,22 +86,37 @@
 		if (!file_exists($cfile) || $mtime > $last_modified) {
 			$data = "";
 			if (is_array($config["css"][$css_file])) {
-				foreach ($config["css"][$css_file] as $style) {
-					$data .= file_get_contents($site_root."css/$style")."\n";
+				// if we need LESS
+				if (strpos(implode(" ", $config["css"][$css_file]), "less") > -1) {
+					require_once($server_root."core/inc/utils/less-compiler.inc.php");
+					$less_compiler = new lessc();
+				}
+				foreach ($config["css"][$css_file] as $style_file) {
+					$style = file_get_contents($site_root."css/$style_file");
+					if (strpos($style_file, "less") > -1) {
+						// convert LESS
+						$style = $less_compiler->parse($style);
+					} else {
+						// normal CSS
+						if ($config["css"]["prefix"]) {
+							// Replace CSS3 easymode
+							$style = BigTree::formatCSS3($style);
+						}
+					}
+					$data .= $style."\n";
 				}
 			}
+			// Should only loop once, not with every file
 			if (is_array($config["css"]["vars"])) {
 				foreach ($config["css"]["vars"] as $key => $val) {
 					$data = str_replace('$'.$key,$val,$data);
 				}
 			}
-			// Replace CSS3 easymode and Minify
-			$data = BigTree::formatCSS3($data);
-			
-			require_once($server_root."core/inc/utils/less-compiler.inc.php");
-			$less = new lessc();
-			$data = $less->parse($data);
-			
+			if ($config["css"]["minify"]) {
+				require_once($server_root."core/inc/utils/CSSMin.php");			
+				$minifier = new CSSMin;
+				$data = $minifier->run($data);
+			}	
 			file_put_contents($cfile,$data);
 			header("Content-type: text/css");
 			die($data);

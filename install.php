@@ -326,18 +326,43 @@ php_flag magic_quotes_gpc Off');
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 		<title>Install BigTree</title>
+		<?php if ($installed) { ?>
+		<link rel="stylesheet" href="admin/css/install.css" type="text/css" media="all" />
+		<script type="text/javascript" src="admin/js/lib.js"></script>
+		<script type="text/javascript" src="admin/js/install.js"></script>
+		<?php } else { ?>
 		<link rel="stylesheet" href="core/admin/css/install.css" type="text/css" media="all" />
 		<script type="text/javascript" src="core/admin/js/lib.js"></script>
 		<script type="text/javascript" src="core/admin/js/install.js"></script>
+		<?php } ?>
 	</head>
 	<body class="install">
 		<div class="install_wrapper">
 			<?php if ($installed) { ?>
 			<h1>BigTree Installed</h1>
 			<form method="post" action="" class="module">
+				<h2 class="getting_started"><span></span>Installation Complete</h2>
 				<fieldset class="clear">
-					<p>Thanks for using BigTree CMS. The installation was successful. <a href="admin/">Ready to hit the admin?</a></p><br /><br />
+					<p>Your new BigTree site is ready to go! Login to the CMS using your newly created account.</p>
 				</fieldset>
+				
+				<hr />
+				
+				<h2>Public Site</h2>
+				<fieldset class="clear">
+					<p><small>URL</small><a href="<?php echo $www_root; ?>"><?php echo $www_root; ?></a></p>
+				</fieldset>
+				<br /><br />
+				<h2>Administration Area</h2>
+				<fieldset class="clear">
+					<p>
+						<small>URL</small><a href="<?php echo $www_root."admin/"; ?>"><?php echo $www_root."admin/"; ?></a><br />
+						<small>EMAIL</small><?php echo $cms_user; ?><br />
+						<small>PASSWORD</small><?php for ($i = 0, $count = strlen($cms_pass); $i < $count; $i++) { echo "*"; } ?><br />
+					</p>
+				</fieldset>
+				
+				<br class="clear" /><br />
 			</form>
 			<?php } else { ?>
 			<h1>Install BigTree</h1>

@@ -8,16 +8,20 @@
 		<h2>Module Groups</h2>
 	</summary>
 	<header>
-		<span class="developer_templates_name">Group Name</span>
+		<span class="developer_templates_name" style="width: 704px;">Group Name</span>
+		<span class="developer_templates_name" style="width: 100px;">In Dropdown</span>
 		<span class="view_action">Edit</span>
 		<span class="view_action">Delete</span>
 	</header>
 	<ul id="groups">
 		<? foreach ($groups as $item) { ?>
 		<li id="row_<?=$item["id"]?>">
-			<section class="developer_templates_name">
+			<section class="developer_templates_name" style="width: 704px;">
 				<span class="icon_sort"></span>
 				<?=$item["name"]?>
+			</section>
+			<section class="developer_templates_name" style="width: 100px;">
+				<? if ($item["in_nav"] == "on") { echo 'Yes'; } else { echo 'No'; } ?>
 			</section>
 			<section class="view_action">
 				<a href="<?=$section_root?>edit/<?=$item["id"]?>/" class="icon_edit"></a>

@@ -40,12 +40,14 @@
 				
 				// Find the available thumbnails for this image if we're dropping it in a WYSIWYG area.
 				$available_thumbs = array();
-				foreach ($thumbs as $tk => $tu) {
-					if (substr($tk,0,17) != "bigtree_internal_") {
-						$available_thumbs[] = array(
-							"name" => $tk,
-							"file" => $tu
-						);
+				if (count($thumbs) > 0) {
+					foreach ($thumbs as $tk => $tu) {
+						if (substr($tk,0,17) != "bigtree_internal_") {
+							$available_thumbs[] = array(
+								"name" => $tk,
+								"file" => $tu
+							);
+						}
 					}
 				}
 				

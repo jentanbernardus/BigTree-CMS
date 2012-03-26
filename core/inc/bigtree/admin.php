@@ -783,7 +783,7 @@
 				The id of the newly created group.
 		*/
 		
-		function createModuleGroup($name,$package = 0) {
+		function createModuleGroup($name,$in_nav,$package = 0) {
 			global $cms;
 			
 			$name = mysql_real_escape_string($name);
@@ -801,7 +801,7 @@
 			// Just to be safe
 			$route = mysql_real_escape_string($route);
 			
-			sqlquery("INSERT INTO bigtree_module_groups (`name`,`route`,`package`) VALUES ('$name','$route','$package')");
+			sqlquery("INSERT INTO bigtree_module_groups (`name`,`route`,`in_nav`,`package`) VALUES ('$name','$route','$in_nav','$package')");
 			return sqlid();
 		}
 		
@@ -1043,14 +1043,14 @@
 				is_image - Whether the resource is an image.
 				height - The image height (if it's an image).
 				width - The image width (if it's an image).
-				thumbnails - An array of thumbnails (if it's an image).
+				thumbs - An array of thumbnails (if it's an image).
 				list_thumb_margin - The margin for the list thumbnail (if it's an image).
 			
 			Returns:
 				The new resource id.
 		*/
 		
-		function createResource($folder,$file,$name,$type,$is_image = "",$height = 0,$width = 0,$thumbnails = array(),$list_thumb_margin = 0) {
+		function createResource($folder,$file,$name,$type,$is_image = "",$height = 0,$width = 0,$thumbs = array(),$list_thumb_margin = 0) {
 			$folder = mysql_real_escape_string($folder);
 			$file = mysql_real_escape_string($file);
 			$name = mysql_real_escape_string(htmlspecialchars($name));
@@ -1058,10 +1058,10 @@
 			$is_image = mysql_real_escape_string($is_image);
 			$height = intval($height);
 			$width = intval($width);
-			$thumbnails = mysql_real_escape_string(json_encode($thumbnails));
+			$thumbs = mysql_real_escape_string(json_encode($thumbs));
 			$list_thumb_margin = intval($list_thumb_margin);
 			
-			sqlquery("INSERT INTO bigtree_resources (`file`,`date`,`name`,`type`,`folder`,`is_image`,`height`,`width`,`thumbnails`,`list_thumb_margin`) VALUES ('$file',NOW(),'$name','$type','$folder','$is_image','$height','$width','$thumbnails','$list_thumb_margin')");	
+			sqlquery("INSERT INTO bigtree_resources (`file`,`date`,`name`,`type`,`folder`,`is_image`,`height`,`width`,`thumbs`,`list_thumb_margin`) VALUES ('$file',NOW(),'$name','$type','$folder','$is_image','$height','$width','$thumbs','$list_thumb_margin')");	
 			return sqlid();
 		}
 		
@@ -5235,7 +5235,7 @@
 				name - The name of the module group.
 		*/
 		
-		function updateModuleGroup($id,$name) {
+		function updateModuleGroup($id,$name,$in_nav) {
 			global $cms;
 			
 			$id = mysql_real_escape_string($id);
@@ -5245,7 +5245,8 @@
 			$x = 2;
 			$route = $cms->urlify($name);
 			$oroute = $route;
-			while ($g = $this->getModuleGroupByRoute($route)) {
+			$q = sqlquery("SELECT * FROM bigtree_module_groups WHERE route = '" . mysql_real_escape_string($route) . "'");
+			while ($g = sqlfetch($q)) {
 				if ($g["id"] != $id) {
 					$route = $oroute."-".$x;
 					$x++;
@@ -5255,7 +5256,7 @@
 			// Just to be safe
 			$route = mysql_real_escape_string($route);
 			
-			sqlquery("UPDATE bigtree_module_groups SET name = '$name', route = '$route' WHERE id = '$id'");
+			sqlquery("UPDATE bigtree_module_groups SET name = '$name', route = '$route', in_nav = '$in_nav' WHERE id = '$id'");
 		}
 		
 		/*

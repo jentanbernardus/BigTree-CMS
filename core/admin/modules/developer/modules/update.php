@@ -4,7 +4,7 @@
 	$id = end($path);
 
 	if ($group_new) {
-		$group = $admin->createModuleGroup($group_new);
+		$group = $admin->createModuleGroup($group_new,"on");
 	} else {
 		$group = $group_existing;
 	}

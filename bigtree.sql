@@ -29,7 +29,7 @@ DROP TABLE IF EXISTS `bigtree_module_forms`;
 CREATE TABLE `bigtree_module_forms` ( `id` int(11) NOT NULL AUTO_INCREMENT, `title` varchar(255) NOT NULL, `javascript` varchar(255) NOT NULL, `css` varchar(255) NOT NULL, `callback` varchar(255) NOT NULL, `table` varchar(255) NOT NULL, `fields` text NOT NULL, `positioning` text NOT NULL, `default_position` varchar(255) NOT NULL, PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 DROP TABLE IF EXISTS `bigtree_module_groups`;
-CREATE TABLE `bigtree_module_groups` ( `id` int(11) NOT NULL AUTO_INCREMENT, `name` varchar(255) NOT NULL, `route` varchar(255) NOT NULL, `position` int(11) NOT NULL DEFAULT '0', `package` int(11) NOT NULL, PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+CREATE TABLE `bigtree_module_groups` ( `id` int(11) NOT NULL AUTO_INCREMENT, `name` varchar(255) NOT NULL, `route` varchar(255) NOT NULL, `in_nav` char(2) NOT NULL, `position` int(11) NOT NULL DEFAULT '0', `package` int(11) NOT NULL, PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 DROP TABLE IF EXISTS `bigtree_module_packages`;
 CREATE TABLE `bigtree_module_packages` ( `id` int(11) NOT NULL AUTO_INCREMENT, `foundry_id` int(11) NOT NULL, `author` varchar(255) NOT NULL, `name` varchar(255) NOT NULL, `primary_version` int(11) NOT NULL, `secondary_version` int(11) NOT NULL, `tertiary_version` int(11) NOT NULL, `description` text NOT NULL, `release_notes` text NOT NULL, `details` text NOT NULL, `group_id` int(11) NOT NULL, `module_id` int(11) NOT NULL, `tables` text NOT NULL, `files` text NOT NULL, `downloaded` char(2) NOT NULL, `private` char(2) NOT NULL, `last_updated` datetime NOT NULL, PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
