@@ -1,6 +1,6 @@
 <?
 	// BigTree Version
-	$GLOBALS["bigtree"]["version"] = "4.0";		
+	$GLOBALS["bigtree"]["version"] = "4.0b1";		
 	$GLOBALS["wiki"] = "http://wiki.bigtreecms.com/index.php/";
 	
 	// If they're requesting images, css, or js, just give it to them.
