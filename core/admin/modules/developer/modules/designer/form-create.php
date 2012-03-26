@@ -20,8 +20,11 @@
 			"type" => $t
 		);
 		$options = json_decode($_POST["options"][$key],true);
-		foreach ($options as $k => $o)
-			$field[$k] = $o;
+		if (is_array($options)) {
+			foreach ($options as $k => $o) {
+				$field[$k] = $o;
+			}
+		}
 		
 		$x = 2;
 		$field_name = str_replace("-","_",$cms->urlify($ft));
