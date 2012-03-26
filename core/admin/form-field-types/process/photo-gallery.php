@@ -37,7 +37,8 @@
 				$resource = mysql_real_escape_string($d["existing"]);
 				
 				$r = $admin->getResourceByFile($resource);
-				$pinfo = BigTree::pathInfo($r["file"]);					
+				$r["file"] = str_replace(array("{wwwroot}",$www_root),$site_root,$r["file"]);
+				$pinfo = BigTree::pathInfo($r["file"]);
 				
 				// We're going to need to create a local copy if we need more 
 				if ((is_array($options["crops"]) && count($options["crops"])) || (is_array($options["thumbs"]) && count($options["thumbs"]))) {

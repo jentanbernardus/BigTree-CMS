@@ -44,6 +44,7 @@
 					$resource = mysql_real_escape_string(str_replace($www_root,"{wwwroot}",substr($value,11)));
 					
 					$r = $admin->getResourceByFile($resource);
+					$r["file"] = str_replace(array("{wwwroot}",$www_root),$site_root,$r["file"]);
 					$pinfo = BigTree::pathInfo($r["file"]);					
 					
 					// We're going to need to create a local copy if we need more 
