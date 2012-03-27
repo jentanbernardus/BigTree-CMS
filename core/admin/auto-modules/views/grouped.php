@@ -24,4 +24,6 @@
 		});
 		<? } ?>
 	}
+	
+	_local_refreshSort();
 </script>
