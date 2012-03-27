@@ -1,5 +1,4 @@
 <?
-	
 	$breadcrumb[] = array("link" => $mroot . "activity/", "title" => "Recent Activity");
 	
 	if ($btxTwitterAPI->active_username) {

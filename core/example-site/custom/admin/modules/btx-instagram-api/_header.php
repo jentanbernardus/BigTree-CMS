@@ -1,6 +1,5 @@
 <?
-	
-	include "../custom/inc/modules/btx-instagram-api.php";
+	include BigTree::path("inc/modules/btx-instagram-api.php");
 	
 	$mroot = $admin_root . "btx-instagram-api/";
 	
@@ -33,7 +32,6 @@
 			"route" => ""
 		)
 	);
-	
 ?>
 <style>
 	h1 span.instagram { background: url(<?=$admin_root?>images/modules/btx-instagram-api-icon.png) no-repeat center; height: 30px; margin: 1px 8px 0 0; width: 30px; }

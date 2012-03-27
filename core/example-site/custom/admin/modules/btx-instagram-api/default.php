@@ -4,11 +4,11 @@
 ?>
 <div class="form_container" id="instagram_api">
 	<section>
-		<? if (!$btxInstagramAPI->client_id) { ?>
+			<? if (!$btxInstagramAPI->client_id) { ?>
 			<h2>
 				You still need to set a Client ID. <a href="<?=$mroot?>client-id/" class="button" style="float: right; margin-top: -6px;">Set Client ID</a> 
 			</h2>
-		<? } else { ?>
+			<? } else { ?>
 			<h2>
 				Client ID: <strong><?=$btxInstagramAPI->client_id?></strong> 
 				
@@ -26,6 +26,6 @@
 			
 			<p>Search for something by tag:</p>
 			<pre>$btxInstagramAPI->search("tag");</pre>
-		<? } ?>
+			<? } ?>
 	</section>
 </div>

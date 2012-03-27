@@ -1,12 +1,10 @@
 <?
-	
 	if (class_exists("BTXWikipediaAPI")) {
 		$btxInstagramAPI = new BTXInstagramAPI;
 		$instagramImages = $btxInstagramAPI->searchTag($currentWonder["title"], 20);
 		$instagramCount = floor(count($instagramImages["data"]) / 4) * 4;
 		$instagramImages = array_slice($instagramImages["data"], 0, $instagramCount);
 	}
-	
 ?>
 <div class="inner">
 	<figure class="grid_8 large">

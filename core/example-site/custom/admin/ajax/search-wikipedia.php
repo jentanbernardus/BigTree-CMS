@@ -1,9 +1,7 @@
-<?
-	
+<?	
 	if ($_GET["q"] != "") {
 		$wikiAPI = new BTXWikipediaAPI;
 		$results = $wikiAPI->search($_GET["q"]);
-		//print_r($results);
 		if (count($results[1]) && is_array($results[1])) {
 			echo '<ul>';
 			foreach ($results[1] as $item) {
@@ -14,5 +12,4 @@
 			echo '<p>[No Results]</p>';
 		}
 	}
-	
 ?>

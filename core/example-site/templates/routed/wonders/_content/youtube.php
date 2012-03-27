@@ -1,10 +1,8 @@
 <?
-	
 	if (class_exists("BTXYouTubeAPI")) {
 		$btxYouTubeAPI = new BTXYouTubeAPI;
 		$youTubeVideos = $btxYouTubeAPI->search($currentWonder["title"], 3);
 	}
-	
 ?>
 <div class="grid_12 contain center">
 	<h3>The Visions</h3>

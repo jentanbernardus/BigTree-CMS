@@ -1,5 +1,4 @@
 <?
-	
 	/* BASIC NAV RECURSION */
 	function recurseNav($nav, $mypage = "", $isSitemap = false) {
 		global $config, $www_root;
@@ -131,7 +130,7 @@
 		$cache_file = $server_root . "cache/custom/google-maps-" . md5($location);
 		$cache_age = file_exists($cache_file) ? filemtime($cache_file) : 0;
 		
-		if ($cache_age === false || $cache_age < (time() - (60 * 60 * 24))) { // 24 hrs
+		if ($cache_age === false || $cache_age < (time() - (60 * 60 * 24))) {
 			$return = array();
 			$file = utf8_encode(file_get_contents("http://maps.google.com/maps/geo?q=$location&output=xml"));
 			$xml = new SimpleXMLElement($file);
@@ -151,5 +150,4 @@
 		$no_process = true;
 		return $return;
 	}
-	
 ?>

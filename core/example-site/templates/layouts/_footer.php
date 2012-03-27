@@ -1,5 +1,4 @@
 <?
-	
 	$footerAddress = $cms->getSetting("footer-address");
 	$footerSocial = $cms->getSetting("footer-social-links");
 	$aboutMe = $cms->getPage(3);
@@ -9,7 +8,6 @@
 	$end = strpos($footerAddress, "</span>");
 	$geoAddress = substr($footerAddress, $start, ($end - $start));
 	$geoAddress = geocodeAddress($geoAddress);
-	
 ?>
 		<footer id="footer">
 			<div class="container_12 contain">

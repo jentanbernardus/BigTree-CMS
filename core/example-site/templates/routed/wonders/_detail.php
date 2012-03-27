@@ -1,7 +1,5 @@
 <?
-	
 	$introImage = BigTree::prefixFile($currentWonder["image"], "lrg_");
-	
 ?>
 <header class="intro">
 	<div class="container_12">

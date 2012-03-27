@@ -1,5 +1,4 @@
 <?
-	
 	$layout = "wonders";
 	
 	if ($commands[0] != "") {
@@ -9,5 +8,4 @@
 		$wonders = $wondersMod->getAll("date DESC");
 		include "_list.php";
 	}
-	
 ?>

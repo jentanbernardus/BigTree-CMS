@@ -1,5 +1,4 @@
 <?
-	
 	$breadcrumb[] = array("link" => $mroot . "active-username/", "title" => "Active Username");
 	
 	if (end($commands) == "save" && isset($_POST["twitter_api_active_username"])) {

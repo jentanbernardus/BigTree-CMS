@@ -1,5 +1,4 @@
 <?
-	
 	if (class_exists("BTXTwitterAPI")) {
 		$twitterAPI = new BTXTwitterAPI;
 		$twitterTimeline = $twitterAPI->search($currentWonder["title"]);
@@ -8,7 +7,6 @@
 	} else {
 		$twitterTimeline = false;
 	}
-	
 ?>
 <div class="grid_3 info">
 	<h4>The Sounds</h4>

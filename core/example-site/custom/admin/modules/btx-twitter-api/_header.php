@@ -1,6 +1,5 @@
-<?
-	
-	include "../custom/inc/modules/btx-twitter-api.php";
+<?	
+	include BigTree::path("inc/modules/btx-twitter-api.php");
 	
 	$mroot = $admin_root . "btx-twitter-api/";
 	
@@ -38,7 +37,6 @@
 			"route" => "activity"
 		)
 	);
-	
 ?>
 <style>
 	h1 span.twitter { background: url(<?=$admin_root?>images/modules/btx-twitter-api-icon.png) no-repeat center; height: 30px; margin: 1px 8px 0 0; width: 30px; }

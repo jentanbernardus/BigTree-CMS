@@ -1,18 +1,8 @@
 <?
-/*
-	Cachable Module; Simple text based caching of cURLed data 
-		
-		Copyright (c) 2012 Ben Plum, MIT license
-		http://www.benjaminplum.com
-		
-		$this->version
-		$this->debug
-		$this->cache_root
-		$this->cache_base
-		$this->cache_prefix
-		$this->max_cache_age
-		$this->curl_options
-*/
+	/*
+		Class: BTXCacheableModule
+			Cachable Module; Simple text based cacheing of cURLed data 
+	*/
 	
 	class BTXCachableModule extends BigTreeModule {
 		
@@ -20,7 +10,8 @@
 		var $curl_options = array();
 		
 		/*
-			Construct
+			Constructor
+				Setting $debug to true forces through cache.
 		*/
 		public function __construct($debug = false) {
 			global $server_root;
@@ -31,18 +22,21 @@
 			
 			if (!is_dir($this->cache_root)) {
 				mkdir($this->cache_root);
+				chmod($this->cache_root,0777);
 			}
 		}
 		
 		/*
-			Return cache filetime; "0" if file does nto exist
+			Function: cacheAge
+				Return cache filetime; "0" if file does not exist
 		*/
 		public function cacheAge($file) {
 			return file_exists($file) ? filemtime($file) : 0;
 		}
 		
 		/*
-			cURL w/ Caching; allows for custom formatter (must be class method)
+			Function: cacheCurl
+				cURL w/ Caching; allows for custom formatter (must be class method)
 		*/
 		public function cacheCurl($curl_url, $cache_file, $formatter = false, $is_xml = false) {
 			$cache_age = $this->cacheAge($cache_file);
@@ -68,7 +62,8 @@
 		}
 		
 		/*
-			Clear cahced files; empty filename clears all
+			Function: clearCache
+				Clear cahced files; empty filename clears all
 		*/
 		public function clearCache($cache_file = false) {
 			if ($cache_file === false) {
@@ -81,10 +76,11 @@
 			} else {
 				unlink($this->cache_root . $cache_file);
 			}
-	    }
+		}
 		
 		/*
-			Convert ugly objects to simple arrays; keys to lowercase
+			Function: xmlToArray
+				Convert ugly objects to simple arrays; keys to lowercase
 		*/ 
 		private function xmlToArray($xml, $root = true) {
 			if (!is_object($xml)) {
@@ -109,7 +105,6 @@
 					$data = array(
 						'attributes' => array(),
 						'value' => (count($node) > 0) ? $this->xmlToArray($node, false) : (string)$node
-						// 'value' => (string)$node (old code)
 					);
 		 			
 					foreach ($attributes as $attr => $value) {
@@ -139,5 +134,4 @@
 			}
 		}
 	}
-	
 ?>

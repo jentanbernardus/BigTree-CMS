@@ -1,21 +1,20 @@
 <?
-	
 	$site = $cms->getPage(0, false);
 	
 	$site_title = $site["title"];
 	$page_title = ($page["title"] != $site_title) ? $page["title"] : false;
 	$top = $cms->getToplevelNavigationId($page["id"]);
 	$nav = $cms->getNavByParent(0, 2);
-	
-?><!DOCTYPE html>
+?>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=7" /> <!-- FORCE IE 7 -->
 		<meta name="keywords" content="" />
 		<meta name="description" content="" />
-    			
-		<title><? if($local_title) echo $local_title . ' &middot; '; ?><? if($page_title) echo $page_title . ' &middot; '; ?><?=$site_title?></title>
+				
+		<title><? if ($local_title) { echo $local_title . ' &middot; '; } ?><? if ($page_title) { echo $page_title . ' &middot; '; } ?><?=$site_title?></title>
 		
 		<link rel="shortcut icon" href="<?=$www_root?>favicon.ico" type="image/x-icon" />
 

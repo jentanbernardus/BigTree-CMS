@@ -7,19 +7,6 @@
 	<div class="container_12 contain">
 		<?
 			$current = array_shift($wonders);
-			//$image = BigTree::prefixFile($wonder["image"], "lrg_");
-		?>
-<!--
-		<article class="current_wonder">
-			<div class="grid_9">
-				<img src="<?=$image?>" alt="<?=$wonder["title"]?>" />
-			</div>
-			<div class="grid_3">
-				<h2><a href="<?=$wonderLink?><?=$wonder["route"]?>/"><?=$wonder["title"]?></a></h2>
-			</div>
-		</article>
--->
-		<?
 			foreach ($wonders as $wonder) {
 				$image = BigTree::prefixFile($wonder["image"], "lrg_");
 		?>

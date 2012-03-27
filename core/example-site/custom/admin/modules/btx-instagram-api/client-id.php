@@ -1,5 +1,4 @@
 <?
-	
 	$breadcrumb[] = array("link" => $mroot . "client-id/", "title" => "Client ID");
 	
 	if (end($commands) == "save" && isset($_POST["instagram_client_id"])) {

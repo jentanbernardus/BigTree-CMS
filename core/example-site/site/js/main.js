@@ -212,13 +212,13 @@ if (window.console === undefined) { window.console = { log: function() {}, error
 		//Push Custom Google Analytics Events
 		captureAction: function(category, action, label) {
 			Utils.log("GA ACTION: " + category + ", " + action + ", " + label);
-			if(typeof _gaq == undefined) _gaq = [];
+			if (typeof _gaq == undefined) _gaq = [];
 			_gaq.push(['_trackEvent', category, action, label]);
 		},
 		capturePage: function(url) {
 			Utils.log("GA PAGEVIEW: " + url);
-			if(typeof _gaq == undefined) _gaq = [];
-			if(!isAndroid && !isBlackBerry && !isIOS)
+			if (typeof _gaq == undefined) _gaq = [];
+			if (!isAndroid && !isBlackBerry && !isIOS)
 			{
 				_gaq.push(['_trackPageview', url]);
 			}
@@ -229,7 +229,7 @@ if (window.console === undefined) { window.console = { log: function() {}, error
 	var Cookies = {
 		create: function(name, value, days) {
 			var expires = "";
-			if(days) {
+			if (days) {
 				var date = new Date();
 				date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
 				expires = "; expires=" + date.toGMTString();

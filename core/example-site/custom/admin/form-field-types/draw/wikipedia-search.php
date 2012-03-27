@@ -41,7 +41,7 @@
 	#wiki_results ul li a:hover { color: #578FB1; }
 	#wiki_results ul li a.active { color: #222; }
 </style>
-<script>
+<script type="text/javascript">
 	function doWikiSearch(e) {
 		e.preventDefault();
 		e.stopPropagation();
@@ -55,12 +55,14 @@
 			}
 		});
 	}
+	
 	function clearWikiSearch(e) {
 		e.preventDefault();
 		e.stopPropagation();
 		
 		$("#wiki_results").html("");
 	}
+	
 	function setWikiArticle(e) {
 		e.preventDefault();
 		e.stopPropagation();
@@ -80,6 +82,7 @@
 		
 		$("#wiki_preview").html('<strong>' + title + '</strong><br /><a href="' + url + '" target="_blank">' + url + '</a>');
 	}
+	
 	$(document).ready(function() {
 		$("#do_wiki_search").on("click", doWikiSearch);
 		$("#clear_wiki_results").on("click", clearWikiSearch);

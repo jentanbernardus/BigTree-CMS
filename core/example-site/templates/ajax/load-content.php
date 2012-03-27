@@ -1,5 +1,4 @@
 <?
-	
 	include "../templates/routed/wonders/_header.php";
 	
 	$type = $_GET["type"];
@@ -19,5 +18,4 @@
 	if ($type == "youtube") {
 		include "../templates/routed/wonders/_content/youtube.php";
 	}
-	
 ?>

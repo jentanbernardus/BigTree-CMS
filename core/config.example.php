@@ -67,7 +67,7 @@
 	// example: "variable_name" => "Variable Value" will replace all instances of $variable_name with 'Variable Value'
 	$config["js"]["vars"] = array(
 		// "variable_name" => "Variable Value"
-	)
+	);
 	
 	// Flag for JS minification 
 	$config["js"]["minify"] = false; 
@@ -83,7 +83,7 @@
 	// example: "variable_name" => "Variable Value" will replace all instances of $variable_name with 'Variable Value'
 	$config["css"]["vars"] = array(
 		// "variable_name" => "Variable Value"
-	)
+	);
 	
 	// Flag for BigTree CSS3 parsing - automatic vendor prefixing for standard CSS3 
 	$config["css"]["prefix"] = false;

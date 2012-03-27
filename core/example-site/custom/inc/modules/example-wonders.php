@@ -5,7 +5,7 @@
 		var $Module = "1";
 		
 		function getCurrent() {
-			return $this->get(sqlfetch(sqlquery("SELECT * FROM {$this->Table} WHERE date <= NOW() ORDER BY date DESC LIMIT 1")));
+			return $this->get(sqlfetch(sqlquery("SELECT * FROM example_wonders WHERE date <= NOW() ORDER BY date DESC LIMIT 1")));
 		}
 	}
 ?>

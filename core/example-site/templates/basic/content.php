@@ -1,5 +1,5 @@
 <header class="grid_12">
-	<h1><? echo $page_header?></h1>
+	<h1><?=$page_header?></h1>
 	<hr class="short" />
 </header>
 <nav class="grid_3 subnav">
