@@ -150,6 +150,8 @@
 			perc = 108 / w;
 			h = perc * h;
 			style = { margin: Math.floor((108 - h) / 2) + "px 0 0 0" };
+		} else {
+			style = { margin: "0px" };
 		}
 		
 		$(this).css(style);
