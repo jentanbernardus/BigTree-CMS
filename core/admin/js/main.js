@@ -484,7 +484,8 @@ var BigTreeFileInput = Class.extend({
 	},
 	
 	checkInput: function() {
-		this.Container.find(".data").html(this.Element.val());
+		pinfo = basename(this.Element.val());
+		this.Container.find(".data").html(pinfo);
 	},
 	
 	destroy: function() {
