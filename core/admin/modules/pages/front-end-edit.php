@@ -1,7 +1,6 @@
 <?
 	$page = end($path);
 	
-	
 	// Check for a page lock
 	$lock = $admin->lockCheck("bigtree_pages",$page,"admin/modules/pages/front-end-locked.php",$_GET["force"],false);
 	
@@ -57,7 +56,7 @@
 	<body>
 		<div id="bigtree_dialog_window" class="front_end_editor">
 			<h2>Edit Page Content</h2>
-			<form id="bigtree_dialog_form" method="post" action="<?=$admin_root?>pages/front-end-update/<?=$page["id"]?>/" enctype="multipart/form-data">
+			<form id="bigtree_dialog_form" method="post" action="<?=$admin_root?>pages/front-end-update/<?=$page?>/" enctype="multipart/form-data">
 				<div class="overflow">
 					<p class="error_message" style="display: none;">Errors found! Please fix the highlighted fields before submitting.</p>
 					<?

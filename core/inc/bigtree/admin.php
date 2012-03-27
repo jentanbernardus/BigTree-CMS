@@ -4994,7 +4994,7 @@
 				$file = $GLOBALS["server_root"]."cache/".base64_encode(str_replace($GLOBALS["www_root"],"",$cms->getLink($page)));		
 			}
 			if (file_exists($file)) {
-				unlink($file);
+				@unlink($file);
 			}
 		}
 		
@@ -5377,6 +5377,8 @@
 					}
 				}
 			}
+			$in_nav = mysql_real_escape_string($data["in_nav"]);
+			$redirect_lower = mysql_real_escape_string($data["redirect_lower"]);
 
 			// Make an ipl:// or {wwwroot}'d version of the URL
 			if ($external) {

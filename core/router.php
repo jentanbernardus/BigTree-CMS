@@ -419,7 +419,7 @@
 		}
 	}
 	
-	if ($page["id"] && $_SESSION["bigtree"]["id"] && !$cms->Secure) {
+	if (isset($page) && $_SESSION["bigtree"]["id"] && !$cms->Secure) {
 		$show_bar_default = $_COOKIE["hide_bigtree_bar"] ? "false" : "true";
 		$show_preview_bar = "false";
 		$return_link = "";
