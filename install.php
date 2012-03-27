@@ -334,11 +334,14 @@ php_flag magic_quotes_gpc Off');
 			}
 			
 			// Update the config a little bit.
-			$config_data = file_get_contents("templates/config.php");
+			// MAKE SURE WE GET ALL THE USER'S VARS
+			$config_data = str_replace($find,$replace,file_get_contents("templates/config.php")); 
+/*
 			$config_data = str_replace('// "javascript_file.js"','"jquery-1.7.1.min.js",
 		"main.js"',$config_data);
 			$config_data = str_replace('// "style_sheet.css"','"grid.css",
 		"master.css"',$config_data);
+*/
 			file_put_contents("templates/config.php",$config_data);
 		}
 
