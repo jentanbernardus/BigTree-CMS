@@ -5377,6 +5377,8 @@
 					}
 				}
 			}
+			$in_nav = mysql_real_escape_string($data["in_nav"]);
+			$redirect_lower = mysql_real_escape_string($data["redirect_lower"]);
 
 			// Make an ipl:// or {wwwroot}'d version of the URL
 			if ($external) {
