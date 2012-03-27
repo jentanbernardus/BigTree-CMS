@@ -4,7 +4,7 @@
 			Cachable Module; Simple text based cacheing of cURLed data 
 	*/
 	
-	class BTXCachableModule extends BigTreeModule {
+	class BTXCacheableModule extends BigTreeModule {
 		
 		var $version = "0.1";
 		var $curl_options = array();
