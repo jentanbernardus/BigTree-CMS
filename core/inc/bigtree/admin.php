@@ -4994,7 +4994,7 @@
 				$file = $GLOBALS["server_root"]."cache/".base64_encode(str_replace($GLOBALS["www_root"],"",$cms->getLink($page)));		
 			}
 			if (file_exists($file)) {
-				unlink($file);
+				@unlink($file);
 			}
 		}
 		
