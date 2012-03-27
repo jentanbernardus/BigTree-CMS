@@ -98,7 +98,6 @@ $(document).ready(function() {
 	
 	$(".save_and_preview").click(function() {
 		sform = $(this).parents("form");
-		sform.attr("target","_blank");
 		sform.attr("action","admin_root/pages/update/preview/");
 		sform.submit();
 		
