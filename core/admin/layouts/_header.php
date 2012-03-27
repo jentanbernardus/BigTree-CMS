@@ -21,12 +21,7 @@
 		)),
 		array("link" => "pages", "title" => "Pages", "access" => 0),
 		array("link" => "modules", "title" => "Modules", "access" => 0, "children" => $mgroups),
-		array("link" => "users", "title" => "Users", "access" => 1, "children" => array(
-/*
-			array("link" => "view", "title" => "View Users", "access" => 1),
-			array("link" => "tokens", "title" => "View API Tokens", "access" => 1)
-*/
-		)),
+		array("link" => "users", "title" => "Users", "access" => 1),
 		array("link" => "settings", "title" => "Settings", "access" => 1),
 		array("link" => "developer", "title" => "Developer", "access" => 2, "children" => array(
 			array("link" => "templates", "title" => "Templates", "access" => 2),

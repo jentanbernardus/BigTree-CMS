@@ -404,39 +404,6 @@
 		}
 		
 		/*
-			Function: createAPIToken
-				Creates an API token.
-				Checks permissions.
-			
-			Parameters:
-				user - The user to create the token for.
-				read_only - Whether the token is read-only or not.
-				
-			Returns:
-				The id of the newly created token.
-		*/
-		
-		function createAPIToken($user,$read_only) {
-			$this->requireLevel(1);
-			
-			$user = mysql_real_escape_string($user);
-			$read_only = mysql_real_escape_string($read_only);
-			
-			$token = BigTree::randomString(30);
-			$r = sqlrows(sqlquery("SELECT * FROM bigtree_api_tokens WHERE token = '$token'"));
-			while ($r) {
-				$token = BigTree::randomString(30);
-				$r = sqlrows(sqlquery("SELECT * FROM bigtree_api_tokens WHERE token = '$token'"));				
-			}
-			
-			$token = mysql_real_escape_string($token);
-			
-			sqlquery("INSERT INTO bigtree_api_tokens (`token`,`user`,`readonly`) VALUES ('$token','$user','$read_only')");
-			
-			return sqlid();
-		}
-		
-		/*
 			Function: createCallout
 				Creates a callout and its files.
 			
@@ -1282,21 +1249,6 @@
 		}
 		
 		/*
-			Function: deleteAPIToken
-				Deletes an API token.
-				Checks permissions.
-			
-			Parameters:
-				id - The id of the token.
-		*/
-		
-		function deleteAPIToken($id) {
-			$this->requireLevel(1);
-			$id = mysql_real_escape_string($id);
-			sqlquery("DELETE FROM bigtree_api_tokens WHERE id = '$id'");
-		}
-		
-		/*
 			Function: deleteCallout
 				Deletes a callout and removes its file.
 			
@@ -1866,44 +1818,6 @@
 				$class = "icon_preview";
 			}
 			return $class;
-		}
-		
-		/*
-			Function: getAPIToken
-				Retrieves an API token for a given email address and password.
-			
-			Parameters:
-				email - The email address of the user.
-				password - The password of the user.
-			
-			Returns:
-				An API token if the email/password login was correct, otherwise false.
-				If a temporary API token already exists for the user its expiration is extended to 24 hours from now.
-				If a temporary token doesn't already exist, a new one is created that expires in 24 hours.
-		*/
-
-		function getAPIToken($email,$password) {
-			global $config;
-			$f = sqlfetch(sqlquery("SELECT * FROM bigtree_users WHERE email = '".mysql_real_escape_string($email)."'"));
-			$phpass = new PasswordHash($config["password_depth"], TRUE);
-			$ok = $phpass->CheckPassword($password,$f["password"]);
-			if ($ok) {
-				$existing = sqlfetch(sqlquery("SELECT * FROM bigtree_api_tokens WHERE temporary = 'on' AND user = '".$f["id"]."' AND expires > NOW()"));
-				if ($existing) {
-					sqlquery("UPDATE bigtree_api_tokens SET expires = '".date("Y-m-d H:i:s",strtotime("+1 day"))."' WHERE id = '".$existing["id"]."'");
-					return $existing["token"];
-				}
-				$token = BigTree::randomString(30);
-				$r = sqlrows(sqlquery("SELECT * FROM bigtree_api_tokens WHERE token = '$token'"));
-				while ($r) {
-					$token = BigTree::randomString(30);
-					$r = sqlrows(sqlquery("SELECT * FROM bigtree_api_tokens WHERE token = '$token'"));
-				}
-				sqlquery("DELETE FROM bigtree_api_tokens WHERE user = '".$f["id"]."' AND temporary = 'on'");
-				sqlquery("INSERT INTO bigtree_api_tokens (`token`,`user`,`expires`,`temporary`) VALUES ('$token','".$f["id"]."','".date("Y-m-d H:i:s",strtotime("+1 day"))."','on')");
-				return $token;
-			}
-			return false;
 		}
 		
 		/*
@@ -2972,35 +2886,6 @@
 		}
 		
 		/*
-			Function: getPageOfTokens
-				Returns a page of API tokens.
-			
-			Parameters:
-				page - The page number to return.
-				query - Optional query string to search against.
-			
-			Returns:
-				An array of API token entries with the "user" column replaced with a user entry.
-			
-			See Also:
-				<getUser>
-		*/		
-
-		function getPageOfTokens($page = 0,$query = "") {
-			if ($query) {
-				$q = sqlquery("SELECT * FROM bigtree_api_tokens WHERE token LIKE '%".mysql_real_escape_string($query)."%' ORDER BY id DESC LIMIT ".($page*$this->PerPage).",".$this->PerPage);
-			} else {
-				$q = sqlquery("SELECT * FROM bigtree_api_tokens ORDER BY id DESC LIMIT ".($page*$this->PerPage).",".$this->PerPage);
-			}
-			$items = array();
-			while ($f = sqlfetch($q)) {
-				$f["user"] = $this->getUser($f["user"]);
-				$items[] = $f;
-			}
-			return $items;
-		}
-		
-		/*
 			Function: getPageOfUsers
 				Returns a page of users.
 			
@@ -3862,63 +3747,6 @@
 		}
 		
 		/*
-			Function: getToken
-				Returns a token.
-			
-			Parameters:
-				id - The id for the token.
-			
-			Returns:
-				A token entry.
-		*/
-		
-		function getToken($id) {
-			return sqlfetch(sqlquery("SELECT * FROM bigtree_api_tokens WHERE id = '".mysql_real_escape_string($id)."'"));
-		}
-		
-		/*
-			Function: getTokensPageCount
-				Returns the number of pages of tokens.
-			
-			Parameters:
-				query - Optional query string to search against.
-			
-			Returns:
-				The number of pages matching the query string.
-		*/		
-
-		function getTokensPageCount($query = "") {
-			if ($query) {
-				$q = sqlquery("SELECT id FROM bigtree_api_tokens WHERE token LIKE '%".mysql_real_escape_string($query)."%'");
-			} else {
-				$q = sqlquery("SELECT id FROM bigtree_api_tokens");
-			}
-			$r = sqlrows($q);
-			$pages = ceil($r / $this->PerPage);
-			if ($pages == 0) {
-				$pages = 1;
-			}
-			return $pages;
-		}
-		
-		/*
-			Function: getTokenUsers
-				Gets a list of users available to make a token for.
-			
-			Returns:
-				An array of users with access level at or below the logged in user, ordered by email.
-		*/
-		
-		function getTokenUsers() {
-			$items = array();
-			$q = sqlquery("SELECT * FROM bigtree_users WHERE level <= '".$this->Level."' ORDER BY email");
-			while ($f = sqlfetch($q)) {
-				$items[] = $f;
-			}
-			return $items;
-		}
-		
-		/*
 			Function: getUnreadMessageCount
 				Returns the number of unread messages for the logged in user.
 			
@@ -4324,67 +4152,6 @@
 				die();
 			}
 			return $this->Permissions[$module];
-		}
-		
-		/*
-			Function: requireAPILevel
-				Requires a user level for a given action in the API.
-				Stops execution and returns an encoded error if the user's level is too low.
-			
-			Parameters:
-				level - User level to require (0 is normal user, 1 is administrator, 2 is developer)
-		*/
-
-		function requireAPILevel($level) {
-			if ($this->Level < $level) {
-				echo BigTree::apiEncode(array("success" => false,"error" => "Permission level is too low."));
-				die();
-			}
-		}
-		
-		/*
-			Function: requireAPIModuleAccess
-				Requires acess to a given module in the API.
-				Stops execution and returns an encoded error if the user is unanable to access the module.
-			
-			Parameters:
-				module - The module id to check permission for.
-		*/
-
-		function requireAPIModuleAccess($module) {
-			if (!$this->Permissions[$module]) {
-				echo BigTree::apiEncode(array("success" => false,"error" => "Not permitted."));
-				die();
-			}
-		}
-		
-		/*
-			Function: requireAPIModulePublisherAccess
-				Requires acess to a given module in the API.
-				Stops execution and returns an encoded error if the user is not a publisher of the module.
-			
-			Parameters:
-				module - The module id to check permission for.
-		*/
-
-		function requireAPIModulePublisherAccess($module) {
-			if ($this->Permissions[$module] != "p") {
-				echo BigTree::apiEncode(array("success" => false,"error" => "Publishing permission required."));
-				die();
-			}
-		}
-		
-		/*
-			Function: requireAPIWrite
-				Requires write access to the API.
-				Stops execution and returns an encoded error if the token does not have write access
-		*/				
-
-		function requireAPIWrite() {
-			if ($this->ReadOnly) {
-				echo BigTree::apiEncode(array("success" => false,"error" => "Not available in read only mode."));
-				die();
-			}
 		}
 		
 		/*
@@ -5024,26 +4791,6 @@
 		
 		function unlock($table,$id) {
 			sqlquery("DELETE FROM bigtree_locks WHERE `table` = '".mysql_real_escape_string($table)."' AND item_id = '".mysql_real_escape_string($id)."'");
-		}
-		
-		/*
-			Function: updateAPIToken
-				Updates a token.
-				Checks permissions.
-			
-			Parameters:
-				id - The id of the token.
-				user - The user for the token.
-				read_only - Whether the token is read-only or not.
-		*/
-		
-		function updateAPIToken($id,$user,$read_only) {
-			$this->requireLevel(1);
-			$id = mysql_real_escape_string($id);
-			$user = mysql_real_escape_string($user);
-			$read_only = mysql_real_escape_string($read_only);
-		
-			sqlquery("UPDATE bigtree_api_tokens SET user = '$user', readonly = '$read_only' WHERE id = '$id'");
 		}
 		
 		/*
@@ -5785,34 +5532,6 @@
 			$phpass = new PasswordHash($config["password_depth"], TRUE);
 			$password = mysql_real_escape_string($phpass->HashPassword($password));
 			sqlquery("UPDATE bigtree_users SET password = '$password' WHERE id = '$id'");
-		}
-		
-		/*
-			Function: validateToken
-				Validates a token.
-				Sets up a token's "user session" if validation passes.
-			
-			Parameters:
-				token - The token to validate.
-				
-			Returns:
-				true if successful, otherwise false.
-		*/
-
-		function validateToken($token) {
-			$t = sqlfetch(sqlquery("SELECT * FROM bigtree_api_tokens WHERE token = '$token' AND (expires > NOW() OR temporary != 'on')"));
-			if (!$t) {
-				return false;
-			}
-
-			$user = $this->getUser($t["user"]);
-			$this->ID = $user["id"];
-			$this->User = $user["email"];
-			$this->Level = $user["level"];
-			$this->Name = $user["name"];
-			$this->Permissions = $user["permissions"];
-			$this->ReadOnly = $t["readonly"];
-			return true;
 		}
 	}
 ?>

@@ -157,7 +157,7 @@
 		</li>
 		<li>
 			<section class="site_status_message">JSON Support</section>
-			<section class="site_status_action">JSON module is required for API usage</section>
+			<section class="site_status_action">JSON module is required.</section>
 			<section class="site_status_status <?=$json?>"></section>
 		</li>
 		<li>

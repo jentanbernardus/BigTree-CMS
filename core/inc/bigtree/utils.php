@@ -8,29 +8,6 @@
 	class BigTree {
 	
 		/*
-			Function: apiEncode
-				Encodes an array in the requested response format.
-			
-			Parameters:
-				data - An array of data (key/value pairs)
-			
-			Returns:
-				Either XML or JSON data.
-		*/
-		
-		static function apiEncode($data) {
-			global $api_type,$last_api_data;
-			$last_api_data = $data;
-			if ($api_type == "json") {
-				header("Content-type: application/json");
-				return json_encode($data);
-			} elseif ($api_type == "xml") {
-				header("Content-type: text/xml");
-				self::arrayToXML($data);
-			}
-		}
-		
-		/*
 			Function: arrayToXML
 				Turns a PHP array into an XML string.
 			

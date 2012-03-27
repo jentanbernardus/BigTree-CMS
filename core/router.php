@@ -190,39 +190,6 @@
 		}
 		die();
 	}
-	
-	// Handle API calls.
-	if ($path[0] == "api") {
-		if (!count($_POST) && count($_GET)) {
-			$_POST = $_GET;
-		}
-		include BigTree::path("inc/bigtree/admin.php");
-		include BigTree::path("inc/bigtree/auto-modules.php");
-		$admin = new BigTreeAdmin;
-		$autoModule = new BigTreeAutoModule;
-		$api_type = $path[1];
-		$x = 2;
-		$apipath = "";
-		while ($x < count($path) - 1) {
-			$apipath .= $path[$x]."/";
-			$x++;
-		}
-		if ($apipath.$path[$x] != "users/authenticate") {
-			if (isset($_POST["bigtreeapi"]["token"])) {
-				if (!$admin->validateToken($_POST["bigtreeapi"]["token"])) {
-					echo BigTree::apiEncode(array("success" => false,"error" => "Invalid token. Please login."));
-					die();
-				}			
-			} else {
-				if (!$admin->validateToken($_POST["token"])) {
-					echo BigTree::apiEncode(array("success" => false,"error" => "Invalid token. Please login."));
-					die();
-				}
-			}
-		}
-		include BigTree::path("api/".$apipath.$path[$x].".php");
-		die();	
-	}
 
 	// Tell the browser we're serving HTML
 	header("Content-type: text/html");
