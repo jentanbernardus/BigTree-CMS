@@ -7,7 +7,7 @@
 		$feed = false;
 	}
 	
-	$view["title"] = "RecentActivity";
+	$view["title"] = "Recent Activity";
 		
 	include "_heading.php";
 	include BigTree::path("admin/auto-modules/_nav.php"); 

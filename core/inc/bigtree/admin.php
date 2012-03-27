@@ -1119,7 +1119,7 @@
 				return false;
 			}
 
-			sqlquery("INSERT INTO bigtree_settings (`id`,`name`,`description`,`type`,`locked`,`module`,`encrypted`,`system`) VALUES ('$id','$name','$description','$type','$locked','$module','$encrypted','$system')");
+			sqlquery("INSERT INTO bigtree_settings (`id`,`name`,`description`,`type`,`locked`,`encrypted`,`system`) VALUES ('$id','$name','$description','$type','$locked','$encrypted','$system')");
 			// Audit trail.
 			$this->track("bigtree_settings",$id,"created");
 
@@ -5626,7 +5626,7 @@
 				return false;
 			}
 			
-			sqlquery("UPDATE bigtree_settings SET id = '$id', type = '$type', name = '$name', description = '$description', locked = '$locked', module = '$module', encrypted = '$encrypted' WHERE id = '$old_id'");
+			sqlquery("UPDATE bigtree_settings SET id = '$id', type = '$type', name = '$name', description = '$description', locked = '$locked', encrypted = '$encrypted' WHERE id = '$old_id'");
 
 			// If encryption status has changed, update the value
 			if ($existing["encrypted"] && !$encrypted) {
