@@ -987,7 +987,7 @@
 		static function publishPendingItem($table,$id,$data,$many_to_many = array(),$tags = array()) {
 			global $module;
 			
-			self::deletePendingItem($table,substr($id,1));
+			self::deletePendingItem($table,$id);
 			
 			$query_fields = array();
 			$query_vals = array();

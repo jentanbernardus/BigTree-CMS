@@ -1,6 +1,5 @@
-BigTree CMS is copyright 2012 Fastspot -- http://www.fastspot.com/
-BigTree CMS is licensed under LGPL.
-===================================
+BigTree CMS - Copyright 2012, Fastspot -- http://www.fastspot.com/
+==================================================================
 
 GNU General Public License, version 3 (GPL-3.0)
 [OSI Approved License]
