@@ -21,7 +21,7 @@
 				$i = 1;
 				foreach ($instagramImages as $item) {
 			?>
-			<a href="<?=$item["link"]?>" target="_blank" class="pic<? if($i == 1) echo ' active'; ?><? if($i % 4 == 0) echo ' end'; ?>" data-large="<?=$item["images"]["standard_resolution"]["url"]?>" data-caption="<?=$item["caption"]["text"]?>" data-user="<?=$item["user"]["username"]?>"><span style="background-image: url(<?=$item["images"]["thumbnail"]["url"]?>);"><?=$i?></span></a>
+			<a href="<?=$item["link"]?>" target="_blank" class="pic<? if ($i == 1) { echo ' active'; } ?><? if ($i % 4 == 0) { echo ' end'; } ?>" data-large="<?=$item["images"]["standard_resolution"]["url"]?>" data-caption="<?=$item["caption"]["text"]?>" data-user="<?=$item["user"]["username"]?>"><span style="background-image: url(<?=$item["images"]["thumbnail"]["url"]?>);"><?=$i?></span></a>
 			<?
 					$i++;
 				}

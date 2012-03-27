@@ -46,7 +46,7 @@
 	</summary>
 	<section>
 		<?
-			if($visits) {
+			if ($visits) {
 		?>
 		<div class="graph">
 			<?

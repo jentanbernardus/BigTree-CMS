@@ -17,10 +17,9 @@ bigtree_bar_body.appendChild(bigtree_bar_tab);
 
 function bigtree_bar_get_style(oElm, strCssRule){
 	var strValue = "";
-	if(document.defaultView && document.defaultView.getComputedStyle){
+	if (document.defaultView && document.defaultView.getComputedStyle){
 		strValue = document.defaultView.getComputedStyle(oElm, "").getPropertyValue(strCssRule);
-	}
-	else if(oElm.currentStyle){
+	} else if (oElm.currentStyle){
 		strCssRule = strCssRule.replace(/\-(\w)/g, function (strMatch, p1){
 			return p1.toUpperCase();
 		});

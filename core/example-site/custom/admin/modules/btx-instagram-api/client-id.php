@@ -17,10 +17,10 @@
 <div class="form_container" id="instagram_api">
 	<form method="post" action="<?=$mroot?>client-id/save/" class="module">
 		<section>
-			<p>Enter a Client ID.</p>
+			<p>Enter an Instagram Client ID.</p>
 			<br />
 			<? if ($userError) { ?>
-			<p class="error_message">Please enter a Client ID</p>
+			<p class="error_message">The Client ID you entered was invalid.</p>
 			<? } ?>
 			<div class="left">
 				<fieldset>

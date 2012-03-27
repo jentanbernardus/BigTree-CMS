@@ -38,7 +38,7 @@
 				Searches Instagram for a given tag and returns the results.
 		*/
 		public function searchTag($tag = false, $count = false) {
-			if(!$tag || !$this->client_id) {
+			if (!$tag || !$this->client_id) {
 				return false;
 			}
 			$tag = str_ireplace(" ", "", $tag);
@@ -59,6 +59,13 @@
 			global $admin; 
 			
 			if (!$clientID) {
+				return false;
+			}
+			
+			// Check to see if this client ID is going to give us an error.
+			$this->client_id = $clientID;
+			$response = $this->searchTag("test");
+			if ($response["meta"]["error_type"]) {
 				return false;
 			}
 			

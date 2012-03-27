@@ -22,7 +22,7 @@
 			<p<? if (!$error) { ?> style="display: none;"<? } ?> class="error_message">Errors found! Please fix the highlighted fields before submitting.</p>
 			<fieldset id="send_to"<? if ($error && !count($send_to)) { ?> class="form_error"<? } ?>>
 				<label class="required">Send To<? if ($error && !count($send_to)) { ?><span class="form_error_reason">Required</span><? } ?></label>
-				<? if(count($users) > 1) { ?>
+				<? if (count($users) > 1) { ?>
 				<div class="multi_widget many_to_many">
 					<ul>
 						<?

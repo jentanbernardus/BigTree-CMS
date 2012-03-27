@@ -6,7 +6,7 @@ $(document).ready(function() {
 });
 
 function toggleWriteDatabase(target) {
-	if(target.is(':checked')) {
+	if (target.is(':checked')) {
 		$("#loadbalanced_settings").css({ display: "block" });
 	} else {
 		$("#loadbalanced_settings").css({ display: "none" });
