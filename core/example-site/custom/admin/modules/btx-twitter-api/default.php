@@ -31,7 +31,7 @@
 		    Module Usage
 		</h2>
 		<p>The Twitter API module provides a simple way to fetch and parse json formatted Twitter feeds. </p>
-		<p>Create a new instance of the Twitter Module:</p>
+		<p>Create a new instance of the Twitter Class:</p>
 		<pre>$btxTwitterAPI = new BTXTwitterAPI;</pre>
 		
 		<p>Fetch a user; defaults to your active username:</p>

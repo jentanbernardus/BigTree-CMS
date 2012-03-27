@@ -21,8 +21,8 @@
 			</h2>
 			<br class="clear" />
 			<p>The Instagram API module provides a simple way to interact with the <a href="http://instagram.com/developer/" target="_blank">Instagram API</a>.</p>
-			<p>Create a new instance of the Instagram Module:</p>
-			<pre>$btxInstagramAPI = new BTXInstagramAPI("language");</pre>
+			<p>Create a new instance of the Instagram Class:</p>
+			<pre>$btxInstagramAPI = new BTXInstagramAPI;</pre>
 			
 			<p>Search for something by tag:</p>
 			<pre>$btxInstagramAPI->search("tag");</pre>
