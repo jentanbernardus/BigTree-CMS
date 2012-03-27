@@ -322,7 +322,7 @@ php_flag magic_quotes_gpc Off');
   RewriteRule    (.*) site/$1    [L]
 </IfModule>');
 		
-		// Install the sample site if they asked for it.
+		// Install the example site if they asked for it.
 		if ($install_example_site) {
 			bt_copy_dir("core/example-site/","");
 			$sql_queries = explode("\n",file_get_contents("example-site.sql"));
@@ -333,15 +333,12 @@ php_flag magic_quotes_gpc Off');
 				}
 			}
 			
-			// Update the config a little bit.
-			// MAKE SURE WE GET ALL THE USER'S VARS
+			// Update the config file with CSS/Javascript for the example site.
 			$config_data = str_replace($find,$replace,file_get_contents("templates/config.php")); 
-/*
 			$config_data = str_replace('// "javascript_file.js"','"jquery-1.7.1.min.js",
 		"main.js"',$config_data);
 			$config_data = str_replace('// "style_sheet.css"','"grid.css",
 		"master.css"',$config_data);
-*/
 			file_put_contents("templates/config.php",$config_data);
 		}
 
