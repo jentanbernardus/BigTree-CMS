@@ -1,5 +1,7 @@
 BigTree CMS - Copyright 2012, Fastspot -- http://www.fastspot.com/
 ==================================================================
+Licensed under the GNU Lesser General Public License 3.0
+==================================================================
 
 GNU General Public License, version 3 (GPL-3.0)
 [OSI Approved License]
