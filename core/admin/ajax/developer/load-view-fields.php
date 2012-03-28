@@ -31,7 +31,7 @@
 	$cached_types = $admin->getCachedFieldTypes();
 	$types = $cached_types["module"];
 ?>
-<fieldset id="fields">
+<fieldset id="fields"<? if ($type == "images" || $type == "images-grouped") { ?> style="display: none;"<? } ?>>
 	<label>Fields</label>
 	
 	<div class="form_table">

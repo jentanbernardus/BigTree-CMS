@@ -5,6 +5,8 @@
 
 	$breadcrumb[] = array("title" => $module["name"], "link" => "developer/modules/edit/".$module["id"]."/");
 	$breadcrumb[] = array("title" => "Edit View", "link" => "#");
+	
+	BigTree::globalizeArray($view,array("htmlspecialchars"));
 ?>
 <h1><span class="icon_developer_modules"></span>Edit View</h1>
 <? include BigTree::path("admin/modules/developer/modules/_nav.php") ?>
@@ -20,31 +22,31 @@
 			</div>
 			<fieldset>
 				<label>Add/Edit Suffix</label>
-				<input type="text" name="suffix" value="<?=$view["suffix"]?>" />
+				<input type="text" name="suffix" value="<?=$suffix?>" />
 			</fieldset>
 			<? } ?>
 			
 			<fieldset>
 				<label>Preview URL <small>(optional, i.e. http://www.website.com/news/preview/ &mdash; the item's id will be entered as the final route)</small></label>
-				<input type="text" name="preview_url" value="<?=htmlspecialchars($view["preview_url"])?>" />
+				<input type="text" name="preview_url" value="<?=$preview_url?>" />
 			</fieldset>
 			
 			<div class="left">
 				<fieldset>
 					<label class="required">Item Title <small>(for example, "Questions" to make the title "Viewing Questions")</small></label>
-					<input type="text" name="title" value="<?=$view["title"]?>" class="required" />
+					<input type="text" name="title" value="<?=$title?>" class="required" />
 				</fieldset>
 				<fieldset>
 					<label class="required">Data Table</label>
 					<select name="table" id="view_table" class="required" >
-						<? BigTree::getTableSelectOptions($view["table"]); ?>
+						<? BigTree::getTableSelectOptions($table); ?>
 					</select>
 				</fieldset>
 				<fieldset>
 					<label>View Type</label>
 					<select name="type" id="view_type" class="left" >
-						<? foreach ($admin->ViewTypes as $key => $type) { ?>
-						<option value="<?=$key?>"<? if ($key == $view["type"]) { ?> selected="selected"<? } ?>><?=htmlspecialchars($type)?></option>
+						<? foreach ($admin->ViewTypes as $key => $t) { ?>
+						<option value="<?=$key?>"<? if ($key == $type) { ?> selected="selected"<? } ?>><?=$t?></option>
 						<? } ?>
 					</select>
 					&nbsp; <a href="#" class="options icon_settings"></a>
@@ -55,11 +57,11 @@
 			<div class="right">
 				<fieldset>
 					<label>Page Description <small>(instructions for the user)</small></label>
-					<textarea name="description" ><?=$view["description"]?></textarea>
+					<textarea name="description" ><?=$description?></textarea>
 				</fieldset>
 				
 				<fieldset>
-					<input type="checkbox" name="uncached" <? if ($view["uncached"]) { ?>checked="checked" <? } ?>/>
+					<input type="checkbox" name="uncached" <? if ($uncached) { ?>checked="checked" <? } ?>/>
 					<label class="for_checkbox">Don't Cache View Data <small>(removes parsers, pending changes)</small></label>
 				</fieldset>
 			</div>
@@ -67,12 +69,7 @@
 			
 		</section>
 		<section class="sub" id="field_area">
-			<?
-				$table = $view["table"];
-				$fields = $view["fields"];
-				$actions = $view["actions"];
-				include BigTree::path("admin/ajax/developer/load-view-fields.php");
-			?>
+			<? include BigTree::path("admin/ajax/developer/load-view-fields.php") ?>
 		</section>
 		<footer>
 			<input type="submit" class="button blue" value="Update" />
