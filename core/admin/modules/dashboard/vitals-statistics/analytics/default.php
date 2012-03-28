@@ -85,6 +85,19 @@
 		} elseif ($bounce_growth > 2) {
 			$bounce_class = 'warning';
 		}
+		
+		if (!$current["views"]) {
+			$current["views"] = 0;
+		}
+		if (!$past["views"]) {
+			$past["views"] = 0;
+		}
+		if (!$current["visits"]) {
+			$current["visits"] = 0;
+		}
+		if (!$past["visits"]) {
+			$past["visits"] = 0;
+		}
 ?>
 <div class="set">
 	<div class="data">
@@ -142,9 +155,13 @@
 		<div class="graph">
 			<?
 				$x = 0;
+				$graph_max = ($graph_max < 1) ? 1 : $graph_max;
 				foreach ($two_week_visits as $date => $count) {
 					$height = round($graph_bar_height * ($count - $graph_min) / $graph_max) + 12;
 					$x++;
+					if (!$count) {
+						$count = 0;
+					}
 			?>
 			<section class="bar<? if ($x == 14) { ?> last<? } elseif ($x == 1) { ?> first<? } ?>" style="height: <?=$height?>px; margin-top: <?=(82-$height)?>px;">
 				<?=$count?>

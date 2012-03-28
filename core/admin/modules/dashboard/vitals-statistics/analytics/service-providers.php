@@ -24,7 +24,8 @@
 	</header>
 	<ul id="service_providers">
 		<?
-			foreach ($cache["service_providers"] as $provider) {
+			if (is_array($cache["service_providers"])) {
+				foreach ($cache["service_providers"] as $provider) {
 		?>
 		<li>
 			<section class="analytics_metric_name"><?=ucwords($provider["name"])?></section>
@@ -32,6 +33,11 @@
 			<section class="analytics_view_count"><?=$provider["views"]?></section>
 		</li>
 		<?
+				}
+			} else {
+		?>
+		<li class="no_content">We have no data yet.</li>
+		<?		
 			}
 		?>
 	</ul>

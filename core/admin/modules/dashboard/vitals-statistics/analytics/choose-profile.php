@@ -19,7 +19,7 @@
 <div class="form_container">
 	<form method="post" action="<?=$mroot?>set-profile/" class="module">
 		<section>
-			<p>Please choose the correct site profile below.</p>
+			<p>Please choose the correct site profile below, click Update, and wait while we gather your Google Analytics information.</p>
 			<br />
 			<fieldset>
 				<label>Profile</label>

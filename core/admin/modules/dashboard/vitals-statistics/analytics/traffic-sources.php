@@ -24,7 +24,8 @@
 	</header>
 	<ul id="traffic_sources">
 		<?
-			foreach ($cache["referrers"] as $source) {
+			if (is_array($cache["referrers"])) {
+				foreach ($cache["referrers"] as $source) {
 		?>
 		<li>
 			<section class="analytics_metric_name"><?=ucwords($source["name"])?></section>
@@ -32,6 +33,11 @@
 			<section class="analytics_view_count"><?=$source["views"]?></section>
 		</li>
 		<?
+				}
+			} else {
+		?>
+		<li class="no_content">We have no data yet.</li>
+		<?		
 			}
 		?>
 	</ul>

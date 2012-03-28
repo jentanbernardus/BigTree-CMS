@@ -24,7 +24,8 @@
 	</header>
 	<ul>
 		<?
-			foreach ($cache["keywords"] as $keyword) {
+			if (is_array($cache["keywords"])) {
+				foreach ($cache["keywords"] as $keyword) {
 		?>
 		<li>
 			<section class="analytics_metric_name"><?=ucwords($keyword["name"])?></section>
@@ -32,6 +33,11 @@
 			<section class="analytics_view_count"><?=$keyword["views"]?></section>
 		</li>
 		<?
+				}
+			} else {
+		?>
+		<li class="no_content">We have no data yet.</li>
+		<?		
 			}
 		?>
 	</ul>
