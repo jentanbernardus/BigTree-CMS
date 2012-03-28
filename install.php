@@ -59,6 +59,9 @@ RewriteRule ^(.*)$ rewrite.php?link=$1 [QSA,L]');
 		if ($response != "test.html") {
 			$error = ".htaccess overrides are currently not allowed by your Apache configuration. Please set 'AllowOverride All' for this directory.";
 		}
+		@unlink("test/.htaccess");
+		@unlink("test/rewrite.php");
+		@rmdir("test");
 	}
 
 	// Clean all post variables up.
