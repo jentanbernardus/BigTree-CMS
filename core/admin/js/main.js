@@ -1439,8 +1439,8 @@ var BigTreeFormValidator = Class.extend({
 		this.form.find("input.required, select.required, textarea.required").each(function() {
 			if ($(this).nextAll(".mceEditor").length) {
 				val = tinyMCE.get($(this).attr("id")).getContent();
-			} else if ($(this).parents("div").nextAll(".currently").length) {
-				val = $(this).parents("div").nextAll(".currently").find("input").val();
+			} else if ($(this).parents("div").nextAll(".currently, .currently_file").length) {
+				val = $(this).parents("div").nextAll(".currently, .currently_file").find("input").val();
 				if (!val) {
 					val = $(this).val();
 				}

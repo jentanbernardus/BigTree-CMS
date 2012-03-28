@@ -121,7 +121,6 @@
 	<summary>
 		<a href="<?=$developer_root?>modules/views/add/<?=$mod["id"]?>/" class="add">Add</a>
 		<h2>Module Views <small><?=$mod["name"]?></small></h2>
-	
 	</summary>
 	<header>
 		<span class="developer_view_name">View Name</span>
@@ -133,7 +132,13 @@
 		<? foreach ($views as $view) { ?>
 		<li>
 			<section class="developer_view_name">View <?=$view["title"]?></section>
-			<section class="view_action"><a href="<?=$developer_root?>modules/views/style/<?=$view["id"]?>/" class="icon_preview"></a></section>
+			<section class="view_action">
+				<? if ($view["type"] != "images" && $view["type"] != "images-grouped") { ?>
+				<a href="<?=$developer_root?>modules/views/style/<?=$view["id"]?>/" class="icon_preview"></a>
+				<? } else { ?>
+				<span class="icon_preview disabled_icon has_tooltip"></span>
+				<? } ?>
+			</section>
 			<section class="view_action"><a href="<?=$developer_root?>modules/views/edit/<?=$view["id"]?>/" class="icon_edit"></a></section>
 			<section class="view_action"><a href="<?=$developer_root?>modules/views/delete/<?=$id?>/<?=$view["id"]?>/" class="icon_delete"></a></section>
 		</li>

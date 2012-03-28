@@ -9,17 +9,18 @@
 	if (($type == "draggable" || $type == "draggable-group") && !$columns["position"]) {
 		$errors[] = "Sorry, but you can't create a draggable view without a 'position' column in your table.  Please create a position column (integer) in your table and try again.";
 	}
-	if ($actions["archive"] && !($columns["archived"]["type"] == "char" && $columns["archived"]["size"] == "2")) {
+	if ($actions["archive"] && !(($columns["archived"]["type"] == "char" || $columns["archived"]["type"] == "varchar") && $columns["archived"]["size"] == "2")) {
 		$errors[] = "Sorry, but you must have a column named 'archived' that is char(2) in order to use the archive function.";
 	}
-	if ($actions["approve"] && !($columns["approved"]["type"] == "char" && $columns["approved"]["size"] == "2")) {
+	if ($actions["approve"] && !(($columns["approved"]["type"] == "char" || $columns["approved"]["type"] == "varchar") && $columns["approved"]["size"] == "2")) {
 		$errors[] = "Sorry, but you must have a column named 'approved' that is char(2) in order to use the approve function.";
 	}
-	if ($actions["feature"] && !($columns["featured"]["type"] == "char" && $columns["featured"]["size"] == "2")) {
+	if ($actions["feature"] && !(($columns["featured"]["type"] == "char" || $columns["featured"]["type"] == "varchar") && $columns["featured"]["size"] == "2")) {
 		$errors[] = "Sorry, but you must have a column named 'featured' that is char(2) in order to use the feature function.";
 	}
 	
-	if (count($errors)) {	
+	if (count($errors)) {
+		$_SESSION["bigtree"]["developer"]["saved_view"] = $_POST;
 ?>
 <h1><span class="icon_developer_modules"></span>View Error</h1>
 <div class="form_container">

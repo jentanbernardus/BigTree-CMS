@@ -8,6 +8,11 @@
 
 	$breadcrumb[] = array("title" => $mod["name"], "link" => "developer/modules/edit/".$module["id"]."/");
 	$breadcrumb[] = array("title" => "Add View", "link" => "#");
+	
+	if (isset($_SESSION["bigtree"]["developer"]["saved_view"])) {
+		BigTree::globalizeArray($_SESSION["bigtree"]["developer"]["saved_view"],array("htmlspecialchars"));
+		unset($_SESSION["bigtree"]["developer"]["saved_view"]);
+	}
 ?>
 <h1><span class="icon_developer_modules"></span>Add View</h1>
 <? include BigTree::path("admin/modules/developer/modules/_nav.php") ?>
@@ -28,7 +33,7 @@
 			
 			<fieldset>
 				<label>Preview URL <small>(optional, i.e. http://www.website.com/news/preview/ &mdash; the item's id will be entered as the final route)</small></label>
-				<input type="text" name="preview_url" value="<?=htmlspecialchars($view["preview_url"])?>" />
+				<input type="text" name="preview_url" value="<?=$preview_url?>" />
 			</fieldset>
 			
 			<div class="left">
@@ -48,23 +53,23 @@
 				<fieldset>
 					<label>View Type</label>
 					<select name="type" id="view_type" class="left" >
-						<? foreach ($admin->ViewTypes as $key => $type) { ?>
-						<option value="<?=$key?>"<? if ($key == $view["type"]) { ?> selected="selected"<? } ?>><?=htmlspecialchars($type)?></option>
+						<? foreach ($admin->ViewTypes as $key => $t) { ?>
+						<option value="<?=$key?>"<? if ($key == $type) { ?> selected="selected"<? } ?>><?=$t?></option>
 						<? } ?>
 					</select>
 					&nbsp; <a href="#" class="options icon_settings"></a>
-					<input type="hidden" name="options" id="view_options" value="<?=htmlspecialchars($view["options"])?>" />
+					<input type="hidden" name="options" id="view_options" value="<?=$options?>" />
 				</fieldset>
 			</div>
 			
 			<div class="right">
 				<fieldset>
 					<label>Page Description <small>(instructions for the user)</small></label>
-					<textarea name="description" ><?=$view["description"]?></textarea>
+					<textarea name="description" ><?=$description?></textarea>
 				</fieldset>
 				
 				<fieldset>
-					<input type="checkbox" name="uncached" />
+					<input type="checkbox" name="uncached" <? if ($uncached) { ?>checked="checked" <? } ?>/>
 					<label class="for_checkbox">Don't Cache View Data <small>(removes parsers, pending changes)</small></label>
 				</fieldset>
 			</div>
