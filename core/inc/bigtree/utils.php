@@ -207,9 +207,10 @@
 			$dpath = "/";
 			foreach ($dir_parts as $d) {
 				$dpath .= $d;
-				if (!file_exists($dpath)) {
-					mkdir($dpath);
-					chmod($dpath,0777);
+				// We're using the silence operator here because in situations with open_basedir restrictions checking for things farther up the path will result in warnings.
+				if (!@file_exists($dpath)) {
+					@mkdir($dpath);
+					@chmod($dpath,0777);
 				}
 				$dpath .= "/";
 			}
