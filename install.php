@@ -38,6 +38,28 @@
 			$warnings[] = "BigTree requires Apache to have mod_rewrite installed (this is a FATAL ERROR).";
 		}
 	}
+	
+	// See if .htaccess Rewrites work
+	if (is_writable(".")) {
+		@mkdir("test");
+		@file_put_contents("test/.htaccess",'RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ rewrite.php?link=$1 [QSA,L]');
+		@file_put_contents("test/rewrite.php",'<?=$_GET["link"]?>');
+		$url = "http://".$_SERVER["HTTP_HOST"].str_replace("install.php","test/test.html",$_SERVER["REQUEST_URI"]);
+		// If we have cURL, use it.
+		if (function_exists("curl_init")) {
+			$ch = curl_init();
+			curl_setopt($ch, CURLOPT_URL, $url);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+			$response = curl_exec($ch);
+		} else {
+			$response = file_get_contents($url);
+		}
+		if ($response != "test.html") {
+			$error = ".htaccess overrides are currently not allowed by your Apache configuration. Please set 'AllowOverride All' for this directory.";
+		}
+	}
 
 	// Clean all post variables up.
 	foreach ($_POST as $key => $val) {
