@@ -31,9 +31,12 @@
 	if (intval(ini_get("memory_limit")) < 32) {
 		$warnings[] = "PHP's memory limit is currently under 32MB. BigTree recommends at least 32MB of memory be available to PHP.";
 	}
-	$apache_modules = apache_get_modules();
-	if (in_array('mod_rewrite', $apache_modules) === false) {
-		$warnings[] = "BigTree requires Apache to have mod_rewrite installed (this is a FATAL ERROR).";
+
+	if (function_exists("apache_get_modules")) {
+		$apache_modules = apache_get_modules();
+		if (in_array('mod_rewrite', $apache_modules) === false) {
+			$warnings[] = "BigTree requires Apache to have mod_rewrite installed (this is a FATAL ERROR).";
+		}
 	}
 
 	// Clean all post variables up.
