@@ -13,9 +13,16 @@
 		}
 		
 		$ifile = (file_exists("../custom/admin/images/".$ipath.$path[$x])) ? "../custom/admin/images/".$ipath.$path[$x] : "../core/admin/images/".$ipath.$path[$x];
-		$headers = apache_request_headers();
+		
+		if (function_exists("apache_request_headers")) {
+			$headers = apache_request_headers();
+			$ims = $headers["If-Modified-Since"];
+		} else {
+			$ims = $_SERVER["HTTP_IF_MODIFIED_SINCE"];
+		}
+		
 		$last_modified = filemtime($ifile);
-		if ($headers["If-Modified-Since"] && strtotime($headers["If-Modified-Since"]) == $last_modified) {
+		if ($ims && strtotime($ims) == $last_modified) {
 			header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_modified).' GMT', true, 304);
 			die();
 		}
@@ -48,9 +55,16 @@
 		}
 		
 		$ifile = (file_exists("../custom/admin/css/".$ipath.$path[$x])) ? "../custom/admin/css/".$ipath.$path[$x] : "../core/admin/css/".$ipath.$path[$x];
-		$headers = apache_request_headers();
+		
+		if (function_exists("apache_request_headers")) {
+			$headers = apache_request_headers();
+			$ims = $headers["If-Modified-Since"];
+		} else {
+			$ims = $_SERVER["HTTP_IF_MODIFIED_SINCE"];
+		}
+		
 		$last_modified = filemtime($ifile);
-		if ($headers["If-Modified-Since"] && strtotime($headers["If-Modified-Since"]) == $last_modified) {
+		if ($ims && strtotime($ims) == $last_modified) {
 			header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_modified).' GMT', true, 304);
 			die();
 		}
@@ -82,9 +96,15 @@
 			die();
 		}
 		
-		$headers = apache_request_headers();
+		if (function_exists("apache_request_headers")) {
+			$headers = apache_request_headers();
+			$ims = $headers["If-Modified-Since"];
+		} else {
+			$ims = $_SERVER["HTTP_IF_MODIFIED_SINCE"];
+		}
+		
 		$last_modified = filemtime($ifile);
-		if ($headers["If-Modified-Since"] && strtotime($headers["If-Modified-Since"]) == $last_modified) {
+		if ($ims && strtotime($ims) == $last_modified) {
 			header("Last-Modified: ".gmdate("D, d M Y H:i:s", $last_modified).' GMT', true, 304);
 			die();
 		}
