@@ -306,7 +306,9 @@
 			
 			self::cacheNewItem($id,$table);
 			
-			$admin->track($table,$id,"created");
+			if ($admin) {
+				$admin->track($table,$id,"created");
+			}
 
 			return $id;
 		}
@@ -344,7 +346,9 @@
 
 			self::cacheNewItem($id,$table,true);
 			
-			$admin->track($table,"p$id","created-pending");
+			if ($admin) {
+				$admin->track($table,"p$id","created-pending");
+			}
 			
 			return $id;
 		}
@@ -365,7 +369,10 @@
 			sqlquery("DELETE FROM $table WHERE id = '$id'");
 			sqlquery("DELETE FROM bigtree_pending_changes WHERE `table` = '$table' AND item_id = '$id'");
 			self::uncacheItem($id,$table);
-			$admin->track($table,$id,"deleted");
+			
+			if ($admin) {
+				$admin->track($table,$id,"deleted");
+			}
 		}
 		
 		/*
@@ -383,7 +390,10 @@
 			$id = mysql_real_escape_string($id);
 			sqlquery("DELETE FROM bigtree_pending_changes WHERE `table` = '$table' AND id = '$id'");
 			self::uncacheItem("p$id",$table);
-			$admin->track($table,"p$id","deleted-pending");
+
+			if ($admin) {
+				$admin->track($table,"p$id","deleted-pending");
+			}
 		}
 		
 		/*
@@ -1109,12 +1119,19 @@
 				$comments = mysql_real_escape_string(json_encode($comments));
 				sqlquery("UPDATE bigtree_pending_changes SET comments = '$comments', changes = '$changes', mtm_changes = '$many_data', tags_changes = '$tags_data', date = NOW(), user = '".$admin->ID."', type = 'EDIT' WHERE id = '".$existing["id"]."'");
 				self::recacheItem($id,$table);
-				$admin->track($table,$id,"updated-draft");
+				
+				if ($admin) {
+					$admin->track($table,$id,"updated-draft");
+				}
+				
 				return $existing["id"];
 			} else {
 				sqlquery("INSERT INTO bigtree_pending_changes (`user`,`date`,`table`,`item_id`,`changes`,`mtm_changes`,`tags_changes`,`module`,`type`) VALUES ('".$admin->ID."',NOW(),'$table','$id','$changes','$many_data','$tags_data','$module','EDIT')");
 				self::recacheItem($id,$table);
-				$admin->track($table,$id,"saved-draft");
+				
+				if ($admin) {
+					$admin->track($table,$id,"saved-draft");
+				}
 				return sqlid();
 			}
 		}
@@ -1197,7 +1214,9 @@
 				self::recacheItem($id,$table);
 			}
 			
-			$admin->track($table,$id,"updated");
+			if ($admin) {
+				$admin->track($table,$id,"updated");
+			}
 		}
 
 	}

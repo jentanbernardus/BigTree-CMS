@@ -67,6 +67,7 @@
 		"BigTreeUploadService" => "inc/bigtree/upload-service.php",
 		"BigTreeAdmin" => "inc/bigtree/admin.php",
 		"BigTreeGoogleAnalytics" => "inc/bigtree/google-analytics.php",
+		"BigTreeAutoModule" => "inc/bigtree/auto-modules.php",
 		"S3" => "inc/utils/amazon-s3.php",
 		"CF_Authentication" => "inc/utils/rackspace-cloud.php"
 	);

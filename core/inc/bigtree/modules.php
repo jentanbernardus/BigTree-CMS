@@ -57,7 +57,10 @@
 			$query .= implode(",",$vparts).")";
 			sqlquery($query);
 			
-			return sqlid();
+			$id = sqlid();
+			BigTreeAutoModule::cacheNewItem($id,$this->Table);
+			
+			return $id;
 		}
 		
 		/*
@@ -76,6 +79,7 @@
 				$item = $item["id"];
 			}
 			$this->update($item,"approved","on");
+			BigTreeAutoModule::recacheItem($item,$this->Table);
 		}
 		
 		/*
@@ -94,6 +98,7 @@
 				$item = $item["id"];
 			}
 			$this->update($item,"archived","on");
+			BigTreeAutoModule::recacheItem($item,$this->Table);
 		}
 		
 		/*
@@ -112,6 +117,8 @@
 		function delete($id) {
 			$id = mysql_real_escape_string($id);
 			sqlquery("DELETE FROM `".$this->Table."` WHERE id = '$id'");
+			sqlquery("DELETE FROM bigtree_pending_changes WHERE `table` = '".$this->Table."' AND item_id = '$id'");
+			BigTreeAutoModule::uncacheItem($id,$this->Table);
 		}
 		
 		/*
@@ -130,6 +137,7 @@
 				$item = $item["id"];
 			}
 			$this->update($item,"featured","on");
+			BigTreeAutoModule::recacheItem($item,$this->Table);
 		}
 		
 		/*
@@ -580,6 +588,7 @@
 			
 			$keys = array_keys($item);
 			$this->update($id,$keys,$item);
+			BigTreeAutoModule::recacheItem($id,$this->Table);
 		}
 		
 		/*
@@ -619,6 +628,7 @@
 				$item = $item["id"];
 			}
 			$this->update($item,"position",$position);
+			BigTreeAutoModule::recacheItem($item,$this->Table);
 		}
 		
 		/*
@@ -637,6 +647,7 @@
 				$item = $item["id"];
 			}
 			$this->update($item,"approved","");
+			BigTreeAutoModule::recacheItem($item,$this->Table);
 		}	
 		
 		/*
@@ -655,6 +666,7 @@
 				$item = $item["id"];
 			}
 			$this->update($item,"archived","");
+			BigTreeAutoModule::recacheItem($item,$this->Table);
 		}
 		
 		/*
@@ -673,6 +685,7 @@
 				$item = $item["id"];
 			}
 			$this->update($item,"featured","");
+			BigTreeAutoModule::recacheItem($item,$this->Table);
 		}
 		
 		/*
@@ -707,6 +720,7 @@
 			}
 			
 			sqlquery($query);
+			BigTreeAutoModule::recacheItem($id,$this->Table);
 		}
 	}
 ?>
