@@ -1206,7 +1206,7 @@ var BigTreeFileManager = {
 				return false;
 			} else {
 				this.fieldName.value = $("#file_browser_selected_file").val();
-				this.closeFileBrowser();
+				return this.closeFileBrowser();
 			}
 		} else {
 			if (this.type == "image") {
@@ -1221,7 +1221,7 @@ var BigTreeFileManager = {
 			} else if (this.type == "photo-gallery") {
 				this.callback($("#file_browser_selected_file").val(),$("#file_browser_detail_title_input").val(),$(".file_browser_images .selected img").attr("src"));
 			}
-			this.closeFileBrowser();
+			return this.closeFileBrowser();
 		}
 	},
 	
