@@ -719,6 +719,8 @@
 						$sort = "column$x";
 					}
 				}
+			} else {
+				$sort = "CONVERT(id,UNSIGNED)";
 			}
 			
 			if ($page === "all") {
