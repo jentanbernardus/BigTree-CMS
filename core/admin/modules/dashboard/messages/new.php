@@ -32,7 +32,7 @@
 						?>
 						<li>
 							<input type="hidden" name="send_to[<?=$x?>]" value="<?=htmlspecialchars($id)?>" />
-							<p><?=htmlspecialchars($users[$id])?></p>
+							<p><?=htmlspecialchars($users[$id]["name"])?></p>
 							<a href="#" class="icon_delete"></a>
 						</li>
 						<?

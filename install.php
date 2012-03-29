@@ -80,9 +80,9 @@ RewriteRule ^(.*)$ rewrite.php?link=$1 [QSA,L]');
 		$error = "Please make the current working directory writable.";
 	} elseif (count($_POST)) {
 		if ($write_host && $write_user && $write_password) {
-			$con = mysql_connect($write_host,$write_user,$write_password,$db);
+			$con = @mysql_connect($write_host,$write_user,$write_password,$db);
 		} else {
-			$con = mysql_connect($host,$user,$password);
+			$con = @mysql_connect($host,$user,$password);
 		}
 		if (!$con) {
 			$error = "Could not connect to database.";

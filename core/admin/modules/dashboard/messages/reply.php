@@ -47,7 +47,7 @@
 						?>
 						<li>
 							<input type="hidden" name="send_to[<?=$x?>]" value="<?=htmlspecialchars($id)?>" />
-							<p><?=htmlspecialchars($users[$id])?></p>
+							<p><?=htmlspecialchars($users[$id]["name"])?></p>
 							<a href="#" class="icon_delete"></a>
 						</li>
 						<?
@@ -59,10 +59,10 @@
 					<footer>
 						<select>
 							<?
-								foreach ($users as $id => $name) {
+								foreach ($users as $id => $u) {
 									if ($item["id"] != $admin->ID) {
 							?>
-							<option value="<?=$id?>"><?=htmlspecialchars($name)?></option>
+							<option value="<?=$id?>"><?=htmlspecialchars($u["name"])?></option>
 							<?
 									}
 								}
