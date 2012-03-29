@@ -31,11 +31,6 @@
 			</fieldset>
 			<? } ?>
 			
-			<fieldset>
-				<label>Preview URL <small>(optional, i.e. http://www.website.com/news/preview/ &mdash; the item's id will be entered as the final route)</small></label>
-				<input type="text" name="preview_url" value="<?=$preview_url?>" />
-			</fieldset>
-			
 			<div class="left">
 				<fieldset>
 					<label class="required">Item Title <small>(for example, "Questions" to make the title "Viewing Questions")</small></label>
@@ -73,6 +68,11 @@
 					<label class="for_checkbox">Don't Cache View Data <small>(removes parsers, pending changes)</small></label>
 				</fieldset>
 			</div>
+			
+			<fieldset>
+				<label>Preview URL <small>(optional, i.e. http://www.website.com/news/preview/ &mdash; the item's id will be entered as the final route)</small></label>
+				<input type="text" name="preview_url" value="<?=$preview_url?>" />
+			</fieldset>
 		</section>
 		<section class="sub" id="field_area">
 			<? if (!$table) { ?>
