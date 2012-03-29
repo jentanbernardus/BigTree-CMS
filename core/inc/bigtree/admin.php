@@ -3249,7 +3249,7 @@
 					$ok = true;
 				// Check permissions on a page if it's a page.
 				} elseif ($f["table"] == "bigtree_pages") {
-					$r = $this->getPageAccessLevelByUser($id);
+					$r = $this->getPageAccessLevel($id);
 					// If we're a publisher, this is ours!
 					if ($r == "p") {
 						$ok = true;
@@ -4076,6 +4076,24 @@
 				return str_replace(array($GLOBALS["www_root"],$GLOBALS["resource_root"]),"{wwwroot}",$url);
 			}
 			return "ipl://".$navid."//".base64_encode(json_encode($commands));
+		}
+		
+		/*
+			Function: markMessageRead
+				Marks a message as read by the currently logged in user.
+			
+			Parameters:
+				id - The message id.
+		*/
+		
+		function markMessageRead($id) {
+			$message = $this->getMessage($id);
+			if (!$message) {
+				return false;
+			}
+			$read_by = str_replace("|".$this->ID."|","",$message["read_by"])."|".$this->ID."|";
+			sqlquery("UPDATE bigtree_messages SET read_by = '".mysql_real_escape_string($read_by)."' WHERE id = '".$message["id"]."'");
+			return true;
 		}
 		
 		/*
