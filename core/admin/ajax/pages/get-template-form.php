@@ -33,38 +33,42 @@
 <p class="error_message" style="display: none;">Errors found! Please fix the highlighted fields before submitting.</p>
 <?
 	$tabindex = 1;
-	foreach ($tdata["resources"] as $options) {
-		$key = $options["id"];
-		$type = $options["type"];
-		$title = $options["title"];
-		$subtitle = $options["subtitle"];
-		$value = $resources[$key];
-		$options["directory"] = "files/pages/";
-		$currently_key = "resources[currently_$key]";
-		$key = "resources[$key]";
-		
-		// Setup Validation Classes
-		$label_validation_class = "";
-		$input_validation_class = "";
-		if ($options["validation"]) {
-			if (strpos($options["validation"],"required") !== false) {
-				$label_validation_class = ' class="required"';
+	if (is_array($tdata["resources"]) && count($tdata["resources"])) {
+		foreach ($tdata["resources"] as $options) {
+			$key = $options["id"];
+			$type = $options["type"];
+			$title = $options["title"];
+			$subtitle = $options["subtitle"];
+			$value = $resources[$key];
+			$options["directory"] = "files/pages/";
+			$currently_key = "resources[currently_$key]";
+			$key = "resources[$key]";
+			
+			// Setup Validation Classes
+			$label_validation_class = "";
+			$input_validation_class = "";
+			if ($options["validation"]) {
+				if (strpos($options["validation"],"required") !== false) {
+					$label_validation_class = ' class="required"';
+				}
+				$input_validation_class = ' class="'.$options["validation"].'"';
 			}
-			$input_validation_class = ' class="'.$options["validation"].'"';
-		}
+			
+			if ($options["wrapper"]) {
+				echo $options["wrapper"];
+			}
+			
+			include BigTree::path("admin/form-field-types/draw/$type.php");
+			
+			if ($options["wrapper"]) {
+				$parts = explode(" ",$options["wrapper"]);
+				echo "</".substr($parts[0],1).">";
+			}
 		
-		if ($options["wrapper"]) {
-			echo $options["wrapper"];
+			$tabindex++;
 		}
-		
-		include BigTree::path("admin/form-field-types/draw/$type.php");
-		
-		if ($options["wrapper"]) {
-			$parts = explode(" ",$options["wrapper"]);
-			echo "</".substr($parts[0],1).">";
-		}
-
-		$tabindex++;
+	} else {
+		echo '<p>There are no resources for your selected template.</p>';
 	}
 
 	$mce_width = 898;

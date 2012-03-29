@@ -268,8 +268,8 @@
 		// Redirect lower if the template is !
 		if ($page["template"] == "!") {
 			$nav = $cms->getNavByParent($page["id"],1);
-			$first = $nav[0];
-			header("Location: ".$cms->getLink($first["id"]));
+			$first = current($nav);
+			header("Location: ".$first["link"]);
 			die();
 		}
 		

@@ -5436,12 +5436,13 @@
 			    if ($resource["id"]) {
 			    	$options = json_decode($resource["options"],true);
 			    	foreach ($options as $key => $val) {
-			    		if ($key != "name" && $key != "id" && $key != "type")
+			    		if ($key != "title" && $key != "id" && $key != "subtitle" && $key != "type") {
 			    			$resource[$key] = $val;
+			    		}
 			    	}
 			    	
 			    	$resource["id"] = htmlspecialchars($resource["id"]);
-			    	$resource["name"] = htmlspecialchars($resource["name"]);
+			    	$resource["title"] = htmlspecialchars($resource["title"]);
 			    	$resource["subtitle"] = htmlspecialchars($resource["subtitle"]);
 			    	unset($resource["options"]);
 			    	$clean_resources[] = $resource;
