@@ -34,6 +34,9 @@
 		$visits = $ga_cache["two_week"];
 		$min = min((is_array($visits)) ? $visits : array($visits));
 		$max = max((is_array($visits)) ? $visits : array($visits)) - $min;
+		if ($max == 0) {
+			$max = 1;
+		}
 		$bar_height = 70;
 ?>
 <div class="table">
