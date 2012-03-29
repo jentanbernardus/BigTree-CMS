@@ -127,7 +127,13 @@
 				</section>
 				<section class="developer_resource_action">
 					<a href="#" class="icon_edit" name="<?=$x?>"></a>
-					<input type="hidden" name="resources[<?=$x?>][options]" value="<?=htmlspecialchars(json_encode($resource))?>" id="options_<?=$x?>" />
+					<?
+						$options = $resource;
+						unset($options["id"]);
+						unset($options["title"]);
+						unset($options["subtitle"]);
+					?>
+					<input type="hidden" name="resources[<?=$x?>][options]" value="<?=htmlspecialchars(json_encode($options))?>" id="options_<?=$x?>" />
 				</section>
 				<section class="developer_resource_action">
 					<a href="#" class="icon_delete"></a>
