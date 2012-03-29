@@ -139,7 +139,9 @@
 			// Run pop lists
 			foreach ($poplists as $key => $pop) {
 				$f = sqlfetch(sqlquery("SELECT `".$pop["description"]."` FROM `".$pop["table"]."` WHERE id = '".$item[$key]."'"));
-				$item[$key] = end($f);
+				if (is_array($f)) {
+					$item[$key] = current($f);
+				}
 			}
 			
 			$cache = true;
