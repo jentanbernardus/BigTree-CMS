@@ -1883,7 +1883,7 @@
 		*/
 
 		function getBasicTemplates() {
-			$q = sqlquery("SELECT * FROM bigtree_templates WHERE level <= '".$this->Level."' ORDER BY position desc");
+			$q = sqlquery("SELECT * FROM bigtree_templates WHERE level <= '".$this->Level."' ORDER BY position DESC, id ASC");
 			$items = array();
 			while ($f = sqlfetch($q)) {
 				if (!$f["routed"]) {
@@ -3562,7 +3562,7 @@
 		*/
 
 		function getRoutedTemplates() {
-			$q = sqlquery("SELECT * FROM bigtree_templates WHERE level <= '".$this->Level."' ORDER BY position desc");
+			$q = sqlquery("SELECT * FROM bigtree_templates WHERE level <= '".$this->Level."' ORDER BY position DESC, id ASC");
 			$items = array();
 			while ($f = sqlfetch($q)) {
 				if ($f["routed"]) {
